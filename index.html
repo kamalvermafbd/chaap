@@ -509,6 +509,7 @@ style="
         <!-- PROFILE PAGE -->
      <div id="profilePage" style="display:none;">
   <h2>My Profile</h2>
+  
 <div id="profileLoading" style="display:none; color:red;">Loading...</div>
 <input id="pName" placeholder="Full Name" readonly><br>
 <input id="pMobile" placeholder="Mobile" disabled><br>
@@ -1804,28 +1805,24 @@ function updateForgotOverlay(msg) {
   document.getElementById("fpOverlay").textContent = msg;
 }
 function showPage(pageId) {
+  // Always hide both wrappers first
+  document.getElementById("menuWrapper").style.display = "none";
+  document.getElementById("pageWrapper").style.display = "none";
 
-  // Hide ALL pages first (important)
+  // Hide all inner pages
   document.getElementById("profilePage").style.display = "none";
   document.getElementById("ordersPage").style.display = "none";
   document.getElementById("offersPage").style.display = "none";
 
+  // Show requested
   if (pageId === "menuPage") {
-
-    // Show ONLY menu page
     document.getElementById("menuWrapper").style.display = "block";
-    document.getElementById("pageWrapper").style.display = "none";
-
   } else {
-
-    // Show pages section
-    document.getElementById("menuWrapper").style.display = "none";
     document.getElementById("pageWrapper").style.display = "block";
-
-    // Show selected page ONLY
     document.getElementById(pageId).style.display = "block";
   }
 }
+
 
 
 function activateMenu(element) {
@@ -2121,6 +2118,7 @@ function apiPost(api, data = {}) {
 </script>
 </body>
 </html>
+
 
 
 
