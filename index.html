@@ -407,7 +407,8 @@ style="
        
      ">
   <ul id="premiumMenu">
-  <li onclick="activateMenu(this); showPage('menuPage')">
+  <li onclick="openMenuPageProperly(this)">
+
   <span class="nav-icon">
   <svg viewBox="0 0 24 24" width="32" height="32">
     <path d="M6 7V6a6 6 0 0 1 12 0v1h2a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h2Zm2 0h8V6a4 4 0 0 0-8 0v1Z" 
@@ -546,51 +547,15 @@ style="
         style="display:block; margin-top:15px;">
   Checkout
 </button>
-
-
   </div>
         </div>
-
     </div>
 
     <!--  OTHER PAGES WRAPPER (default hidden) -->
     <div id="pageWrapper" style="display:none; padding:10px;">
 
         <!-- PROFILE PAGE -->
-     <div id="profilePage" style="display:none;">
-  <h2>My Profile</h2>
-  
-<div id="profileLoading" style="display:none; color:red;">Loading...</div>
-<input id="pName" placeholder="Full Name" readonly><br>
-<input id="pMobile" placeholder="Mobile" disabled><br>
-<input id="pEmail" placeholder="Email" readonly><br>
-<input id="pAddress" placeholder="Address" readonly><br>
 
-<input id="ppin" placeholder="Pincode" readonly><br>
-<input id="pCity" placeholder="City" readonly><br>
-<input id="pState" placeholder="State" readonly><br>
-
-  
-   <!-- Buttons -->
-  <button id="editBtn" onclick="enableProfileEdit()">Edit</button>
-  <button id="saveBtn" onclick="saveProfile()" style="display:none;">Save Changes</button>
-  <button id="cancelBtn" onclick="cancelProfileEdit()" style="display:none;">Cancel</button>
-  
-
-<div id="profileOverlay"
-     style="
-       position:fixed;
-       inset:0;
-       background:rgba(0,0,0,0.45);
-       z-index:9999;
-       color:white;
-       font-size:22px;
-       align-items:center;
-       justify-content:center;
-     ">
-  Saving your profile…
-</div>
-</div>
       <!-- ORDERS PAGE -->
 <div id="ordersPage" style="display:none;">
   <h2>My Orders</h2>
@@ -2179,6 +2144,18 @@ localStorage.setItem("userEmail", res.email || "");   //
       alert("Login error: " + err.message);
     });
 }
+  function openMenuPageProperly(el) {
+  // Remove active from all menu items
+  document.querySelectorAll("#premiumMenu li")
+    .forEach(li => li.classList.remove("active"));
+
+  // Highlight Continue Shopping
+  el.classList.add("active");
+
+  // Show only Menu page
+  showPage("menuPage");
+}
+
 </script>
 <script>
 function hideAllPages() {
@@ -2197,5 +2174,8 @@ function apiPost(api, data = {}) {
   }).then(res => res.json());
 }
 </script>
-</body>
+
+    
+    </body>
 </html>
+
