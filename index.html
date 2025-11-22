@@ -1804,27 +1804,28 @@ function updateForgotOverlay(msg) {
 }
 function showPage(pageId) {
 
+  // Hide ALL pages first (important)
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("ordersPage").style.display = "none";
+  document.getElementById("offersPage").style.display = "none";
+
   if (pageId === "menuPage") {
-    
-    // Show the menu screen
+
+    // Show ONLY menu page
     document.getElementById("menuWrapper").style.display = "block";
     document.getElementById("pageWrapper").style.display = "none";
 
   } else {
 
-    // Hide menu completely
+    // Show pages section
     document.getElementById("menuWrapper").style.display = "none";
     document.getElementById("pageWrapper").style.display = "block";
 
-    // Hide all pages first
-    document.getElementById("profilePage").style.display = "none";
-    document.getElementById("ordersPage").style.display = "none";
-    document.getElementById("offersPage").style.display = "none";
-
-    // Show selected page
+    // Show selected page ONLY
     document.getElementById(pageId).style.display = "block";
   }
 }
+
 
 function activateMenu(element) {
   document.querySelectorAll("#premiumMenu li").forEach(li => li.classList.remove("active"));
@@ -2118,4 +2119,5 @@ function apiPost(api, data = {}) {
 </script>
 </body>
 </html>
+
 
