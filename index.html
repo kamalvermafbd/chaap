@@ -1,0 +1,2120 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Chaap Express PWA</title>
+
+  <!-- Real Manifest File -->
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="icon" sizes="192x192" href="/icons/icon-192.png">
+  <link rel="icon" sizes="512x512" href="/icons/icon-512.png">
+
+  <meta name="theme-color" content="#ff6f00" />
+  <style>
+    /* Fade-in effect for menu items */
+.fadeIn {
+  animation: fadeIn 0.6s ease forwards;
+  opacity: 0;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Slide-in animation for category titles */
+.slideIn {
+  animation: slideIn 0.7s ease forwards;
+  opacity: 0;
+}
+@keyframes slideIn {
+  from { transform: translateX(-30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Ripple animation for buttons */
+button {
+  position: relative;
+  overflow: hidden;
+}
+button::after {
+  content: "";
+  position: absolute;
+  background: rgba(255,255,255,0.4);
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+}
+button:active::after {
+  width: 200px;
+  height: 200px;
+  top: 50%;
+  left: 50%;
+  opacity: 1;
+  transition: 0.4s ease;
+}
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: #fffdf7;
+      color: #333;
+    }
+    header {
+      text-align: center;
+      background: #ff6347;
+      color: white;
+      padding: 20px;
+    }
+    .menu-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      padding: 20px;
+    }
+    .menu-item {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 10px;
+      text-align: center;
+    }
+    .menu-item img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .cart {
+      padding: 20px;
+      background: #fff8f0;
+      border-top: 2px solid #ff6347;
+    }
+    cart-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      margin: 2px 0;
+      border-bottom: 1px solid #eee;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border-bottom: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th:nth-child(2), td:nth-child(2) {
+      width: 60px;
+    }
+    button {
+      background: #ff6347;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover { background: #e7533d; }
+    checkout-btn {
+      width: auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    #checkoutForm button[type="button"] {
+      margin-top: 25px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+    }
+    input, textarea, select {
+      width: 100%;
+      margin: 6px 0;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    #address, #orderType, #customerName, #email {
+      display: none;
+    }
+#menu p {
+  color: #000;
+  font-weight: 600;
+}
+body {
+  background: linear-gradient(135deg, #fff9f2, #ffe6d5);
+  background-attachment: fixed;
+}
+
+/* Profile Page Input Styling */
+#profilePage input {
+  width: 280px !important;       /* Fixed compact width */
+  max-width: 90% !important;     /* Responsive */
+  font-size: 14px !important;    /* Smaller text */
+  height: 32px !important;       /* Compact height */
+  padding: 4px 10px !important;  /* Balanced padding */
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+#profilePage input[readonly] {
+  background: #f5f5f5;
+  color: #555;
+}
+
+#editBtn, #saveBtn, #cancelBtn {
+  font-size: 14px !important;
+  padding: 6px 12px !important;
+}
+
+/* PREMIUM LEFT SIDEBAR */
+#leftNav {
+  position: fixed;
+  left: 0;
+  width: 220px;
+  top: 180px;    /* header ?? ???? */
+  bottom: 0;
+  background: #2A0A4A;  /* elegant royal blue */
+  color: white;
+  padding: 20px 15px;
+  border-right: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 2px 0 12px rgba(0,0,0,0.12);
+  border-top-right-radius: 12px;
+   transform: translateX(-100%);
+  transition: transform 0.3s ease;
+
+}
+
+/* Menu UL */
+#leftNav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Items */
+#leftNav li {
+  padding: 12px 10px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  color: white;
+  font-size: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: 0.2s;  
+}
+
+/* Hover effect */
+#leftNav li:hover {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(4px);
+}
+
+/* Active menu */
+#leftNav li.active {
+  background: white;
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+/* Premium badge for numbers */
+.nav-badge {
+  background: white;
+  color: #1e3a8a;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+/* Premium Navigation Icons */
+.nav-icon {
+  font-size: 22px;       /* Bigger size */
+  color: #ffd166;        /* Soft gold/yellow – looks premium on blue */
+  font-weight: bold;
+}
+#profileOverlay { 
+   display: none; 
+   position: fixed; 
+   inset: 0;
+   background: rgba(0,0,0,0.45);
+   z-index: 9999;
+   color: white;
+   font-size: 22px;
+   align-items: center;
+   justify-content: center;
+}
+#profileOverlay.active {
+   display: flex;
+}
+
+/* soft noise overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+  opacity: 0.15;
+  pointer-events: none;
+}
+/* Sidebar hidden by default (slide-left) */
+
+/* When sidebar is active */
+#leftNav.active {
+  transform: translateX(0);
+}
+
+
+    
+  </style>
+</head>
+<body>
+
+  <button onclick="openLogin()" 
+        style="position:absolute; right:100px; top:60px; z-index:9999;
+               background:#444;color:white;padding:8px 14px;border:none;
+               border-radius:6px;cursor:pointer;">
+  Login
+</button>
+<button id="logoutBtn"
+        onclick="logoutUser()" 
+        style="position:absolute; right:58px; top:60px; z-index:9999;
+               background:#444;color:white;padding:8px 14px;border:none;
+               border-radius:6px;cursor:pointer; display:none;">
+  Logout
+</button>
+
+<button onclick="openSignup()" 
+        style="position:absolute; right:12px; top:60px; z-index:9999;
+               background:#444;color:white;padding:8px 14px;border:none;
+               border-radius:6px;cursor:pointer;">
+  Signup
+</button>
+<div  id="signupLabelBox" 
+style="
+  position:absolute;
+  right:12px;
+  top:100px;
+  width:180px;
+  text-align:right;
+  font-size:13px;
+  color:#FFFFFF; 
+  font-weight:500;
+  font-family:Poppins, sans-serif;
+  line-height:16px;
+">
+  
+  <span style="color:#FFFFFF; font-weight:600; text-decoration:none; cursor:pointer;"
+        onclick="openSignup()">
+  Are you not registered? <br> Just Sign Up
+  </span>
+</div>
+
+ <!-- HAMBURGER BUTTON (appears only after login) -->
+<button id="hamburgerBtn"
+        onclick="toggleSidebar()"
+        style="position:fixed; top:15px; left:15px; font-size:26px;
+               background:#7A0010; color:#FFD166; border:none;
+               padding:8px 12px; border-radius:8px; cursor:pointer;
+               box-shadow:0 2px 6px rgba(0,0,0,0.2); z-index:9999; display:none;">
+  <svg id="hamburgerIcon" viewBox="0 0 24 24" width="24" height="24" fill="#FFD166">
+    <rect y="4" width="24" height="3"></rect>
+    <rect y="10" width="24" height="3"></rect>
+    <rect y="16" width="24" height="3"></rect>
+  </svg>
+</button>
+
+<button id="installBtn" 
+        style="
+          display:none;
+          position:fixed;
+          bottom:20px;
+          right:20px;
+          background:#ff6347;
+          color:white;
+          padding:10px 16px;
+          border-radius:8px;
+          font-size:16px;
+          border:none;
+          box-shadow:0 4px 10px rgba(0,0,0,0.2);
+          z-index:99999;
+        ">
+  Install App
+</button>
+
+  <header>
+    <div id="restaurantInfo">
+      <h1 id="restaurantName">Loading...</h1>
+      <p id="restaurantAddress"></p>
+    </div>
+    <p>Delicious meals delivered fast!</p>
+  </header>
+
+<!-- LEFT NAVIGATION PANEL -->
+<!-- LEFT NAVIGATION PANEL -->
+<div id="leftNav"
+     style="
+       position:fixed;
+       left:0;
+       top:90px;
+       bottom:0;
+       width:180px;
+       background:#1976d2;
+       color:white;
+       border-right:1px solid #e6e6e6;
+       box-shadow: 2px 0 4px rgba(0,0,0,0.06); /* soft professional shadow */
+       padding:20px;
+       z-index:999;
+       overflow-y:auto;
+       display:block; /* default hidden */
+       
+     ">
+  <ul id="premiumMenu">
+  <li onclick="activateMenu(this); showPage('menuPage')">
+  <span class="nav-icon">
+  <svg viewBox="0 0 24 24" width="32" height="32">
+    <path d="M6 7V6a6 6 0 0 1 12 0v1h2a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h2Zm2 0h8V6a4 4 0 0 0-8 0v1Z" 
+          fill="#FFD166"></path>
+  </svg>
+</span>
+
+  Continue Shopping
+</li>
+
+      <li onclick="activateMenu(this); showPage('profilePage'); loadUserProfile();">
+    <span class="nav-badge">1</span>
+    My Profile
+  </li>
+
+  <li onclick="activateMenu(this); showPage('ordersPage')">
+    <span class="nav-badge">2</span>
+    My Orders
+  </li>
+
+  <li onclick="activateMenu(this); showPage('offersPage')">
+    <span class="nav-badge">3</span>
+    Offers
+  </li>
+
+</ul>
+
+</div>
+
+<!-- RIGHT SIDE MAIN CONTENT -->
+<!-- MAIN CONTENT AREA -->
+<div id="mainContent" 
+     style="margin-left:0px; padding:20px; transition:0.2s ease;">
+
+    <!--  MENU WRAPPER (default visible) -->
+    <div id="menuWrapper">
+
+        <!-- FILTER AREA -->
+        <div id="filterWrapper" style="text-align:center; margin-bottom:15px;">
+ <!-- Category Filter -->
+        <select id="categoryFilter" onchange="filterMenu()"
+            style="width:45%;max-width:200px;padding:10px;font-size:16px;
+                   border-radius:6px;border:1px solid #ccc;background:white;">
+            <option value="">All Categories</option>
+        </select>
+
+        <!-- Search -->
+        <input type="text" id="menuSearch"
+               placeholder="Search food item..."
+               oninput="filterMenu()"
+               style="width:45%;max-width:200px;padding:10px;font-size:16px;
+                      border-radius:6px;border:1px solid #ccc;margin-left:10px;">
+
+        <!-- Clear -->
+        <button onclick="clearFilters()"
+            style="padding:10px 15px;margin-left:10px;background:#777;color:white;
+                   border:none;border-radius:6px;cursor:pointer;">
+            Clear
+        </button>
+
+
+
+            <!-- Your existing category filter + search + clear button will be here -->
+        </div>
+
+        
+
+        <!-- MENU LIST -->
+        <div id="menu" class="menu-container">
+            <p>Loading menu...</p>
+        </div>
+
+        <!-- CART -->
+        <div id="cartWrapper">
+            <!-- Your current cart HTML goes here -->
+
+             <div class="cart">
+    <h3>Your Cart</h3>
+    <table id="cartTable">
+      <thead>
+        <tr><th>Food</th><th>Qty</th><th>Rate</th><th>Total</th><th>Action</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    Total: &#8377;<span id="cartTotal">0.00</span>
+
+<button onclick="openCheckout()" class="checkout-btn" 
+        style="display:block; margin-top:15px;">
+  Checkout
+</button>
+
+
+  </div>
+        </div>
+
+    </div>
+
+    <!--  OTHER PAGES WRAPPER (default hidden) -->
+    <div id="pageWrapper" style="display:none; padding:10px;">
+
+        <!-- PROFILE PAGE -->
+     <div id="profilePage" style="display:none;">
+  <h2>My Profile</h2>
+
+<div id="profileLoading" style="display:none; color:red;">Loading...</div>
+<input id="pName" placeholder="Full Name" readonly><br>
+<input id="pMobile" placeholder="Mobile" disabled><br>
+<input id="pEmail" placeholder="Email" readonly><br>
+<input id="pAddress" placeholder="Address" readonly><br>
+
+<input id="ppin" placeholder="Pincode" readonly><br>
+<input id="pCity" placeholder="City" readonly><br>
+<input id="pState" placeholder="State" readonly><br>
+
+  
+   <!-- Buttons -->
+  <button id="editBtn" onclick="enableProfileEdit()">Edit</button>
+  <button id="saveBtn" onclick="saveProfile()" style="display:none;">Save Changes</button>
+  <button id="cancelBtn" onclick="cancelProfileEdit()" style="display:none;">Cancel</button>
+  
+
+<div id="profileOverlay"
+     style="
+       position:fixed;
+       inset:0;
+       background:rgba(0,0,0,0.45);
+       z-index:9999;
+       color:white;
+       font-size:22px;
+       align-items:center;
+       justify-content:center;
+     ">
+  Saving your profile…
+</div>
+</div>
+
+        </div>
+
+<div id="profileLoadOverlay"
+     style="
+       display:none;
+       position:fixed;
+       inset:0;
+       background:rgba(0,0,0,0.45);
+       z-index:9999;
+       color:white;
+       font-size:22px;
+       align-items:center;
+       justify-content:center;
+     ">
+  Loading profile…
+</div>
+
+        <!-- ORDERS PAGE -->
+        <div id="ordersPage" style="display:none;">
+            <h2>My Orders</h2>
+            <p>Your past and current orders will show here.</p>
+        </div>
+
+        <!-- OFFERS PAGE -->
+        <div id="offersPage" style="display:none;">
+            <h2>Available Offers</h2>
+            <p>Special offers will be displayed here.</p>
+        </div>
+
+    </div>
+
+</div>
+
+  
+ 
+
+  <div id="checkoutModal" class="modal">
+    <div class="modal-content">
+      <h3>Checkout</h3>
+      <form id="checkoutForm" onsubmit="event.preventDefault(); placeOrder();">
+        <input type="tel" id="mobile" pattern="^[0-9]{10}$" placeholder="Enter 10-digit Mobile" required oninput="checkCustomerByMobile()">
+        <p id="infoMsg" style="color:green;font-size:14px;display:none;margin-top:4px;"></p>
+
+        <select id="orderType" onchange="toggleAddressField()" required>
+          <option value="">Select Order Type</option>
+          <option value="Dine In">Dine In</option>
+          <option value="Take Away">Take Away</option>
+          <option value="Home Delivery">Home Delivery</option>
+        </select>
+
+        <input type="text" id="customerName" placeholder="Name" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <textarea id="address" placeholder="Address"></textarea>
+
+        <select id="paymentMethod" required>
+          <option value="">Select Payment</option>
+          <option value="Cash on Delivery">Cash on Delivery</option>
+          <option value="Online">Online</option>
+        </select>
+
+        <button type="submit" class="checkout-btn">Place Order</button>
+        <button type="button" onclick="closeCheckout()">Cancel</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function levenshtein(a, b) {
+  a = a || ""; b = b || "";
+  const m = a.length, n = b.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
+  const dp = Array.from({length: m+1}, () => new Array(n+1).fill(0));
+  for (let i=0;i<=m;i++) dp[i][0] = i;
+  for (let j=0;j<=n;j++) dp[0][j] = j;
+  for (let i=1;i<=m;i++) {
+    for (let j=1;j<=n;j++) {
+      const cost = a[i-1] === b[j-1] ? 0 : 1;
+      dp[i][j] = Math.min(dp[i-1][j] + 1, dp[i][j-1] + 1, dp[i-1][j-1] + cost);
+    }
+  }
+  return dp[m][n];
+}
+
+// Normalize text for comparison
+function normalizeText(s) {
+  return String(s || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, "")   // remove punctuation
+    .replace(/\s+/g, " ")         // collapse spaces
+    .trim();
+}
+
+// Map several synonyms / common variants to canonical form
+const CANONICAL_MAP = {
+  "starter": "Starters",
+  "starters": "Starters",
+  "startrer": "Starters",
+  "snack": "Snacks",
+  "snacks": "Snacks",
+  "drink": "Drink",
+  "drinks": "Drinks",
+  "mocktail": "Mocktail",
+  "mocktails": "Mocktails",
+  "cocktail": "Cocktail",
+  "cocktails": "Cocktails",
+  "main course": "Main Course",
+  "main": "Main Course",
+  "maincourse": "Main Course",
+  "sweets": "Sweets",
+  "sweet": "Sweet",
+  "dessert": "Dessert",
+  "desserts": "Desserts"
+};
+
+// Return canonical name for a category string using map + fuzzy fallback
+function canonicalCategory(raw, priorityListLower) {
+  const norm = normalizeText(raw);
+  if (!norm) return ""; // blank
+
+  // direct map
+  if (CANONICAL_MAP[norm]) return CANONICAL_MAP[norm];
+
+  // singular/plural quick fix: strip trailing 's'
+  if (norm.endsWith("s") && CANONICAL_MAP[norm.slice(0,-1)]) {
+    return CANONICAL_MAP[norm.slice(0,-1)];
+  }
+
+  // fuzzy match against priority list and canonical map keys
+  let best = {score: Infinity, key: null, target: null};
+
+  // check known canonical keys (map keys)
+  for (const key of Object.keys(CANONICAL_MAP)) {
+    const d = levenshtein(norm, key);
+    if (d < best.score) { best = {score: d, key, target: CANONICAL_MAP[key]}; }
+  }
+
+  // check priority list labels (lowercase versions)
+  for (const label of priorityListLower) {
+    const d = levenshtein(norm, label);
+    if (d < best.score) { best = {score: d, key: label, target: label.split(" ").map(w=>w[0].toUpperCase()+w.slice(1)).join(" ")}; }
+  }
+
+  // if very close (threshold), accept fuzzy match
+  if (best.score <= Math.max(1, Math.floor(Math.min(norm.length, (best.key||"").length) * 0.35))) {
+    // return capitalized target (if target from priorityListLower, it might be lowercase)
+    const t = best.target || best.key;
+    // ensure Title Case
+    return String(t).split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  }
+
+  // fallback: title-case the original normalized string
+  return norm.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+}
+
+// NEW populateCategoryDropdown — shows canonical categories (no duplicates from typos)
+
+function populateCategoryDropdown(items) {
+  const dropdown = document.getElementById("categoryFilter");
+  dropdown.innerHTML = `<option value="">All Categories</option>`;
+
+  // priority list (same as renderMenu)
+  const categoryPriority = [
+    "starters","snacks","drinks","mocktails","cocktails","main course","sweets","desserts"
+  ];
+  const priorityLower = categoryPriority.slice();
+
+  // Build set of canonical categories
+  const canonicalSet = new Set();
+  items.forEach(i => {
+    const can = canonicalCategory(i.category, priorityLower);
+    if (can) canonicalSet.add(can);
+  });
+
+  // Sort canonical list using priority (known ones first in defined order, others alphabetic)
+  const list = Array.from(canonicalSet);
+  list.sort((a,b) => {
+    const A = a.toLowerCase(), B = b.toLowerCase();
+    const ai = priorityLower.indexOf(A);
+    const bi = priorityLower.indexOf(B);
+    if (ai !== -1 && bi !== -1) return ai - bi;
+    if (ai !== -1) return -1;
+    if (bi !== -1) return 1;
+    return A.localeCompare(B);
+  });
+
+  list.forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    dropdown.appendChild(opt);
+  });
+}
+
+    
+
+    let menuItems = [];
+    let cart = [];
+
+    const API_BASE = "https://script.google.com/macros/s/AKfycbzQI9C_VquMe7XiunhDU5AU76auOXuQq5mxlg6MzAS7sLCM2LTHy3W56e1KmMhc-oe06Q/exec";
+
+
+function apiGet(api, params = {}) {
+  const url = new URL(API_BASE);
+  url.searchParams.set("api", api);
+
+  Object.keys(params).forEach(k => 
+    url.searchParams.set(k, params[k])
+  );
+
+  return fetch(url.toString(), {
+    method: "GET",
+    headers: { "Accept": "application/json" }
+  }).then(res => res.json());
+}
+apiGet("getMenu")
+  .then(res => renderMenu(res.menu))
+
+  .catch(err => console.error("Menu load error:", err));
+
+    apiGet("getRestaurantInfo")
+  .then(res => {
+    document.getElementById("restaurantName").innerHTML = "&#127860; " + res.name;
+
+    document.getElementById("restaurantAddress").innerText = res.address;
+  })
+  .catch(err => {
+    console.error("Restaurant info load error:", err);
+  });
+
+
+ function renderMenu(items) {
+  menuItems = items;
+
+  // Auto-fill category dropdown (canonical)
+  populateCategoryDropdown(items);
+
+  const menuDiv = document.getElementById('menu');
+  menuDiv.innerHTML = '';
+
+  // priority brain
+  const categoryPriority = [
+    "starters",
+    "snacks",
+    "drinks",
+    "mocktails",
+    "cocktails",
+    "main course",
+    "sweets",
+    "desserts"
+  ];
+
+  // Build map: original raw category -> canonical
+  const rawToCanonical = {};
+  items.forEach(it => {
+    const raw = (it.category || "").toString();
+    rawToCanonical[raw] = canonicalCategory(raw, categoryPriority);
+  });
+
+  // Extract unique canonical categories (preserve order)
+  let categoryOrder = [...new Set(
+    Object.values(rawToCanonical).filter(c => c && c !== "")
+  )];
+
+  // Sort categoryOrder using priority (canonical lowercases)
+  categoryOrder.sort((a,b) => {
+    const A = a.toLowerCase(), B = b.toLowerCase();
+    const ai = categoryPriority.indexOf(A);
+    const bi = categoryPriority.indexOf(B);
+    if (ai !== -1 && bi !== -1) return ai - bi;
+    if (ai !== -1) return -1;
+    if (bi !== -1) return 1;
+    return A.localeCompare(B);
+  });
+
+//  CHEF SPECIAL SECTION (Top Highlight)
+const chefSpecialItems = items.filter(i => {
+  const val = (i.hotselling || i.Hotselling || "").toString().trim().toUpperCase();
+  return val === "TRUE";
+});
+
+if (chefSpecialItems.length > 0) {
+  const heading = document.createElement("h2");
+  heading.classList.add("slideIn");
+  heading.innerHTML = "Chef Special";
+  heading.style.margin = "10px 0 5px";
+  heading.style.padding = "10px";
+  heading.style.background = "#ff6347";
+  heading.style.color = "white";
+  heading.style.borderRadius = "6px";
+  heading.style.gridColumn = "1 / -1";
+  menuDiv.appendChild(heading);
+
+  chefSpecialItems.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "menu-item fadeIn";
+
+    div.innerHTML = `
+      <img src="${item.image}">
+      <h4>${item.name}</h4>
+      <p>${item.description || ""}</p>
+      <strong>&#8377;${item.price}</strong>
+
+      <button onclick="addToCart('${item.name.replace(/'/g,"\\'")}', ${item.price})">Add to Cart</button>
+    `;
+
+    menuDiv.appendChild(div);
+  });
+}
+
+  // Display grouped by canonical categories
+  categoryOrder.forEach(cat => { 
+    // group items whose canonical category matches this cat
+    const group = items.filter(i => {
+      const can = rawToCanonical[(i.category || "").toString()];
+      return (can || "").toLowerCase() === cat.toLowerCase();
+    });
+
+    if (group.length > 0) {
+      // Category heading
+      const heading = document.createElement("h2");
+      heading.classList.add("slideIn");
+
+      heading.innerHTML = cat;
+      heading.style.margin = "10px 0 5px";
+      heading.style.padding = "10px";
+      heading.style.background = "#ff6347";
+      heading.style.color = "white";
+      heading.style.borderRadius = "6px";
+      heading.style.gridColumn = "1 / -1";
+      menuDiv.appendChild(heading);
+
+      // Add items under this category
+      group.forEach(item => {
+        const div = document.createElement('div');
+       div.className = 'menu-item fadeIn';
+
+        div.innerHTML = `
+          <img src="${item.image}" alt="${item.name}">
+          <h4>${item.name}</h4>
+          <p>${item.description || ""}</p>
+          <strong>&#8377;${item.price}</strong>
+<br>
+          <button onclick="addToCart('${item.name.replace(/'/g,"\\'")}', ${item.price})">Add to Cart</button>
+        `;
+        menuDiv.appendChild(div);
+      });
+    }
+  });
+}
+
+function clearFilters() {
+  document.getElementById("menuSearch").value = "";
+  document.getElementById("categoryFilter").value = "";
+
+  // Reset menu to original grouped view
+  renderMenu(menuItems);
+}
+
+    function addToCart(name, price) {
+      const existing = cart.find(i => i.name === name);
+      if (existing) existing.quantity++;
+      else cart.push({ name, price, quantity: 1 });
+      renderCart();
+    }
+
+    function renderCart() {
+      const tbody = document.querySelector('#cartTable tbody');
+      tbody.innerHTML = '';
+      let total = 0;
+      cart.forEach((item, idx) => {
+        const rowTotal = item.price * item.quantity;
+        total += rowTotal;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.name}</td>
+          <td><input type="number" value="${item.quantity}" min="1" onchange="updateQty(${idx}, this.value)"></td>
+          <td>&#8377;${item.price}</td>
+
+          <td>&#8377;${rowTotal.toFixed(2)}</td>
+
+          <td><button onclick="removeItem(${idx})">Delete</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+      document.getElementById('cartTotal').innerText = total.toFixed(2);
+    }
+
+    function updateQty(index, qty) {
+      cart[index].quantity = parseInt(qty);
+      renderCart();
+    }
+
+    function removeItem(index) {
+      cart.splice(index, 1);
+      renderCart();
+    }
+
+    function openCheckout() {
+      if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+      }
+      document.getElementById('checkoutModal').style.display = 'flex';
+    }
+
+    function closeCheckout() {
+      document.getElementById('checkoutModal').style.display = 'none';
+    }
+
+    
+ function checkCustomerByMobile() {
+  const mobile = document.getElementById('mobile').value.trim();
+
+  // If mobile incomplete ? reset everything
+  if (mobile.length !== 10) {
+
+    // Reset Order Type
+    const orderSelect = document.getElementById('orderType');
+    orderSelect.value = ""; 
+    orderSelect.style.display = "none"; 
+
+    // Hide customer fields
+    document.getElementById('customerName').style.display = "none";
+    document.getElementById('email').style.display = "none";
+    document.getElementById('address').style.display = "none";
+    document.getElementById('paymentMethod').style.display = "none";
+    document.getElementById('infoMsg').style.display = "none";
+
+    return;
+  }
+
+  // When valid mobile ? show Order Type
+  document.getElementById('orderType').style.display = "block";
+}
+
+function toggleAddressField() {
+  const orderType = document.getElementById('orderType').value;
+  if (!orderType) return;
+
+  const mobile = document.getElementById('mobile').value.trim();
+  if (!/^[0-9]{10}$/.test(mobile)) {
+    alert("Enter a valid 10-digit mobile number first.");
+    return;
+  }
+
+  const nameField = document.getElementById('customerName');
+  const emailField = document.getElementById('email');
+  const addressField = document.getElementById('address');
+  const paymentField = document.getElementById('paymentMethod');
+  const infoMsg = document.getElementById('infoMsg');
+  const overlay = document.getElementById('loadingOverlay');
+
+  // Show overlay while lookup is in progress
+  overlay.style.display = "flex";
+
+  // Disable only the Order Type select temporarily
+  document.getElementById('orderType').disabled = true;
+
+  // ?? New fetch API instead of google.script.run
+  apiGet("getCustomerDetailsByMobile", { mobile })
+    .then(data => {
+      // Autofill if data exists
+      nameField.value = data?.name || "";
+      emailField.value = data?.email || "";
+      addressField.value = data?.address || "";
+
+      // Show customer fields
+      nameField.style.display = "block";
+      emailField.style.display = "block";
+
+      // Show address only if Home Delivery
+      if (orderType === "Home Delivery") {
+        addressField.style.display = "block";
+        addressField.required = true;
+      } else {
+        addressField.style.display = "none";
+        addressField.required = false;
+        addressField.value = "";
+      }
+
+      // Make fields editable
+      nameField.readOnly = false;
+      emailField.readOnly = false;
+      addressField.readOnly = false;
+
+      // Show Payment Method field
+      paymentField.style.display = "block";
+
+      // Warning message if found
+      if (data && (data.name || data.email || data.address)) {
+        alert("We have retrieved your previous details. Please review them carefully and update any information if necessary.");
+      } else {
+        infoMsg.style.display = "none";
+      }
+
+      // Hide overlay & enable order select
+      overlay.style.display = "none";
+      document.getElementById('orderType').disabled = false;
+    })
+    .catch(err => {
+      console.error("Customer lookup error:", err);
+
+      overlay.style.display = "none";
+      document.getElementById('orderType').disabled = false;
+
+      alert("Error loading customer details.");
+    });
+}
+    function placeOrder() {
+  const customerName = document.getElementById('customerName').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const mobile = document.getElementById('mobile').value.trim();
+  const orderType = document.getElementById('orderType').value;
+  const address = document.getElementById('address').value.trim();
+  const paymentMethod = document.getElementById('paymentMethod').value;
+
+  if (!/^[0-9]{10}$/.test(mobile)) {
+    alert("Enter a valid 10-digit mobile number");
+    return;
+  }
+  if (orderType === "Home Delivery" && !address) {
+    alert("Please enter delivery address");
+    return;
+  }
+
+  const totalAmount = parseFloat(document.getElementById('cartTotal').innerText);
+
+  const orderData = {
+    customerName,
+    email,
+    mobile,
+    orderType,
+    address,
+    cartItems: cart,
+    totalAmount,
+    paymentMethod
+  };
+
+  // ?? Show overlay & lock UI
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.innerText = "Processing your order... Please wait...";
+  overlay.style.display = "flex";
+
+  document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
+    .forEach(el => el.disabled = true);
+
+  // ?? REPLACEMENT (fetch API instead of google.script.run)
+  apiPost("placeOrder", orderData)
+    .then(res => {
+      if (res.success) {
+        alert(
+          `Order placed successfully!\nYour Order Number: ${res.orderNumber}\n\n${res.message}`
+        );
+        cart = [];
+        renderCart();
+        closeCheckout();
+      } else {
+        alert(res.message || "Order failed.");
+      }
+
+      // Unlock UI
+      overlay.style.display = "none";
+      document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
+        .forEach(el => el.disabled = false);
+    })
+    .catch(err => {
+      console.error("Order error:", err);
+      alert("Error placing order. Please try again.");
+
+      overlay.style.display = "none";
+      document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
+        .forEach(el => el.disabled = false);
+    });
+}
+
+function filterMenu() {
+  const text = document.getElementById("menuSearch").value.toLowerCase();
+  const selected = document.getElementById("categoryFilter").value.toLowerCase();
+
+  // Step 1: canonical category detect recursively
+  let filtered = menuItems.map(i => ({
+    ...i,
+    canonical: canonicalCategory(i.category).toLowerCase()
+  }));
+
+  // Step 2: Apply category filter
+  if (selected !== "") {
+    filtered = filtered.filter(i => i.canonical === selected);
+  }
+
+  // Step 3: Apply text filter
+  if (text.trim() !== "") {
+    filtered = filtered.filter(i =>
+      i.name.toLowerCase().includes(text) ||
+      (i.description && i.description.toLowerCase().includes(text))
+    );
+  }
+
+  // If no filter ? show full grouped menu
+  if (selected === "" && text.trim() === "") {
+    renderMenu(menuItems);
+    return;
+  }
+
+  const menuDiv = document.getElementById("menu");
+  menuDiv.innerHTML = "";
+
+  if (filtered.length === 0) {
+    menuDiv.innerHTML = "<p style='padding:10px;'>No items found.</p>";
+    return;
+  }
+
+  // Step 4: Group filtered results by canonical category
+  const groups = {};
+  filtered.forEach(item => {
+    const cat = item.canonical;
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push(item);
+  });
+
+  // Step 5: Show groups with heading (same UI as renderMenu)
+  Object.keys(groups).forEach(cat => {
+    const heading = document.createElement("h2");
+    heading.classList.add("slideIn");
+
+    heading.innerHTML = cat.replace(/\b\w/g, c => c.toUpperCase());
+    heading.style.margin = "10px 0 5px";
+    heading.style.padding = "10px";
+    heading.style.background = "#ff6347";
+    heading.style.color = "white";
+    heading.style.borderRadius = "6px";
+    heading.style.gridColumn = "1 / -1";
+    menuDiv.appendChild(heading);
+
+    groups[cat].forEach(item => {
+      const div = document.createElement("div");
+      div.className = "menu-item fadeIn";
+
+      div.innerHTML = `
+        <img src="${item.image}">
+        <h4>${item.name}</h4>
+        <p>${item.description || ""}</p>
+        <strong>&#8377;${item.price}</strong><br>
+        <button onclick="addToCart('${item.name}', ${item.price})">Add to Cart</button>
+      `;
+      menuDiv.appendChild(div);
+    });
+  });
+}
+
+  </script>
+<div id="loginProgressOverlay" style="
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.35);
+  z-index:9999;
+  color:white;
+  font-size:22px;
+  align-items:center;
+  justify-content:center;
+">
+  Login in progress…
+</div>
+
+  <div id="loadingOverlay" style="
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 24px;
+  ">
+    Processing your order...
+  </div>
+
+<div id="fpOverlay" style="
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.4);
+  z-index:9999;
+  color:white;
+  font-size:22px;
+  align-items:center;
+  justify-content:center;
+">
+  Sending OTP...
+</div>
+
+<div id="loginModal" class="modal">
+  <div class="modal-content" style="text-align:center;">
+   <h2 style="
+  font-size: 16px; 
+  color: #cc0000; 
+  font-weight: 500; 
+  margin-bottom: 12px;
+  text-transform: none;
+">
+  Please enter your registered mobile number and password
+</h2>
+
+<input type="text" style="display:none" autocomplete="username">
+<input type="password" style="display:none" autocomplete="current-password">
+
+<input 
+  type="tel" 
+  id="loginMobile" 
+  placeholder="Mobile Number" 
+  maxlength="10" 
+  autocomplete="off"
+  autocorrect="off"
+  autocapitalize="off"
+  oninput="validateLoginMobile()"
+  spellcheck="false">
+  <p id="mobileError" style="color:red;font-size:12px;display:none;margin:5px 0 0;"></p>
+<input 
+  type="password" 
+  id="loginPassword" 
+  placeholder="Password"
+  autocomplete="new-password"
+  autocorrect="off"
+  autocapitalize="off"
+  spellcheck="false">
+
+    
+<button onclick="loginUser()">Login</button>
+<button onclick="openForgotPassword()" 
+        style="margin-top:10px;background:#ff6347;
+               color:white;border:none;border-radius:6px;
+               padding:8px 12px;cursor:pointer;">
+  Forgot Password
+</button>
+
+    <button onclick="closeLogin()" 
+            style="margin-top:15px;padding:8px 12px;;color:ff6347;
+                   border:none;border-radius:6px;">
+      Close
+    </button>
+  </div>
+</div>
+
+<div id="userInfoBox" 
+     style="position:absolute; left:250px; top:50px; 
+            background:#ff6347; color:white; padding:8px 12px; 
+            border-radius:6px; display:none; font-size:16px;">
+  Logged in: <span id="loggedEmail"></span><br>
+ 
+</div>
+<!-- FORGOT PASSWORD MODAL -->
+<div id="forgotPasswordModal" class="modal">
+  <div class="modal-content" style="text-align:center;">
+
+    <h2 style="font-size:18px;color:#333;margin-bottom:10px;">
+      Reset Your Password
+    </h2>
+
+    <input type="tel" id="fpMobile" placeholder="Enter Mobile Number"
+           maxlength="10"
+           style="margin-bottom:10px;">
+
+    <button onclick="sendResetOTP()">Send OTP</button>
+
+    <input type="text" id="fpOTP" placeholder="Enter OTP"
+           style="display:none;margin-top:10px;">
+
+    <input type="password" id="fpNewPass" placeholder="Enter New Password"
+           style="display:none;margin-top:10px;">
+
+    <button id="resetBtn" onclick="resetPassword()" 
+            style="display:none;margin-top:10px;">
+      Update Password
+    </button>
+
+    <button onclick="closeForgotPassword()" 
+            style="margin-top:15px;padding:8px 12px;background:#444;
+                   color:#fff;border:none;border-radius:6px;">
+      Close
+    </button>
+  </div>
+</div>
+
+<!-- SIGNUP MODAL (simple welcome text) -->
+<div id="signupModal" class="modal">
+  <div class="modal-content">
+    <h2>Welcome User</h2>
+
+    <p style="font-size:14px;color:#555;margin-top:10px;">
+      This is a test signup window.  
+      No backend code is triggered.
+    </p>
+
+      <input type="text" id="suMobile" placeholder="Mobile">
+
+    <input type="password" id="suPassword" placeholder="Password">
+
+    <input type="text" id="suName" placeholder="Name">
+
+    <input type="email" id="suEmail" placeholder="Email">
+
+<button type="button" onclick="sendEmailOTP()">Send OTP</button>
+
+<input type="text" id="suEmailOTP" placeholder="Enter Email OTP">
+
+   <textarea id="suAddress" placeholder="Address"></textarea>
+   <!-- NEW PINCODE FIELD -->
+<select id="suPincode" onchange="onPincodeSelect()">
+  <option value="">Select Pincode</option>
+</select>
+
+   <input type="text" id="suCity" placeholder="City" readonly>
+
+    <!-- STATE (Auto-filled) -->
+    <input type="text" id="suState" placeholder="State" readonly>
+
+    <button onclick="verifyAndSignup()">Submit</button>
+    <button onclick="closeSignup()">Close</button>
+  </div>
+</div>
+<script>
+
+//open login
+function openLogin() {
+  document.getElementById("loginModal").style.display = "flex";
+}
+
+function closeLogin() {
+  document.getElementById("loginModal").style.display = "none";
+}
+
+
+function logoutUser() {
+  document.getElementById("userInfoBox").style.display = "none";
+  document.getElementById("loggedEmail").innerText = "";
+
+    // Show Login + Signup buttons again
+  document.querySelector("button[onclick='openLogin()']").style.display = "inline-block";
+  document.querySelector("button[onclick='openSignup()']").style.display = "inline-block";
+
+  //  Hide Logout button
+  document.getElementById("logoutBtn").style.display = "none";
+document.getElementById("signupLabelBox").style.display = "block";
+document.getElementById("hamburgerBtn").style.display = "none";
+
+  //  Hide Navigation on Logout
+  document.getElementById("leftNav").style.display = "none";  
+  
+document.getElementById("menuWrapper").style.display = "block";
+document.getElementById("pageWrapper").style.display = "none";
+
+//  Hide all sub pages
+document.getElementById("profilePage").style.display = "none";
+document.getElementById("ordersPage").style.display = "none";
+document.getElementById("offersPage").style.display = "none";
+
+//  Reset active menu highlight if any
+document.querySelectorAll("#premiumMenu li").forEach(li => li.classList.remove("active"));
+document.getElementById("mainContent").style.marginLeft = "0";
+localStorage.removeItem("userMobile");
+  alert("Logged out successfully.");
+}
+
+</script>
+<script>
+let cityList = []; // map sheet data store
+
+function openSignup() {
+  document.getElementById("signupModal").style.display = "flex";
+
+  // Load city/pincode list only once
+  if (cityList.length === 0) {
+    apiGet("getCityList")
+      .then(res => fillPincodeDropdown(res.cities))
+      .catch(err => {
+        console.error("City list load error:", err);
+        alert("Failed to load city/pincode list.");
+      });
+  }
+}
+
+
+
+
+function closeSignup() {
+  document.getElementById("signupModal").style.display = "none";
+}
+
+function fillPincodeDropdown(list) {
+  cityList = list;
+
+  const ddl = document.getElementById("suPincode");
+  ddl.innerHTML = `<option value="">Select Pincode</option>`;
+
+  list.forEach(item => {
+    const opt = document.createElement("option");
+    opt.value = item.pin;
+    opt.textContent = item.pin;
+    ddl.appendChild(opt);
+  });
+}
+
+function onPincodeSelect() {
+  const pin = document.getElementById("suPincode").value;
+  const cityBox = document.getElementById("suCity");
+  const stateBox = document.getElementById("suState");
+
+  if (!pin) {
+    cityBox.value = "";
+    stateBox.value = "";
+    return;
+  }
+
+  const record = cityList.find(r => String(r.pin) === String(pin));
+
+  if (record) {
+    cityBox.value = record.city;
+    stateBox.value = record.state;
+  } else {
+    cityBox.value = "";
+    stateBox.value = "";
+    alert("Pincode not found.");
+  }
+}
+
+function finalSignup() {
+  const user = {
+    mobile: document.getElementById("suMobile").value.trim(),
+    password: document.getElementById("suPassword").value.trim(),
+    name: document.getElementById("suName").value.trim(),
+    email: document.getElementById("suEmail").value.trim(),
+    address: document.getElementById("suAddress").value.trim(),
+    pincode: document.getElementById("suPincode").value.trim(),
+    city: document.getElementById("suCity").value.trim(),
+    state: document.getElementById("suState").value.trim()
+  };
+
+  // BASIC VALIDATIONS
+  if (!/^[0-9]{10}$/.test(user.mobile)) {
+    alert("Enter valid 10-digit mobile.");
+    return;
+  }
+  if (!user.password) return alert("Enter password");
+  if (!user.name) return alert("Enter name");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email)) {
+    alert("Enter valid email.");
+    return;
+  }
+  if (user.pincode.length !== 6) {
+    alert("Enter valid 6-digit pincode.");
+    return;
+  }
+  if (!user.city || !user.state) {
+    alert("Invalid pincode area.");
+    return;
+  }
+
+  // FORM ALREADY LOCKED BY verifyAndSignup()
+  // ? DO NOT CALL lockSignupForm() AGAIN
+  updateSignupOverlayMessage("Creating account...");
+
+  // ? CORRECT POST REQUEST
+  fetch(API_BASE + "?api=registerUser", {
+    method: "POST",
+     body: JSON.stringify(user)
+  })
+    .then(r => {
+      // If server returned non-JSON ? avoid crash
+      if (!r.ok) throw new Error("Server error " + r.status);
+      return r.json();
+    })
+    .then(res => {
+      unlockSignupForm();
+
+      if (res.success) {
+        alert(res.message || "Signup successful!");
+        closeSignup();
+      } else {
+        alert(res.message || "Signup failed.");
+      }
+    })
+    .catch(err => {
+      unlockSignupForm();
+      alert("Signup failed: " + err.message);
+    });
+}
+
+
+function lockSignupForm() {
+  const modal = document.querySelector("#signupModal .modal-content");
+
+  // Disable all fields inside modal
+  [...modal.querySelectorAll("input, select, textarea, button")].forEach(el => {
+    el.disabled = true;
+  });
+
+  // Overlay
+  const overlay = document.createElement("div");
+  overlay.id = "signupProgressOverlay";
+  overlay.style.position = "fixed";
+  overlay.style.inset = "0";
+  overlay.style.background = "rgba(0,0,0,0.35)";
+  overlay.style.display = "flex";
+  overlay.style.alignItems = "center";
+  overlay.style.justifyContent = "center";
+  overlay.style.fontSize = "22px";
+  overlay.style.color = "#fff";
+  overlay.style.zIndex = "9999";
+  overlay.textContent = "Signup in progress…";
+  document.body.appendChild(overlay);
+}
+function unlockSignupForm() {
+  const modal = document.querySelector("#signupModal .modal-content");
+
+  // Enable everything
+  [...modal.querySelectorAll("input, select, textarea, button")].forEach(el => {
+    el.disabled = false;
+  });
+
+  // Remove overlay
+  const overlay = document.getElementById("signupProgressOverlay");
+  if (overlay) overlay.remove();
+}
+
+function sendEmailOTP() {
+  const email = document.getElementById("suEmail").value.trim();
+
+  if (!email) {
+    alert("Please enter email first.");
+    return;
+  }
+
+  // ?? lock UI while sending OTP
+  lockSignupForm();
+  updateSignupOverlayMessage("Sending OTP...");
+
+  // ? GAS ? Netlify API call conversion
+  apiGet("sendSignupEmailOTP", { email })
+    .then(res => {
+      unlockSignupForm();
+
+      if (res.success) {
+        alert("OTP sent to your email!");
+      } else {
+        alert(res.message);
+      }
+    })
+    .catch(err => {
+      unlockSignupForm();
+      alert("Error sending OTP: " + err.message);
+    });
+}
+
+function verifyAndSignup() {
+  const email = document.getElementById("suEmail").value.trim();
+  const otp = document.getElementById("suEmailOTP").value.trim();
+
+  if (!otp) {
+    alert("Please enter OTP.");
+    return;
+  }
+
+  // ?? LOCK UI + show overlay "Verifying OTP..."
+  lockSignupForm();
+  updateSignupOverlayMessage("Verifying OTP...");
+
+  // ? Netlify API CALL (GAS ?????)
+  apiGet("verifyEmailOTP", { email, otp })
+    .then(res => {
+      if (!res.success) {
+        unlockSignupForm();
+        alert(res.message);
+        return;
+      }
+
+      // OTP verified ? show next message
+      updateSignupOverlayMessage("Creating Account...");
+
+      // Now create new user
+      finalSignup();
+    })
+    .catch(err => {
+      unlockSignupForm();
+      alert("OTP verification failed: " + err.message);
+    });
+}
+
+ 
+function updateSignupOverlayMessage(msg) {
+  const overlay = document.getElementById("signupProgressOverlay");
+  if (overlay) overlay.textContent = msg;
+}
+
+window.addEventListener("load", () => {
+  document.getElementById("loginMobile").value = "";
+  document.getElementById("loginPassword").value = "";
+});
+
+function validateLoginMobile() {
+  const input = document.getElementById("loginMobile");
+  const error = document.getElementById("mobileError");
+
+  const original = input.value;          // User typed value
+  const digitsOnly = original.replace(/\D/g, "");  // Remove letters
+
+  // Update field to digits only
+  input.value = digitsOnly;
+
+  //  If user typed any non-digit (abcd etc.)
+  if (original !== digitsOnly) {
+    error.style.display = "block";
+    error.innerText = "Please enter only mobile numbers. Letters are not allowed.";
+    return;
+  }
+
+  //  Less than 10 digits but typed correctly
+  if (digitsOnly.length > 0 && digitsOnly.length < 10) {
+    error.style.display = "block";
+    error.innerText = "Please enter a valid 10-digit mobile number.";
+    return;
+  }
+
+  //  Exactly 10 digits ? no warning
+  if (digitsOnly.length === 10) {
+    error.style.display = "none";
+    return;
+  }
+
+  //  Empty field ? hide error
+  error.style.display = "none";
+}
+
+function lockLoginForm() {
+  const modal = document.querySelector("#loginModal .modal-content");
+
+  // Disable everything
+  [...modal.querySelectorAll("input, button")].forEach(el => {
+    el.disabled = true;
+  });
+
+  // Show overlay
+  document.getElementById("loginProgressOverlay").style.display = "flex";
+}
+
+function unlockLoginForm() {
+  const modal = document.querySelector("#loginModal .modal-content");
+
+  // Enable everything
+  [...modal.querySelectorAll("input, button")].forEach(el => {
+    el.disabled = false;
+  });
+
+  // Hide overlay
+  document.getElementById("loginProgressOverlay").style.display = "none";
+}
+
+function openForgotPassword() {
+  document.getElementById("forgotPasswordModal").style.display = "flex";
+}
+
+function closeForgotPassword() {
+  document.getElementById("forgotPasswordModal").style.display = "none";
+
+  // Reset fields
+  document.getElementById("fpMobile").value = "";
+  document.getElementById("fpOTP").value = "";
+  document.getElementById("fpNewPass").value = "";
+
+  // Hide OTP and Password fields
+  document.getElementById("fpOTP").style.display = "none";
+  document.getElementById("fpNewPass").style.display = "none";
+  document.getElementById("resetBtn").style.display = "none";
+}
+
+// STEP 1: SEND OTP
+function sendResetOTP() {
+  const mobile = document.getElementById("fpMobile").value.trim();
+
+  if (!/^[0-9]{10}$/.test(mobile)) {
+    alert("Please enter valid 10-digit mobile.");
+    return;
+  }
+
+  // SHOW OVERLAY + LOCK UI
+  document.getElementById("fpOverlay").style.display = "flex";
+  lockForgotForm();
+  updateForgotOverlay("Sending OTP...");
+
+  // ? Netlify GET API call
+  apiGet("sendPasswordResetOTP", { mobile })
+    .then(res => {
+      document.getElementById("fpOverlay").style.display = "none";
+      unlockForgotForm();
+
+      if (res.success) {
+        alert("OTP sent successfully!");
+
+        // show hidden fields
+        document.getElementById("fpOTP").style.display = "block";
+        document.getElementById("fpNewPass").style.display = "block";
+        document.getElementById("resetBtn").style.display = "block";
+      } else {
+        alert(res.message);
+      }
+    })
+    .catch(err => {
+      document.getElementById("fpOverlay").style.display = "none";
+      unlockForgotForm();
+      alert("Error: " + err.message);
+    });
+}
+
+
+// STEP 2: RESET PASSWORD
+function resetPassword() {
+  const mobile = document.getElementById("fpMobile").value.trim();
+  const otp = document.getElementById("fpOTP").value.trim();
+  const newPass = document.getElementById("fpNewPass").value.trim();
+
+  if (!otp) {
+    alert("Enter OTP.");
+    return;
+  }
+  if (!newPass) {
+    alert("Enter new password.");
+    return;
+  }
+
+  // SHOW OVERLAY + LOCK UI
+  document.getElementById("fpOverlay").style.display = "flex";
+  lockForgotForm();
+  updateForgotOverlay("Updating password...");
+
+  // ? Netlify POST API
+  apiPost("resetPassword", { mobile, otp, newPass })
+    .then(res => {
+      document.getElementById("fpOverlay").style.display = "none";
+      unlockForgotForm();
+
+      if (res.success) {
+        alert("Password updated successfully!");
+        closeForgotPassword();
+      } else {
+        alert(res.message);
+      }
+    })
+    .catch(err => {
+      document.getElementById("fpOverlay").style.display = "none";
+      unlockForgotForm();
+      alert("Error: " + err.message);
+    });
+}
+
+
+function lockForgotForm() {
+  const modal = document.querySelector("#forgotPasswordModal .modal-content");
+  [...modal.querySelectorAll("input, button")].forEach(el => el.disabled = true);
+}
+
+function unlockForgotForm() {
+  const modal = document.querySelector("#forgotPasswordModal .modal-content");
+  [...modal.querySelectorAll("input, button")].forEach(el => el.disabled = false);
+}
+
+function updateForgotOverlay(msg) {
+  document.getElementById("fpOverlay").textContent = msg;
+}
+function showPage(pageId) {
+
+  if (pageId === "menuPage") {
+    
+    // Show the menu screen
+    document.getElementById("menuWrapper").style.display = "block";
+    document.getElementById("pageWrapper").style.display = "none";
+
+  } else {
+
+    // Hide menu completely
+    document.getElementById("menuWrapper").style.display = "none";
+    document.getElementById("pageWrapper").style.display = "block";
+
+    // Hide all pages first
+    document.getElementById("profilePage").style.display = "none";
+    document.getElementById("ordersPage").style.display = "none";
+    document.getElementById("offersPage").style.display = "none";
+
+    // Show selected page
+    document.getElementById(pageId).style.display = "block";
+  }
+}
+
+function activateMenu(element) {
+  document.querySelectorAll("#premiumMenu li").forEach(li => li.classList.remove("active"));
+  element.classList.add("active");
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById("leftNav");
+  const menuBtn = document.getElementById("hamburgerBtn");
+  const main = document.getElementById("mainContent");
+
+  // Sidebar hidden ? open
+  if (!sidebar.classList.contains("active")) {
+    sidebar.classList.add("active");
+    main.style.marginLeft = "220px";
+    menuBtn.innerHTML = `
+<svg width="22" height="22">
+  <path d="M4 4 L20 20 M20 4 L4 20" stroke="#FFD166" stroke-width="3"/>
+</svg>`;
+
+  } 
+  else {
+    // close sidebar
+    sidebar.classList.remove("active");
+    main.style.marginLeft = "0";
+    menuBtn.innerHTML = `
+<svg width="24" height="24" fill="#FFD166">
+  <rect y="4" width="24" height="3"></rect>
+  <rect y="10" width="24" height="3"></rect>
+  <rect y="16" width="24" height="3"></rect>
+</svg>`;
+
+
+  }
+}
+function loadUserProfile() {
+  const mobile = localStorage.getItem("userMobile");
+
+  if (!mobile) {
+    alert("Session expired. Please login again.");
+    return;
+  }
+
+  // ? SHOW SIMPLE LOADING TEXT
+  document.getElementById("profileLoading").style.display = "block";
+
+  // ? Netlify API replacement
+  apiGet("getUserProfile", { mobile })
+    .then(res => {
+      document.getElementById("profileLoading").style.display = "none";
+
+      if (!res.success) {
+        alert("User not found");
+        return;
+      }
+
+      fillProfileForm(res);
+    })
+    .catch(err => {
+      document.getElementById("profileLoading").style.display = "none";
+      alert("Failed: " + err.message);
+    });
+}
+
+function fillProfileForm(res) {
+  document.getElementById("profileLoading").style.display = "none";
+
+  if (!res.success) {
+    alert("User not found");
+    return;
+  }
+
+  // Autofill
+  document.getElementById("pName").value = res.name || "";
+  document.getElementById("pMobile").value = res.mobile || "";
+  document.getElementById("pEmail").value = res.email || "";
+  document.getElementById("pAddress").value = res.address || "";
+   document.getElementById("ppin").value = res.pincode || "";
+  document.getElementById("pCity").value = res.city || "";
+  document.getElementById("pState").value = res.state || "";
+  setProfileReadonly(true);
+}
+function showProfilePage() {
+  hideAllPages();
+  document.getElementById("profilePage").style.display = "block";
+  loadUserProfile();   // ? profile load karo
+}
+
+function setProfileReadonly(state) {
+  document.getElementById("pName").readOnly = state;
+  document.getElementById("pEmail").readOnly = state;
+  document.getElementById("pAddress").readOnly = state;
+  document.getElementById("ppin").readOnly = state;
+  document.getElementById("pCity").readOnly = state;
+  document.getElementById("pState").readOnly = state;
+
+  // Mobile never editable
+  document.getElementById("pMobile").disabled = true;
+}
+function enableProfileEdit() {
+  setProfileReadonly(false);
+
+  document.getElementById("editBtn").style.display = "none";
+  document.getElementById("saveBtn").style.display = "inline-block";
+  document.getElementById("cancelBtn").style.display = "inline-block";
+}
+function cancelProfileEdit() {
+  loadUserProfile();   // reload original values
+  document.getElementById("editBtn").style.display = "inline-block";
+  document.getElementById("saveBtn").style.display = "none";
+  document.getElementById("cancelBtn").style.display = "none";
+}
+
+function saveProfile() {
+  const data = {
+    mobile: document.getElementById("pMobile").value.trim(),
+    name: document.getElementById("pName").value.trim(),
+    email: document.getElementById("pEmail").value.trim(),
+    address: document.getElementById("pAddress").value.trim(),
+    pincode: document.getElementById("ppin").value.trim(),
+    city: document.getElementById("pCity").value.trim(),
+    state: document.getElementById("pState").value.trim()
+  };
+
+  if (!data.name) return alert("Name cannot be empty");
+  if (!data.email) return alert("Email cannot be empty");
+  if (data.pincode.length !== 6) return alert("Enter valid 6-digit pincode");
+
+  // ? Show overlay
+  document.getElementById("profileOverlay").classList.add("active");
+
+  // Disable buttons
+  document.getElementById("editBtn").disabled = true;
+  document.getElementById("saveBtn").disabled = true;
+  document.getElementById("cancelBtn").disabled = true;
+
+  // ? Netlify POST request
+  apiPost("updateUserProfile", data)
+    .then(res => {
+      document.getElementById("profileOverlay").classList.remove("active");
+
+      // Re-enable buttons
+      document.getElementById("editBtn").disabled = false;
+      document.getElementById("saveBtn").disabled = false;
+      document.getElementById("cancelBtn").disabled = false;
+
+      if (res.success) {
+        alert("Profile updated successfully!");
+        loadUserProfile();
+
+        document.getElementById("editBtn").style.display = "inline-block";
+        document.getElementById("saveBtn").style.display = "none";
+        document.getElementById("cancelBtn").style.display = "none";
+      } else {
+        alert(res.message);
+      }
+    })
+    .catch(err => {
+      document.getElementById("profileOverlay").classList.remove("active");
+      alert("Error: " + err.message);
+    });
+}
+
+
+</script>
+<script>
+let deferredPrompt;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // Show button
+  document.getElementById("installBtn").style.display = "block";
+});
+
+// When user clicks install button
+document.getElementById("installBtn").addEventListener("click", async () => {
+  if (!deferredPrompt) return;
+
+  deferredPrompt.prompt();
+
+  const result = await deferredPrompt.userChoice;
+
+  if (result.outcome === "accepted") {
+    alert("App installed successfully!");
+  }
+
+  deferredPrompt = null;
+
+  // Hide button after install
+  document.getElementById("installBtn").style.display = "none";
+});
+
+// Hide button if already installed
+window.addEventListener("appinstalled", () => {
+  document.getElementById("installBtn").style.display = "none";
+});
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js')
+
+    .then(reg => {
+      console.log('SW Registered on Netlify');
+
+      // SAME UPDATE CHECK SYSTEM
+      reg.addEventListener("updatefound", () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener("statechange", () => {
+          if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+            if (confirm("A new version of the app is available. Update now?")) {
+              window.location.reload();
+            }
+          }
+        });
+      });
+
+    })
+    .catch(err => {
+      console.error('SW Failed:', err);
+    });
+}
+</script>
+<script>
+function loginUser() {
+  const mobile = document.getElementById("loginMobile").value.trim();
+  const password = document.getElementById("loginPassword").value.trim();
+
+  if (!/^[0-9]{10}$/.test(mobile)) {
+    alert("Enter valid 10-digit mobile.");
+    return;
+  }
+
+  lockLoginForm();
+
+  apiPost("login", { mobile, password })
+    .then(res => {
+      unlockLoginForm();
+
+      if (!res.success) {
+        alert(res.message || "Login failed.");
+        return;
+      }
+
+      localStorage.setItem("userMobile", mobile);
+
+      document.getElementById("loggedEmail").innerText = res.email || "";
+      document.getElementById("userInfoBox").style.display = "block";
+
+      // hide login + signup
+      document.querySelector("button[onclick='openLogin()']").style.display = "none";
+      document.querySelector("button[onclick='openSignup()']").style.display = "none";
+      document.getElementById("signupLabelBox").style.display = "none";
+
+      // show logout
+      document.getElementById("logoutBtn").style.display = "inline-block";
+      document.getElementById("hamburgerBtn").style.display = "block";
+
+      // show left nav
+      document.getElementById("leftNav").style.display = "block";
+
+      closeLogin();
+    })
+    .catch(err => {
+      unlockLoginForm();
+      alert("Login error: " + err.message);
+    });
+}
+</script>
+<script>
+function hideAllPages() {
+  document.getElementById("menuWrapper").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("ordersPage").style.display = "none";
+  document.getElementById("offersPage").style.display = "none";
+}
+</script>
+<script>
+
+function apiPost(api, data = {}) {
+  return fetch(API_BASE + "?api=" + api, {
+    method: "POST",
+    body: JSON.stringify(data)  // ??? ?? header ?? ????
+  }).then(res => res.json());
+}
+
+
+
+</script>
+</body>
+</html>
