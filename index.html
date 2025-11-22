@@ -425,14 +425,13 @@ style="
     My Profile
   </li>
 
-  <li onclick="activateMenu(this); hideAllPages(); showPage('ordersPage')">
+  <li onclick="activateMenu(this); showPage('ordersPage'); loadUserOrders();">
 
     <span class="nav-badge">2</span>
     My Orders
   </li>
 
-  <li onclick="activateMenu(this); hideAllPages(); showPage('offersPage')">
-
+ <li onclick="activateMenu(this); showPage('offersPage'); loadOffers();">
     <span class="nav-badge">3</span>
     Offers
   </li>
@@ -1922,6 +1921,47 @@ function loadUserProfile() {
       alert("Failed: " + err.message);
     });
 }
+function loadUserOrders() {
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) {
+    alert("Session expired. Please login again.");
+    return;
+  }
+  // ? SHOW SIMPLE LOADING TEXT
+  document.getElementById("ordersLoading").style.display = "block";
+  // ? Netlify API replacement
+  apiGet("getUserOrders", { mobile })
+    .then(res => {
+      document.getElementById("ordersLoading").style.display = "none";
+      if (!res.success) {
+        alert("No orders found");
+        return;
+      }
+      fillOrdersList(res.orders);
+    })
+    .catch(err => {
+      document.getElementById("ordersLoading").style.display = "none";
+      alert("Failed: " + err.message);
+    });
+}
+function loadOffers() {
+  // ? SHOW SIMPLE LOADING TEXT
+  document.getElementById("offersLoading").style.display = "block";
+  // ? Netlify API replacement
+  apiGet("getOffers", {})
+    .then(res => {
+      document.getElementById("offersLoading").style.display = "none";
+      if (!res.success) {
+        alert("No offers available");
+        return;
+      }
+      fillOffersList(res.offers);
+    })
+    .catch(err => {
+      document.getElementById("offersLoading").style.display = "none";
+      alert("Failed: " + err.message);
+    });
+}
 
 function fillProfileForm(res) {
   document.getElementById("profileLoading").style.display = "none";
@@ -2159,6 +2199,7 @@ function apiPost(api, data = {}) {
     
     </body>
 </html>
+
 
 
 
