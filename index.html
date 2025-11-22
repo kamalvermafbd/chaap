@@ -185,6 +185,17 @@ body {
   background: #f5f5f5;
   color: #555;
 }
+#pageWrapper {
+  position: relative;
+}
+
+#pageWrapper > div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
 
 #editBtn, #saveBtn, #cancelBtn {
   font-size: 14px !important;
@@ -498,7 +509,6 @@ style="
         <!-- PROFILE PAGE -->
      <div id="profilePage" style="display:none;">
   <h2>My Profile</h2>
-
 <div id="profileLoading" style="display:none; color:red;">Loading...</div>
 <input id="pName" placeholder="Full Name" readonly><br>
 <input id="pMobile" placeholder="Mobile" disabled><br>
@@ -530,23 +540,29 @@ style="
   Saving your profile…
 </div>
 </div>
+    <!-- OTHER PAGES WRAPPER (default hidden) -->
+    <div id="pageWrapper" style="display:none; padding:10px;">
 
+        <!-- PROFILE PAGE -->
+        <div id="profilePage" style="display:none;">
+            ... (your existing profile HTML stays SAME)
         </div>
 
-<div id="profileLoadOverlay"
-     style="
-       display:none;
-       position:fixed;
-       inset:0;
-       background:rgba(0,0,0,0.45);
-       z-index:9999;
-       color:white;
-       font-size:22px;
-       align-items:center;
-       justify-content:center;
-     ">
-  Loading profile…
-</div>
+        <!-- PROFILE LOAD OVERLAY -->
+        <div id="profileLoadOverlay"
+             style="
+               display:none;
+               position:fixed;
+               inset:0;
+               background:rgba(0,0,0,0.45);
+               z-index:9999;
+               color:white;
+               font-size:22px;
+               align-items:center;
+               justify-content:center;
+             ">
+          Loading profile…
+        </div>
 
         <!-- ORDERS PAGE -->
         <div id="ordersPage" style="display:none;">
@@ -560,12 +576,10 @@ style="
             <p>Special offers will be displayed here.</p>
         </div>
 
-    </div>
+    </div> <!-- END pageWrapper (correct position) -->
 
-</div>
+   
 
-  
- 
 
   <div id="checkoutModal" class="modal">
     <div class="modal-content">
@@ -2119,5 +2133,6 @@ function apiPost(api, data = {}) {
 </script>
 </body>
 </html>
+
 
 
