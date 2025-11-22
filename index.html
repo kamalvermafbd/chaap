@@ -189,13 +189,6 @@ body {
   position: relative;
 }
 
-#pageWrapper > div {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
 
 #editBtn, #saveBtn, #cancelBtn {
   font-size: 14px !important;
@@ -378,11 +371,19 @@ style="
 </button>
 
   <header>
+    <div id="userInfoBox" 
+     style="position:absolute; left:250px; top:50px; 
+            background:#ff6347; color:white; padding:8px 12px; 
+            border-radius:6px; display:none; font-size:16px;">
+  Logged in: <span id="loggedEmail"></span><br>
+ 
+</div>
     <div id="restaurantInfo">
       <h1 id="restaurantName">Loading...</h1>
       <p id="restaurantAddress"></p>
     </div>
     <p>Delicious meals delivered fast!</p>
+    
   </header>
 
 <!-- LEFT NAVIGATION PANEL -->
@@ -541,6 +542,18 @@ style="
   Saving your profile…
 </div>
 </div>
+      <!-- ORDERS PAGE -->
+<div id="ordersPage" style="display:none;">
+  <h2>My Orders</h2>
+  <p>No order history available.</p>
+</div>
+
+<!-- OFFERS PAGE -->
+<div id="offersPage" style="display:none;">
+  <h2>Offers</h2>
+  <p>No offers available currently.</p>
+</div>
+
    
   <div id="checkoutModal" class="modal">
     <div class="modal-content">
@@ -1253,13 +1266,7 @@ function filterMenu() {
   </div>
 </div>
 
-<div id="userInfoBox" 
-     style="position:absolute; left:250px; top:50px; 
-            background:#ff6347; color:white; padding:8px 12px; 
-            border-radius:6px; display:none; font-size:16px;">
-  Logged in: <span id="loggedEmail"></span><br>
- 
-</div>
+
 <!-- FORGOT PASSWORD MODAL -->
 <div id="forgotPasswordModal" class="modal">
   <div class="modal-content" style="text-align:center;">
@@ -1603,31 +1610,59 @@ function updateSignupOverlayMessage(msg) {
   if (overlay) overlay.textContent = msg;
 }
 
+// === FINAL STABLE LOAD HANDLER ===
 window.addEventListener("load", () => {
 
-  document.getElementById("loginMobile").value = "";
-  document.getElementById("loginPassword").value = "";
+  // clear login fields
+  const loginMobile = document.getElementById("loginMobile");
+  const loginPassword = document.getElementById("loginPassword");
+  if (loginMobile) loginMobile.value = "";
+  if (loginPassword) loginPassword.value = "";
 
   const mobile = localStorage.getItem("userMobile");
   const email  = localStorage.getItem("userEmail");
 
+  // Always reset full UI first
+  document.getElementById("menuWrapper").style.display = "block";
+  document.getElementById("pageWrapper").style.display = "none";
+
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("ordersPage").style.display = "none";
+  document.getElementById("offersPage").style.display = "none";
+
+  document.getElementById("leftNav").classList.remove("active");
+  document.getElementById("leftNav").style.display = "none";
+  document.getElementById("mainContent").style.marginLeft = "0";
+
+  document.getElementById("hamburgerBtn").style.display = "none";
+  document.getElementById("logoutBtn").style.display = "none";
+  document.getElementById("userInfoBox").style.display = "none";
+
+  document.querySelector("button[onclick='openLogin()']").style.display = "inline-block";
+  document.querySelector("button[onclick='openSignup()']").style.display = "inline-block";
+  document.getElementById("signupLabelBox").style.display = "block";
+
+  // ----- if logged in -----
   if (mobile) {
 
+    // Show user info
+    document.getElementById("loggedEmail").innerText = email || "";
     document.getElementById("userInfoBox").style.display = "block";
 
-    
-    document.getElementById("loggedEmail").innerText = email || "";
-
+    // Hide login/signup
     document.querySelector("button[onclick='openLogin()']").style.display = "none";
     document.querySelector("button[onclick='openSignup()']").style.display = "none";
     document.getElementById("signupLabelBox").style.display = "none";
 
-    document.getElementById("logoutBtn").style.display = "inline-block";
+    // Show nav + hamburger
     document.getElementById("leftNav").style.display = "block";
     document.getElementById("hamburgerBtn").style.display = "block";
+    document.getElementById("logoutBtn").style.display = "inline-block";
 
+    // Always show menu page after refresh
     showPage("menuPage");
 
+    // highlight first item
     const firstMenu = document.querySelector("#premiumMenu li");
     if (firstMenu) firstMenu.classList.add("active");
   }
@@ -2118,6 +2153,7 @@ function apiPost(api, data = {}) {
 </script>
 </body>
 </html>
+
 
 
 
