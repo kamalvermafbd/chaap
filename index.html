@@ -1644,37 +1644,34 @@ function updateSignupOverlayMessage(msg) {
 
 window.addEventListener("load", () => {
 
-  /*** 1. Clear login modal fields (needed) ***/
   document.getElementById("loginMobile").value = "";
   document.getElementById("loginPassword").value = "";
 
-  /*** 2. AUTO-LOGIN RESTORE ***/
   const mobile = localStorage.getItem("userMobile");
+  const email  = localStorage.getItem("userEmail");
 
   if (mobile) {
 
-    // Show logged-in UI
     document.getElementById("userInfoBox").style.display = "block";
-    document.getElementById("loggedEmail").innerText = "";
 
-    // Hide login + signup buttons
+    
+    document.getElementById("loggedEmail").innerText = email || "";
+
     document.querySelector("button[onclick='openLogin()']").style.display = "none";
     document.querySelector("button[onclick='openSignup()']").style.display = "none";
     document.getElementById("signupLabelBox").style.display = "none";
 
-    // Show logout + left nav + hamburger
     document.getElementById("logoutBtn").style.display = "inline-block";
     document.getElementById("leftNav").style.display = "block";
     document.getElementById("hamburgerBtn").style.display = "block";
 
-    // Open menu page by default
     showPage("menuPage");
 
-    // Highlight "Continue Shopping" in sidebar
     const firstMenu = document.querySelector("#premiumMenu li");
     if (firstMenu) firstMenu.classList.add("active");
   }
 });
+
 
 
 function validateLoginMobile() {
@@ -2117,7 +2114,8 @@ function loginUser() {
       }
 
       localStorage.setItem("userMobile", mobile);
-
+localStorage.setItem("userEmail", res.email || "");   // 
+      
       document.getElementById("loggedEmail").innerText = res.email || "";
       document.getElementById("userInfoBox").style.display = "block";
 
@@ -2163,6 +2161,7 @@ function apiPost(api, data = {}) {
 </script>
 </body>
 </html>
+
 
 
 
