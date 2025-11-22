@@ -476,7 +476,36 @@ style="
         </div>
 
         <!-- OTHER PAGES WRAPPER (default hidden) -->
-<div id="pageWrapper" style="display:none; padding:10px;">
+
+
+        <!-- MENU LIST -->
+        <div id="menu" class="menu-container">
+            <p>Loading menu...</p>
+        </div>
+
+        <!-- CART -->
+        <div id="cartWrapper">
+            <!-- Your current cart HTML goes here -->
+
+             <div class="cart">
+    <h3>Your Cart</h3>
+    <table id="cartTable">
+      <thead>
+        <tr><th>Food</th><th>Qty</th><th>Rate</th><th>Total</th><th>Action</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    Total: &#8377;<span id="cartTotal">0.00</span>
+
+<button onclick="openCheckout()" class="checkout-btn" 
+        style="display:block; margin-top:15px;">
+  Checkout
+</button>
+  </div>
+        </div>
+    </div>
+
+  <div id="pageWrapper" style="display:none; padding:10px;">
 
     <!-- PROFILE PAGE -->
     <div id="profilePage" style="display:none;">
@@ -523,34 +552,6 @@ style="
     </div>
 
 </div>
-
-
-        <!-- MENU LIST -->
-        <div id="menu" class="menu-container">
-            <p>Loading menu...</p>
-        </div>
-
-        <!-- CART -->
-        <div id="cartWrapper">
-            <!-- Your current cart HTML goes here -->
-
-             <div class="cart">
-    <h3>Your Cart</h3>
-    <table id="cartTable">
-      <thead>
-        <tr><th>Food</th><th>Qty</th><th>Rate</th><th>Total</th><th>Action</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    Total: &#8377;<span id="cartTotal">0.00</span>
-
-<button onclick="openCheckout()" class="checkout-btn" 
-        style="display:block; margin-top:15px;">
-  Checkout
-</button>
-  </div>
-        </div>
-    </div>
 
   <div id="checkoutModal" class="modal">
     <div class="modal-content">
@@ -2161,5 +2162,6 @@ function apiPost(api, data = {}) {
     
     </body>
 </html>
+
 
 
