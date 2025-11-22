@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Chaap Express PWA</title>
+  <title>Chaap Express</title>
 
   <!-- Real Manifest File -->
   <link rel="manifest" href="/manifest.json">
@@ -254,7 +254,7 @@ body {
 /* Premium Navigation Icons */
 .nav-icon {
   font-size: 22px;       /* Bigger size */
-  color: #ffd166;        /* Soft gold/yellow – looks premium on blue */
+  color: #ffd166;        /* Soft gold/yellow â€“ looks premium on blue */
   font-weight: bold;
 }
 #profileOverlay { 
@@ -527,7 +527,7 @@ style="
        align-items:center;
        justify-content:center;
      ">
-  Saving your profile…
+  Saving your profileâ€¦
 </div>
 </div>
 
@@ -545,7 +545,7 @@ style="
        align-items:center;
        justify-content:center;
      ">
-  Loading profile…
+  Loading profileâ€¦
 </div>
 
         <!-- ORDERS PAGE -->
@@ -686,7 +686,7 @@ function canonicalCategory(raw, priorityListLower) {
   return norm.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 }
 
-// NEW populateCategoryDropdown — shows canonical categories (no duplicates from typos)
+// NEW populateCategoryDropdown â€” shows canonical categories (no duplicates from typos)
 
 function populateCategoryDropdown(items) {
   const dropdown = document.getElementById("categoryFilter");
@@ -1194,7 +1194,7 @@ function filterMenu() {
   align-items:center;
   justify-content:center;
 ">
-  Login in progress…
+  Login in progressâ€¦
 </div>
 
   <div id="loadingOverlay" style="
@@ -1543,7 +1543,7 @@ function lockSignupForm() {
   overlay.style.fontSize = "22px";
   overlay.style.color = "#fff";
   overlay.style.zIndex = "9999";
-  overlay.textContent = "Signup in progress…";
+  overlay.textContent = "Signup in progressâ€¦";
   document.body.appendChild(overlay);
 }
 function unlockSignupForm() {
@@ -2118,3 +2118,4 @@ function apiPost(api, data = {}) {
 </script>
 </body>
 </html>
+
