@@ -425,12 +425,14 @@ style="
     My Profile
   </li>
 
-  <li onclick="activateMenu(this); showPage('ordersPage')">
+  <li onclick="activateMenu(this); hideAllPages(); showPage('ordersPage')">
+
     <span class="nav-badge">2</span>
     My Orders
   </li>
 
-  <li onclick="activateMenu(this); showPage('offersPage')">
+  <li onclick="activateMenu(this); hideAllPages(); showPage('offersPage')">
+
     <span class="nav-badge">3</span>
     Offers
   </li>
@@ -2129,16 +2131,11 @@ localStorage.setItem("userEmail", res.email || "");   //
     });
 }
   function openMenuPageProperly(el) {
-  // Remove active from all menu items
-  document.querySelectorAll("#premiumMenu li")
-    .forEach(li => li.classList.remove("active"));
-
-  // Highlight Continue Shopping
-  el.classList.add("active");
-
-  // Show only Menu page
-  showPage("menuPage");
+  activateMenu(el);
+  hideAllPages();
+  document.getElementById("menuWrapper").style.display = "block";
 }
+
 
 </script>
 <script>
@@ -2162,6 +2159,7 @@ function apiPost(api, data = {}) {
     
     </body>
 </html>
+
 
 
 
