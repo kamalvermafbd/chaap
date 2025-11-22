@@ -372,9 +372,10 @@ style="
 
   <header>
     <div id="userInfoBox" 
-     style="position:absolute; left:250px; top:50px; 
-            background:#ff6347; color:white; padding:8px 12px; 
-            border-radius:6px; display:none; font-size:16px;">
+     style="background:#ff6347; color:white; padding:6px 12px;
+            border-radius:6px; display:none; font-size:14px;
+            margin-top:10px; display:inline-block;">
+
   Logged in: <span id="loggedEmail"></span><br>
  
 </div>
@@ -472,7 +473,55 @@ style="
             <!-- Your existing category filter + search + clear button will be here -->
         </div>
 
+        <!-- OTHER PAGES WRAPPER (default hidden) -->
+<div id="pageWrapper" style="display:none; padding:10px;">
+
+    <!-- PROFILE PAGE -->
+    <div id="profilePage" style="display:none;">
+        <h2>My Profile</h2>
         
+        <div id="profileLoading" style="display:none; color:red;">Loading...</div>
+        <input id="pName" placeholder="Full Name" readonly><br>
+        <input id="pMobile" placeholder="Mobile" disabled><br>
+        <input id="pEmail" placeholder="Email" readonly><br>
+        <input id="pAddress" placeholder="Address" readonly><br>
+        <input id="ppin" placeholder="Pincode" readonly><br>
+        <input id="pCity" placeholder="City" readonly><br>
+        <input id="pState" placeholder="State" readonly><br>
+
+        <button id="editBtn" onclick="enableProfileEdit()">Edit</button>
+        <button id="saveBtn" onclick="saveProfile()" style="display:none;">Save Changes</button>
+        <button id="cancelBtn" onclick="cancelProfileEdit()" style="display:none;">Cancel</button>
+
+        <div id="profileOverlay"
+             style="
+               position:fixed;
+               inset:0;
+               background:rgba(0,0,0,0.45);
+               z-index:9999;
+               color:white;
+               font-size:22px;
+               align-items:center;
+               justify-content:center;
+             ">
+          Saving your profile…
+        </div>
+    </div>
+
+    <!-- ORDERS PAGE -->
+    <div id="ordersPage" style="display:none;">
+        <h2>My Orders</h2>
+        <p>No order history available.</p>
+    </div>
+
+    <!-- OFFERS PAGE -->
+    <div id="offersPage" style="display:none;">
+        <h2>Offers</h2>
+        <p>No offers available currently.</p>
+    </div>
+
+</div>
+
 
         <!-- MENU LIST -->
         <div id="menu" class="menu-container">
@@ -2147,17 +2196,6 @@ function apiPost(api, data = {}) {
     body: JSON.stringify(data)  // ??? ?? header ?? ????
   }).then(res => res.json());
 }
-
-
-
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
