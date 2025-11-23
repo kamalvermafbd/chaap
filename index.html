@@ -186,6 +186,19 @@ body {
   background: linear-gradient(135deg, #fff9f2, #ffe6d5);
   background-attachment: fixed;
 }
+    .variant-row {
+  display: flex;
+  gap: 8px;
+  margin: 5px 0;
+}
+
+.variant-box {
+  border: 1px solid #ddd;
+  padding: 6px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
 
 /* Profile Page Input Styling */
 #profilePage input {
@@ -766,7 +779,7 @@ apiGet("getMenu")
   });
 
 
- function renderMenu(items) {
+function renderMenu(items) {
   menuItems = items;
 
   // Auto-fill category dropdown (canonical)
@@ -810,51 +823,42 @@ apiGet("getMenu")
     return A.localeCompare(B);
   });
 
-//  CHEF SPECIAL SECTION (Top Highlight)
-const chefSpecialItems = items.filter(i => {
-  const val = (i.hotselling || i.Hotselling || "").toString().trim().toUpperCase();
-  return val === "TRUE";
-});
-
-if (chefSpecialItems.length > 0) {
-  const heading = document.createElement("h2");
-  heading.classList.add("slideIn");
-  heading.innerHTML = "Chef Special";
-  heading.style.margin = "10px 0 5px";
-  heading.style.padding = "10px";
-  heading.style.background = "#ff6347";
-  heading.style.color = "white";
-  heading.style.borderRadius = "6px";
-  heading.style.gridColumn = "1 / -1";
-  menuDiv.appendChild(heading);
-
-  chefSpecialItems.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "menu-item fadeIn";
-
-    div.innerHTML = `
-      <img src="${item.image}">
-      <h4>${item.name}</h4>
-      <p>${item.description || ""}</p>
-      <strong>&#8377;${item.price}</strong>
-<br>
-      <button onclick="addToCart('${item.name.replace(/'/g,"\\'")}', ${item.price})">Add to Cart</button>
-    `;
-
-    menuDiv.appendChild(div);
+  // ====== CHEF SPECIAL SECTION ======
+  const chefSpecialItems = items.filter(i => {
+    const val = (i.hotselling || i.Hotselling || "").toString().trim().toUpperCase();
+    return val === "TRUE";
   });
-}
 
-  // Display grouped by canonical categories
-  categoryOrder.forEach(cat => { 
-    // group items whose canonical category matches this cat
+  if (chefSpecialItems.length > 0) {
+    const heading = document.createElement("h2");
+    heading.classList.add("slideIn");
+    heading.innerHTML = "Chef Special";
+    heading.style.margin = "10px 0 5px";
+    heading.style.padding = "10px";
+    heading.style.background = "#ff6347";
+    heading.style.color = "white";
+    heading.style.borderRadius = "6px";
+    heading.style.gridColumn = "1 / -1";
+    menuDiv.appendChild(heading);
+
+    chefSpecialItems.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "menu-item fadeIn";
+
+      div.innerHTML = buildMenuCardHTML(item);
+      menuDiv.appendChild(div);
+      activateVariantSelector(item);
+    });
+  }
+
+  // ====== CATEGORY GROUPING ======
+  categoryOrder.forEach(cat => {
     const group = items.filter(i => {
       const can = rawToCanonical[(i.category || "").toString()];
       return (can || "").toLowerCase() === cat.toLowerCase();
     });
 
     if (group.length > 0) {
-      // Category heading
       const heading = document.createElement("h2");
       heading.classList.add("slideIn");
 
@@ -867,24 +871,18 @@ if (chefSpecialItems.length > 0) {
       heading.style.gridColumn = "1 / -1";
       menuDiv.appendChild(heading);
 
-      // Add items under this category
       group.forEach(item => {
         const div = document.createElement('div');
-       div.className = 'menu-item fadeIn';
+        div.className = 'menu-item fadeIn';
 
-        div.innerHTML = `
-          <img src="${item.image}" alt="${item.name}">
-          <h4>${item.name}</h4>
-          <p>${item.description || ""}</p>
-          <strong>&#8377;${item.price}</strong>
-<br>
-          <button onclick="addToCart('${item.name.replace(/'/g,"\\'")}', ${item.price})">Add to Cart</button>
-        `;
+        div.innerHTML = buildMenuCardHTML(item);
         menuDiv.appendChild(div);
+        activateVariantSelector(item);
       });
     }
   });
 }
+
 
 function clearFilters() {
   document.getElementById("menuSearch").value = "";
@@ -894,12 +892,25 @@ function clearFilters() {
   renderMenu(menuItems);
 }
 
-    function addToCart(name, price) {
-      const existing = cart.find(i => i.name === name);
-      if (existing) existing.quantity++;
-      else cart.push({ name, price, quantity: 1 });
-      renderCart();
-    }
+function addToCart(name, price, unit) {
+  let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+  const existing = cart.find(i => i.name === name && i.unit === unit);
+
+  if (existing) {
+    existing.quantity++;
+  } else {
+    cart.push({
+      name,
+      unit,
+      price,
+      quantity: 1
+    });
+  }
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+  alert(`${name} (${unit}) added to cart`);
+}
 
     function renderCart() {
       const tbody = document.querySelector('#cartTable tbody');
@@ -1113,29 +1124,43 @@ function toggleAddressField() {
 
 function filterMenu() {
   const text = document.getElementById("menuSearch").value.toLowerCase();
-  const selected = document.getElementById("categoryFilter").value.toLowerCase();
+  const selected = document.getElementById("categoryFilter").value; // note: keep original case (Title Case)
 
-  // Step 1: canonical category detect recursively
+  // priority list - same as renderMenu/populateCategoryDropdown
+  const categoryPriority = [
+    "starters",
+    "snacks",
+    "drinks",
+    "mocktails",
+    "cocktails",
+    "main course",
+    "sweets",
+    "desserts"
+  ];
+
+  // Step 1: canonical category detect (PASS priority list)
   let filtered = menuItems.map(i => ({
     ...i,
-    canonical: canonicalCategory(i.category).toLowerCase()
+    canonical: canonicalCategory(i.category, categoryPriority).toLowerCase()
   }));
 
-  // Step 2: Apply category filter
-  if (selected !== "") {
-    filtered = filtered.filter(i => i.canonical === selected);
+  // Step 2: Apply category filter (if selected not empty)
+  if (selected && selected.trim() !== "") {
+    const selLower = selected.toLowerCase();
+    filtered = filtered.filter(i => i.canonical === selLower);
   }
 
   // Step 3: Apply text filter
   if (text.trim() !== "") {
+    const q = text.trim();
     filtered = filtered.filter(i =>
-      i.name.toLowerCase().includes(text) ||
-      (i.description && i.description.toLowerCase().includes(text))
+      (String(i.name || "").toLowerCase().includes(q)) ||
+      (i.description && String(i.description).toLowerCase().includes(q))
     );
   }
 
-  // If no filter ? show full grouped menu
-  if (selected === "" && text.trim() === "") {
+  // If no filter ? show full grouped menu (reuse renderMenu)
+  if ((!selected || selected === "") && text.trim() === "") {
     renderMenu(menuItems);
     return;
   }
@@ -1148,19 +1173,30 @@ function filterMenu() {
     return;
   }
 
-  // Step 4: Group filtered results by canonical category
+  // Step 4: Group filtered results by canonical category (preserve ordering by priority)
   const groups = {};
   filtered.forEach(item => {
-    const cat = item.canonical;
+    const cat = item.canonical || "Other";
     if (!groups[cat]) groups[cat] = [];
     groups[cat].push(item);
   });
 
-  // Step 5: Show groups with heading (same UI as renderMenu)
-  Object.keys(groups).forEach(cat => {
+  // Build order: priority first, then alphabetic
+  const groupKeys = Object.keys(groups);
+  groupKeys.sort((a,b) => {
+    const ai = categoryPriority.indexOf(a);
+    const bi = categoryPriority.indexOf(b);
+    if (ai !== -1 && bi !== -1) return ai - bi;
+    if (ai !== -1) return -1;
+    if (bi !== -1) return 1;
+    return a.localeCompare(b);
+  });
+
+  // Step 5: Render groups using buildMenuCardHTML + activateVariantSelector
+  groupKeys.forEach(cat => {
     const heading = document.createElement("h2");
     heading.classList.add("slideIn");
-
+    // Title case heading
     heading.innerHTML = cat.replace(/\b\w/g, c => c.toUpperCase());
     heading.style.margin = "10px 0 5px";
     heading.style.padding = "10px";
@@ -1174,17 +1210,21 @@ function filterMenu() {
       const div = document.createElement("div");
       div.className = "menu-item fadeIn";
 
-      div.innerHTML = `
-        <img src="${item.image}">
-        <h4>${item.name}</h4>
-        <p>${item.description || ""}</p>
-        <strong>&#8377;${item.price}</strong><br>
-        <button onclick="addToCart('${item.name}', ${item.price})">Add to Cart</button>
-      `;
+      // Use the same card builder as the main view (handles Single / Multi)
+      div.innerHTML = buildMenuCardHTML(item);
       menuDiv.appendChild(div);
+
+      // Activate variant selector if item is multi (so radio -> button enabling works)
+      try {
+        activateVariantSelector(item);
+      } catch (e) {
+        // fail-safe: don't break UI on JS errors
+        console.error("activateVariantSelector error:", e);
+      }
     });
   });
 }
+
 
   </script>
 <div id="loginProgressOverlay" style="
@@ -2211,11 +2251,81 @@ function apiPost(api, data = {}) {
     body: JSON.stringify(data)  // ??? ?? header ?? ????
   }).then(res => res.json());
 }
+
+  function buildMenuCardHTML(item) {
+  let priceSection = "";
+  let cartSection = "";
+
+  // SINGLE ITEM
+  if (item.cat2 === "Single") {
+    priceSection = `
+      <strong>₹${item.price}</strong><br>
+      <small>${item.unit || ""}</small>
+    `;
+    cartSection = `
+      <button onclick="addToCart('${item.name}', ${item.price}, '${item.unit}')">
+        Add to Cart
+      </button>
+    `;
+  }
+
+  // MULTI ITEM
+  if (item.cat2 === "Multi") {
+    let variantsHTML = "";
+    item.variants.forEach(v => {
+      variantsHTML += `
+        <label class="variant-row">
+          <input type="radio" name="var-${item.name}" data-unit="${v.unit}" data-price="${v.price}">
+          ${v.unit} - ₹${v.price}
+        </label>
+      `;
+    });
+
+    priceSection = `<div class="variant-box">${variantsHTML}</div>`;
+
+    cartSection = `
+      <button disabled id="btn-${item.name}" onclick="addVariantToCart('${item.name}')">
+        Select a Variant
+      </button>
+    `;
+  }
+
+  return `
+    <img src="${item.image}" alt="${item.name}">
+    <h4>${item.name}</h4>
+    <p>${item.description || ""}</p>
+    ${priceSection}
+    ${cartSection}
+  `;
+}
+function activateVariantSelector(item) {
+  if (item.cat2 !== "Multi") return;
+
+  const radios = document.querySelectorAll(`input[name="var-${item.name}"]`);
+  radios.forEach(r => {
+    r.addEventListener("change", () => {
+      const btn = document.getElementById(`btn-${item.name}`);
+      btn.disabled = false;
+      btn.innerText = "Add to Cart";
+    });
+  });
+}
+function addVariantToCart(name) {
+  const selected = document.querySelector(`input[name="var-${name}"]:checked`);
+  if (!selected) return;
+
+  const unit = selected.dataset.unit;
+  const price = Number(selected.dataset.price);
+
+  addToCart(name, price, unit);
+}
+
 </script>
 
     
     </body>
 </html>
+
 
 
 
