@@ -94,8 +94,13 @@ button:active::after {
 
 .menu-item button {
   margin-top: auto;
-  display: block;
+  display: inline-block;   /* full width nahi lega */
+  width: auto;             /* text ke hisaab se size */
+  padding: 6px 14px;       /* perfect compact size */
+  font-size: 14px;
+  align-self: center;      /* center me aayega */
 }
+
 
     .menu-item img {
       width: 100%;
@@ -2210,6 +2215,7 @@ function apiPost(api, data = {}) {
     
     </body>
 </html>
+
 
 
 
