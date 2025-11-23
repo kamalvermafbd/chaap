@@ -893,8 +893,10 @@ function clearFilters() {
 }
 
 function addToCart(name, price, unit) {
+  // Step 1: Load cart from storage
   let cart = JSON.parse(localStorage.getItem("cart") || "[]");
 
+  // Step 2: Check if same item + same unit already exists
   const existing = cart.find(i => i.name === name && i.unit === unit);
 
   if (existing) {
@@ -908,9 +910,18 @@ function addToCart(name, price, unit) {
     });
   }
 
+  // Step 3: Save updated cart into storage
   localStorage.setItem("cart", JSON.stringify(cart));
+
+  // Step 4: Update GLOBAL cart variable also
+  window.cart = cart;
+
+  // Step 5: Re-render cart table
+  renderCart();
+
   alert(`${name} (${unit}) added to cart`);
 }
+
 
     function renderCart() {
       const tbody = document.querySelector('#cartTable tbody');
@@ -1724,8 +1735,6 @@ window.addEventListener("load", () => {
   }
 });
 
-
-
 function validateLoginMobile() {
   const input = document.getElementById("loginMobile");
   const error = document.getElementById("mobileError");
@@ -2319,20 +2328,7 @@ function addVariantToCart(name) {
 
   addToCart(name, price, unit);
 }
-
+  
 </script>
-
-    
-    </body>
+</body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
