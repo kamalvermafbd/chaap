@@ -193,6 +193,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap:10px;
   padding: 6px 4px;
   background: #f9f9f9;
   border-radius: 6px;
@@ -2308,7 +2309,7 @@ function apiPost(api, data = {}) {
 
     cartSection = `
       <button disabled id="btn-${item.name}" onclick="addVariantToCart('${item.name}')">
-        Select a Variant
+        Add to Cart
       </button>
     `;
   }
@@ -2337,17 +2338,23 @@ btn.style.background = "#ff6347";
 }
 function addVariantToCart(name) {
   const selected = document.querySelector(`input[name="var-${name}"]:checked`);
-  if (!selected) return;
+
+  if (!selected) {
+    alert("Please select an option");
+    return;
+  }
 
   const unit = selected.dataset.unit;
   const price = Number(selected.dataset.price);
 
   addToCart(name, price, unit);
 }
+
   
 </script>
 </body>
 </html>
+
 
 
 
