@@ -86,10 +86,20 @@ button:active::after {
       padding: 10px;
     }
       .menu-item h4, 
-.menu-item p,
-.menu-item img {
+      .menu-item p,
+      .menu-item img {
       text-align: center;
     }
+    /* FIX SINGLE ITEM PRICE ALIGNMENT */
+.menu-item .variant-row {
+  text-align: left !important;
+}
+
+.menu-item .variant-row .unit,
+.menu-item .variant-row .price {
+  text-align: left !important;
+}
+
     /* Keep button fixed at bottom */
 .menu-item {
   display: flex;
@@ -2303,8 +2313,12 @@ function apiPost(api, data = {}) {
   // SINGLE ITEM
   if (item.cat2 === "Single") {
     priceSection = `
-      <strong>₹${item.price}</strong><br>
-      <small>${item.unit || ""}</small>
+      <div class="variant-row" style="margin-top:10px;">
+    <div class="left-side">
+       <span class="unit">${item.unit || ""}</span>
+    </div>
+    <span class="price">₹${item.price}</span>
+  </div>
     `;
     cartSection = `
       <button onclick="addToCart('${item.name}', ${item.price}, '${item.unit}')">
@@ -2384,6 +2398,7 @@ function addVariantToCart(name) {
 </script>
 </body>
 </html>
+
 
 
 
