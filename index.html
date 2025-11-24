@@ -306,6 +306,13 @@ body {
 @media (min-width:520px) {
   .variant-row { white-space: nowrap; }
 }
+/* Visual-only "disabled" look so clicks still work */
+.disabled-btn {
+  background: #ccc !important;
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: auto !important; /* ensure clicks are still delivered */
+}
 
 /* Profile Page Input Styling */
 #profilePage input {
@@ -2416,14 +2423,14 @@ if (item.cat2 === "Multi") {
 
   priceSection = `<div class="variant-box">${variantsHTML}</div>`;
 
-  cartSection = `
-    <button class="add-btn"
-            onclick="addVariantToCart('${item.name}')"
-            id="btn-${idSafe}"
-            disabled>
-      Add to Cart
-    </button>
-  `;
+ cartSection = `
+  <button class="add-btn disabled-btn"
+          onclick="addVariantToCart('${item.name}')"
+          id="btn-${idSafe}">
+    Add to Cart
+  </button>
+`;
+
 }
 
   return `
@@ -2442,14 +2449,19 @@ function activateVariantSelector(item) {
   const btn = document.getElementById(`btn-${idSafe}`);
 
   radios.forEach(r => {
-    r.addEventListener("change", () => {
-      btn.disabled = false;
-      btn.dataset.price = r.dataset.price;
-      btn.dataset.unit = r.dataset.unit;
+   r.addEventListener("change", () => {
+  // enable visually: remove the disabled visual class
+  btn.classList.remove("disabled-btn");
 
-      btn.style.background = "#ff6347";
-      btn.style.opacity = "1";
-    });
+  // store selected variant data on button (used by delegated click handler)
+  btn.dataset.price = r.dataset.price;
+  btn.dataset.unit  = r.dataset.unit;
+
+  // restore normal appearance
+  btn.style.background = "#ff6347";
+  btn.style.opacity = "1";
+});
+
   });
 }
 
@@ -2466,10 +2478,51 @@ function addVariantToCart(name) {
   addToCart(name, price, unit);
 }
 
+// Delegated click handler for all Add buttons (works for Single and Multi)
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('.add-btn');
+  if (!btn) return;
+
+  // If visually-disabled, show alert and stop
+  if (btn.classList.contains('disabled-btn')) {
+    alert("Please select an option before adding to cart.");
+    return;
+  }
+
+  // Otherwise determine source of data and add to cart
+  // For Single items we placed data- attributes in HTML; for Multi we
+  // set dataset price/unit on variant selection.
+  const name  = btn.dataset.name || btn.getAttribute('data-name') || btn.closest('.menu-item')?.querySelector('h4')?.innerText || "Item";
+  const price = Number(btn.dataset.price || btn.getAttribute('data-price') || 0);
+  const unit  = btn.dataset.unit  || btn.getAttribute('data-unit') || "";
+
+  // If price is 0 or absent, try to pick from nearest .price text (fallback)
+  if (!price || price === 0) {
+    const priceElem = btn.closest('.menu-item')?.querySelector('.price');
+    if (priceElem) {
+      const txt = priceElem.innerText.replace(/[^\d.]/g, "");
+      if (txt) {
+        const fallback = Number(txt);
+        if (!isNaN(fallback)) {
+          addToCart(name, fallback, unit);
+          return;
+        }
+      }
+    }
+    alert("Price not found for this item.");
+    return;
+  }
+
+  // Good: add to cart
+  addToCart(name, price, unit);
+});
+</script>
+
 
 
   
 </script>
 </body>
 </html>
+
 
