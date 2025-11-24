@@ -1230,7 +1230,17 @@ function deleteCart() {
     renderCart();
 }
 
-    
+    function removeItem(index) {
+  // Remove from array
+  cart.splice(index, 1);
+
+  // Save updated array in localStorage (memory se bhi remove)
+  localStorage.setItem("cart", JSON.stringify(cart));
+
+  // Re-render cart UI
+  renderCart();
+}
+
  function checkCustomerByMobile() {
   const mobile = document.getElementById('mobile').value.trim();
 
@@ -2762,6 +2772,7 @@ document.addEventListener('click', function (e) {
 </script>
 </body>
 </html>
+
 
 
 
