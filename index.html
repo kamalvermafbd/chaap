@@ -1163,7 +1163,8 @@ function addToCart(name, unit, rate, discPercent = 0) {
         <td>₹ ${discAmt.toFixed(2)}</td>
         <td>₹ ${netAmt.toFixed(2)}</td>
         <td>₹ ${total.toFixed(2)}</td>
-        <td><button onclick="removeItem(${idx})">Delete</button></td>
+        <td><button class="delete-btn" data-index="${idx}">Delete</button></td>
+
       `;
     } else {
       // No discount mode
@@ -2756,6 +2757,7 @@ document.addEventListener('click', function(e) {
 </script>
 </body>
 </html>
+
 
 
 
