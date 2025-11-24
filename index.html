@@ -2313,13 +2313,15 @@ function apiPost(api, data = {}) {
   // SINGLE ITEM
   if (item.cat2 === "Single") {
     priceSection = `
-      <div class="variant-row" style="margin-top:10px;">
-    <div class="left-side">
-       <span class="unit">${item.unit || ""}</span>
+  <div class="variant-box">
+    <div class="variant-row">
+      <div class="left-side">
+        <span class="unit">${item.unit || ""}</span>
+      </div>
+      <span class="price">₹${item.price}</span>
     </div>
-    <span class="price">₹${item.price}</span>
   </div>
-    `;
+`;
     cartSection = `
       <button onclick="addToCart('${item.name}', ${item.price}, '${item.unit}')">
         Add to Cart
@@ -2398,6 +2400,7 @@ function addVariantToCart(name) {
 </script>
 </body>
 </html>
+
 
 
 
