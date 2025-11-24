@@ -1025,15 +1025,45 @@ function clearFilters() {
   renderMenu(menuItems);
 }
 
-function addToCart(name, price, unit) {
+function addToCart(name, unit, rate, discPercent = 0) {
   let stored = JSON.parse(localStorage.getItem("cart") || "[]");
 
   const existing = stored.find(i => i.name === name && i.unit === unit);
 
   if (existing) {
-    existing.quantity++;
+    existing.qty++;
+
+    existing.total = existing.qty * existing.rate;
+
+    if (existing.discPercent > 0) {
+      existing.discAmt = existing.total * (existing.discPercent / 100);
+      existing.netAmt = existing.total - existing.discAmt;
+    } else {
+      delete existing.discAmt;
+      delete existing.netAmt;
+    }
+
   } else {
-    stored.push({ name, unit, price, quantity: 1 });
+    const qty = 1;
+    const total = rate * qty;
+
+    let newItem = {
+      name,
+      unit,
+      qty,
+      rate,
+      total
+    };
+
+    // ONLY add discount fields if discount > 0
+    if (discPercent > 0) {
+      const discAmt = total * (discPercent / 100);
+      newItem.discPercent = discPercent;
+      newItem.discAmt = discAmt;
+      newItem.netAmt = total - discAmt;
+    }
+
+    stored.push(newItem);
   }
 
   localStorage.setItem("cart", JSON.stringify(stored));
@@ -1044,6 +1074,7 @@ function addToCart(name, price, unit) {
   renderCart();
   alert(`${name} (${unit}) added to cart`);
 }
+
 
 
     function renderCart() {
@@ -2610,6 +2641,7 @@ addToCart(name, price, unit);
 </script>
 </body>
 </html>
+
 
 
 
