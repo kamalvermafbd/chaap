@@ -313,6 +313,17 @@ body {
   cursor: not-allowed;
   pointer-events: auto !important; /* ensure clicks are still delivered */
 }
+    .final-price {
+  font-size: 16px;
+  font-weight: 700;
+}
+.mrp {
+  text-decoration: line-through;
+  color: #777;
+  margin-left: 6px;
+  font-size: 13px;
+}
+
 
 /* Profile Page Input Styling */
 #profilePage input {
@@ -2395,24 +2406,47 @@ function apiPost(api, data = {}) {
   let cartSection = "";
 
   // SINGLE ITEM
-  if (item.cat2 === "Single") {
-    priceSection = `
-  <div class="variant-box">
-    <div class="variant-row">
-      <div class="left-side">
-        <span class="unit">${item.unit || ""}</span>
+if (item.cat2 === "Single") {
+  priceSection = `
+    <div class="variant-box">
+      <div class="variant-row">
+        <div class="left-side">
+          <span class="unit">${item.unit || ""}</span>
+
+          ${item.discPercent > 0 ? `
+            <span style="background:#ff3e3e;color:#fff;font-size:11px;
+                         padding:2px 4px;border-radius:3px;">
+              ${item.discPercent}% OFF
+            </span>
+          ` : ""}
+        </div>
+
+        <div style="text-align:right;">
+          <span class="final-price" style="font-weight:700;font-size:16px;">
+            ₹${item.finalPrice}
+          </span>
+
+          ${item.discPercent > 0 ? `
+            <span class="mrp" 
+                  style="text-decoration:line-through;color:#777;
+                         margin-left:6px;font-size:13px;">
+              ₹${item.price}
+            </span>
+          ` : ""}
+        </div>
       </div>
-      <span class="price">₹${item.price}</span>
     </div>
-  </div>
-`;
-    cartSection = `
-      <button class="add-btn"
-        data-name="${item.name}"
-        data-price="${item.price}"
-        data-unit="${item.unit}">
-  Add to Cart
-</button>
+  `;
+
+  cartSection = `
+    <button class="add-btn"
+      data-name="${item.name}"
+      data-price="${item.finalPrice}"
+      data-unit="${item.unit}">
+      Add to Cart
+    </button>`;
+}
+
 
     `;
   }
@@ -2423,20 +2457,44 @@ if (item.cat2 === "Multi") {
   const idSafe = slugify(item.name);
 
   let variantsHTML = "";
-  item.variants.forEach(v => {
-    variantsHTML += `
-      <label class="variant-row">
-        <div class="left-side">
-          <input type="radio"
-                 name="var-${idSafe}"
-                 data-unit="${v.unit}"
-                 data-price="${v.price}">
-          <span class="unit">${v.unit}</span>
-        </div>
-        <span class="price">₹${v.price}</span>
-      </label>
-    `;
-  });
+ item.variants.forEach(v => {
+  variantsHTML += `
+    <label class="variant-row">
+      <div class="left-side">
+        <input type="radio"
+               name="var-${idSafe}"
+               data-unit="${v.unit}"
+               data-price="${v.finalPrice}"
+               data-mrp="${v.price}"
+               data-disc="${v.discPercent}">
+
+        <span class="unit">${v.unit}</span>
+
+        ${v.discPercent > 0 ? `
+          <span style="background:#ff3e3e;color:#fff;
+                       font-size:11px;padding:2px 4px;
+                       border-radius:3px;">
+            ${v.discPercent}% OFF
+          </span>
+        ` : ""}
+      </div>
+
+      <div style="text-align:right;">
+        <span class="final-price" 
+              style="font-weight:700;font-size:16px;">
+          ₹${v.finalPrice}
+        </span>
+
+        ${v.discPercent > 0 ? `
+          <span style="text-decoration:line-through;
+                       color:#777;margin-left:6px;font-size:13px;">
+            ₹${v.price}
+          </span>
+        ` : ""}
+      </div>
+    </label>
+  `;
+});
 
   priceSection = `<div class="variant-box">${variantsHTML}</div>`;
 
@@ -2552,6 +2610,7 @@ addToCart(name, price, unit);
 </script>
 </body>
 </html>
+
 
 
 
