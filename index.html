@@ -1182,29 +1182,30 @@ function addToCart(name, unit, rate, discPercent = 0) {
   document.getElementById("cartTotal").innerText = grandTotal.toFixed(2);
 }
 
-
-    function updateQty(index, qty) {
+function updateQty(index, qty) {
   qty = parseInt(qty);
   if (qty < 1) qty = 1;
 
   const item = cart[index];
+
+  const rate = Number(item.rate);                 // MRP
+  const disc = Number(item.discPercent || 0);     // %
+  
+  // Recalculate properly:
+  const discAmt = (rate * disc) / 100;
+  const netAmt  = rate - discAmt;
+  const total   = netAmt * qty;
+
+  // Store updated values
   item.qty = qty;
+  item.discAmt = discAmt;
+  item.netAmt  = netAmt;
+  item.total   = total;
 
-  // Recalculate totals
-  item.total = item.rate * item.qty;
-
-  // If item has discount fields
-  if (item.discPercent > 0) {
-    item.discAmt = item.total * (item.discPercent / 100);
-    item.netAmt = item.total - item.discAmt;
-  } else {
-    // ensure no leftover fields
-    delete item.discAmt;
-    delete item.netAmt;
-  }
-
-  // Save & render
+  // Save to storage
   localStorage.setItem("cart", JSON.stringify(cart));
+
+  // Re-render table
   renderCart();
 }
 
@@ -2748,6 +2749,7 @@ addToCart(name, unit, price, discPercent);
 </script>
 </body>
 </html>
+
 
 
 
