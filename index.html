@@ -1173,7 +1173,8 @@ function addToCart(name, unit, rate, discPercent = 0) {
         <td><input type="number" value="${qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
         <td>₹ ${rate.toFixed(2)}</td>
         <td>₹ ${total.toFixed(2)}</td>
-        <td><button onclick="removeItem(${idx})">Delete</button></td>
+        <td><button class="delete-btn" data-index="${idx}">Delete</button></td>
+
       `;
     }
 
@@ -2761,6 +2762,7 @@ document.addEventListener('click', function (e) {
 </script>
 </body>
 </html>
+
 
 
 
