@@ -2685,13 +2685,17 @@ function addVariantToCart(name) {
   const selected = document.querySelector(`input[name="var-${idSafe}"]:checked`);
   if (!selected) return null;
 
+  const mrp = Number(selected.dataset.mrp || 0);
+  const disc = Number(selected.dataset.disc || 0);
+
   return {
     name: name,
     unit: selected.dataset.unit,
-    rate: Number(selected.dataset.mrp),          // ✔ CORRECT
-    discPercent: Number(selected.dataset.disc || 0)
+    rate: mrp,
+    discPercent: disc
   };
 }
+
 
 
 
@@ -2701,27 +2705,32 @@ document.addEventListener('click', function(e) {
   const btn = e.target.closest('.add-btn');
   if (!btn) return;
 
+  // Prevent click if disabled visually
   if (btn.classList.contains('disabled-btn')) {
     alert("Please select an option before adding to cart.");
     return;
   }
 
-  const name  = btn.dataset.name;
-  const unit  = btn.dataset.unit || "";
+  const name = btn.dataset.name;
+  const unit = btn.dataset.unit || "";
   const price = Number(btn.dataset.price || 0);
   const discPercent = Number(btn.dataset.disc || 0);
 
-  // Price validation (no fallback)
-  if (!price || price <= 0 || isNaN(price)) {
-    alert("Price not found for this item.");
-    return;
-  }
-
-  // MULTI ITEM
+  // ============================
+  //      MULTI ITEM
+  // ============================
   if (btn.id && btn.id.startsWith("btn-")) {
+
     const info = addVariantToCart(name);
+
     if (!info) {
       alert("Please select an option before adding to cart.");
+      return;
+    }
+
+    // STRICT validation for multi item
+    if (!info.rate || info.rate <= 0 || isNaN(info.rate)) {
+      alert("Price not found for this variant.");
       return;
     }
 
@@ -2729,15 +2738,25 @@ document.addEventListener('click', function(e) {
     return;
   }
 
-  // SINGLE ITEM
+  // ============================
+  //      SINGLE ITEM
+  // ============================
+
+  if (!price || price <= 0 || isNaN(price)) {
+    alert("Price not found for this item.");
+    return;
+  }
+
   addToCart(name, unit, price, discPercent);
 });
+
 
 </script>
   
 </script>
 </body>
 </html>
+
 
 
 
