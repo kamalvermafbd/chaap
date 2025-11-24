@@ -2429,21 +2429,26 @@ function activateVariantSelector(item) {
   if (item.cat2 !== "Multi") return;
 
   const radios = document.querySelectorAll(`input[name="var-${item.name}"]`);
+
   radios.forEach(r => {
     r.addEventListener("change", () => {
       const btn = document.getElementById(`btn-${item.name}`);
+
       btn.disabled = false;
       btn.textContent = "Add to Cart";
-btn.style.background = "#ff6347";
 
+      // Make button visually active (premium look)
+      btn.style.background = "#ff6347";
+      btn.style.opacity = "1";
     });
   });
 }
+
 function addVariantToCart(name) {
   const selected = document.querySelector(`input[name="var-${name}"]:checked`);
 
   if (!selected) {
-    alert("Please select an option");
+    alert("Please choose a variant first.");
     return;
   }
 
@@ -2453,10 +2458,12 @@ function addVariantToCart(name) {
   addToCart(name, price, unit);
 }
 
+
   
 </script>
 </body>
 </html>
+
 
 
 
