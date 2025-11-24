@@ -1145,10 +1145,10 @@ function addToCart(name, unit, rate, discPercent = 0) {
     const qty  = Number(item.qty);
     const disc = Number(item.discPercent || 0);
 
-    // Calculations
-    const discAmt = (rate * disc) / 100;
-    const netAmt  = rate - discAmt;
-    const total   = netAmt * qty;
+    // --- SAFE CALCULATIONS (avoid JS float issues) ---
+    const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
+    const netAmt  = parseFloat((rate - discAmt).toFixed(2));
+    const total   = parseFloat((netAmt * qty).toFixed(2));
 
     grandTotal += total;
 
@@ -1158,7 +1158,7 @@ function addToCart(name, unit, rate, discPercent = 0) {
       tr.innerHTML = `
         <td>${item.name} (${item.unit})</td>
         <td><input type="number" value="${qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
-        <td>₹ ${rate}</td>
+        <td>₹ ${rate.toFixed(2)}</td>
         <td>${disc}%</td>
         <td>₹ ${discAmt.toFixed(2)}</td>
         <td>₹ ${netAmt.toFixed(2)}</td>
@@ -1170,7 +1170,7 @@ function addToCart(name, unit, rate, discPercent = 0) {
       tr.innerHTML = `
         <td>${item.name} (${item.unit})</td>
         <td><input type="number" value="${qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
-        <td>₹ ${rate}</td>
+        <td>₹ ${rate.toFixed(2)}</td>
         <td>₹ ${total.toFixed(2)}</td>
         <td><button onclick="removeItem(${idx})">Delete</button></td>
       `;
@@ -1179,6 +1179,7 @@ function addToCart(name, unit, rate, discPercent = 0) {
     tbody.appendChild(tr);
   });
 
+  // SAFE ROUND FINAL TOTAL
   document.getElementById("cartTotal").innerText = grandTotal.toFixed(2);
 }
 
@@ -2742,6 +2743,7 @@ document.addEventListener('click', function(e) {
 </script>
 </body>
 </html>
+
 
 
 
