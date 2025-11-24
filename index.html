@@ -2480,15 +2480,16 @@ function activateVariantSelector(item) {
 function addVariantToCart(name) {
   const idSafe = slugify(name);
   const selected = document.querySelector(`input[name="var-${idSafe}"]:checked`);
-  if (!selected) {
-    alert("Please select an option before adding to cart.");
+  if (!selected) return null;
 
-    return;
-  }
-  const unit = selected.dataset.unit;
-  const price = Number(selected.dataset.price);
-  addToCart(name, price, unit);
+  return {
+    name: name,
+    unit: selected.dataset.unit,
+    price: Number(selected.dataset.price)
+  };
 }
+
+
 
 // Delegated click handler for all Add buttons (works for Single and Multi)
 document.addEventListener('click', function(e) {
@@ -2525,17 +2526,23 @@ document.addEventListener('click', function(e) {
     return;
   }
 
-  // Good: add to cart
-  addToCart(name, price, unit);
+  // MULTI ITEM: identifier "btn-..."
+if (btn.id && btn.id.startsWith("btn-")) {
+    const info = addVariantToCart(name);
+    if (!info) {
+      alert("Please select an option before adding to cart.");
+      return;
+    }
+    addToCart(info.name, info.price, info.unit);
+    return;
+}
+
+// SINGLE ITEM
+addToCart(name, price, unit);
+
 });
 </script>
-
-
-
   
 </script>
 </body>
 </html>
-
-
-
