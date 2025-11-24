@@ -2403,7 +2403,8 @@ if (item.cat2 === "Multi") {
 
         <div class="left-side">
           <input type="radio" 
-                 name="var-${item.name}" 
+                 name="var-${idSafe}"
+ 
                  data-unit="${v.unit}" 
                  data-price="${v.price}">
           <span class="unit">${v.unit}</span>
@@ -2491,6 +2492,7 @@ document.addEventListener("click", (e) => {
 </script>
 </body>
 </html>
+
 
 
 
