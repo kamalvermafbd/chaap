@@ -2527,56 +2527,53 @@ function apiPost(api, data = {}) {
     body: JSON.stringify(data)  // ??? ?? header ?? ????
   }).then(res => res.json());
 }
-
-  function buildMenuCardHTML(item) {
+  
+function buildMenuCardHTML(item) {
   let priceSection = "";
   let cartSection = "";
 
   // SINGLE ITEM
-if (item.cat2 === "Single") {
-  priceSection = `
-    <div class="variant-box">
-      <div class="variant-row">
-        <div class="left-side">
-          <span class="unit">${item.unit || ""}</span>
+ // SINGLE ITEM
+  if (item.cat2 === "Single") {
+    priceSection = `
+      <div class="variant-box">
+        <div class="variant-row">
+          <div class="left-side">
+            <span class="unit">${item.unit || ""}</span>
 
-          ${item.discPercent > 0 ? `
-            <span style="background:#ff3e3e;color:#fff;font-size:11px;
-                         padding:2px 4px;border-radius:3px;">
-              ${item.discPercent}% OFF
+            ${item.discPercent > 0 ? `
+              <span style="background:#ff3e3e;color:#fff;font-size:11px;
+                           padding:2px 4px;border-radius:3px;">
+                ${item.discPercent}% OFF
+              </span>
+            ` : ""}
+          </div>
+
+          <div style="text-align:right;">
+            <span class="final-price" style="font-weight:700;font-size:16px;">
+              ₹${item.finalPrice}
             </span>
-          ` : ""}
-        </div>
 
-        <div style="text-align:right;">
-          <span class="final-price" style="font-weight:700;font-size:16px;">
-            ₹${item.finalPrice}
-          </span>
-
-          ${item.discPercent > 0 ? `
-            <span class="mrp" 
-                  style="text-decoration:line-through;color:#777;
-                         margin-left:6px;font-size:13px;">
-              ₹${item.price}
-            </span>
-          ` : ""}
+            ${item.discPercent > 0 ? `
+              <span class="mrp" 
+                    style="text-decoration:line-through;color:#777;
+                           margin-left:6px;font-size:13px;">
+                ₹${item.price}
+              </span>
+            ` : ""}
+          </div>
         </div>
       </div>
-    </div>
-  `;
+    `;
 
-  cartSection = `
-  <button class="add-btn"
-  data-name="${item.name}"
-  data-unit="${item.unit}"
-  data-price="${item.finalPrice}"
-  data-disc="${item.discPercent || 0}">
-  Add to Cart
-</button>
-
-}
-
-
+    cartSection = `
+      <button class="add-btn"
+        data-name="${item.name}"
+        data-unit="${item.unit}"
+        data-price="${item.finalPrice}"
+        data-disc="${item.discPercent || 0}">
+        Add to Cart
+      </button>
     `;
   }
 
@@ -2744,6 +2741,7 @@ addToCart(name, unit, price, discPercent);
 </script>
 </body>
 </html>
+
 
 
 
