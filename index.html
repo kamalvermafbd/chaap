@@ -1060,10 +1060,16 @@ function addToCart(name, price, unit) {
       renderCart();
     }
 
-    function removeItem(index) {
-      cart.splice(index, 1);
-      renderCart();
-    }
+  function removeItem(index) {
+  // 1. Remove from memory array
+  cart.splice(index, 1);
+
+  // 2. Update localStorage
+  localStorage.setItem("cart", JSON.stringify(cart));
+
+  // 3. Re-render cart
+  renderCart();
+}
 
     function openCheckout() {
       if (cart.length === 0) {
@@ -1076,6 +1082,11 @@ function addToCart(name, price, unit) {
     function closeCheckout() {
       document.getElementById('checkoutModal').style.display = 'none';
     }
+function deleteCart() {
+    cart = [];
+    localStorage.removeItem("cart");
+    renderCart();
+}
 
     
  function checkCustomerByMobile() {
@@ -2425,10 +2436,11 @@ if (item.cat2 === "Multi") {
 
  cartSection = `
   <button class="add-btn disabled-btn"
-          onclick="addVariantToCart('${item.name}')"
-          id="btn-${idSafe}">
+        id="btn-${idSafe}"
+        data-name="${item.name}">
     Add to Cart
-  </button>
+</button>
+
 `;
 
 }
@@ -2524,5 +2536,6 @@ document.addEventListener('click', function(e) {
 </script>
 </body>
 </html>
+
 
 
