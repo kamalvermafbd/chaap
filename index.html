@@ -1192,7 +1192,7 @@ function toggleAddressField() {
       alert("Error loading customer details.");
     });
 }
-    function placeOrder() {
+function placeOrder() {
   const customerName = document.getElementById('customerName').value.trim();
   const email = document.getElementById('email').value.trim();
   const mobile = document.getElementById('mobile').value.trim();
@@ -1238,7 +1238,9 @@ function toggleAddressField() {
           `Order placed successfully!\nYour Order Number: ${res.orderNumber}\n\n${res.message}`
         );
         cart = [];
+         localStorage.removeItem("cart");
         renderCart();
+        
         closeCheckout();
       } else {
         alert(res.message || "Order failed.");
@@ -2550,6 +2552,7 @@ addToCart(name, price, unit);
 </script>
 </body>
 </html>
+
 
 
 
