@@ -1189,44 +1189,24 @@ function updateQty(index, qty) {
 
   const item = cart[index];
 
-  const rate = Number(item.rate);                 // MRP
-  const disc = Number(item.discPercent || 0);     // %
-  
-  // Recalculate properly:
-  const discAmt = (rate * disc) / 100;
-  const netAmt  = rate - discAmt;
-  const total   = netAmt * qty;
+  const rate = Number(item.rate);       // MRP
+  const disc = Number(item.discPercent || 0);
 
-  // Store updated values
+  // --- SAFE CALCULATIONS (fixed rounding) ---
+  const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
+  const netAmt  = parseFloat((rate - discAmt).toFixed(2));
+  const total   = parseFloat((netAmt * qty).toFixed(2));
+
+  // --- Store clean values ---
   item.qty = qty;
   item.discAmt = discAmt;
   item.netAmt  = netAmt;
   item.total   = total;
 
-  // Save to storage
-  localStorage.setItem("cart", JSON.stringify(cart));
-
-  // Re-render table
-  renderCart();
-}
-
-
-function removeItem(index) {
-  // Remove the item
-  cart.splice(index, 1);
-
-  // Clean cart values (ensure no leftover fields)
-  cart = cart.map(i => {
-    i.qty = Number(i.qty);
-    i.rate = Number(i.rate);
-    i.discPercent = Number(i.discPercent || 0);
-    return i;
-  });
-
   // Save updated cart
   localStorage.setItem("cart", JSON.stringify(cart));
 
-  // Re-render table (auto header + totals)
+  // Re-render table (safe)
   renderCart();
 }
 
@@ -2743,6 +2723,7 @@ document.addEventListener('click', function(e) {
 </script>
 </body>
 </html>
+
 
 
 
