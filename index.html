@@ -2535,12 +2535,14 @@ if (item.cat2 === "Single") {
   `;
 
   cartSection = `
-    <button class="add-btn"
-      data-name="${item.name}"
-      data-price="${item.finalPrice}"
-      data-unit="${item.unit}">
-      Add to Cart
-    </button>`;
+  <button class="add-btn"
+  data-name="${item.name}"
+  data-unit="${item.unit}"
+  data-rate="${item.finalPrice}"
+  data-disc="${item.discPercent || 0}">
+  Add to Cart
+</button>
+
 }
 
 
@@ -2710,6 +2712,7 @@ addToCart(name, unit, price, discPercent);
 </script>
 </body>
 </html>
+
 
 
 
