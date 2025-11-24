@@ -1057,6 +1057,9 @@ function addToCart(name, price, unit) {
 
     function updateQty(index, qty) {
       cart[index].quantity = parseInt(qty);
+      // NEW: Save to localStorage also
+  localStorage.setItem("cart", JSON.stringify(cart));
+
       renderCart();
     }
 
@@ -2546,3 +2549,4 @@ addToCart(name, price, unit);
 </script>
 </body>
 </html>
+
