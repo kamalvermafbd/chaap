@@ -1108,30 +1108,31 @@ function addToCart(name, unit, rate, discPercent = 0) {
 
 
 
-    function renderCart() {
+  function renderCart() {
   const tbody = document.querySelector('#cartTable tbody');
   const thead = document.querySelector('#cartTable thead tr');
-  tbody.innerHTML = '';
+  tbody.innerHTML = "";
 
-  // Check if any item in cart has discount
-  const anyDiscount = cart.some(i => i.discPercent > 0);
+  // Check: does ANY item have discount?
+  const anyDiscount = cart.some(i => Number(i.discPercent) > 0);
 
-  // Build table header based on discount availability
+  // Build header
   if (anyDiscount) {
     thead.innerHTML = `
       <th>Food</th>
       <th>Qty</th>
-      <th>Rate</th>
+      <th>Rate (MRP)</th>
       <th>Disc %</th>
       <th>Disc Amt</th>
       <th>Net Amt</th>
+      <th>Total</th>
       <th>Action</th>
     `;
   } else {
     thead.innerHTML = `
       <th>Food</th>
       <th>Qty</th>
-      <th>Rate</th>
+      <th>Rate (MRP)</th>
       <th>Total</th>
       <th>Action</th>
     `;
@@ -1140,31 +1141,37 @@ function addToCart(name, unit, rate, discPercent = 0) {
   let grandTotal = 0;
 
   cart.forEach((item, idx) => {
-    const tr = document.createElement('tr');
+    const rate = Number(item.rate);        // MRP
+    const qty  = Number(item.qty);
+    const disc = Number(item.discPercent || 0);
 
-    if (item.discPercent > 0) {
-      const discAmt = item.discAmt || 0;
-      const netAmt = item.netAmt || (item.total - discAmt);
-      grandTotal += netAmt;
+    // Calculations
+    const discAmt = (rate * disc) / 100;
+    const netAmt  = rate - discAmt;
+    const total   = netAmt * qty;
 
+    grandTotal += total;
+
+    const tr = document.createElement("tr");
+
+    if (anyDiscount) {
       tr.innerHTML = `
         <td>${item.name} (${item.unit})</td>
-        <td><input type="number" value="${item.qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
-        <td>₹${item.rate}</td>
-        <td>${item.discPercent}%</td>
-        <td>₹${discAmt.toFixed(2)}</td>
-        <td>₹${netAmt.toFixed(2)}</td>
+        <td><input type="number" value="${qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
+        <td>₹ ${rate}</td>
+        <td>${disc}%</td>
+        <td>₹ ${discAmt.toFixed(2)}</td>
+        <td>₹ ${netAmt.toFixed(2)}</td>
+        <td>₹ ${total.toFixed(2)}</td>
         <td><button onclick="removeItem(${idx})">Delete</button></td>
       `;
     } else {
-      const total = item.total;
-      grandTotal += total;
-
+      // No discount mode
       tr.innerHTML = `
         <td>${item.name} (${item.unit})</td>
-        <td><input type="number" value="${item.qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
-        <td>₹${item.rate}</td>
-        <td>₹${total.toFixed(2)}</td>
+        <td><input type="number" value="${qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
+        <td>₹ ${rate}</td>
+        <td>₹ ${total.toFixed(2)}</td>
         <td><button onclick="removeItem(${idx})">Delete</button></td>
       `;
     }
@@ -1172,8 +1179,9 @@ function addToCart(name, unit, rate, discPercent = 0) {
     tbody.appendChild(tr);
   });
 
-  document.getElementById('cartTotal').innerText = grandTotal.toFixed(2);
+  document.getElementById("cartTotal").innerText = grandTotal.toFixed(2);
 }
+
 
     function updateQty(index, qty) {
   qty = parseInt(qty);
@@ -2740,6 +2748,7 @@ addToCart(name, unit, price, discPercent);
 </script>
 </body>
 </html>
+
 
 
 
