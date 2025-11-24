@@ -1078,43 +1078,108 @@ function addToCart(name, unit, rate, discPercent = 0) {
 
 
     function renderCart() {
-      const tbody = document.querySelector('#cartTable tbody');
-      tbody.innerHTML = '';
-      let total = 0;
-      cart.forEach((item, idx) => {
-        const rowTotal = item.price * item.quantity;
-        total += rowTotal;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${item.name}</td>
-          <td><input type="number" value="${item.quantity}" min="1" onchange="updateQty(${idx}, this.value)"></td>
-          <td>&#8377;${item.price}</td>
+  const tbody = document.querySelector('#cartTable tbody');
+  const thead = document.querySelector('#cartTable thead tr');
+  tbody.innerHTML = '';
 
-          <td>&#8377;${rowTotal.toFixed(2)}</td>
+  // Check if any item in cart has discount
+  const anyDiscount = cart.some(i => i.discPercent > 0);
 
-          <td><button onclick="removeItem(${idx})">Delete</button></td>
-        `;
-        tbody.appendChild(tr);
-      });
-      document.getElementById('cartTotal').innerText = total.toFixed(2);
+  // Build table header based on discount availability
+  if (anyDiscount) {
+    thead.innerHTML = `
+      <th>Food</th>
+      <th>Qty</th>
+      <th>Rate</th>
+      <th>Disc %</th>
+      <th>Disc Amt</th>
+      <th>Net Amt</th>
+      <th>Action</th>
+    `;
+  } else {
+    thead.innerHTML = `
+      <th>Food</th>
+      <th>Qty</th>
+      <th>Rate</th>
+      <th>Total</th>
+      <th>Action</th>
+    `;
+  }
+
+  let grandTotal = 0;
+
+  cart.forEach((item, idx) => {
+    const tr = document.createElement('tr');
+
+    if (item.discPercent > 0) {
+      const discAmt = item.discAmt || 0;
+      const netAmt = item.netAmt || (item.total - discAmt);
+      grandTotal += netAmt;
+
+      tr.innerHTML = `
+        <td>${item.name} (${item.unit})</td>
+        <td><input type="number" value="${item.qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
+        <td>₹${item.rate}</td>
+        <td>${item.discPercent}%</td>
+        <td>₹${discAmt.toFixed(2)}</td>
+        <td>₹${netAmt.toFixed(2)}</td>
+        <td><button onclick="removeItem(${idx})">Delete</button></td>
+      `;
+    } else {
+      const total = item.total;
+      grandTotal += total;
+
+      tr.innerHTML = `
+        <td>${item.name} (${item.unit})</td>
+        <td><input type="number" value="${item.qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
+        <td>₹${item.rate}</td>
+        <td>₹${total.toFixed(2)}</td>
+        <td><button onclick="removeItem(${idx})">Delete</button></td>
+      `;
     }
+
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('cartTotal').innerText = grandTotal.toFixed(2);
+}
 
     function updateQty(index, qty) {
-      cart[index].quantity = parseInt(qty);
-      // NEW: Save to localStorage also
-  localStorage.setItem("cart", JSON.stringify(cart));
+  qty = parseInt(qty);
+  if (qty < 1) qty = 1;
 
-      renderCart();
-    }
+  const item = cart[index];
+  item.qty = qty;
+
+  // Recalculate totals
+  item.total = item.rate * item.qty;
+
+  // If item has discount fields
+  if (item.discPercent > 0) {
+    item.discAmt = item.total * (item.discPercent / 100);
+    item.netAmt = item.total - item.discAmt;
+  } else {
+    // ensure no leftover fields
+    delete item.discAmt;
+    delete item.netAmt;
+  }
+
+  // Save & render
+  localStorage.setItem("cart", JSON.stringify(cart));
+  renderCart();
+}
+
 
   function removeItem(index) {
-  // 1. Remove from memory array
+  // Remove the item
   cart.splice(index, 1);
 
-  // 2. Update localStorage
+  // Save updated cart
   localStorage.setItem("cart", JSON.stringify(cart));
 
-  // 3. Re-render cart
+  // Re-render table to update:
+  // - correct totals
+  // - discount columns auto hide/show
   renderCart();
 }
 
@@ -2644,6 +2709,7 @@ addToCart(name, unit, price, discPercent);
 </script>
 </body>
 </html>
+
 
 
 
