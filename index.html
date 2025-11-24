@@ -2529,34 +2529,40 @@ function buildMenuCardHTML(item) {
   let priceSection = "";
   let cartSection = "";
 
-  // SINGLE ITEM
- // SINGLE ITEM
+  // ==========================
+  //       SINGLE ITEM
+  // ==========================
   if (item.cat2 === "Single") {
+
+    // FINAL PRICE CALCULATION (MENU SHEET)
+    const mrp  = Number(item.price);               // From menu sheet
+    const disc = Number(item.discPercent || 0);
+    const finalPrice = parseFloat((mrp - (mrp * disc / 100)).toFixed(2));
+
     priceSection = `
       <div class="variant-box">
         <div class="variant-row">
           <div class="left-side">
             <span class="unit">${item.unit || ""}</span>
 
-            ${item.discPercent > 0 ? `
+            ${disc > 0 ? `
               <span style="background:#ff3e3e;color:#fff;font-size:11px;
                            padding:2px 4px;border-radius:3px;">
-                ${item.discPercent}% OFF
+                ${disc}% OFF
               </span>
             ` : ""}
           </div>
 
           <div style="text-align:right;">
             <span class="final-price" style="font-weight:700;font-size:16px;">
-              ₹${parseFloat(item.finalPrice).toFixed(2)}
-
+              ₹${finalPrice}
             </span>
 
-            ${item.discPercent > 0 ? `
+            ${disc > 0 ? `
               <span class="mrp" 
                     style="text-decoration:line-through;color:#777;
                            margin-left:6px;font-size:13px;">
-                ₹${item.price}
+                ₹${mrp}
               </span>
             ` : ""}
           </div>
@@ -2568,71 +2574,79 @@ function buildMenuCardHTML(item) {
       <button class="add-btn"
         data-name="${item.name}"
         data-unit="${item.unit}"
-      data-price="${item.price}"
-        data-disc="${item.discPercent || 0}">
+        data-price="${mrp}"
+        data-disc="${disc}">
         Add to Cart
       </button>
     `;
   }
 
+  // ==========================
+  //       MULTI ITEM
+  // ==========================
+  if (item.cat2 === "Multi") {
+    const idSafe = slugify(item.name);
 
-// MULTI ITEM
-if (item.cat2 === "Multi") {
-  const idSafe = slugify(item.name);
+    let variantsHTML = "";
 
-  let variantsHTML = "";
- item.variants.forEach(v => {
-  variantsHTML += `
-    <label class="variant-row">
-      <div class="left-side">
-        <input type="radio"
-               name="var-${idSafe}"
-               data-unit="${v.unit}"
-             data-mrp="${v.price}"
-               data-disc="${v.discPercent}">
+    item.variants.forEach(v => {
 
-        <span class="unit">${v.unit}</span>
+      // FINAL PRICE CALCULATION (CAT_ALLOCATION SHEET)
+      const mrp  = Number(v.price);                  // From cat_allocation sheet
+      const disc = Number(v.discPercent || 0);
+      const finalPrice = parseFloat((mrp - (mrp * disc / 100)).toFixed(2));
 
-        ${v.discPercent > 0 ? `
-          <span style="background:#ff3e3e;color:#fff;
-                       font-size:11px;padding:2px 4px;
-                       border-radius:3px;">
-            ${v.discPercent}% OFF
-          </span>
-        ` : ""}
-      </div>
+      variantsHTML += `
+        <label class="variant-row">
+          <div class="left-side">
+            <input type="radio"
+                   name="var-${idSafe}"
+                   data-unit="${v.unit}"
+                   data-mrp="${mrp}"
+                   data-disc="${disc}">
 
-      <div style="text-align:right;">
-        <span class="final-price" 
-              style="font-weight:700;font-size:16px;">
-          ₹${parseFloat(v.finalPrice).toFixed(2)}
+            <span class="unit">${v.unit}</span>
 
-        </span>
+            ${disc > 0 ? `
+              <span style="background:#ff3e3e;color:#fff;
+                           font-size:11px;padding:2px 4px;
+                           border-radius:3px;">
+                ${disc}% OFF
+              </span>
+            ` : ""}
+          </div>
 
-        ${v.discPercent > 0 ? `
-          <span style="text-decoration:line-through;
-                       color:#777;margin-left:6px;font-size:13px;">
-            ₹${v.price}
-          </span>
-        ` : ""}
-      </div>
-    </label>
-  `;
-});
+          <div style="text-align:right;">
+            <span class="final-price" 
+                  style="font-weight:700;font-size:16px;">
+              ₹${finalPrice}
+            </span>
 
-  priceSection = `<div class="variant-box">${variantsHTML}</div>`;
+            ${disc > 0 ? `
+              <span style="text-decoration:line-through;
+                           color:#777;margin-left:6px;font-size:13px;">
+                ₹${mrp}
+              </span>
+            ` : ""}
+          </div>
+        </label>
+      `;
+    });
 
- cartSection = `
-  <button class="add-btn disabled-btn"
-        id="btn-${idSafe}"
-        data-name="${item.name}">
-    Add to Cart
-</button>
+    priceSection = `<div class="variant-box">${variantsHTML}</div>`;
 
-`;
+    cartSection = `
+      <button class="add-btn disabled-btn"
+            id="btn-${idSafe}"
+            data-name="${item.name}">
+        Add to Cart
+      </button>
+    `;
+  }
 
-}
-
+  // ==========================
+  //       RETURN CARD
+  // ==========================
   return `
     <img src="${item.image}" alt="${item.name}">
     <h4>${item.name}</h4>
@@ -2641,6 +2655,7 @@ if (item.cat2 === "Multi") {
     ${cartSection}
   `;
 }
+
 function activateVariantSelector(item) {
   if (item.cat2 !== "Multi") return;
 
@@ -2723,6 +2738,7 @@ document.addEventListener('click', function(e) {
 </script>
 </body>
 </html>
+
 
 
 
