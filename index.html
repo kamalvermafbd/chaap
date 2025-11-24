@@ -1024,6 +1024,37 @@ function clearFilters() {
   // Reset menu to original grouped view
   renderMenu(menuItems);
 }
+function rebuildCart() {
+  cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+  cart = cart.map(item => {
+    // quantity fix
+    item.qty = Number(item.qty || item.quantity || 1);
+
+    // rate fix
+    item.rate = Number(item.rate || item.price || 0);
+
+    // total recalc
+    item.total = item.rate * item.qty;
+
+    // discount recalc
+    if (item.discPercent > 0) {
+      item.discAmt = item.total * (item.discPercent / 100);
+      item.netAmt = item.total - item.discAmt;
+    } else {
+      delete item.discAmt;
+      delete item.netAmt;
+    }
+
+    return item;
+  });
+
+  // store updated clean cart
+  localStorage.setItem("cart", JSON.stringify(cart));
+
+  // rerender
+  renderCart();
+}
 
 function addToCart(name, unit, rate, discPercent = 0) {
   let stored = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -2713,6 +2744,7 @@ addToCart(name, unit, price, discPercent);
 </script>
 </body>
 </html>
+
 
 
 
