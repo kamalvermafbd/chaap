@@ -301,6 +301,11 @@ body {
 .menu-item p {
   text-align: center !important;
 }
+.variant-row { white-space: normal; }
+
+@media (min-width:520px) {
+  .variant-row { white-space: nowrap; }
+}
 
 /* Profile Page Input Styling */
 #profilePage input {
@@ -879,6 +884,12 @@ apiGet("getMenu")
   .catch(err => {
     console.error("Restaurant info load error:", err);
   });
+function slugify(s) {
+  return String(s || "")
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9\-_]/g, "");
+}
 
 
 function renderMenu(items) {
@@ -995,32 +1006,22 @@ function clearFilters() {
 }
 
 function addToCart(name, price, unit) {
-  // Step 1: Load cart from storage
-  let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+  let stored = JSON.parse(localStorage.getItem("cart") || "[]");
 
-  // Step 2: Check if same item + same unit already exists
-  const existing = cart.find(i => i.name === name && i.unit === unit);
+  const existing = stored.find(i => i.name === name && i.unit === unit);
 
   if (existing) {
     existing.quantity++;
   } else {
-    cart.push({
-      name,
-      unit,
-      price,
-      quantity: 1
-    });
+    stored.push({ name, unit, price, quantity: 1 });
   }
 
-  // Step 3: Save updated cart into storage
-  localStorage.setItem("cart", JSON.stringify(cart));
+  localStorage.setItem("cart", JSON.stringify(stored));
 
-  // Step 4: Update GLOBAL cart variable also
-  window.cart = cart;
+  cart = stored;
+  window.cart = stored;
 
-  // Step 5: Re-render cart table
   renderCart();
-
   alert(`${name} (${unit}) added to cart`);
 }
 
@@ -1781,6 +1782,8 @@ function updateSignupOverlayMessage(msg) {
 
 // === FINAL STABLE LOAD HANDLER ===
 window.addEventListener("load", () => {
+cart = JSON.parse(localStorage.getItem("cart") || "[]");
+renderCart();
 
   // clear login fields
   const loginMobile = document.getElementById("loginMobile");
@@ -2380,14 +2383,19 @@ function apiPost(api, data = {}) {
   </div>
 `;
     cartSection = `
-      <button onclick="addToCart('${item.name}', ${item.price}, '${item.unit}')">
-        Add to Cart
-      </button>
+      <button class="add-btn"
+        data-name="${item.name}"
+        data-price="${item.price}"
+        data-unit="${item.unit}">
+  Add to Cart
+</button>
+
     `;
   }
 
   // MULTI ITEM
 if (item.cat2 === "Multi") {
+   const idSafe = slugify(item.name);
   let variantsHTML = "";
   item.variants.forEach(v => {
     variantsHTML += `
@@ -2410,7 +2418,12 @@ if (item.cat2 === "Multi") {
   priceSection = `<div class="variant-box">${variantsHTML}</div>`;
 
   cartSection = `
-    <button disabled id="btn-${item.name}" onclick="addVariantToCart('${item.name}')">
+      <button class="add-btn" 
+            id="btn-${idSafe}" 
+            data-name="${item.name}"
+            data-unit=""
+            data-price=""
+            disabled>
       Add to Cart
     </button>
   `;
@@ -2428,16 +2441,16 @@ if (item.cat2 === "Multi") {
 function activateVariantSelector(item) {
   if (item.cat2 !== "Multi") return;
 
-  const radios = document.querySelectorAll(`input[name="var-${item.name}"]`);
+  const idSafe = slugify(item.name);
+  const radios = document.querySelectorAll(`input[name="var-${idSafe}"]`);
+  const btn = document.getElementById(`btn-${idSafe}`);
 
   radios.forEach(r => {
     r.addEventListener("change", () => {
-      const btn = document.getElementById(`btn-${item.name}`);
-
       btn.disabled = false;
-      btn.textContent = "Add to Cart";
+      btn.dataset.price = r.dataset.price;
+      btn.dataset.unit = r.dataset.unit;
 
-      // Make button visually active (premium look)
       btn.style.background = "#ff6347";
       btn.style.opacity = "1";
     });
@@ -2445,24 +2458,40 @@ function activateVariantSelector(item) {
 }
 
 function addVariantToCart(name) {
-  const selected = document.querySelector(`input[name="var-${name}"]:checked`);
-
+  const idSafe = slugify(name);
+  const selected = document.querySelector(`input[name="var-${idSafe}"]:checked`);
   if (!selected) {
+    alert("Please select an option before adding to cart.");
+
+    return;
+  }
+  const unit = selected.dataset.unit;
+  const price = Number(selected.dataset.price);
+  addToCart(name, price, unit);
+}
+
+
+document.addEventListener("click", (e) => {
+  const b = e.target.closest(".add-btn");
+  if (!b) return;
+
+  const name = b.dataset.name;
+  const price = Number(b.dataset.price);
+  const unit = b.dataset.unit;
+
+  if (!unit) {
     alert("Please choose a variant first.");
     return;
   }
 
-  const unit = selected.dataset.unit;
-  const price = Number(selected.dataset.price);
-
   addToCart(name, price, unit);
-}
-
+});
 
   
 </script>
 </body>
 </html>
+
 
 
 
