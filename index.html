@@ -2570,7 +2570,7 @@ function buildMenuCardHTML(item) {
       <button class="add-btn"
         data-name="${item.name}"
         data-unit="${item.unit}"
-        data-price="${item.finalPrice}"
+      data-price="${item.price}"
         data-disc="${item.discPercent || 0}">
         Add to Cart
       </button>
@@ -2590,8 +2590,7 @@ if (item.cat2 === "Multi") {
         <input type="radio"
                name="var-${idSafe}"
                data-unit="${v.unit}"
-               data-price="${v.finalPrice}"
-               data-mrp="${v.price}"
+             data-mrp="${v.price}"
                data-disc="${v.discPercent}">
 
         <span class="unit">${v.unit}</span>
@@ -2741,6 +2740,7 @@ addToCart(name, unit, price, discPercent);
 </script>
 </body>
 </html>
+
 
 
 
