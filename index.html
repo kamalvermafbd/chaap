@@ -2578,10 +2578,11 @@ function addVariantToCart(name) {
   if (!selected) return null;
 
   return {
-    name: name,
-    unit: selected.dataset.unit,
-    price: Number(selected.dataset.price)
-  };
+  name: name,
+  unit: selected.dataset.unit,
+  price: Number(selected.dataset.price),
+  discPercent: Number(selected.dataset.disc || 0)
+};
 }
 
 
@@ -2628,12 +2629,14 @@ if (btn.id && btn.id.startsWith("btn-")) {
       alert("Please select an option before adding to cart.");
       return;
     }
-    addToCart(info.name, info.price, info.unit);
-    return;
+    addToCart(info.name, info.unit, info.price, Number(info.discPercent || 0));
+return;
 }
 
 // SINGLE ITEM
-addToCart(name, price, unit);
+const discPercent = Number(btn.dataset.disc || 0);
+addToCart(name, unit, price, discPercent);
+
 
 });
 </script>
@@ -2641,6 +2644,7 @@ addToCart(name, price, unit);
 </script>
 </body>
 </html>
+
 
 
 
