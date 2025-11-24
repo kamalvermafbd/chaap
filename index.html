@@ -120,6 +120,21 @@ button:active::after {
   margin-bottom: 10px;
 }
 
+/* FIX: Ensure price never gets cut */
+.variant-row {
+  overflow: visible !important;
+}
+
+/* FIX: Give space on right side so ₹ price doesn't clip */
+.variant-box {
+  padding-right: 14px !important;
+}
+
+/* FIX: prevent label flex from shrinking price */
+.price {
+  flex-shrink: 0 !important;
+  margin-left: auto !important;
+}
 
 
     .menu-item img {
@@ -2414,6 +2429,7 @@ function addVariantToCart(name) {
 </script>
 </body>
 </html>
+
 
 
 
