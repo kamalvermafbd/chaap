@@ -1210,18 +1210,25 @@ function updateQty(index, qty) {
 }
 
 
-  function removeItem(index) {
+function removeItem(index) {
   // Remove the item
   cart.splice(index, 1);
+
+  // Clean cart values (ensure no leftover fields)
+  cart = cart.map(i => {
+    i.qty = Number(i.qty);
+    i.rate = Number(i.rate);
+    i.discPercent = Number(i.discPercent || 0);
+    return i;
+  });
 
   // Save updated cart
   localStorage.setItem("cart", JSON.stringify(cart));
 
-  // Re-render table to update:
-  // - correct totals
-  // - discount columns auto hide/show
+  // Re-render table (auto header + totals)
   renderCart();
 }
+
 
     function openCheckout() {
       if (cart.length === 0) {
@@ -2749,6 +2756,7 @@ addToCart(name, unit, price, discPercent);
 </script>
 </body>
 </html>
+
 
 
 
