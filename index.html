@@ -140,6 +140,25 @@ button:active::after {
   margin-right: 8px !important;
 }
 
+/* Keep Multi-variant in single line ALWAYS */
+.variant-row {
+  white-space: nowrap !important;
+}
+
+/* Left side ko shrink hone se rokna */
+.left-side {
+  flex-shrink: 0 !important;
+}
+
+/* Unit text 1st column me rahe, wrap na ho */
+.unit {
+  white-space: nowrap !important;
+}
+
+/* Price right me fix ho jaye, wrap na ho */
+.price {
+  white-space: nowrap !important;
+}
 
     .menu-item img {
       width: 100%;
@@ -2433,6 +2452,7 @@ function addVariantToCart(name) {
 </script>
 </body>
 </html>
+
 
 
 
