@@ -2705,77 +2705,43 @@ document.addEventListener('click', function(e) {
   const btn = e.target.closest('.add-btn');
   if (!btn) return;
 
-  // If visually-disabled, show alert and stop
   if (btn.classList.contains('disabled-btn')) {
     alert("Please select an option before adding to cart.");
     return;
   }
 
-  // Otherwise determine source of data and add to cart
-  // For Single items we placed data- attributes in HTML; for Multi we
-  // set dataset price/unit on variant selection.
-  const name  = btn.dataset.name || btn.getAttribute('data-name') || btn.closest('.menu-item')?.querySelector('h4')?.innerText || "Item";
-  const price = Number(btn.dataset.price || btn.getAttribute('data-price') || 0);
-  const unit  = btn.dataset.unit  || btn.getAttribute('data-unit') || "";
+  const name  = btn.dataset.name;
+  const unit  = btn.dataset.unit || "";
+  const price = Number(btn.dataset.price || 0);
+  const discPercent = Number(btn.dataset.disc || 0);
 
-  // If price is 0 or absent, try to pick from nearest .price text (fallback)
-  if (!price || price === 0) {
-    const priceElem = btn.closest('.menu-item')?.querySelector('.price');
-    if (priceElem) {
-      const txt = priceElem.innerText.replace(/[^\d.]/g, "");
-      if (txt) {
-        const fallback = Number(txt);
-        if (!isNaN(fallback)) {
-          addToCart(name, fallback, unit);
-          return;
-        }
-      }
-    }
+  // Price validation (no fallback)
+  if (!price || price <= 0 || isNaN(price)) {
     alert("Price not found for this item.");
     return;
   }
 
-  // MULTI ITEM: identifier "btn-..."
-if (btn.id && btn.id.startsWith("btn-")) {
+  // MULTI ITEM
+  if (btn.id && btn.id.startsWith("btn-")) {
     const info = addVariantToCart(name);
     if (!info) {
       alert("Please select an option before adding to cart.");
       return;
     }
-    addToCart(info.name, info.unit, info.rate, Number(info.discPercent || 0));
 
-return;
-}
+    addToCart(info.name, info.unit, info.rate, info.discPercent);
+    return;
+  }
 
-// SINGLE ITEM
-const discPercent = Number(btn.dataset.disc || 0);
-addToCart(name, unit, price, discPercent);
-
-
+  // SINGLE ITEM
+  addToCart(name, unit, price, discPercent);
 });
+
 </script>
   
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
