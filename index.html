@@ -2702,34 +2702,34 @@ function addVariantToCart(name) {
 
 
 // Delegated click handler for all Add buttons (works for Single and Multi)
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
   const btn = e.target.closest('.add-btn');
   if (!btn) return;
 
-  // Prevent click if disabled visually
+  // ============================
+  // Prevent click when disabled
+  // ============================
   if (btn.classList.contains('disabled-btn')) {
     alert("Please select an option before adding to cart.");
     return;
   }
 
   const name = btn.dataset.name;
-  const unit = btn.dataset.unit || "";
-  const price = Number(btn.dataset.price || 0);
-  const discPercent = Number(btn.dataset.disc || 0);
 
   // ============================
-  //      MULTI ITEM
+  //       MULTI ITEM
   // ============================
   if (btn.id && btn.id.startsWith("btn-")) {
 
     const info = addVariantToCart(name);
 
+    // No variant selected
     if (!info) {
       alert("Please select an option before adding to cart.");
       return;
     }
 
-    // STRICT validation for multi item
+    // STRICT validation: variant MRP must exist
     if (!info.rate || info.rate <= 0 || isNaN(info.rate)) {
       alert("Price not found for this variant.");
       return;
@@ -2740,8 +2740,11 @@ document.addEventListener('click', function(e) {
   }
 
   // ============================
-  //      SINGLE ITEM
+  //       SINGLE ITEM
   // ============================
+  const unit = btn.dataset.unit || "";
+  const price = Number(btn.dataset.price || 0);
+  const discPercent = Number(btn.dataset.disc || 0);
 
   if (!price || price <= 0 || isNaN(price)) {
     alert("Price not found for this item.");
@@ -2752,11 +2755,13 @@ document.addEventListener('click', function(e) {
 });
 
 
+
 </script>
   
 </script>
 </body>
 </html>
+
 
 
 
