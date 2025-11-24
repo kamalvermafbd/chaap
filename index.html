@@ -2713,34 +2713,23 @@ function addVariantToCart(name) {
 
 
 // Delegated click handler for all Add buttons (works for Single and Multi)
+// ADD-TO-CART HANDLER
 document.addEventListener('click', function (e) {
   const btn = e.target.closest('.add-btn');
   if (!btn) return;
 
   const name = btn.dataset.name;
 
-  // ============================
-  // Prevent click when variant not selected
-  // ============================
   if (btn.classList.contains('disabled-btn')) {
     alert("Please select an option before adding to cart.");
     return;
   }
 
-  // ============================
-  //       MULTI ITEM
-  // ============================
+  // MULTI ITEM
   if (btn.id && btn.id.startsWith("btn-")) {
-
     const info = addVariantToCart(name);
+    if (!info) return alert("Please select an option before adding to cart.");
 
-    // No variant selected
-    if (!info) {
-      alert("Please select an option before adding to cart.");
-      return;
-    }
-
-    // MRP check
     if (!info.rate || info.rate <= 0 || isNaN(info.rate)) {
       alert("Price not found for this variant.");
       return;
@@ -2750,9 +2739,7 @@ document.addEventListener('click', function (e) {
     return;
   }
 
-  // ============================
-  //       SINGLE ITEM
-  // ============================
+  // SINGLE ITEM
   const unit = btn.dataset.unit || "";
   const price = Number(btn.dataset.price || 0);
   const discPercent = Number(btn.dataset.disc || 0);
@@ -2766,12 +2753,24 @@ document.addEventListener('click', function (e) {
 });
 
 
+// DELETE HANDLER — MUST BE BELOW ADD HANDLER
+document.addEventListener("click", function (e) {
+  const del = e.target.closest(".delete-btn");
+  if (!del) return;
+
+  const index = Number(del.dataset.index);
+  removeItem(index);
+});
+
+
+
 
 </script>
   
 </script>
 </body>
 </html>
+
 
 
 
