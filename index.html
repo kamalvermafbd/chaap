@@ -2674,7 +2674,7 @@ function addVariantToCart(name) {
   return {
     name: name,
     unit: selected.dataset.unit,
-    rate: Number(selected.dataset.price),          // ✔ CORRECT
+    rate: Number(selected.dataset.mrp),          // ✔ CORRECT
     discPercent: Number(selected.dataset.disc || 0)
   };
 }
@@ -2740,6 +2740,7 @@ addToCart(name, unit, price, discPercent);
 </script>
 </body>
 </html>
+
 
 
 
