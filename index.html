@@ -2394,24 +2394,22 @@ function apiPost(api, data = {}) {
   }
 
   // MULTI ITEM
+// MULTI ITEM
 if (item.cat2 === "Multi") {
-   const idSafe = slugify(item.name);
+  const idSafe = slugify(item.name);
+
   let variantsHTML = "";
   item.variants.forEach(v => {
     variantsHTML += `
       <label class="variant-row">
-
         <div class="left-side">
-          <input type="radio" 
+          <input type="radio"
                  name="var-${idSafe}"
- 
-                 data-unit="${v.unit}" 
+                 data-unit="${v.unit}"
                  data-price="${v.price}">
           <span class="unit">${v.unit}</span>
         </div>
-
         <span class="price">₹${v.price}</span>
-
       </label>
     `;
   });
@@ -2419,17 +2417,14 @@ if (item.cat2 === "Multi") {
   priceSection = `<div class="variant-box">${variantsHTML}</div>`;
 
   cartSection = `
-      <button class="add-btn" 
-            id="btn-${idSafe}" 
-            data-name="${item.name}"
-            data-unit=""
-            data-price=""
+    <button class="add-btn"
+            onclick="addVariantToCart('${item.name}')"
+            id="btn-${idSafe}"
             disabled>
       Add to Cart
     </button>
   `;
 }
-
 
   return `
     <img src="${item.image}" alt="${item.name}">
@@ -2472,40 +2467,9 @@ function addVariantToCart(name) {
 }
 
 
-document.addEventListener("click", (e) => {
-  const b = e.target.closest(".add-btn");
-  if (!b) return;
-
-  const name = b.dataset.name;
-  const price = Number(b.dataset.price);
-  const unit = b.dataset.unit;
-
-  if (!unit) {
-    alert("Please choose a variant first.");
-    return;
-  }
-
-  addToCart(name, price, unit);
-});
 
   
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
