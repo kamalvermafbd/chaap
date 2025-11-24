@@ -2717,15 +2717,15 @@ document.addEventListener('click', function (e) {
   const btn = e.target.closest('.add-btn');
   if (!btn) return;
 
+  const name = btn.dataset.name;
+
   // ============================
-  // Prevent click when disabled
+  // Prevent click when variant not selected
   // ============================
   if (btn.classList.contains('disabled-btn')) {
     alert("Please select an option before adding to cart.");
     return;
   }
-
-  const name = btn.dataset.name;
 
   // ============================
   //       MULTI ITEM
@@ -2740,7 +2740,7 @@ document.addEventListener('click', function (e) {
       return;
     }
 
-    // STRICT validation: variant MRP must exist
+    // MRP check
     if (!info.rate || info.rate <= 0 || isNaN(info.rate)) {
       alert("Price not found for this variant.");
       return;
@@ -2772,6 +2772,7 @@ document.addEventListener('click', function (e) {
 </script>
 </body>
 </html>
+
 
 
 
