@@ -2673,7 +2673,7 @@ function activateVariantSelector(item) {
   btn.classList.remove("disabled-btn");
 
   // store selected variant data on button (used by delegated click handler)
-  btn.dataset.price = r.dataset.price;
+  btn.dataset.price = r.dataset.mrp;
   btn.dataset.unit  = r.dataset.unit;
 
   // restore normal appearance
@@ -2758,6 +2758,7 @@ addToCart(name, unit, price, discPercent);
 </script>
 </body>
 </html>
+
 
 
 
