@@ -2549,7 +2549,7 @@ if (item.cat2 === "Single") {
     `;
   }
 
-  // MULTI ITEM
+
 // MULTI ITEM
 if (item.cat2 === "Multi") {
   const idSafe = slugify(item.name);
@@ -2697,7 +2697,8 @@ if (btn.id && btn.id.startsWith("btn-")) {
       alert("Please select an option before adding to cart.");
       return;
     }
-    addToCart(info.name, info.unit, info.price, Number(info.discPercent || 0));
+    addToCart(info.name, info.unit, info.rate, Number(info.discPercent || 0));
+
 return;
 }
 
@@ -2712,6 +2713,7 @@ addToCart(name, unit, price, discPercent);
 </script>
 </body>
 </html>
+
 
 
 
