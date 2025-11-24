@@ -119,6 +119,20 @@ button:active::after {
 .variant-box {
   margin-bottom: 10px;
 }
+    /* Final fix: price cutting issue */
+.variant-row {
+  gap: 12px !important;
+}
+
+.price {
+  flex-shrink: 0 !important;
+}
+
+.left-side {
+  flex-grow: 1 !important;
+  min-width: 0 !important;
+}
+
 
     .menu-item img {
       width: 100%;
@@ -2412,6 +2426,7 @@ function addVariantToCart(name) {
 </script>
 </body>
 </html>
+
 
 
 
