@@ -981,7 +981,8 @@ let renderIndex = 0;
        div.innerHTML = buildMenuCardHTML(item, renderIndex);
   renderIndex++;
       menuDiv.appendChild(div);
-      activateVariantSelector(item);
+      activateVariantSelector(item, renderIndex - 1);
+
     });
   }
 
@@ -2700,7 +2701,8 @@ const btn = document.getElementById(`btn-${idSafe}`);
 }
 
 function addVariantToCart(name) {
-  const idSafe = slugify(name);
+  const selected = document.querySelector(`input[name^="var-${slugify(name)}-"]:checked`);
+
   const selected = document.querySelector(`input[name="var-${idSafe}"]:checked`);
   if (!selected) return null;
 
@@ -2777,6 +2779,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
