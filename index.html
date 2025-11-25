@@ -2593,13 +2593,12 @@ window.addEventListener("appinstalled", () => {
 
 <script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js');
-}
-
+  navigator.serviceWorker
+    .register('/sw.js')
     .then(reg => {
       console.log('SW Registered on Netlify');
 
-      // SAME UPDATE CHECK SYSTEM
+      // update system
       reg.addEventListener("updatefound", () => {
         const newWorker = reg.installing;
         newWorker.addEventListener("statechange", () => {
@@ -2617,6 +2616,7 @@ if ('serviceWorker' in navigator) {
     });
 }
 </script>
+
 <script>
 function loginUser() {
   const mobile = document.getElementById("loginMobile").value.trim();
@@ -2920,6 +2920,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
