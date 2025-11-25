@@ -915,7 +915,8 @@ apiGet("getMenu")
     document.getElementById("restaurantAddress").innerText = res.address;
  // NEW (store tax settings globally)
     restaurantTax.taxType        = res.taxType || "";
-    restaurantTax.servicePercent = Number(res.servicePercent) || 0;
+    restaurantTax.servicePercent = (res.servicePercent && res.servicePercent !== "NIL") ? Number(res.servicePercent) : 0;
+
     restaurantTax.cgstPercent    = Number(res.cgstPercent) || 0;
     restaurantTax.sgstPercent    = Number(res.sgstPercent) || 0;
     restaurantTax.igstPercent    = Number(res.igstPercent) || 0;
@@ -1229,7 +1230,11 @@ function addToCart(name, unit, rate, discPercent = 0) {
 
     // Multiline summary (clean)
     taxHtml = `
-      <p style="margin:2px 0;">Service Charges (${restaurantTax.servicePercent}%): ₹${serviceAmt.toFixed(2)}</p>
+      ${restaurantTax.servicePercent > 0 
+    ? `<p style="margin:2px 0;">Service Charges (${restaurantTax.servicePercent}%): ₹${serviceAmt.toFixed(2)}</p>`
+    : ""
+}
+
       <p style="margin:2px 0;">CGST (${restaurantTax.cgstPercent}%): ₹${cgstAmt.toFixed(2)}</p>
       <p style="margin:2px 0;">SGST (${restaurantTax.sgstPercent}%): ₹${sgstAmt.toFixed(2)}</p>
       ${restaurantTax.igstPercent > 0 ? `<p style="margin:2px 0;">IGST (${restaurantTax.igstPercent}%): ₹${igstAmt.toFixed(2)}</p>` : ""}
@@ -1431,7 +1436,11 @@ let grandTotalFinal = baseTotal;
 if (restaurantTax.taxType === "On Bill") {
 
   // Service Charge
-  serviceAmt = parseFloat(((baseTotal * restaurantTax.servicePercent) / 100).toFixed(2));
+ serviceAmt =
+  restaurantTax.servicePercent > 0
+    ? parseFloat(((baseTotal * restaurantTax.servicePercent) / 100).toFixed(2))
+    : 0;
+
 
   // Taxable amount = base + service charge
   taxableAmount = parseFloat((baseTotal + serviceAmt).toFixed(2));
@@ -2894,6 +2903,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
