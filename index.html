@@ -2701,12 +2701,11 @@ const btn = document.getElementById(`btn-${idSafe}`);
 }
 
 function addVariantToCart(name) {
-  const selected = document.querySelector(`input[name^="var-${slugify(name)}-"]:checked`);
-
-  const selected = document.querySelector(`input[name="var-${idSafe}"]:checked`);
+  const safe = slugify(name);
+  const selected = document.querySelector(`input[name^="var-${safe}-"]:checked`);
   if (!selected) return null;
 
-  const mrp = Number(selected.dataset.mrp || 0);
+  const mrp  = Number(selected.dataset.mrp || 0);
   const disc = Number(selected.dataset.disc || 0);
 
   return {
@@ -2779,6 +2778,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
