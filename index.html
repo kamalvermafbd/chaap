@@ -1013,7 +1013,7 @@ let renderIndex = 0;
   renderIndex++;
         
         menuDiv.appendChild(div);
-        activateVariantSelector(item);
+        activateVariantSelector(item, renderIndex - 1);
       });
     }
   });
@@ -2673,12 +2673,13 @@ function buildMenuCardHTML(item, idx) {
   `;
 }
 
-function activateVariantSelector(item) {
+function activateVariantSelector(item, idx) {
+
   if (item.cat2 !== "Multi") return;
 
-  const idSafe = slugify(item.name);
-  const radios = document.querySelectorAll(`input[name="var-${idSafe}"]`);
-  const btn = document.getElementById(`btn-${idSafe}`);
+  const idSafe = slugify(item.name) + "-" + item.idx;
+const radios = document.querySelectorAll(`input[name="var-${idSafe}"]`);
+const btn = document.getElementById(`btn-${idSafe}`);
 
   radios.forEach(r => {
    r.addEventListener("change", () => {
@@ -2775,6 +2776,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
