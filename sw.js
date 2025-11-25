@@ -1,4 +1,4 @@
-const CACHE_NAME = "chaap-cache-v17";
+const CACHE_NAME = "chaap-cache-v18";
 
 const URLS_TO_CACHE = [
   "/",
@@ -39,12 +39,20 @@ self.addEventListener("fetch", event => {
 
       return fetch(event.request)
         .then(response => {
-          if (response.ok && event.request.method === "GET") {
+
+          // 🔥 DO NOT CACHE GOOGLE APPS SCRIPT API RESPONSES
+          if (
+            response.ok &&
+            event.request.method === "GET" &&
+            !event.request.url.includes("/exec") &&
+            !event.request.url.includes("?api=")
+          ) {
             const clone = response.clone();
             caches.open(CACHE_NAME).then(cache => {
               cache.put(event.request, clone);
             });
           }
+
           return response;
         })
         .catch(() => {
@@ -67,19 +75,3 @@ self.addEventListener("fetch", event => {
     })
   );
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
