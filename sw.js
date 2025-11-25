@@ -1,4 +1,4 @@
-const CACHE_NAME = "chaap-cache-v16";
+const CACHE_NAME = "chaap-cache-v17";
 
 const URLS_TO_CACHE = [
   "/",
@@ -67,6 +67,7 @@ self.addEventListener("fetch", event => {
     })
   );
 });
+
 
 
 
