@@ -2677,7 +2677,8 @@ function activateVariantSelector(item, idx) {
 
   if (item.cat2 !== "Multi") return;
 
-  const idSafe = slugify(item.name) + "-" + item.idx;
+  const idSafe = slugify(item.name) + "-" + idx;
+
 const radios = document.querySelectorAll(`input[name="var-${idSafe}"]`);
 const btn = document.getElementById(`btn-${idSafe}`);
 
@@ -2776,6 +2777,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
