@@ -1202,7 +1202,82 @@ function addToCart(name, unit, rate, discPercent = 0) {
   });
 
   // SAFE ROUND FINAL TOTAL
-  document.getElementById("cartTotal").innerText = grandTotal.toFixed(2);
+  // SAFE ROUND TOTAL
+// SAFE ROUND TOTAL
+let baseTotal = parseFloat(grandTotal.toFixed(2));
+document.getElementById("cartTotal").innerText = baseTotal.toFixed(2);
+
+// ==============================
+//   TAX ONLY WHEN "ON BILL"
+// ==============================
+let extraHTML = "";
+
+// Dynamic column span
+let colSpan = anyDiscount ? 8 : 5;
+
+if (restaurantTax.taxType === "On Bill") {
+
+  // Service Charge
+  let serviceAmt = (baseTotal * restaurantTax.servicePercent) / 100;
+  serviceAmt = parseFloat(serviceAmt.toFixed(2));
+
+  // Tax base amount = total + service charge
+  let taxableAmount = baseTotal + serviceAmt;
+
+  // CGST
+  let cgstAmt = (taxableAmount * restaurantTax.cgstPercent) / 100;
+  cgstAmt = parseFloat(cgstAmt.toFixed(2));
+
+  // SGST
+  let sgstAmt = (taxableAmount * restaurantTax.sgstPercent) / 100;
+  sgstAmt = parseFloat(sgstAmt.toFixed(2));
+
+  // IGST
+  let igstAmt = (taxableAmount * restaurantTax.igstPercent) / 100;
+  igstAmt = parseFloat(igstAmt.toFixed(2));
+
+  // Grand Total
+  let grandTotal = parseFloat(
+    (taxableAmount + cgstAmt + sgstAmt + igstAmt).toFixed(2)
+  );
+
+  // BUILD EXTRA ROWS
+  extraHTML = `
+    <tr><td colspan="${colSpan}" style="text-align:right;font-weight:bold;">
+      Service Charges (${restaurantTax.servicePercent}%):
+      ₹${serviceAmt}
+    </td></tr>
+
+    <tr><td colspan="${colSpan}" style="text-align:right;font-weight:bold;">
+      CGST (${restaurantTax.cgstPercent}%):
+      ₹${cgstAmt}
+    </td></tr>
+
+    <tr><td colspan="${colSpan}" style="text-align:right;font-weight:bold;">
+      SGST (${restaurantTax.sgstPercent}%):
+      ₹${sgstAmt}
+    </td></tr>
+
+    ${restaurantTax.igstPercent > 0 ? `
+    <tr><td colspan="${colSpan}" style="text-align:right;font-weight:bold;">
+      IGST (${restaurantTax.igstPercent}%):
+      ₹${igstAmt}
+    </td></tr>` : ""}
+
+    <tr><td colspan="${colSpan}" style="text-align:right;
+      font-size:18px;font-weight:bold;color:#d40000;">
+      Grand Total: ₹${grandTotal}
+    </td></tr>
+  `;
+
+} else {
+  extraHTML = "";
+}
+
+// Append tax rows
+tbody.insertAdjacentHTML("beforeend", extraHTML);
+
+
 }
 
 function updateQty(index, qty) {
@@ -2794,6 +2869,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
