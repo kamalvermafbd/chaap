@@ -1405,6 +1405,9 @@ function toggleAddressField() {
     });
 }
 function placeOrder() {
+  if (window._orderLock) return;
+window._orderLock = true;
+
   const customerName = document.getElementById('customerName').value.trim();
   const email = document.getElementById('email').value.trim();
   const mobile = document.getElementById('mobile').value.trim();
@@ -1520,6 +1523,8 @@ const totalAmount = grandTotalFinal;
       document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
         .forEach(el => el.disabled = false);
     });
+  window._orderLock = false;
+
 }
 
 function filterMenu() {
@@ -2903,6 +2908,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
