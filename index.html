@@ -1451,18 +1451,63 @@ function placeOrder() {
     return;
   }
 
-  const totalAmount = parseFloat(document.getElementById('cartTotal').innerText);
+  // BASE TOTAL (without tax)
+let baseTotal = parseFloat(document.getElementById('cartTotal').innerText);
+
+// Defaults for "On Item"
+let serviceAmt = 0;
+let taxableAmount = baseTotal;
+let cgstAmt = 0;
+let sgstAmt = 0;
+let igstAmt = 0;
+let grandTotalFinal = baseTotal;
+
+// If Tax_Type = "On Bill", then apply tax logic
+if (restaurantTax.taxType === "On Bill") {
+
+  // Service Charge
+  serviceAmt = parseFloat(((baseTotal * restaurantTax.servicePercent) / 100).toFixed(2));
+
+  // Taxable amount = base + service charge
+  taxableAmount = parseFloat((baseTotal + serviceAmt).toFixed(2));
+
+  // CGST
+  cgstAmt = parseFloat(((taxableAmount * restaurantTax.cgstPercent) / 100).toFixed(2));
+
+  // SGST
+  sgstAmt = parseFloat(((taxableAmount * restaurantTax.sgstPercent) / 100).toFixed(2));
+
+  // IGST
+  igstAmt = parseFloat(((taxableAmount * restaurantTax.igstPercent) / 100).toFixed(2));
+
+  // FINAL GRAND TOTAL
+  grandTotalFinal = parseFloat((taxableAmount + cgstAmt + sgstAmt + igstAmt).toFixed(2));
+}
+
+// FINAL AMOUNT TO SAVE / SEND TO SHEET
+const totalAmount = grandTotalFinal;
+
 
   const orderData = {
-    customerName,
-    email,
-    mobile,
-    orderType,
-    address,
-    cartItems: cart,
-    totalAmount,
-    paymentMethod
-  };
+  customerName,
+  email,
+  mobile,
+  orderType,
+  address,
+  cartItems: cart,
+
+  // BASE totals
+  baseTotal,
+  serviceAmt,
+  taxableAmount,
+  cgstAmt,
+  sgstAmt,
+  igstAmt,
+  grandTotal: grandTotalFinal,
+
+  paymentMethod
+};
+
 
   // ?? Show overlay & lock UI
   const overlay = document.getElementById('loadingOverlay');
@@ -2869,6 +2914,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
