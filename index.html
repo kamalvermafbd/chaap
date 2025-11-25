@@ -2846,6 +2846,18 @@ document.addEventListener('click', function (e) {
     }
 
     addToCart(info.name, info.unit, info.rate, info.discPercent);
+    // 1a — RESET VARIANT RADIO BUTTONS
+const parentCard = btn.closest(".menu-item");
+if (parentCard) {
+  parentCard.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+}
+    // 1b — disable button
+btn.classList.add("disabled-btn");
+btn.dataset.price = "";
+btn.dataset.unit = "";
+btn.style.background = "#ccc";
+btn.style.opacity = "0.6";
+
     return;
   }
 
@@ -2877,6 +2889,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
