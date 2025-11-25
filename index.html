@@ -645,6 +645,10 @@ style="
 
              <div class="cart">
     <h3>Your Cart</h3>
+               <p id="hiddenBaseTotal" style="display:none; text-align:right; font-weight:bold;">
+  Cart Total: ₹<span id="cartTotal">0.00</span>
+</p>
+
     <table id="cartTable">
       <thead>
         <tr><th>Food</th><th>Qty</th><th>Rate</th><th>Total</th><th>Action</th></tr>
@@ -1205,9 +1209,7 @@ function addToCart(name, unit, rate, discPercent = 0) {
 // SAFE ROUND TOTAL
 let baseTotal = parseFloat(grandTotal.toFixed(2));
 document.getElementById("cartTotal").innerText = baseTotal.toFixed(2);
-<p style="text-align:right; font-weight:bold; display:none;">
-  Cart Total: ₹<span id="cartTotal">0.00</span>
-</p>
+
 
 // ==============================
 //   TAX ONLY WHEN "ON BILL"
@@ -2924,6 +2926,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
