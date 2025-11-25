@@ -2593,8 +2593,8 @@ window.addEventListener("appinstalled", () => {
 
 <script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js')
-
+  navigator.serviceWorker.register('/sw.js');
+}
 
     .then(reg => {
       console.log('SW Registered on Netlify');
@@ -2920,6 +2920,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
