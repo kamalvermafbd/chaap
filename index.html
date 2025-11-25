@@ -656,6 +656,8 @@ style="
    style="text-align:right;font-weight:bold;margin:10px 0;">
   Total: ₹<span id="cartTotal">0.00</span>
 </p>
+               <!-- Tax Summary Comes Here -->
+<div id="taxSummary" style="text-align:right; margin-top:10px; font-weight:bold;"></div>
 
 <button onclick="openCheckout()" class="checkout-btn" 
         style="display:block; margin-top:15px;">
@@ -1279,7 +1281,8 @@ if (restaurantTax.taxType === "On Bill") {
 }
 
 // Append tax rows
-tbody.insertAdjacentHTML("beforeend", extraHTML);
+document.getElementById("taxSummary").innerHTML = extraHTML;
+
 
 
 }
@@ -2916,6 +2919,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
