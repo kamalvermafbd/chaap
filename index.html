@@ -740,6 +740,14 @@ style="
   </div>
 
   <script>
+    let restaurantTax = {
+  taxType: "",
+  servicePercent: 0,
+  cgstPercent: 0,
+  sgstPercent: 0,
+  igstPercent: 0
+};
+
     let cart = JSON.parse(localStorage.getItem("cart") || "[]");
 renderCart();
     function levenshtein(a, b) {
@@ -898,9 +906,17 @@ apiGet("getMenu")
     apiGet("getRestaurantInfo")
   .then(res => {
     document.getElementById("restaurantName").innerHTML = "&#127860; " + res.name;
-
     document.getElementById("restaurantAddress").innerText = res.address;
-  })
+ // NEW (store tax settings globally)
+    restaurantTax.taxType        = res.taxType || "";
+    restaurantTax.servicePercent = Number(res.servicePercent) || 0;
+    restaurantTax.cgstPercent    = Number(res.cgstPercent) || 0;
+    restaurantTax.sgstPercent    = Number(res.sgstPercent) || 0;
+    restaurantTax.igstPercent    = Number(res.igstPercent) || 0;
+
+    console.log("Restaurant Tax Settings Loaded:", restaurantTax);
+  
+    })
   .catch(err => {
     console.error("Restaurant info load error:", err);
   });
@@ -2778,6 +2794,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
