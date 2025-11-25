@@ -1167,11 +1167,11 @@ function addToCart(name, unit, rate, discPercent = 0) {
   let grandTotal = 0;
 
   cart.forEach((item, idx) => {
-    const rate = Number(item.rate);        // MRP
+    const rate = Number(item.rate);
     const qty  = Number(item.qty);
     const disc = Number(item.discPercent || 0);
 
-    // --- SAFE CALCULATIONS (avoid JS float issues) ---
+    // --- SAFE CALCULATIONS ---
     const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
     const netAmt  = parseFloat((rate - discAmt).toFixed(2));
     const total   = parseFloat((netAmt * qty).toFixed(2));
@@ -1190,102 +1190,60 @@ function addToCart(name, unit, rate, discPercent = 0) {
         <td>₹ ${netAmt.toFixed(2)}</td>
         <td>₹ ${total.toFixed(2)}</td>
         <td><button class="delete-btn" data-index="${idx}">Delete</button></td>
-
       `;
     } else {
-      // No discount mode
       tr.innerHTML = `
         <td>${item.name} (${item.unit})</td>
         <td><input type="number" value="${qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
         <td>₹ ${rate.toFixed(2)}</td>
         <td>₹ ${total.toFixed(2)}</td>
         <td><button class="delete-btn" data-index="${idx}">Delete</button></td>
-
       `;
     }
 
     tbody.appendChild(tr);
   });
 
-  // SAFE ROUND FINAL TOTAL
-  // SAFE ROUND TOTAL
-// SAFE ROUND TOTAL
-let baseTotal = parseFloat(grandTotal.toFixed(2));
-document.getElementById("cartTotal").innerText = baseTotal.toFixed(2);
+  // ===== SAFE ROUND FINAL TOTAL =====
+  let baseTotal = parseFloat(grandTotal.toFixed(2));
+  document.getElementById("cartTotal").innerText = baseTotal.toFixed(2);
 
-// ==============================
-//   TAX ONLY WHEN "ON BILL"
-// ==============================
-let extraHTML = "";
+  // ===== BUILD TAX SUMMARY =====
+  let taxHtml = "";
 
-// Dynamic column span
-let colSpan = anyDiscount ? 8 : 5;
+  if (restaurantTax.taxType === "On Bill") {
 
-if (restaurantTax.taxType === "On Bill") {
+    // Service Charge
+    const serviceAmt = parseFloat(((baseTotal * restaurantTax.servicePercent) / 100).toFixed(2));
 
-  // Service Charge
-  let serviceAmt = (baseTotal * restaurantTax.servicePercent) / 100;
-  serviceAmt = parseFloat(serviceAmt.toFixed(2));
+    // Taxable amount
+    const taxableAmount = parseFloat((baseTotal + serviceAmt).toFixed(2));
 
-  // Tax base amount = total + service charge
-  let taxableAmount = baseTotal + serviceAmt;
+    // CGST / SGST / IGST
+    const cgstAmt = parseFloat(((taxableAmount * restaurantTax.cgstPercent) / 100).toFixed(2));
+    const sgstAmt = parseFloat(((taxableAmount * restaurantTax.sgstPercent) / 100).toFixed(2));
+    const igstAmt = parseFloat(((taxableAmount * restaurantTax.igstPercent) / 100).toFixed(2));
 
-  // CGST
-  let cgstAmt = (taxableAmount * restaurantTax.cgstPercent) / 100;
-  cgstAmt = parseFloat(cgstAmt.toFixed(2));
+    // Grand total final
+    const grandTotalCalc = parseFloat((taxableAmount + cgstAmt + sgstAmt + igstAmt).toFixed(2));
 
-  // SGST
-  let sgstAmt = (taxableAmount * restaurantTax.sgstPercent) / 100;
-  sgstAmt = parseFloat(sgstAmt.toFixed(2));
+    // Multiline summary (clean)
+    taxHtml = `
+      <p style="margin:2px 0;">Service Charges (${restaurantTax.servicePercent}%): ₹${serviceAmt.toFixed(2)}</p>
+      <p style="margin:2px 0;">CGST (${restaurantTax.cgstPercent}%): ₹${cgstAmt.toFixed(2)}</p>
+      <p style="margin:2px 0;">SGST (${restaurantTax.sgstPercent}%): ₹${sgstAmt.toFixed(2)}</p>
+      ${restaurantTax.igstPercent > 0 ? `<p style="margin:2px 0;">IGST (${restaurantTax.igstPercent}%): ₹${igstAmt.toFixed(2)}</p>` : ""}
+      <p style="margin:6px 0 0; font-weight:700; color:#d40000;">Grand Total: ₹${grandTotalCalc.toFixed(2)}</p>
+    `;
+  }
 
-  // IGST
-  let igstAmt = (taxableAmount * restaurantTax.igstPercent) / 100;
-  igstAmt = parseFloat(igstAmt.toFixed(2));
-
-  // Grand Total
-  let grandTotal = parseFloat(
-    (taxableAmount + cgstAmt + sgstAmt + igstAmt).toFixed(2)
-  );
-
-  // BUILD EXTRA ROWS
-  extraHTML = `
-    <tr><td colspan="${colSpan}" style="text-align:right;font-weight:bold;">
-      Service Charges (${restaurantTax.servicePercent}%):
-      ₹${serviceAmt}
-    </td></tr>
-
-    <tr><td colspan="${colSpan}" style="text-align:right;font-weight:bold;">
-      CGST (${restaurantTax.cgstPercent}%):
-      ₹${cgstAmt}
-    </td></tr>
-
-    <tr><td colspan="${colSpan}" style="text-align:right;font-weight:bold;">
-      SGST (${restaurantTax.sgstPercent}%):
-      ₹${sgstAmt}
-    </td></tr>
-
-    ${restaurantTax.igstPercent > 0 ? `
-    <tr><td colspan="${colSpan}" style="text-align:right;font-weight:bold;">
-      IGST (${restaurantTax.igstPercent}%):
-      ₹${igstAmt}
-    </td></tr>` : ""}
-
-    <tr><td colspan="${colSpan}" style="text-align:right;
-      font-size:18px;font-weight:bold;color:#d40000;">
-      Grand Total: ₹${grandTotal}
-    </td></tr>
-  `;
-
-} else {
-  extraHTML = "";
+  // ===== INJECT TAX SUMMARY BELOW TOTAL =====
+  const taxSummaryEl = document.getElementById("taxSummary");
+  if (taxSummaryEl) {
+    taxSummaryEl.innerHTML = taxHtml;
+  }
 }
 
-// Append tax rows
-document.getElementById("taxSummary").innerHTML = extraHTML;
-
-
-
-}
 
 function updateQty(index, qty) {
   qty = parseInt(qty);
@@ -2919,6 +2877,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
