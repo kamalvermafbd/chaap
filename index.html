@@ -920,7 +920,7 @@ function renderMenu(items) {
 
   const menuDiv = document.getElementById('menu');
   menuDiv.innerHTML = '';
-
+let renderIndex = 0;
   // priority brain
   const categoryPriority = [
     "starters",
@@ -978,7 +978,8 @@ function renderMenu(items) {
       const div = document.createElement("div");
       div.className = "menu-item fadeIn";
 
-      div.innerHTML = buildMenuCardHTML(item);
+       div.innerHTML = buildMenuCardHTML(item, renderIndex);
+  renderIndex++;
       menuDiv.appendChild(div);
       activateVariantSelector(item);
     });
@@ -1008,7 +1009,9 @@ function renderMenu(items) {
         const div = document.createElement('div');
         div.className = 'menu-item fadeIn';
 
-        div.innerHTML = buildMenuCardHTML(item);
+         div.innerHTML = buildMenuCardHTML(item, renderIndex);
+  renderIndex++;
+        
         menuDiv.appendChild(div);
         activateVariantSelector(item);
       });
@@ -2770,6 +2773,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
