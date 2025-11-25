@@ -2540,7 +2540,8 @@ function apiPost(api, data = {}) {
   }).then(res => res.json());
 }
   
-function buildMenuCardHTML(item) {
+function buildMenuCardHTML(item, idx) {
+
   let priceSection = "";
   let cartSection = "";
 
@@ -2600,7 +2601,8 @@ function buildMenuCardHTML(item) {
   //       MULTI ITEM
   // ==========================
   if (item.cat2 === "Multi") {
-    const idSafe = slugify(item.name);
+    const idSafe = slugify(item.name) + "-" + idx;
+
 
     let variantsHTML = "";
 
@@ -2773,6 +2775,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
