@@ -645,17 +645,14 @@ style="
 
              <div class="cart">
     <h3>Your Cart</h3>
-<p id="hiddenBaseTotal" style="display:none; text-align:right; font-weight:bold;">
-  Cart Total: ₹<span id="cartTotal">0.00</span>
-</p>               
-
     <table id="cartTable">
       <thead>
         <tr><th>Food</th><th>Qty</th><th>Rate</th><th>Total</th><th>Action</th></tr>
       </thead>
       <tbody></tbody>
     </table>
- 
+    Total: &#8377;<span id="cartTotal">0.00</span>
+
 <button onclick="openCheckout()" class="checkout-btn" 
         style="display:block; margin-top:15px;">
   Checkout
@@ -1210,7 +1207,6 @@ function addToCart(name, unit, rate, discPercent = 0) {
 let baseTotal = parseFloat(grandTotal.toFixed(2));
 document.getElementById("cartTotal").innerText = baseTotal.toFixed(2);
 
-
 // ==============================
 //   TAX ONLY WHEN "ON BILL"
 // ==============================
@@ -1278,18 +1274,10 @@ if (restaurantTax.taxType === "On Bill") {
   extraHTML = "";
 }
 
-// Insert BASE TOTAL first (just after cart rows)
-tbody.insertAdjacentHTML("beforeend", `
-  <tr>
-    <td colspan="${colSpan}" 
-        style="text-align:right;font-weight:bold;">
-      Total: ₹${baseTotal.toFixed(2)}
-    </td>
-  </tr>
-`);
-
-// Now insert TAX rows BELOW the Total
+// Append tax rows
 tbody.insertAdjacentHTML("beforeend", extraHTML);
+
+
 }
 
 function updateQty(index, qty) {
@@ -2595,12 +2583,12 @@ window.addEventListener("appinstalled", () => {
 
 <script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker
-    .register('/sw.js')
+  navigator.serviceWorker.register('./sw.js')
+
     .then(reg => {
       console.log('SW Registered on Netlify');
 
-      // update system
+      // SAME UPDATE CHECK SYSTEM
       reg.addEventListener("updatefound", () => {
         const newWorker = reg.installing;
         newWorker.addEventListener("statechange", () => {
@@ -2618,7 +2606,6 @@ if ('serviceWorker' in navigator) {
     });
 }
 </script>
-
 <script>
 function loginUser() {
   const mobile = document.getElementById("loginMobile").value.trim();
@@ -2919,12 +2906,9 @@ document.addEventListener("click", function (e) {
   removeItem(index);
 });
 
+
+
 </script>
 </body>
 </html>
-
-
-
-
-
 
