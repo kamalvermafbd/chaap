@@ -1146,7 +1146,7 @@ function addToCart(name, unit, rate, discPercent = 0) {
   // Build header
   if (anyDiscount) {
     thead.innerHTML = `
-      <th>Food</th>
+      <th>Item</th>
       <th>Qty</th>
       <th>Rate (MRP)</th>
       <th>Disc %</th>
@@ -1157,7 +1157,7 @@ function addToCart(name, unit, rate, discPercent = 0) {
     `;
   } else {
     thead.innerHTML = `
-      <th>Food</th>
+      <th>Item</th>
       <th>Qty</th>
       <th>Rate (MRP)</th>
       <th>Total</th>
@@ -2903,6 +2903,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
