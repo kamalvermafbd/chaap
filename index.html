@@ -651,8 +651,7 @@ style="
       </thead>
       <tbody></tbody>
     </table>
-    Total: &#8377;<span id="cartTotal">0.00</span>
-
+ 
 <button onclick="openCheckout()" class="checkout-btn" 
         style="display:block; margin-top:15px;">
   Checkout
@@ -1274,10 +1273,18 @@ if (restaurantTax.taxType === "On Bill") {
   extraHTML = "";
 }
 
-// Append tax rows
+// Insert BASE TOTAL first (just after cart rows)
+tbody.insertAdjacentHTML("beforeend", `
+  <tr>
+    <td colspan="${colSpan}" 
+        style="text-align:right;font-weight:bold;">
+      Total: ₹${baseTotal.toFixed(2)}
+    </td>
+  </tr>
+`);
+
+// Now insert TAX rows BELOW the Total
 tbody.insertAdjacentHTML("beforeend", extraHTML);
-
-
 }
 
 function updateQty(index, qty) {
@@ -2914,6 +2921,7 @@ document.addEventListener("click", function (e) {
 </script>
 </body>
 </html>
+
 
 
 
