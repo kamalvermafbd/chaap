@@ -1084,19 +1084,40 @@ function rebuildCart() {
 function addToCart(name, unit, rate, discPercent = 0) {
   let stored = JSON.parse(localStorage.getItem("cart") || "[]");
 
+  // --- FIND REAL itemid & variantid FROM MENU DATA ---
+  let itemId = "";
+  let variantId = "";
+
+  // 1) Find menu item
+  const menuItem = menuItems.find(m => m.name === name);
+
+  if (menuItem) {
+    // itemId always from menu sheet
+    itemId = menuItem.itemid || "";
+
+    // MULTI → find variant from cat_allocation
+    if (menuItem.cat2 === "Multi" && Array.isArray(menuItem.variants)) {
+      const vr = menuItem.variants.find(v => v.unit === unit);
+      if (vr) variantId = vr.variantid || "";
+    }
+
+    // SINGLE → no variant list, so variantid = itemid + unit shortcut
+    if (menuItem.cat2 === "Single") {
+      variantId = String(itemId) + "-" + slugify(unit);
+    }
+  }
+
+  // --------------------------------------------
+
   const existing = stored.find(i => i.name === name && i.unit === unit);
 
   if (existing) {
     existing.qty++;
-
     existing.total = existing.qty * existing.rate;
 
     if (existing.discPercent > 0) {
       existing.discAmt = existing.total * (existing.discPercent / 100);
       existing.netAmt = existing.total - existing.discAmt;
-    } else {
-      delete existing.discAmt;
-      delete existing.netAmt;
     }
 
   } else {
@@ -1104,21 +1125,21 @@ function addToCart(name, unit, rate, discPercent = 0) {
     const total = rate * qty;
 
     let newItem = {
-  name,
-  unit,
-  qty,
-  rate,
-  total,
+      name,
+      unit,
+      qty,
+      rate,
+      total,
 
-  // Mandatory backend mapping
-  itemId: slugify(name),
-  variantId: slugify(name + "-" + unit)
-};
+      // ❤️ Correct mapping
+      itemId: itemId,
+      variantId: variantId,
 
-    // ONLY add discount fields if discount > 0
+      discPercent: discPercent || 0
+    };
+
     if (discPercent > 0) {
       const discAmt = total * (discPercent / 100);
-      newItem.discPercent = discPercent;
       newItem.discAmt = discAmt;
       newItem.netAmt = total - discAmt;
     }
@@ -1127,13 +1148,11 @@ function addToCart(name, unit, rate, discPercent = 0) {
   }
 
   localStorage.setItem("cart", JSON.stringify(stored));
-
   cart = stored;
-  window.cart = stored;
 
   renderCart();
+  saveCartToBackend();
   alert(`${name} (${unit}) added to cart`);
-   saveCartToBackend();  
 }
 
 
@@ -3026,6 +3045,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
