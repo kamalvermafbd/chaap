@@ -1131,6 +1131,7 @@ function addToCart(name, unit, rate, discPercent = 0) {
 
   renderCart();
   alert(`${name} (${unit}) added to cart`);
+   saveCartToBackend();  
 }
 
 
@@ -2903,11 +2904,31 @@ document.addEventListener("click", function (e) {
   removeItem(index);
 });
 
+function saveCartToBackend() {
+  const mobile = localStorage.getItem("userMobile");
+
+  // Guest user → No backend save
+  if (!mobile) return;
+
+  apiPost("saveCart", {
+    mobile: mobile,
+    email: localStorage.getItem("userEmail") || "",
+    sessionId: localStorage.getItem("sessionId") || "",
+    cartItems: cart
+  })
+  .then(res => {
+    console.log("Cart Save:", res);
+  })
+  .catch(err => {
+    console.error("Cart Save Error:", err);
+  });
+}
 
 
 </script>
 </body>
 </html>
+
 
 
 
