@@ -904,8 +904,14 @@ function apiGet(api, params = {}) {
 }
 apiGet("getMenu")
   .then(res => renderMenu(res.menu))
-
   .catch(err => console.error("Menu load error:", err));
+// LOAD cat_allocation sheet
+apiGet("getCatAllocations")
+  .then(res => {
+    window.cat_allocations = res.cat_allocations || [];
+    console.log("Cat Allocations Loaded:", window.cat_allocations);
+  })
+  .catch(err => console.error("cat allocation load error:", err));
 
     apiGet("getRestaurantInfo")
   .then(res => {
@@ -1084,35 +1090,41 @@ function rebuildCart() {
 function addToCart(name, unit, rate, discPercent = 0) {
   let stored = JSON.parse(localStorage.getItem("cart") || "[]");
 
-  // --- FIND REAL itemId & variantId FROM menuItems (fallback to slugs) ---
-  let itemId = "";
-  let variantId = "";
+  // --- FIND REAL itemId & variantId EXACTLY AS PER SHEETS ---
+let itemId = "";
+let variantId = "";
 
-  // Find menu item by name (exact match)
-  const menuItem = (window.menuItems || []).find(m => String(m.name || "").trim() === String(name || "").trim());
+// Find menu item by name
+const menuItem = (window.menuItems || []).find(
+  m => String(m.name || "").trim() === String(name || "").trim()
+);
 
-  if (menuItem) {
-    // Prefer server-provided itemid, otherwise use slug of name
-    itemId = menuItem.itemid || menuItem.itemId || slugify(menuItem.name);
+if (menuItem) {
+  itemId = menuItem.itemid || menuItem.itemId;
 
-    // If Multi, try to find matching variant object and take its variant id
-    if ((menuItem.cat2 || "").toLowerCase() === "multi" && Array.isArray(menuItem.variants)) {
-      const vr = menuItem.variants.find(v => String(v.unit || "").trim() === String(unit || "").trim());
-      if (vr) {
-        variantId = vr.variantid || vr.variantId || slugify(menuItem.name + "-" + vr.unit);
-      } else {
-        // no exact unit match -> fallback variant id using unit
-        variantId = slugify(menuItem.name + "-" + unit);
-      }
-    } else {
-      // Single items: create a sensible variant id so backend doesn't get blank
-      variantId = String(itemId) + "-" + slugify(unit || "");
-    }
-  } else {
-    // menuItem not found (shouldn't happen usually) -> robust fallback
-    itemId = slugify(name);
-    variantId = slugify(name + "-" + unit);
+  // ---- SINGLE ----
+  if ((menuItem.cat2 || "").toLowerCase() === "single") {
+    variantId = "";   // <- ALWAYS EMPTY FOR SINGLE
   }
+
+  // ---- MULTI ----
+  else {
+    // fetch from cat_allocation instead of menuItem.variants
+    const variant = (window.cat_allocations || []).find(v =>
+      String(v.itemId) === String(itemId) &&
+      String(v.unit || "").trim() === String(unit || "").trim()
+    );
+
+    // correct mapping
+    variantId = variant ? variant.variantId || variant.variantid : "";
+  }
+
+} else {
+  // fallback (should never happen)
+  itemId = slugify(name);
+  variantId = "";
+}
+
 
   // --------------------------------------------
   const existing = stored.find(i => i.name === name && i.unit === unit);
@@ -3057,6 +3069,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
