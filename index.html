@@ -2092,6 +2092,8 @@ window.addEventListener("load", () => {
 
   const mobile = localStorage.getItem("userMobile");
   const email  = localStorage.getItem("userEmail");
+  //  LOAD USER CART FROM BACKEND IF LOGGED IN
+  loadUserCartOnStart();   // <<< ADD THIS LINE
 
   // Always reset full UI first
   document.getElementById("menuWrapper").style.display = "block";
@@ -3013,6 +3015,7 @@ function sendGuestCartToBackend() {
 </script>
 </body>
 </html>
+
 
 
 
