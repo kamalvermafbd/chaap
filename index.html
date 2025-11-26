@@ -2945,13 +2945,20 @@ document.addEventListener("click", function (e) {
 function saveCartToBackend() {
   const mobile = localStorage.getItem("userMobile");
 
-  // Guest user → No backend save
+  // Guest → backend save नहीं
   if (!mobile) return;
 
+  // Always ensure stable sessionId
+  let sessionId = localStorage.getItem("sessionId");
+  if (!sessionId) {
+    sessionId = "SESS-" + Date.now();
+    localStorage.setItem("sessionId", sessionId);
+  }
+
   apiPost("saveCart", {
-    mobile: mobile,
+    mobile,
     email: localStorage.getItem("userEmail") || "",
-    sessionId: localStorage.getItem("sessionId") || "",
+    sessionId,                   // important fix
     cartItems: cart
   })
   .then(res => {
@@ -2961,6 +2968,7 @@ function saveCartToBackend() {
     console.error("Cart Save Error:", err);
   });
 }
+
 
 function sendGuestCartToBackend() {
 
@@ -3015,6 +3023,7 @@ function sendGuestCartToBackend() {
 </script>
 </body>
 </html>
+
 
 
 
