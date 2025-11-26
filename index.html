@@ -1102,7 +1102,8 @@ function addToCart(name, unit, rate, discPercent = 0) {
   if (menuItem) {
 
     //  CORRECT: menu sheet column = itemid
-    itemId = menuItem.itemid;
+    itemId = menuItem.itemId;
+
 
     // ---- SINGLE ----
     if ((menuItem.cat2 || "").toLowerCase() === "single") {
@@ -3067,6 +3068,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
