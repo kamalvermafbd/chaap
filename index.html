@@ -1843,6 +1843,11 @@ document.querySelectorAll("#premiumMenu li").forEach(li => li.classList.remove("
 document.getElementById("mainContent").style.marginLeft = "0";
 localStorage.removeItem("userMobile");
   alert("Logged out successfully.");
+  // STEP-5A — Clear cart on logout
+localStorage.removeItem("cart");
+cart = [];
+renderCart();
+
 }
 
 </script>
@@ -2614,6 +2619,33 @@ function loginUser() {
       
 localStorage.setItem("userEmail", res.email || "");   // 
       sendGuestCartToBackend();
+      // ↓↓↓ ADD THIS BLOCK EXACTLY HERE ↓↓↓
+apiGet("getCart", { mobile })
+  .then(res => {
+    if (res.success && Array.isArray(res.cart)) {
+      const backendCart = res.cart;
+      const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+      // merge logic
+      backendCart.forEach(b => {
+        const match = localCart.find(
+          l => l.name === b.name && l.unit === b.unit
+        );
+        if (match) {
+          match.qty += Number(b.qty || 1);
+        } else {
+          localCart.push(b);
+        }
+      });
+
+      localStorage.setItem("cart", JSON.stringify(localCart));
+      cart = localCart;
+      renderCart();
+    }
+  })
+  .catch(err => console.error("Cart restore error:", err));
+// ↑↑↑ STOP HERE — DO NOT MOVE THIS ↑↑↑
+
 
       document.getElementById("loggedEmail").innerText = res.email || "";
       document.getElementById("userInfoBox").style.display = "block";
@@ -2961,9 +2993,27 @@ function sendGuestCartToBackend() {
   .catch(err => console.error("Guest cart merge error:", err));
 }
 
+  function loadUserCartOnStart() {
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) return; // not logged in
+
+  apiGet("getCart", { mobile })
+    .then(res => {
+      if (res.success && Array.isArray(res.cart)) {
+        const backendCart = res.cart;
+        localStorage.setItem("cart", JSON.stringify(backendCart));
+        cart = backendCart;
+        renderCart();
+      }
+    })
+    .catch(err => console.error("Load cart on start error:", err));
+}
+
+
 </script>
 </body>
 </html>
+
 
 
 
