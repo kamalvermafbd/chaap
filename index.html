@@ -1276,6 +1276,8 @@ function updateQty(index, qty) {
 
   // Re-render table (safe)
   renderCart();
+    // STEP 5C — Backend update after qty change
+  saveCartToBackend();
 }
 
 
@@ -2928,6 +2930,7 @@ function saveCartToBackend() {
 </script>
 </body>
 </html>
+
 
 
 
