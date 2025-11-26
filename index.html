@@ -1101,7 +1101,7 @@ function addToCart(name, unit, rate, discPercent = 0) {
 
   if (menuItem) {
 
-    // ⭐ CORRECT: menu sheet column = itemid
+    //  CORRECT: menu sheet column = itemid
     itemId = menuItem.itemid;
 
     // ---- SINGLE ----
@@ -1111,7 +1111,7 @@ function addToCart(name, unit, rate, discPercent = 0) {
 
     // ---- MULTI ----
     else {
-      // ⭐ CORRECT: cat_allocation column = itemid
+      //  CORRECT: cat_allocation column = itemid
       const variant = (window.cat_allocations || []).find(v =>
         String(v.itemid) === String(itemId) &&
         String(v.unit || "").trim() === String(unit || "").trim()
@@ -3067,6 +3067,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
