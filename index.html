@@ -2611,8 +2611,10 @@ function loginUser() {
       }
 
       localStorage.setItem("userMobile", mobile);
-localStorage.setItem("userEmail", res.email || "");   // 
       
+localStorage.setItem("userEmail", res.email || "");   // 
+      sendGuestCartToBackend();
+
       document.getElementById("loggedEmail").innerText = res.email || "";
       document.getElementById("userInfoBox").style.display = "block";
 
@@ -2926,10 +2928,43 @@ function saveCartToBackend() {
   });
 }
 
+function sendGuestCartToBackend() {
+
+  let localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+  // If no guest cart → exit
+  if (!localCart || localCart.length === 0) return;
+
+  const mobile = localStorage.getItem("userMobile");
+  const email = localStorage.getItem("userEmail");
+  const sessionId = localStorage.getItem("sessionId") || Date.now().toString();
+
+  const payload = {
+      mobile,
+      email,
+      sessionId,
+      cartItems: localCart
+  };
+
+  fetch(API_BASE + "?api=saveCart", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(res => {
+    console.log("Guest cart merged:", res);
+
+    if (res.success) {
+      localStorage.removeItem("cart");   // remove guest cart
+    }
+  })
+  .catch(err => console.error("Guest cart merge error:", err));
+}
 
 </script>
 </body>
 </html>
+
 
 
 
