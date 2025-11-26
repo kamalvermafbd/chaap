@@ -1091,39 +1091,41 @@ function addToCart(name, unit, rate, discPercent = 0) {
   let stored = JSON.parse(localStorage.getItem("cart") || "[]");
 
   // --- FIND REAL itemId & variantId EXACTLY AS PER SHEETS ---
-let itemId = "";
-let variantId = "";
+  let itemId = "";
+  let variantId = "";
 
-// Find menu item by name
-const menuItem = (window.menuItems || []).find(
-  m => String(m.name || "").trim() === String(name || "").trim()
-);
+  // Find menu item by name
+  const menuItem = (window.menuItems || []).find(
+    m => String(m.name || "").trim() === String(name || "").trim()
+  );
 
-if (menuItem) {
-  itemId = menuItem.itemid || menuItem.itemId;
+  if (menuItem) {
 
-  // ---- SINGLE ----
-  if ((menuItem.cat2 || "").toLowerCase() === "single") {
-    variantId = "";   // <- ALWAYS EMPTY FOR SINGLE
+    // ⭐ CORRECT: menu sheet column = itemid
+    itemId = menuItem.itemid;
+
+    // ---- SINGLE ----
+    if ((menuItem.cat2 || "").toLowerCase() === "single") {
+      variantId = "";   // ALWAYS EMPTY FOR SINGLE
+    }
+
+    // ---- MULTI ----
+    else {
+      // ⭐ CORRECT: cat_allocation column = itemid
+      const variant = (window.cat_allocations || []).find(v =>
+        String(v.itemid) === String(itemId) &&
+        String(v.unit || "").trim() === String(unit || "").trim()
+      );
+
+      // correct mapping
+      variantId = variant ? variant.variantId : "";
+    }
+
+  } else {
+    // fallback (should never happen)
+    itemId = slugify(name);
+    variantId = "";
   }
-
-  // ---- MULTI ----
-  else {
-    // fetch from cat_allocation instead of menuItem.variants
-    const variant = (window.cat_allocations || []).find(v =>
-      String(v.itemId) === String(itemId) &&
-      String(v.unit || "").trim() === String(unit || "").trim()
-    );
-
-    // correct mapping
-    variantId = variant ? variant.variantId || variant.variantid : "";
-  }
-
-} else {
-  // fallback (should never happen)
-  itemId = slugify(name);
-  variantId = "";
-}
 
 
   // --------------------------------------------
@@ -1151,11 +1153,9 @@ if (menuItem) {
       rate: Number(rate),
       total,
 
-      // Correct mapping for backend
       itemId: itemId,
       variantId: variantId,
 
-      // keep discount field (0 if none)
       discPercent: Number(discPercent || 0)
     };
 
@@ -1168,7 +1168,6 @@ if (menuItem) {
     stored.push(newItem);
   }
 
-  // Persist + UI update + backend sync
   localStorage.setItem("cart", JSON.stringify(stored));
   cart = stored;
   window.cart = stored;
@@ -1177,7 +1176,6 @@ if (menuItem) {
   saveCartToBackend();
   alert(`${name} (${unit}) added to cart`);
 }
-
 
 
 
@@ -3069,6 +3067,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
