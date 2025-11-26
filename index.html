@@ -2622,35 +2622,34 @@ function loginUser() {
       }
 
       localStorage.setItem("userMobile", mobile);
-      
-localStorage.setItem("userEmail", res.email || "");   // 
+      localStorage.setItem("userEmail", res.email || "");
+
       sendGuestCartToBackend();
-      // ↓↓↓ ADD THIS BLOCK EXACTLY HERE ↓↓↓
-apiGet("getCart", { mobile })
-  .then(res => {
-    if (res.success && Array.isArray(res.cart)) {
-      const backendCart = res.cart;
-      const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-      // merge logic
-      backendCart.forEach(b => {
-        const match = localCart.find(
-          l => l.name === b.name && l.unit === b.unit
-        );
-        if (match) {
-          match.qty += Number(b.qty || 1);
-        } else {
-          localCart.push(b);
-        }
-      });
+      // ↓↓↓ MERGE BACKEND → LOCAL CART (ONLY ONE TIME) ↓↓↓
+      apiGet("getCart", { mobile })
+        .then(res => {
+          if (res.success && Array.isArray(res.cart)) {
+            const backendCart = res.cart;
+            const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-      localStorage.setItem("cart", JSON.stringify(localCart));
-      cart = localCart;
-      renderCart();
-    }
-  })
-  .catch(err => console.error("Cart restore error:", err));
-// ↑↑↑ STOP HERE — DO NOT MOVE THIS ↑↑↑
+            backendCart.forEach(b => {
+              const match = localCart.find(
+                l => l.name === b.name && l.unit === b.unit
+              );
+              if (match) {
+                match.qty += Number(b.qty || 1);
+              } else {
+                localCart.push(b);
+              }
+            });
+
+            localStorage.setItem("cart", JSON.stringify(localCart));
+            cart = localCart;
+            renderCart();
+          }
+        })
+        .catch(err => console.error("Cart restore error:", err));
 
 
       document.getElementById("loggedEmail").innerText = res.email || "";
@@ -2675,6 +2674,7 @@ apiGet("getCart", { mobile })
       alert("Login error: " + err.message);
     });
 }
+
   function openMenuPageProperly(el) {
   activateMenu(el);
   hideAllPages();
@@ -3026,6 +3026,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
