@@ -1104,12 +1104,16 @@ function addToCart(name, unit, rate, discPercent = 0) {
     const total = rate * qty;
 
     let newItem = {
-      name,
-      unit,
-      qty,
-      rate,
-      total
-    };
+  name,
+  unit,
+  qty,
+  rate,
+  total,
+
+  // Mandatory backend mapping
+  itemId: slugify(name),
+  variantId: slugify(name + "-" + unit)
+};
 
     // ONLY add discount fields if discount > 0
     if (discPercent > 0) {
@@ -2945,7 +2949,7 @@ document.addEventListener("click", function (e) {
 function saveCartToBackend() {
   const mobile = localStorage.getItem("userMobile");
 
-  // Guest → backend save नहीं
+  // Guest → no save
   if (!mobile) return;
 
   // Always ensure stable sessionId
@@ -2958,16 +2962,13 @@ function saveCartToBackend() {
   apiPost("saveCart", {
     mobile,
     email: localStorage.getItem("userEmail") || "",
-    sessionId,                   // important fix
+    sessionId,
     cartItems: cart
   })
-  .then(res => {
-    console.log("Cart Save:", res);
-  })
-  .catch(err => {
-    console.error("Cart Save Error:", err);
-  });
+  .then(res => console.log("Cart Save:", res))
+  .catch(err => console.error("Cart Save Error:", err));
 }
+
 
 
 function sendGuestCartToBackend() {
@@ -2979,7 +2980,9 @@ function sendGuestCartToBackend() {
 
   const mobile = localStorage.getItem("userMobile");
   const email = localStorage.getItem("userEmail");
-  const sessionId = localStorage.getItem("sessionId") || Date.now().toString();
+  const sessionId = localStorage.getItem("sessionId") || ("SESS-" + Date.now());
+localStorage.setItem("sessionId", sessionId);
+
 
   const payload = {
       mobile,
@@ -3023,6 +3026,7 @@ function sendGuestCartToBackend() {
 </script>
 </body>
 </html>
+
 
 
 
