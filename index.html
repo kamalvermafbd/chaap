@@ -2822,7 +2822,8 @@ function buildMenuCardHTML(item, idx) {
                    name="var-${idSafe}"
                    data-unit="${v.unit}"
                    data-mrp="${mrp}"
-                   data-disc="${disc}">
+                   data-disc="${disc}"
+                   data-variant-id="${v.variantId}">
 
             <span class="unit">${v.unit}</span>
 
@@ -2892,6 +2893,8 @@ const btn = document.getElementById(`btn-${idSafe}`);
   // store selected variant data on button (used by delegated click handler)
   btn.dataset.price = r.dataset.mrp;
   btn.dataset.unit  = r.dataset.unit;
+     btn.dataset.variantId = r.dataset.variantId;
+
 
   // restore normal appearance
   btn.style.background = "#ff6347";
@@ -2913,8 +2916,11 @@ function addVariantToCart(name) {
     name: name,
     unit: selected.dataset.unit,
     rate: mrp,
-    discPercent: disc
-  };
+    discPercent: disc,
+    variantId: selected.dataset.variantId,
+    itemId: menuItems.find(m => m.name === name)?.itemId
+};
+
 }
 
 
@@ -2944,7 +2950,8 @@ document.addEventListener('click', function (e) {
       return;
     }
 
-    addToCart(info.name, info.unit, info.rate, info.discPercent);
+  addToCart(info.name, info.unit, info.rate, info.discPercent, info.itemId, info.variantId);
+
 
 // 1a — RESET VARIANT RADIOS
 const parentCard = btn.closest(".menu-item");
@@ -2975,7 +2982,10 @@ btn.dataset.disc = "";
     return;
   }
 
-  addToCart(name, unit, price, discPercent);
+  addToCart(name, unit, price, discPercent,
+          menuItems.find(m => m.name === name)?.itemId,
+          "");
+
 });
 
 
@@ -3068,6 +3078,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
