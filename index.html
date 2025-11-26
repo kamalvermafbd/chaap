@@ -1084,76 +1084,88 @@ function rebuildCart() {
 function addToCart(name, unit, rate, discPercent = 0) {
   let stored = JSON.parse(localStorage.getItem("cart") || "[]");
 
-  // --- FIND REAL itemid & variantid FROM MENU DATA ---
+  // --- FIND REAL itemId & variantId FROM menuItems (fallback to slugs) ---
   let itemId = "";
   let variantId = "";
 
-  // 1) Find menu item
-  const menuItem = menuItems.find(m => m.name === name);
+  // Find menu item by name (exact match)
+  const menuItem = (window.menuItems || []).find(m => String(m.name || "").trim() === String(name || "").trim());
 
   if (menuItem) {
-    // itemId always from menu sheet
-    itemId = menuItem.itemid || "";
+    // Prefer server-provided itemid, otherwise use slug of name
+    itemId = menuItem.itemid || menuItem.itemId || slugify(menuItem.name);
 
-    // MULTI → find variant from cat_allocation
-    if (menuItem.cat2 === "Multi" && Array.isArray(menuItem.variants)) {
-      const vr = menuItem.variants.find(v => v.unit === unit);
-      if (vr) variantId = vr.variantid || "";
+    // If Multi, try to find matching variant object and take its variant id
+    if ((menuItem.cat2 || "").toLowerCase() === "multi" && Array.isArray(menuItem.variants)) {
+      const vr = menuItem.variants.find(v => String(v.unit || "").trim() === String(unit || "").trim());
+      if (vr) {
+        variantId = vr.variantid || vr.variantId || slugify(menuItem.name + "-" + vr.unit);
+      } else {
+        // no exact unit match -> fallback variant id using unit
+        variantId = slugify(menuItem.name + "-" + unit);
+      }
+    } else {
+      // Single items: create a sensible variant id so backend doesn't get blank
+      variantId = String(itemId) + "-" + slugify(unit || "");
     }
-
-    // SINGLE → no variant list, so variantid = itemid + unit shortcut
-    if (menuItem.cat2 === "Single") {
-      variantId = String(itemId) + "-" + slugify(unit);
-    }
+  } else {
+    // menuItem not found (shouldn't happen usually) -> robust fallback
+    itemId = slugify(name);
+    variantId = slugify(name + "-" + unit);
   }
 
   // --------------------------------------------
-
   const existing = stored.find(i => i.name === name && i.unit === unit);
 
   if (existing) {
-    existing.qty++;
-    existing.total = existing.qty * existing.rate;
+    existing.qty = Number(existing.qty || 0) + 1;
+    existing.total = parseFloat((existing.qty * existing.rate).toFixed(2));
 
-    if (existing.discPercent > 0) {
-      existing.discAmt = existing.total * (existing.discPercent / 100);
-      existing.netAmt = existing.total - existing.discAmt;
+    if (Number(existing.discPercent || 0) > 0) {
+      existing.discAmt = parseFloat(((existing.total * Number(existing.discPercent)) / 100).toFixed(2));
+      existing.netAmt = parseFloat((existing.total - existing.discAmt).toFixed(2));
+    } else {
+      delete existing.discAmt;
+      delete existing.netAmt;
     }
-
   } else {
     const qty = 1;
-    const total = rate * qty;
+    const total = parseFloat((rate * qty).toFixed(2));
 
     let newItem = {
       name,
       unit,
       qty,
-      rate,
+      rate: Number(rate),
       total,
 
-      // ❤️ Correct mapping
+      // Correct mapping for backend
       itemId: itemId,
       variantId: variantId,
 
-      discPercent: discPercent || 0
+      // keep discount field (0 if none)
+      discPercent: Number(discPercent || 0)
     };
 
     if (discPercent > 0) {
-      const discAmt = total * (discPercent / 100);
+      const discAmt = parseFloat(((total * Number(discPercent)) / 100).toFixed(2));
       newItem.discAmt = discAmt;
-      newItem.netAmt = total - discAmt;
+      newItem.netAmt = parseFloat((total - discAmt).toFixed(2));
     }
 
     stored.push(newItem);
   }
 
+  // Persist + UI update + backend sync
   localStorage.setItem("cart", JSON.stringify(stored));
   cart = stored;
+  window.cart = stored;
 
   renderCart();
   saveCartToBackend();
   alert(`${name} (${unit}) added to cart`);
 }
+
 
 
 
@@ -3045,6 +3057,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
