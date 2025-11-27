@@ -4090,23 +4090,26 @@ function mergeCartWithMenuData() {
   console.log("🟩 AFTER MERGE cart =", cart);
 
   cart = cart.map(ci => {
-    const menuItem = menuItems.find(m => String(m.itemId) == String(ci.itemId));
-    if (menuItem) {
-      ci.name = menuItem.name || ci.name;
+    const menuItem = menuItems.find(m => String(m.itemId) === String(ci.itemId));
+    const alloc    = (window.cat_allocations || []).find(
+                       v => String(v.variantId) === String(ci.variantId)
+                     );
 
-      if ((menuItem.cat2 || "").toLowerCase() === "single") {
-        ci.unit = menuItem.unit || ci.unit;
-      } else if (Array.isArray(menuItem.variants)) {
-        const vr = menuItem.variants.find(v =>
-          String(v.variantId || v.variantid || "").trim() === String(ci.variantId || "").trim()
-        );
-        if (vr) ci.unit = vr.unit || ci.unit;
-      }
+    // Name priority: cart > menu
+    if (!ci.name && menuItem) ci.name = menuItem.name;
+
+    // Unit priority: cart > alloc > menu
+    if (!ci.unit) {
+      if (alloc && alloc.unit) ci.unit = alloc.unit;
+      else if (menuItem && menuItem.unit) ci.unit = menuItem.unit;
     }
+
     return ci;
   });
 }
 
+
 </script>
 </body>
 </html>
+
