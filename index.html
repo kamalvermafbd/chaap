@@ -447,7 +447,105 @@ body::before {
 #leftNav.active {
   transform: translateX(0);
 }
+/* =====================================
+   H1 — ROYAL PURPLE GLASS HEADER
+   ===================================== */
+header {
+  background: rgba(62, 14, 84, 0.55);          /* transparent royal purple */
+  backdrop-filter: blur(18px);                /* premium blur effect */
+  -webkit-backdrop-filter: blur(18px);
+  color: #FFEED5 !important;                  /* soft gold text */
+  padding: 35px 20px !important;
+  text-align: center;
+  border-bottom-left-radius: 22px;
+  border-bottom-right-radius: 22px;
 
+  /* premium shadow */
+  box-shadow: 
+    0 12px 28px rgba(62, 14, 84, 0.30),
+    0 4px 12px rgba(255, 209, 102, 0.15);
+
+  position: relative;
+  overflow: hidden;
+}
+
+/* Golden light glow layer */
+header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 120%, 
+    rgba(255, 209, 102, 0.28),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* Title text */
+header h1 {
+  color: #FFD166 !important;                 /* brighter gold */
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+
+  /* Soft glow */
+  text-shadow:
+    0 0 12px rgba(255, 209, 102, 0.55),
+    0 0 22px rgba(255, 209, 102, 0.35);
+
+  animation: glassFadeDown 0.8s ease forwards;
+}
+
+/* Subtitle */
+header p {
+  color: #FFEBD1 !important;
+  font-size: 15px;
+  margin-top: -6px;
+  animation: glassFadeUp 1s ease forwards;
+}
+
+/* Entry animations */
+@keyframes glassFadeDown {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glassFadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =====================================
+   GLOBAL ROYAL PURPLE–GOLD BACKGROUND
+   ===================================== */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+
+  background: linear-gradient(
+      135deg, 
+      #250436 0%, 
+      #3E0E54 40%, 
+      #5E2A9E 100%
+    );
+  background-attachment: fixed;
+  color: #f7eaff;
+
+  /* smooth color transition */
+  transition: background 0.6s ease;
+}
+
+/* Soft premium gold noise overlay (texture) */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: url('https://www.transparenttextures.com/patterns/asfalt-light.png');
+  opacity: 0.08;
+  z-index: -1;
+}
 
     
   </style>
@@ -3091,6 +3189,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
