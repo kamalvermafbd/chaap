@@ -1417,13 +1417,15 @@ style="
 
              <div class="cart">
     <h3>Your Cart</h3>
+                <div id="cartContainer">
     <table id="cartTable">
       <thead>
         <tr><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th><th>Action</th></tr>
       </thead>
       <tbody></tbody>
     </table>
-  
+    </div>
+
 <p id="cartBaseTotal" 
    style="text-align:right;font-weight:bold;margin:10px 0;">
   Total: ₹<span id="cartTotal">0.00</span>
@@ -1965,7 +1967,18 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
 
 
   function renderCart() {
-  const tbody = document.querySelector('#cartTable tbody');
+  document.getElementById("cartContainer").innerHTML = `
+      <div id="cartCards"></div>
+      <table id="cartTable">
+          <thead>
+            <tr><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th><th>Action</th></tr>
+          </thead>
+          <tbody></tbody>
+      </table>
+    `;
+
+    
+    const tbody = document.querySelector('#cartTable tbody');
   const thead = document.querySelector('#cartTable thead tr');
   tbody.innerHTML = "";
 
@@ -3863,6 +3876,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
