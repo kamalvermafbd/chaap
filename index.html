@@ -1283,6 +1283,78 @@ select {
   border-radius: 20px;
   margin-bottom: 25px;
 }
+/* ==========================================
+   STEP 10 — PREMIUM QUANTITY BUTTONS
+   ========================================== */
+
+/* Quantity button base */
+.qty-btn,
+.increment-btn,
+.decrement-btn,
+button.qtyPlus,
+button.qtyMinus {
+  width: 32px;
+  height: 32px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+
+  font-size: 18px;
+  font-weight: 700;
+
+  color: #FFD166;     /* gold text */
+  background: rgba(62, 14, 84, 0.65);   /* glossy purple */
+  backdrop-filter: blur(6px);
+
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.25),
+    0 0 10px rgba(255,209,102,0.25);
+
+  transition: 0.25s ease;
+}
+
+/* Hover → golden glow */
+.qty-btn:hover,
+.increment-btn:hover,
+.decrement-btn:hover,
+button.qtyPlus:hover,
+button.qtyMinus:hover {
+  transform: scale(1.12);
+  background: rgba(62, 14, 84, 0.85);
+
+  box-shadow:
+    0 8px 16px rgba(0,0,0,0.30),
+    0 0 16px rgba(255,209,102,0.55);
+}
+
+/* Active click → bounce */
+.qty-btn:active,
+.increment-btn:active,
+.decrement-btn:active,
+button.qtyPlus:active,
+button.qtyMinus:active {
+  transform: scale(0.90);
+}
+
+/* Quantity number display */
+.qty-number {
+  font-size: 16px;
+  font-weight: 700;
+  padding: 4px 10px;
+
+  color: #FFEED5;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+
+  margin: 0 6px;
+
+  border: 1px solid rgba(255,209,102,0.25);
+}
 
     
   </style>
@@ -3926,6 +3998,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
