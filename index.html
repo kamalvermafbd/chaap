@@ -1131,10 +1131,10 @@ if (itemIdFromBtn) {
     }
 
   } else {
-    // fallback (should never happen)
-    itemId = slugify(name);
-    variantId = "";
-  }
+    // Only fallback if ABSOLUTELY no match
+    console.warn("MenuItem not found for:", name, unit);
+    return; // STOP — do not add wrong cart item
+}
 
 
   // --------------------------------------------
@@ -3086,6 +3086,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
