@@ -2052,14 +2052,15 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
     const netRate = rate - discAmt;
 
     let newItem = {
-      name,
-      unit,
+      name: item.name,
+  unit: item.unit || item.variant || "",
       qty,
       rate: Number(rate),
       total: parseFloat(total.toFixed(2)),
       itemId,
       variantId,
       discPercent: Number(discPercent),
+       image: item.image || ""
         };
 
     if (discPercent > 0) {
@@ -2085,8 +2086,22 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
 
 
 function renderCart() {
-  console.log("CART DATA:", cart);
- mergeCartWithMenuData();
+
+ 
+cart = JSON.parse(localStorage.getItem("cart")) || [];
+mergeCartWithMenuData();
+  console.log("CART DATA:", cart); 
+
+  // ---- FIX: name + unit merge from menuItems ----
+cart = cart.map(c => {
+    const m = menuItems.find(i => i.itemId == c.itemId);
+    return {
+      ...c,
+      name: c.name || m?.name || "",
+      unit: c.unit || m?.unit || ""
+    };
+  });
+
   document.getElementById("cartContainer").innerHTML = `
       <div id="cartCards"></div>
       <table id="cartTable">
@@ -4094,6 +4109,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
