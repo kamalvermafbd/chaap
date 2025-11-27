@@ -2066,7 +2066,9 @@ let newItem = {
   discPercent: Number(discPercent),
   image: item.image || allocation.image || ""
 };
-
+    // 🔥 FULL FIX: if menuItems not loaded then backup name+unit
+    if (!newItem.name) newItem.name = name;
+    if (!newItem.unit) newItem.unit = unit;
 
     if (discPercent > 0) {
       newItem.discAmt = parseFloat(discAmt.toFixed(2));
@@ -2094,7 +2096,6 @@ console.log("🟥 BEFORE MERGE render-cart cart =", cart);
 
  
 cart = JSON.parse(localStorage.getItem("cart")) || [];
-//mergeCartWithMenuData();
   console.log("CART DATA:", cart); 
 
   document.getElementById("cartContainer").innerHTML = `
@@ -4129,6 +4130,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
