@@ -1087,8 +1087,16 @@ function rebuildCart() {
   renderCart();
 }
 
-function addToCart(name, unit, rate, discPercent = 0) {
+function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", variantIdFromBtn = "") {
+const cleanUnit = String(unit || "").trim().toLowerCase();
+const cleanName = String(name || "").trim().toLowerCase();
+
   let stored = JSON.parse(localStorage.getItem("cart") || "[]");
+// STEP 1B — If itemIdFromBtn came, override mapping
+if (itemIdFromBtn) {
+  itemId = itemIdFromBtn;
+  variantId = variantIdFromBtn || "";
+}
 
   // --- FIND REAL itemId & variantId EXACTLY AS PER SHEETS ---
   let itemId = "";
@@ -1115,7 +1123,7 @@ function addToCart(name, unit, rate, discPercent = 0) {
       //  CORRECT: cat_allocation column = itemId
       const variant = (window.cat_allocations || []).find(v =>
         String(v.itemId) === String(itemId) &&
-        String(v.unit || "").trim() === String(unit || "").trim()
+        String(v.unit || "").trim().toLowerCase() === cleanUnit
       );
 
       // correct mapping
@@ -3078,6 +3086,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
