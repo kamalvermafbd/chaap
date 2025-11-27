@@ -4055,7 +4055,7 @@ localStorage.setItem("sessionId", sessionId);
     .then(res => {
       if (res.success && Array.isArray(res.cart)) {
         const backendCart = res.cart;
-        localStorage.setItem("cart", JSON.stringify(backendCart));
+        
      
         renderCart();
       }
@@ -4111,6 +4111,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
