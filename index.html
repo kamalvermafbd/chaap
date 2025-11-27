@@ -4057,7 +4057,7 @@ localStorage.setItem("sessionId", sessionId);
       if (res.success && Array.isArray(res.cart)) {
         const backendCart = res.cart;
         localStorage.setItem("cart", JSON.stringify(backendCart));
-        cart = backendCart;
+        ///cart = backendCart;
         renderCart();
       }
     })
@@ -4110,6 +4110,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
