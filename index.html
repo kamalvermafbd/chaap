@@ -2073,8 +2073,7 @@ let newItem = {
       newItem.netAmt = parseFloat((netRate * qty).toFixed(2));
     }
  // --- FIX: Always store name + unit ---
-    newItem.name = newItem.name || name;   // <-- ADD THIS
-    newItem.unit = newItem.unit || unit;   // <-- ADD THIS
+    
     stored.push(newItem);
   }
 
@@ -2099,13 +2098,12 @@ mergeCartWithMenuData();
 
   // ---- FIX: name + unit merge from menuItems ----
 cart = cart.map(c => {
-    const m = menuItems.find(i => i.itemId == c.itemId);
-    return {
-      ...c,
-      name: c.name || m?.name || "",
-      unit: c.unit || m?.unit || ""
-    };
-  });
+    // DO NOT TOUCH name — addToCart already stores correct name
+    // DO NOT TOUCH unit for Single/Multi — mergeCartWithMenuData already handles this
+
+    return c;  // <-- KEEP CART VALUES AS THEY ARE
+});
+
 
   document.getElementById("cartContainer").innerHTML = `
       <div id="cartCards"></div>
@@ -4094,20 +4092,19 @@ window.addEventListener("resize", () => {
 
 function mergeCartWithMenuData() {
   cart = cart.map(ci => {
-    const menuItem = menuItems.find(m => m.itemId == ci.itemId);
-
-
+    const menuItem = menuItems.find(m => String(m.itemId) == String(ci.itemId));
     if (menuItem) {
-      ci.name = menuItem.name;
+      ci.name = menuItem.name || ci.name;
 
       if ((menuItem.cat2 || "").toLowerCase() === "single") {
-        ci.unit = menuItem.unit;
+        ci.unit = menuItem.unit || ci.unit;
       } else if (Array.isArray(menuItem.variants)) {
-        const vr = menuItem.variants.find(v => v.variantid == ci.variantId);
-        if (vr) ci.unit = vr.unit;
+        const vr = menuItem.variants.find(v =>
+          String(v.variantId || v.variantid || "").trim() === String(ci.variantId || "").trim()
+        );
+        if (vr) ci.unit = vr.unit || ci.unit;
       }
     }
-
     return ci;
   });
 }
@@ -4115,6 +4112,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
