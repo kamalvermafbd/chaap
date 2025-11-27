@@ -1176,7 +1176,15 @@ html {
   scroll-behavior: smooth;
 }
 
-    
+    /* Fix: Top buttons should not cover overlays */
+#hamburgerBtn,
+#logoutBtn,
+button[onclick="openLogin()"],
+button[onclick="openSignup()"],
+#signupLabelBox {
+  z-index: 50 !important;
+}
+
   </style>
 </head>
 <body>
@@ -3802,6 +3810,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
