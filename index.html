@@ -2080,9 +2080,8 @@ let newItem = {
   localStorage.setItem("cart", JSON.stringify(stored));
   cart = stored;
   window.cart = stored;
-  saveCartToBackend();
-
-  renderCart();
+saveCartToBackend(cart);
+setTimeout(renderCart, 50);
   alert(`${name} (${unit}) added to cart`);
 }
 
@@ -4112,4 +4111,5 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
