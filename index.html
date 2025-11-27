@@ -1216,6 +1216,17 @@ button[onclick="openSignup()"],
   color: #fff !important;
 }
 
+/* Fix: Logged-in email badge */
+#loggedInDisplay,
+.loggedInUser,
+.loginStatus {
+  background: rgba(0, 0, 0, 0.4) !important;   /* dark glass */
+  color: #fff !important;                      /* white text */
+  font-weight: bold !important;                /* bold text */
+  padding: 6px 12px !important;
+  border-radius: 6px !important;
+  display: inline-block !important;
+}
 
   </style>
 </head>
@@ -3842,6 +3853,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
