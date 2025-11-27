@@ -2212,7 +2212,8 @@ mergeCartWithMenuData();
       `;
     }
 
-    document.getElementById("cartCards").innerHTML += cardHTML;
+    document.getElementById("cartCards").insertAdjacentHTML("beforeend", cardHTML);
+
 
     grandTotal += total;
 
@@ -4105,6 +4106,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
