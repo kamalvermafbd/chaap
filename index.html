@@ -61,12 +61,6 @@ button:active::after {
   transition: 0.4s ease;
 }
 
-    body {
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      background: #fffdf7;
-      color: #333;
-    }
     
     .menu-container {
       display: grid;
@@ -148,22 +142,7 @@ button:active::after {
 }
 
 
-/* Profile Page Input Styling */
-#profilePage input {
-  width: 280px !important;       /* Fixed compact width */
-  max-width: 90% !important;     /* Responsive */
-  font-size: 14px !important;    /* Smaller text */
-  height: 32px !important;       /* Compact height */
-  padding: 4px 10px !important;  /* Balanced padding */
-  border: 1px solid #bbb;
-  border-radius: 6px;
-  margin-bottom: 10px;
-  box-sizing: border-box;
-}
-#profilePage input[readonly] {
-  background: #f5f5f5;
-  color: #555;
-}
+
 #pageWrapper {
   position: relative;
 }
@@ -175,71 +154,7 @@ button:active::after {
 }
 
 /* PREMIUM LEFT SIDEBAR */
-#leftNav {
-  position: fixed;
-  left: 0;
-  width: 220px;
-  top: 180px;    /* header ?? ???? */
-  bottom: 0;
-  background: #2A0A4A;  /* elegant royal blue */
-  color: white;
-  padding: 20px 15px;
-  border-right: 1px solid rgba(255,255,255,0.15);
-  box-shadow: 2px 0 12px rgba(0,0,0,0.12);
-  border-top-right-radius: 12px;
-   transform: translateX(-100%);
-  transition: transform 0.3s ease;
 
-}
-
-/* Menu UL */
-#leftNav ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-/* Items */
-#leftNav li {
-  padding: 12px 10px;
-  margin-bottom: 6px;
-  cursor: pointer;
-  color: white;
-  font-size: 16px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: 0.2s;  
-}
-
-/* Hover effect */
-#leftNav li:hover {
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(4px);
-}
-
-/* Active menu */
-#leftNav li.active {
-  background: white;
-  color: #1e3a8a;
-  font-weight: 600;
-}
-
-/* Premium badge for numbers */
-.nav-badge {
-  background: white;
-  color: #1e3a8a;
-  padding: 2px 7px;
-  border-radius: 6px;
-  font-weight: bold;
-}
-/* Premium Navigation Icons */
-.nav-icon {
-  font-size: 22px;       /* Bigger size */
-  color: #ffd166;        /* Soft gold/yellow – looks premium on blue */
-  font-weight: bold;
-}
 #profileOverlay { 
    display: none; 
    position: fixed; 
@@ -3924,55 +3839,4 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
