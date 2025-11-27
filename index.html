@@ -2051,17 +2051,21 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
     const discAmt = (rate * discPercent) / 100;
     const netRate = rate - discAmt;
 
-    let newItem = {
-      name: item.name,
-  unit: item.unit || item.variant || "",
-      qty,
-      rate: Number(rate),
-      total: parseFloat(total.toFixed(2)),
-      itemId,
-      variantId,
-      discPercent: Number(discPercent),
-       image: item.image || ""
-        };
+    const item = menuItems.find(i => i.itemId == itemId) || {};
+const allocation = catAllocationData.find(v => v.variantId == variantId) || {};
+
+let newItem = {
+  name: item.name || allocation.name || "",
+  unit: allocation.unit || item.unit || "",
+  qty,
+  rate: Number(rate),
+  total: parseFloat(total.toFixed(2)),
+  itemId,
+  variantId,
+  discPercent: Number(discPercent),
+  image: item.image || allocation.image || ""
+};
+
 
     if (discPercent > 0) {
       newItem.discAmt = parseFloat(discAmt.toFixed(2));
@@ -4109,6 +4113,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
