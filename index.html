@@ -2144,8 +2144,10 @@ function renderCart() {
         <div class="cart-card">
           <div class="cart-left">
             <div class="cart-title">
-              <span class="item-name">${item.name} (${item.unit || item.variant || item.size || ''})
+              <span class="item-name">
+  ${(item.name || "Item")} (${item.unit || item.variant || item.size || ""})
 </span>
+
               <span class="delete-icon" onclick="updateQty(${idx}, 0)">×</span>
             </div>
 
@@ -4070,6 +4072,7 @@ window.addEventListener("resize", () => {
 </script>
 </body>
 </html>
+
 
 
 
