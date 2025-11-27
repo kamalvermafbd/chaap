@@ -2096,6 +2096,7 @@ console.log("🟥 BEFORE MERGE render-cart cart =", cart);
 
  
 cart = JSON.parse(localStorage.getItem("cart")) || [];
+  mergeCartWithMenuData();   // ✔ TRUE FIX
   console.log("CART DATA:", cart); 
 
   document.getElementById("cartContainer").innerHTML = `
@@ -4130,6 +4131,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
