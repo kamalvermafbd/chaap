@@ -1321,6 +1321,19 @@ button[onclick="openSignup()"],
   font-size: 16px;
   color: #000;
 }
+/* MOBILE VIEW (max-width 768px) */
+@media (max-width: 768px) {
+
+  /* Hide old table */
+  #cartTable {
+    display: none !important;
+  }
+
+  /* Make cards full width */
+  #cartCards {
+    display: flex;
+  }
+}
 
   </style>
 </head>
@@ -4022,6 +4035,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
