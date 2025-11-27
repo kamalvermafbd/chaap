@@ -2096,15 +2096,6 @@ cart = JSON.parse(localStorage.getItem("cart")) || [];
 mergeCartWithMenuData();
   console.log("CART DATA:", cart); 
 
-  // ---- FIX: name + unit merge from menuItems ----
-cart = cart.map(c => {
-    // DO NOT TOUCH name — addToCart already stores correct name
-    // DO NOT TOUCH unit for Single/Multi — mergeCartWithMenuData already handles this
-
-    return c;  // <-- KEEP CART VALUES AS THEY ARE
-});
-
-
   document.getElementById("cartContainer").innerHTML = `
       <div id="cartCards"></div>
       <table id="cartTable">
@@ -2198,6 +2189,7 @@ cart = cart.map(c => {
           <div class="cart-left">
             <div class="cart-title">
               <span class="item-name">${item.name} (${item.unit})</span>
+
               <span class="delete-icon" onclick="updateQty(${idx}, 0)">×</span>
             </div>
 
@@ -4113,6 +4105,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
