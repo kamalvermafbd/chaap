@@ -1334,6 +1334,25 @@ button[onclick="openSignup()"],
     display: flex;
   }
 }
+#cartCards {
+  padding-bottom: 80px;
+}
+@media (max-width: 768px) {
+  #variantPopup {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    padding: 20px !important;
+    overflow-y: auto !important;
+    border-radius: 0 !important;
+  }
+}
+
 
   </style>
 </head>
@@ -1499,6 +1518,10 @@ style="
 
             <!-- Your existing category filter + search + clear button will be here -->
         </div>
+<div id="mobileCartBar" style="display:none;">
+  <span id="mobileCartTotal">0</span>
+  <button onclick="openCheckout()">Checkout</button>
+</div>
 
         <!-- OTHER PAGES WRAPPER (default hidden) -->
 
@@ -4012,10 +4035,26 @@ localStorage.setItem("sessionId", sessionId);
     .catch(err => console.error("Load cart on start error:", err));
 }
 
+function updateMobileCartBar(total) {
+  const bar = document.getElementById("mobileCartBar");
+  const amt = document.getElementById("mobileCartTotal");
+
+  if (!bar || !amt) return;
+
+  // Show only on mobile & only when total > 0
+  if (window.innerWidth <= 768 && total > 0) {
+    amt.textContent = total.toFixed(2);
+    bar.style.display = "flex";
+  } else {
+    bar.style.display = "none";
+  }
+}
+
 
 </script>
 </body>
 </html>
+
 
 
 
