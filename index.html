@@ -2052,7 +2052,8 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
     const netRate = rate - discAmt;
 
     const item = menuItems.find(i => i.itemId == itemId) || {};
-const allocation = catAllocationData.find(v => v.variantId == variantId) || {};
+const allocation = (window.cat_allocations || []).find(v => v.variantId == variantId) || {};
+
 
 let newItem = {
   name: item.name || allocation.name || "",
@@ -4113,6 +4114,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
