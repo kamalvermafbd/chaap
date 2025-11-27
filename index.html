@@ -752,6 +752,122 @@ body::after {
   font-weight: 800;
   box-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
+/* ==========================================
+   STEP 5 — PREMIUM CART DESIGN
+   ========================================== */
+
+/* Main cart container */
+.cart {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255, 209, 102, 0.20);
+  padding: 25px;
+  border-radius: 20px;
+  margin-top: 20px;
+
+  box-shadow: 
+    0 6px 18px rgba(0,0,0,0.18),
+    0 0 12px rgba(255,209,102,0.15);
+}
+
+/* Table container */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 6px;   /* gap between rows */
+}
+
+/* Table header */
+th {
+  background: linear-gradient(135deg, #5E2A9E, #3E0E54);
+  color: #FFD166;
+  padding: 10px;
+  font-weight: 700;
+  border: none;
+  text-transform: uppercase;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+/* Table rows */
+td {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FBEFF4;
+  padding: 12px;
+  border: none;
+  font-size: 15px;
+
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+/* Alternate row highlight */
+tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Premium total line */
+#cartTotalContainer,
+#finalBillBox {
+  margin-top: 20px;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255,209,102,0.3);
+  padding: 15px;
+  border-radius: 14px;
+
+  box-shadow:
+    0 3px 10px rgba(0,0,0,0.15),
+    inset 0 0 12px rgba(255,209,102,0.12);
+}
+
+/* Total text */
+#cartTotal,
+.final-price {
+  color: #FFD166;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* Delete / Remove button */
+td button {
+  background: linear-gradient(135deg, #D7263D, #A30021);
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 13px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+td button:hover {
+  transform: scale(1.07);
+  box-shadow: 0 4px 12px rgba(215,38,61,0.45);
+}
+
+/* Checkout button */
+.checkout-btn, #proceedBtn, #placeOrderBtn {
+  background: linear-gradient(135deg, #FFD166, #FFEB99);
+  color: #3E0E54 !important;
+  font-weight: 800;
+  padding: 12px 20px;
+  border-radius: 14px;
+  margin-top: 15px;
+  font-size: 17px;
+
+  border: 1px solid rgba(255,209,102,0.4);
+  transition: 0.25s ease;
+}
+
+.checkout-btn:hover, #proceedBtn:hover, #placeOrderBtn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 6px 14px rgba(255,209,102,0.35);
+}
 
     
   </style>
@@ -3395,6 +3511,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
