@@ -1323,6 +1323,22 @@ button[onclick="openSignup()"],
 }
 /* MOBILE VIEW (max-width 768px) */
 @media (max-width: 768px) {
+  /* Ensure body background and text color */
+  body {
+    background: linear-gradient(
+      135deg, 
+      #250436 0%, 
+      #3E0E54 40%, 
+      #5E2A9E 100%
+    ) !important; /* Ensure background stays for mobile */
+    color: #f7eaff !important; /* Ensure text color is light */
+  }
+
+  /* Ensure header text color */
+  header {
+    color: #FFEED5 !important; /* Ensure header text color is light */
+  }
+
   /* Hide old table */
   #cartTable {
     display: none !important;
@@ -1359,7 +1375,14 @@ button[onclick="openSignup()"],
     overflow-y: auto !important;
     border-radius: 0 !important;
   }
+
+  /* Ensure cart and background color on mobile */
+  .cart {
+    background-color: rgba(255, 255, 255, 0.15) !important; /* Ensure cart has proper background */
+    color: #3E0E54 !important; /* Ensure text color is dark */
+  }
 }
+
 
 
   </style>
@@ -4139,6 +4162,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
