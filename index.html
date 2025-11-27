@@ -2805,7 +2805,8 @@ function buildMenuCardHTML(item, idx) {
         data-name="${item.name}"
         data-unit="${item.unit}"
         data-price="${mrp}"
-        data-disc="${disc}">
+        data-disc="${disc}"
+        data-item-id="${item.itemId}">
         Add to Cart
       </button>
     `;
@@ -3090,6 +3091,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
