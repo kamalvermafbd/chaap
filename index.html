@@ -1198,6 +1198,26 @@ button[onclick="openSignup()"],
 .item-name {
   color: #fff !important;
 }
+/* Premium category heading background */
+.category-heading {
+  background: #3E0E54 !important;   /* purple glass */
+  color: #FFD166 !important;         /* gold text */
+  border-radius: 10px !important;
+}
+/* Fix: Remove orange/tomato background from category headings */
+.menu-category,
+.category-title,
+.category-heading,
+.categoryName {
+  background: transparent !important;
+  color: #fff !important;
+}
+/* FINAL FIX FOR CATEGORY HEADINGS */
+.category-heading {
+  background: #3E0E54 !important;  /* your purple theme */
+  color: #FFD166 !important;        /* yellow/gold text */
+  border-radius: 8px !important;
+}
 
   </style>
 </head>
@@ -1728,8 +1748,8 @@ let renderIndex = 0;
     heading.innerHTML = "Chef Special";
     heading.style.margin = "10px 0 5px";
     heading.style.padding = "10px";
-    heading.style.background = "#ff6347";
-    heading.style.color = "white";
+    heading.classList.add("category-heading");
+
     heading.style.borderRadius = "6px";
     heading.style.gridColumn = "1 / -1";
     menuDiv.appendChild(heading);
@@ -1760,8 +1780,8 @@ let renderIndex = 0;
       heading.innerHTML = cat;
       heading.style.margin = "10px 0 5px";
       heading.style.padding = "10px";
-      heading.style.background = "#ff6347";
-      heading.style.color = "white";
+      heading.classList.add("category-heading");
+
       heading.style.borderRadius = "6px";
       heading.style.gridColumn = "1 / -1";
       menuDiv.appendChild(heading);
@@ -2399,8 +2419,8 @@ function filterMenu() {
     heading.innerHTML = cat.replace(/\b\w/g, c => c.toUpperCase());
     heading.style.margin = "10px 0 5px";
     heading.style.padding = "10px";
-    heading.style.background = "#ff6347";
-    heading.style.color = "white";
+    heading.classList.add("category-heading");
+
     heading.style.borderRadius = "6px";
     heading.style.gridColumn = "1 / -1";
     menuDiv.appendChild(heading);
@@ -3824,6 +3844,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
