@@ -1086,7 +1086,6 @@ function rebuildCart() {
   // rerender
   renderCart();
 }
-
 function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", variantIdFromBtn = "") {
 
   // STEP 1C – Normalize
@@ -1104,7 +1103,6 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
     itemId = itemIdFromBtn;
     variantId = variantIdFromBtn || "";
   } else {
-
     // --- FIND REAL itemId & variantId EXACTLY AS PER SHEETS ---
     const menuItem = (window.menuItems || []).find(
       m => String(m.name || "").trim().toLowerCase() === cleanName
@@ -1121,7 +1119,6 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
     if ((menuItem.cat2 || "").toLowerCase() === "single") {
       variantId = "";
     }
-
     // MULTI
     else {
       const variant = (window.cat_allocations || []).find(v =>
@@ -1134,37 +1131,50 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
   }
 
   // --------------------------------------------
+  // Correct merge logic: only match by itemId + variantId
   const existing = stored.find(i => i.itemId == itemId && i.variantId == variantId);
 
   if (existing) {
     existing.qty = Number(existing.qty || 0) + 1;
-    existing.total = parseFloat((existing.qty * existing.rate).toFixed(2));
+
+    // recalc totals properly
+    const total = existing.qty * existing.rate;
+    existing.total = parseFloat(total.toFixed(2));
 
     if (existing.discPercent > 0) {
-      existing.discAmt = parseFloat(((existing.total * existing.discPercent) / 100).toFixed(2));
-      existing.netAmt = parseFloat((existing.total - existing.discAmt).toFixed(2));
+      const discAmt = (existing.rate * existing.discPercent) / 100;
+      existing.discAmt = parseFloat(discAmt.toFixed(2));
+
+      const netRate = existing.rate - discAmt;
+      existing.netAmt = parseFloat((netRate * existing.qty).toFixed(2));
     } else {
       delete existing.discAmt;
       delete existing.netAmt;
     }
-  } else {
+  }
+
+  // NEW ITEM
+  else {
     const qty = 1;
-    const total = parseFloat((rate * qty).toFixed(2));
+
+    const total = rate * qty;
+    const discAmt = (rate * discPercent) / 100;
+    const netRate = rate - discAmt;
 
     let newItem = {
       name,
       unit,
       qty,
       rate: Number(rate),
-      total,
+      total: parseFloat(total.toFixed(2)),
       itemId,
       variantId,
-      discPercent: Number(discPercent || 0)
+      discPercent: Number(discPercent)
     };
 
     if (discPercent > 0) {
-      newItem.discAmt = parseFloat(((total * discPercent) / 100).toFixed(2));
-      newItem.netAmt = parseFloat((total - discPercent).toFixed(2));
+      newItem.discAmt = parseFloat(discAmt.toFixed(2));
+      newItem.netAmt = parseFloat((netRate * qty).toFixed(2));
     }
 
     stored.push(newItem);
@@ -1178,6 +1188,7 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
   saveCartToBackend();
   alert(`${name} (${unit}) added to cart`);
 }
+
 
 
 
