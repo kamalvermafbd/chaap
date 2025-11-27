@@ -2066,7 +2066,9 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
       newItem.discAmt = parseFloat(discAmt.toFixed(2));
       newItem.netAmt = parseFloat((netRate * qty).toFixed(2));
     }
-
+ // --- FIX: Always store name + unit ---
+    newItem.name = newItem.name || name;   // <-- ADD THIS
+    newItem.unit = newItem.unit || unit;   // <-- ADD THIS
     stored.push(newItem);
   }
 
@@ -4092,6 +4094,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
