@@ -4054,11 +4054,29 @@ localStorage.setItem("sessionId", sessionId);
   apiGet("getCart", { mobile })
     .then(res => {
       if (res.success && Array.isArray(res.cart)) {
-        const backendCart = res.cart;
-        
-     
-        renderCart();
-      }
+
+  const backendCart = res.cart || [];
+  const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+  // --- PERFECT MERGE ---
+  backendCart.forEach(b => {
+    const match = localCart.find(
+      l => l.itemId == b.itemId && l.variantId == b.variantId
+    );
+
+    if (match) {
+      match.qty = Number(match.qty) + Number(b.qty);
+    } else {
+      localCart.push(b);
+    }
+  });
+
+  localStorage.setItem("cart", JSON.stringify(localCart));
+  cart = localCart;
+
+  renderCart();
+}
+
     })
     .catch(err => console.error("Load cart on start error:", err));
 }
@@ -4111,6 +4129,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
