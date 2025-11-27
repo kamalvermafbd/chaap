@@ -1355,6 +1355,109 @@ button.qtyMinus:active {
 
   border: 1px solid rgba(255,209,102,0.25);
 }
+/* ==========================================
+   STEP 11 — GLOBAL POLISH + PREMIUM SCROLLBAR
+   ========================================== */
+
+/* Smooth transitions globally */
+* {
+  transition: 
+    background 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+/* ===============================
+   PREMIUM SCROLLBAR DESIGN
+   =============================== */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #5E2A9E, #3E0E54);
+  border-radius: 10px;
+  border: 2px solid rgba(255, 209, 102, 0.35);  /* gold border */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #7D3BC4, #4A148C);
+  box-shadow: 0 0 12px rgba(255,209,102,0.45);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-color: #3E0E54 rgba(255, 255, 255, 0.08);
+  scrollbar-width: thin;
+}
+
+/* ===============================
+   GLOBAL SHADOW IMPROVEMENTS
+   =============================== */
+
+/* Card, modal, header, sidebar shadow unification */
+.menu-item,
+.modal-content,
+#leftNav,
+header,
+.cart {
+  box-shadow:
+    0 8px 24px rgba(0,0,0,0.22),
+    0 0 18px rgba(255,209,102,0.15) !important;
+}
+
+/* ===============================
+   GLOBAL GOLD HIGHLIGHT FIXES
+   =============================== */
+
+a, span, small, strong,
+.menu-item h4,
+#menu h2, #menu h3,
+#menu p.slideIn {
+  color: #FFD166 !important;
+}
+
+/* Remove ALL old orange colors */
+body, header, button, .cart {
+  --old-orange: transparent !important;
+}
+
+/* ===============================
+   INPUT + BUTTON SMOOTHNESS
+   =============================== */
+
+/* Softer button corners & glow */
+button {
+  border-radius: 14px !important;
+  box-shadow:
+    0 6px 14px rgba(255,209,102,0.35),
+    inset 0 0 12px rgba(255,209,102,0.25) !important;
+}
+
+/* Premium pressed effect */
+button:active {
+  transform: scale(0.94) !important;
+  box-shadow: inset 0 0 14px rgba(62,14,84,0.45) !important;
+}
+
+/* Input smooth glow */
+input:focus, textarea:focus, select:focus {
+  transform: scale(1.02) !important;
+}
+
+/* ===============================
+   SMOOTH PAGE SCROLL
+   =============================== */
+html {
+  scroll-behavior: smooth;
+}
 
     
   </style>
@@ -3998,6 +4101,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
