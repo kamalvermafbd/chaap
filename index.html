@@ -2060,7 +2060,7 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
       itemId,
       variantId,
       discPercent: Number(discPercent),
-     image: (typeof image !== "undefined" ? image : "")   // safe fix    };
+        };
 
     if (discPercent > 0) {
       newItem.discAmt = parseFloat(discAmt.toFixed(2));
@@ -4070,6 +4070,7 @@ window.addEventListener("resize", () => {
 </script>
 </body>
 </html>
+
 
 
 
