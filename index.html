@@ -1200,10 +1200,13 @@ button[onclick="openSignup()"],
 }
 /* Premium category heading background */
 .category-heading {
-  background: #3E0E54 !important;   /* purple glass */
-  color: #FFD166 !important;         /* gold text */
-  border-radius: 10px !important;
+  background: rgba(30, 0, 50, 0.65) !important;  /* dark purple glass */
+  color: #FFD166 !important;                     /* gold text */
+  padding: 10px !important;
+  border-radius: 8px !important;
+  backdrop-filter: blur(4px) !important;
 }
+
 /* Fix: Remove orange/tomato background from category headings */
 .menu-category,
 .category-title,
@@ -1212,12 +1215,7 @@ button[onclick="openSignup()"],
   background: transparent !important;
   color: #fff !important;
 }
-/* FINAL FIX FOR CATEGORY HEADINGS */
-.category-heading {
-  background: #3E0E54 !important;  /* your purple theme */
-  color: #FFD166 !important;        /* yellow/gold text */
-  border-radius: 8px !important;
-}
+
 
   </style>
 </head>
@@ -3844,6 +3842,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
