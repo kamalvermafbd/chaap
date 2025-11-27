@@ -1088,64 +1088,60 @@ function rebuildCart() {
 }
 
 function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", variantIdFromBtn = "") {
-const cleanUnit = String(unit || "").trim().toLowerCase();
-const cleanName = String(name || "").trim().toLowerCase();
+
+  // STEP 1C – Normalize
+  const cleanUnit = String(unit || "").trim().toLowerCase();
+  const cleanName = String(name || "").trim().toLowerCase();
 
   let stored = JSON.parse(localStorage.getItem("cart") || "[]");
-// STEP 1B — If itemIdFromBtn came, override mapping
-if (itemIdFromBtn) {
-  itemId = itemIdFromBtn;
-  variantId = variantIdFromBtn || "";
-}
 
-  // --- FIND REAL itemId & variantId EXACTLY AS PER SHEETS ---
+  // Declare itemId & variantId FIRST (important)
   let itemId = "";
   let variantId = "";
 
-  // Find menu item by name
-  const menuItem = (window.menuItems || []).find(
-    m => String(m.name || "").trim() === String(name || "").trim()
-  );
+  // STEP 1B — If button already passed correct IDs, use them & SKIP mapping
+  if (itemIdFromBtn) {
+    itemId = itemIdFromBtn;
+    variantId = variantIdFromBtn || "";
+  } else {
 
-  if (menuItem) {
+    // --- FIND REAL itemId & variantId EXACTLY AS PER SHEETS ---
+    const menuItem = (window.menuItems || []).find(
+      m => String(m.name || "").trim().toLowerCase() === cleanName
+    );
 
-    //  CORRECT: menu sheet column = itemId
-    itemId = menuItem.itemId;
-
-
-    // ---- SINGLE ----
-    if ((menuItem.cat2 || "").toLowerCase() === "single") {
-      variantId = "";   // ALWAYS EMPTY FOR SINGLE
+    if (!menuItem) {
+      console.warn("MenuItem not found:", name, unit);
+      return;
     }
 
-    // ---- MULTI ----
+    itemId = menuItem.itemId;
+
+    // SINGLE
+    if ((menuItem.cat2 || "").toLowerCase() === "single") {
+      variantId = "";
+    }
+
+    // MULTI
     else {
-      //  CORRECT: cat_allocation column = itemId
       const variant = (window.cat_allocations || []).find(v =>
         String(v.itemId) === String(itemId) &&
         String(v.unit || "").trim().toLowerCase() === cleanUnit
       );
 
-      // correct mapping
       variantId = variant ? variant.variantId : "";
     }
-
-  } else {
-    // Only fallback if ABSOLUTELY no match
-    console.warn("MenuItem not found for:", name, unit);
-    return; // STOP — do not add wrong cart item
-}
-
+  }
 
   // --------------------------------------------
-  const existing = stored.find(i => i.name === name && i.unit === unit);
+  const existing = stored.find(i => i.itemId == itemId && i.variantId == variantId);
 
   if (existing) {
     existing.qty = Number(existing.qty || 0) + 1;
     existing.total = parseFloat((existing.qty * existing.rate).toFixed(2));
 
-    if (Number(existing.discPercent || 0) > 0) {
-      existing.discAmt = parseFloat(((existing.total * Number(existing.discPercent)) / 100).toFixed(2));
+    if (existing.discPercent > 0) {
+      existing.discAmt = parseFloat(((existing.total * existing.discPercent) / 100).toFixed(2));
       existing.netAmt = parseFloat((existing.total - existing.discAmt).toFixed(2));
     } else {
       delete existing.discAmt;
@@ -1161,17 +1157,14 @@ if (itemIdFromBtn) {
       qty,
       rate: Number(rate),
       total,
-
-      itemId: itemId,
-      variantId: variantId,
-
+      itemId,
+      variantId,
       discPercent: Number(discPercent || 0)
     };
 
     if (discPercent > 0) {
-      const discAmt = parseFloat(((total * Number(discPercent)) / 100).toFixed(2));
-      newItem.discAmt = discAmt;
-      newItem.netAmt = parseFloat((total - discAmt).toFixed(2));
+      newItem.discAmt = parseFloat(((total * discPercent) / 100).toFixed(2));
+      newItem.netAmt = parseFloat((total - discPercent).toFixed(2));
     }
 
     stored.push(newItem);
@@ -3086,6 +3079,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
