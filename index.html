@@ -4051,9 +4051,13 @@ function updateMobileCartBar(total) {
     bar.style.display = "none";
   }
 }
-
+window.addEventListener("resize", () => {
+  const total = parseFloat(document.getElementById("cartTotal")?.innerText || "0");
+  updateMobileCartBar(total);
+});
 
 
 </script>
 </body>
 </html>
+
