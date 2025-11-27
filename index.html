@@ -2083,6 +2083,8 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
 
 
 function renderCart() {
+  console.log("CART DATA:", cart);
+
   document.getElementById("cartContainer").innerHTML = `
       <div id="cartCards"></div>
       <table id="cartTable">
@@ -4072,6 +4074,7 @@ window.addEventListener("resize", () => {
 </script>
 </body>
 </html>
+
 
 
 
