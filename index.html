@@ -2226,9 +2226,7 @@ function renderCart() {
 
   let baseTotal = parseFloat(grandTotal.toFixed(2));
   document.getElementById("cartTotal").innerText = baseTotal.toFixed(2);
-if (typeof updateMobileCartBar === "function") {
-  updateMobileCartBar(baseTotal);
-}
+
 
 
 
@@ -4071,6 +4069,7 @@ window.addEventListener("resize", () => {
 </script>
 </body>
 </html>
+
 
 
 
