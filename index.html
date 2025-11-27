@@ -2818,6 +2818,12 @@ function filterMenu() {
 function openLogin() {
   document.getElementById("loginModal").style.display = "flex";
 }
+function openCheckout() {
+  const modal = document.getElementById("checkoutModal");
+  if (modal) {
+    modal.style.display = "block";
+  }
+}
 
 function closeLogin() {
   document.getElementById("loginModal").style.display = "none";
@@ -4065,6 +4071,7 @@ window.addEventListener("resize", () => {
 </script>
 </body>
 </html>
+
 
 
 
