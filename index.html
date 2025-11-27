@@ -4094,7 +4094,8 @@ window.addEventListener("resize", () => {
 
 function mergeCartWithMenuData() {
   cart = cart.map(ci => {
-    const menuItem = menuItems.find(m => m.itemid == ci.itemId);
+    const menuItem = menuItems.find(m => m.itemId == ci.itemId);
+
 
     if (menuItem) {
       ci.name = menuItem.name;
@@ -4114,6 +4115,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
