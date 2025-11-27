@@ -2265,29 +2265,20 @@ function updateQty(index, qty) {
 
   const item = cart[index];
 
-  // set qty
+  
+
+  // --- Store clean values ---
   item.qty = qty;
-
-  // RE-CALCULATE values
-  const rate = Number(item.rate);
-  const disc = Number(item.discPercent || 0);
-
-  const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
-  const netAmt  = parseFloat((rate - discAmt).toFixed(2));
-  const total   = parseFloat((netAmt * qty).toFixed(2));
-
-  // store
   item.discAmt = discAmt;
   item.netAmt  = netAmt;
   item.total   = total;
 
-  // save
+  // Save updated cart
   localStorage.setItem("cart", JSON.stringify(cart));
 
-  // re-render
+  // Re-render table (safe)
   renderCart();
-
-  // backend update
+    // STEP 5C — Backend update after qty change
   saveCartToBackend();
 }
 
@@ -4061,19 +4052,10 @@ window.addEventListener("resize", () => {
   updateMobileCartBar(total);
 });
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const total = parseFloat(document.getElementById("cartTotal")?.innerText || "0");
-  if (!isNaN(total)) updateMobileCartBar(total);
-});
-</script>
 
 </script>
 </body>
 </html>
-
-
-
 
 
 
