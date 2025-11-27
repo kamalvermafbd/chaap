@@ -1322,23 +1322,8 @@ button[onclick="openSignup()"],
   color: #000;
 }
 /* MOBILE VIEW (max-width 768px) */
+/* MOBILE VIEW (max-width 768px) */
 @media (max-width: 768px) {
-  /* Ensure body background and text color */
-  body {
-    background: linear-gradient(
-      135deg, 
-      #250436 0%, 
-      #3E0E54 40%, 
-      #5E2A9E 100%
-    ) !important; /* Ensure background stays for mobile */
-    color: #f7eaff !important; /* Ensure text color is light */
-  }
-
-  /* Ensure header text color */
-  header {
-    color: #FFEED5 !important; /* Ensure header text color is light */
-  }
-
   /* Hide old table */
   #cartTable {
     display: none !important;
@@ -1375,39 +1360,25 @@ button[onclick="openSignup()"],
     overflow-y: auto !important;
     border-radius: 0 !important;
   }
+}
 
-  /* Ensure cart and background color on mobile */
+/* DESKTOP VIEW */
+@media (min-width: 769px) {
+  /* Desktop styles */
   .cart {
-    background-color: rgba(255, 255, 255, 0.15) !important; /* Ensure cart has proper background */
-    color: #3E0E54 !important; /* Ensure text color is dark */
+    background-color: rgba(255, 255, 255, 0.06) !important; /* Maintain the original cart background */
+    color: #3E0E54 !important; /* Dark text */
   }
-}
-//check
-    /* Ensure that the cart has visible text on both desktop and mobile */
-.cart {
-  background-color: rgba(255, 255, 255, 0.9) !important; /* Light background */
-  color: #3E0E54 !important; /* Dark text */
-}
 
-/* Ensure the item name is visible */
-.item-name {
-  color: #3E0E54 !important; /* Dark color for item text */
-}
+  .item-name {
+    color: #3E0E54 !important; /* Keep item name visible with dark color */
+  }
 
-/* Update the background of the cart table and items */
-#cartTable {
-  background-color: rgba(255, 255, 255, 0.9) !important; /* Light background */
-}
-
-.cart-card {
-  background-color: rgba(255, 255, 255, 0.9) !important; /* Light background for cart cards */
-  color: #3E0E54 !important; /* Dark text for better visibility */
-}
-
-/* Ensure the button text is also visible */
-button {
-  color: #3E0E54 !important;
-  background: linear-gradient(135deg, #FFD166, #FFEB99) !important; /* Button background */
+  /* Ensure the background of the cart card and text is appropriate */
+  .cart-card {
+    background-color: rgba(255, 255, 255, 0.08) !important; /* Light background with subtle transparency */
+    color: #3E0E54 !important; /* Dark text */
+  }
 }
 
 
@@ -4189,6 +4160,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
