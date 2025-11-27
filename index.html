@@ -1353,6 +1353,29 @@ button[onclick="openSignup()"],
   }
 }
 
+/* MOBILE VIEW (max-width 768px) */
+@media (max-width: 768px) {
+  /* Hide old table */
+  #cartTable {
+    display: none !important;
+  }
+
+  /* Make cards full width */
+  #cartCards {
+    display: flex;
+  }
+
+  /* Update the item-name color in mobile view */
+  .item-name {
+    color: #3E0E54 !important; /* Dark color for text */
+  }
+
+  /* Add background color for cart card */
+  .cart-card {
+    background-color: rgba(255, 255, 255, 0.9) !important; /* Light background with slight transparency */
+    color: #3E0E54 !important; /* Dark text */
+  }
+}
 
   </style>
 </head>
@@ -4131,6 +4154,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
