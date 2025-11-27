@@ -2090,6 +2090,8 @@ let newItem = {
 
 
 function renderCart() {
+console.log("🟥 BEFORE MERGE cart =", JSON.parse(localStorage.getItem("cart")));
+console.log("🟥 BEFORE MERGE render-cart cart =", cart);
 
  
 cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -2136,8 +2138,7 @@ mergeCartWithMenuData();
   let grandTotal = 0;
 
   cart.forEach((item, idx) => {
-console.log("MOBILE CARD ITEM:", JSON.stringify(item));
-
+    console.log("🟦 MOBILE CARD ITEM =", item);
     // ------------------------------------------------------
     // MOVE THESE LINES TO THE TOP (THIS WAS THE REAL FIX)
     // ------------------------------------------------------
@@ -4086,6 +4087,8 @@ window.addEventListener("resize", () => {
 });
 
 function mergeCartWithMenuData() {
+  console.log("🟩 AFTER MERGE cart =", cart);
+
   cart = cart.map(ci => {
     const menuItem = menuItems.find(m => String(m.itemId) == String(ci.itemId));
     if (menuItem) {
@@ -4107,6 +4110,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
