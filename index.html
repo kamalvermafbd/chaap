@@ -2010,6 +2010,68 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
   let grandTotal = 0;
 
   cart.forEach((item, idx) => {
+
+    // ========== BUILD MOBILE CARD ==========
+let cardHTML = "";
+
+if (anyDiscount) {
+  cardHTML = `
+    <div class="cart-card">
+      <div class="cart-left">
+        <div class="cart-title">
+          <span class="item-name">${item.name} (${item.unit})</span>
+          <span class="delete-icon" onclick="updateQty(${idx}, 0)">×</span>
+        </div>
+
+        <div class="qty-row">
+          <button class="qty-btn minus" onclick="updateQty(${idx}, ${item.qty - 1})">-</button>
+          <span class="qty">${item.qty}</span>
+          <button class="qty-btn plus" onclick="updateQty(${idx}, ${item.qty + 1})">+</button>
+        </div>
+
+        <div class="price-info">
+          <div class="line">MRP: ₹${rate.toFixed(2)}</div>
+          <div class="line">Disc: ${disc}% | Net: ₹${netAmt.toFixed(2)}</div>
+        </div>
+      </div>
+
+      <div class="cart-right">
+        <img src="${item.image || 'https://via.placeholder.com/60'}" class="item-img">
+        <div class="item-total">₹${total.toFixed(2)}</div>
+      </div>
+    </div>
+  `;
+} else {
+  cardHTML = `
+    <div class="cart-card">
+      <div class="cart-left">
+        <div class="cart-title">
+          <span class="item-name">${item.name} (${item.unit})</span>
+          <span class="delete-icon" onclick="updateQty(${idx}, 0)">×</span>
+        </div>
+
+        <div class="qty-row">
+          <button class="qty-btn minus" onclick="updateQty(${idx}, ${item.qty - 1})">-</button>
+          <span class="qty">${item.qty}</span>
+          <button class="qty-btn plus" onclick="updateQty(${idx}, ${item.qty + 1})">+</button>
+        </div>
+
+        <div class="price-info">
+          <div class="line">Rate: ₹${rate.toFixed(2)}</div>
+        </div>
+      </div>
+
+      <div class="cart-right">
+        <img src="${item.image || 'https://via.placeholder.com/60'}" class="item-img">
+        <div class="item-total">₹${total.toFixed(2)}</div>
+      </div>
+    </div>
+  `;
+}
+
+// Insert card HTML
+document.getElementById("cartCards").innerHTML += cardHTML;
+
     const rate = Number(item.rate);
     const qty  = Number(item.qty);
     const disc = Number(item.discPercent || 0);
@@ -3876,6 +3938,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
