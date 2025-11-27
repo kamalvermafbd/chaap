@@ -1359,8 +1359,22 @@ button[onclick="openSignup()"],
     overflow-y: auto !important;
     border-radius: 0 !important;
   }
-}
 
+  /* Ensure that all text in the mobile view is black */
+  body, .cart, .item-name, .cart-card, #variantPopup, select, input, button, p, h1, h2, h3, h4, h5, h6, label {
+    color: #000000 !important; /* Force all text to be black */
+  }
+
+  /* Override any specific golden or yellow color */
+  .rate, .btn, .btn-primary, .cart-card button, .quantity-button {
+    color: #000000 !important; /* Set text color to black */
+  }
+
+  /* Remove any unwanted background color with a transparent or non-contrasting color */
+  .btn, .cart-card button {
+    background-color: transparent !important; /* Ensure no background colors are affecting the font visibility */
+  }
+}
 
 /* DESKTOP VIEW */
 @media (min-width: 769px) {
@@ -4165,6 +4179,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
