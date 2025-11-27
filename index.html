@@ -1321,6 +1321,45 @@ button[onclick="openSignup()"],
   font-size: 16px;
   color: #000;
 }
+/* MOBILE VIEW (max-width 768px) */
+@media (max-width: 768px) {
+  /* Hide old table */
+  #cartTable {
+    display: none !important;
+  }
+
+  /* Make cards full width */
+  #cartCards {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  /* Update the item-name color in mobile view */
+  .item-name {
+    color: #3E0E54 !important; /* Dark color for text */
+  }
+
+  /* Add background color for cart card */
+  .cart-card {
+    background-color: rgba(255, 255, 255, 0.9) !important; /* Light background with slight transparency */
+    color: #3E0E54 !important; /* Dark text */
+  }
+
+  /* Specific styles for variant popup on mobile */
+  #variantPopup {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    padding: 20px !important;
+    overflow-y: auto !important;
+    border-radius: 0 !important;
+  }
+}
 
 
   </style>
@@ -4100,6 +4139,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
