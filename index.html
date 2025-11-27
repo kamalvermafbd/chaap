@@ -2063,7 +2063,7 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
 
 
 
-  function renderCart() {
+function renderCart() {
   document.getElementById("cartContainer").innerHTML = `
       <div id="cartCards"></div>
       <table id="cartTable">
@@ -2074,15 +2074,12 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
       </table>
     `;
 
-    
-    const tbody = document.querySelector('#cartTable tbody');
+  const tbody = document.querySelector('#cartTable tbody');
   const thead = document.querySelector('#cartTable thead tr');
   tbody.innerHTML = "";
 
-  // Check: does ANY item have discount?
   const anyDiscount = cart.some(i => Number(i.discPercent) > 0);
 
-  // Build header
   if (anyDiscount) {
     thead.innerHTML = `
       <th>Item</th>
@@ -2108,75 +2105,77 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
 
   cart.forEach((item, idx) => {
 
-    // ========== BUILD MOBILE CARD ==========
-let cardHTML = "";
-
-if (anyDiscount) {
-  cardHTML = `
-    <div class="cart-card">
-      <div class="cart-left">
-        <div class="cart-title">
-          <span class="item-name">${item.name} (${item.unit})</span>
-          <span class="delete-icon" onclick="updateQty(${idx}, 0)">×</span>
-        </div>
-
-        <div class="qty-row">
-          <button class="qty-btn minus" onclick="updateQty(${idx}, ${item.qty - 1})">-</button>
-          <span class="qty">${item.qty}</span>
-          <button class="qty-btn plus" onclick="updateQty(${idx}, ${item.qty + 1})">+</button>
-        </div>
-
-        <div class="price-info">
-          <div class="line">MRP: ₹${rate.toFixed(2)}</div>
-          <div class="line">Disc: ${disc}% | Net: ₹${netAmt.toFixed(2)}</div>
-        </div>
-      </div>
-
-      <div class="cart-right">
-        <img src="${item.image || 'https://via.placeholder.com/60'}" class="item-img">
-        <div class="item-total">₹${total.toFixed(2)}</div>
-      </div>
-    </div>
-  `;
-} else {
-  cardHTML = `
-    <div class="cart-card">
-      <div class="cart-left">
-        <div class="cart-title">
-          <span class="item-name">${item.name} (${item.unit})</span>
-          <span class="delete-icon" onclick="updateQty(${idx}, 0)">×</span>
-        </div>
-
-        <div class="qty-row">
-          <button class="qty-btn minus" onclick="updateQty(${idx}, ${item.qty - 1})">-</button>
-          <span class="qty">${item.qty}</span>
-          <button class="qty-btn plus" onclick="updateQty(${idx}, ${item.qty + 1})">+</button>
-        </div>
-
-        <div class="price-info">
-          <div class="line">Rate: ₹${rate.toFixed(2)}</div>
-        </div>
-      </div>
-
-      <div class="cart-right">
-        <img src="${item.image || 'https://via.placeholder.com/60'}" class="item-img">
-        <div class="item-total">₹${total.toFixed(2)}</div>
-      </div>
-    </div>
-  `;
-}
-
-// Insert card HTML
-document.getElementById("cartCards").innerHTML += cardHTML;
-
+    // ------------------------------------------------------
+    // MOVE THESE LINES TO THE TOP (THIS WAS THE REAL FIX)
+    // ------------------------------------------------------
     const rate = Number(item.rate);
     const qty  = Number(item.qty);
     const disc = Number(item.discPercent || 0);
 
-    // --- SAFE CALCULATIONS ---
     const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
     const netAmt  = parseFloat((rate - discAmt).toFixed(2));
     const total   = parseFloat((netAmt * qty).toFixed(2));
+    // ------------------------------------------------------
+
+    // ========== BUILD MOBILE CARD ==========
+    let cardHTML = "";
+
+    if (anyDiscount) {
+      cardHTML = `
+        <div class="cart-card">
+          <div class="cart-left">
+            <div class="cart-title">
+              <span class="item-name">${item.name} (${item.unit})</span>
+              <span class="delete-icon" onclick="updateQty(${idx}, 0)">×</span>
+            </div>
+
+            <div class="qty-row">
+              <button class="qty-btn minus" onclick="updateQty(${idx}, ${item.qty - 1})">-</button>
+              <span class="qty">${item.qty}</span>
+              <button class="qty-btn plus" onclick="updateQty(${idx}, ${item.qty + 1})">+</button>
+            </div>
+
+            <div class="price-info">
+              <div class="line">MRP: ₹${rate.toFixed(2)}</div>
+              <div class="line">Disc: ${disc}% | Net: ₹${netAmt.toFixed(2)}</div>
+            </div>
+          </div>
+
+          <div class="cart-right">
+            <img src="${item.image || 'https://via.placeholder.com/60'}" class="item-img">
+            <div class="item-total">₹${total.toFixed(2)}</div>
+          </div>
+        </div>
+      `;
+    } else {
+      cardHTML = `
+        <div class="cart-card">
+          <div class="cart-left">
+            <div class="cart-title">
+              <span class="item-name">${item.name} (${item.unit})</span>
+              <span class="delete-icon" onclick="updateQty(${idx}, 0)">×</span>
+            </div>
+
+            <div class="qty-row">
+              <button class="qty-btn minus" onclick="updateQty(${idx}, ${item.qty - 1})">-</button>
+              <span class="qty">${item.qty}</span>
+              <button class="qty-btn plus" onclick="updateQty(${idx}, ${item.qty + 1})">+</button>
+            </div>
+
+            <div class="price-info">
+              <div class="line">Rate: ₹${rate.toFixed(2)}</div>
+            </div>
+          </div>
+
+          <div class="cart-right">
+            <img src="${item.image || 'https://via.placeholder.com/60'}" class="item-img">
+            <div class="item-total">₹${total.toFixed(2)}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    document.getElementById("cartCards").innerHTML += cardHTML;
 
     grandTotal += total;
 
@@ -2206,35 +2205,26 @@ document.getElementById("cartCards").innerHTML += cardHTML;
     tbody.appendChild(tr);
   });
 
-  // ===== SAFE ROUND FINAL TOTAL =====
   let baseTotal = parseFloat(grandTotal.toFixed(2));
   document.getElementById("cartTotal").innerText = baseTotal.toFixed(2);
 
-  // ===== BUILD TAX SUMMARY =====
   let taxHtml = "";
 
   if (restaurantTax.taxType === "On Bill") {
 
-    // Service Charge
     const serviceAmt = parseFloat(((baseTotal * restaurantTax.servicePercent) / 100).toFixed(2));
-
-    // Taxable amount
     const taxableAmount = parseFloat((baseTotal + serviceAmt).toFixed(2));
 
-    // CGST / SGST / IGST
     const cgstAmt = parseFloat(((taxableAmount * restaurantTax.cgstPercent) / 100).toFixed(2));
     const sgstAmt = parseFloat(((taxableAmount * restaurantTax.sgstPercent) / 100).toFixed(2));
     const igstAmt = parseFloat(((taxableAmount * restaurantTax.igstPercent) / 100).toFixed(2));
 
-    // Grand total final
     const grandTotalCalc = parseFloat((taxableAmount + cgstAmt + sgstAmt + igstAmt).toFixed(2));
 
-    // Multiline summary (clean)
     taxHtml = `
       ${restaurantTax.servicePercent > 0 
-    ? `<p style="margin:2px 0;">Service Charges (${restaurantTax.servicePercent}%): ₹${serviceAmt.toFixed(2)}</p>`
-    : ""
-}
+      ? `<p style="margin:2px 0;">Service Charges (${restaurantTax.servicePercent}%): ₹${serviceAmt.toFixed(2)}</p>`
+      : ""}
 
       <p style="margin:2px 0;">CGST (${restaurantTax.cgstPercent}%): ₹${cgstAmt.toFixed(2)}</p>
       <p style="margin:2px 0;">SGST (${restaurantTax.sgstPercent}%): ₹${sgstAmt.toFixed(2)}</p>
@@ -2243,11 +2233,8 @@ document.getElementById("cartCards").innerHTML += cardHTML;
     `;
   }
 
-  // ===== INJECT TAX SUMMARY BELOW TOTAL =====
   const taxSummaryEl = document.getElementById("taxSummary");
-  if (taxSummaryEl) {
-    taxSummaryEl.innerHTML = taxHtml;
-  }
+  if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
 }
 
 
@@ -2257,13 +2244,7 @@ function updateQty(index, qty) {
 
   const item = cart[index];
 
-  const rate = Number(item.rate);       // MRP
-  const disc = Number(item.discPercent || 0);
-
-  // --- SAFE CALCULATIONS (fixed rounding) ---
-  const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
-  const netAmt  = parseFloat((rate - discAmt).toFixed(2));
-  const total   = parseFloat((netAmt * qty).toFixed(2));
+  
 
   // --- Store clean values ---
   item.qty = qty;
@@ -4035,6 +4016,7 @@ localStorage.setItem("sessionId", sessionId);
 </script>
 </body>
 </html>
+
 
 
 
