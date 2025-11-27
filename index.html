@@ -2167,7 +2167,8 @@ cart = cart.map(c => {
           <div class="cart-left">
             <div class="cart-title">
               <span class="item-name">
-  ${(item.name || "Item")} (${item.unit || item.variant || item.size || ""})
+  ${item.name} (${item.unit})
+
 </span>
 
               <span class="delete-icon" onclick="updateQty(${idx}, 0)">×</span>
@@ -4112,6 +4113,7 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
 
 
 
