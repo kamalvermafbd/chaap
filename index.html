@@ -3138,29 +3138,51 @@ function getBackendCart(mobile) {
 }
 
 function mergeCarts(localCart, backendCart) {
-  let finalCart = [];
 
+  // Ensure arrays
+  localCart = Array.isArray(localCart) ? localCart : [];
+  backendCart = Array.isArray(backendCart) ? backendCart : [];
+
+  // CLEAN BACKEND DATA (Remove garbage / invalid)
+  backendCart = backendCart
+    .filter(it => it && it.itemId && Number(it.qty || 0) > 0)
+    .map(it => ({
+      ...it,
+      qty: Number(it.qty || 1),
+      rate: Number(it.rate || 0),
+      discPercent: Number(it.discPercent || 0)
+    }));
+
+  // CLEAN LOCAL DATA
+  localCart = localCart
+    .filter(it => it && it.itemId && Number(it.qty || 0) > 0)
+    .map(it => ({
+      ...it,
+      qty: Number(it.qty || 1),
+      rate: Number(it.rate || 0),
+      discPercent: Number(it.discPercent || 0)
+    }));
+
+  // Unique key function
+  const key = it => `${it.itemId}_${it.variantId || ""}`;
+
+  // Start with backend items
   const map = new Map();
+  backendCart.forEach(item => map.set(key(item), { ...item }));
 
-  // Step 1: Backend items safe
-  backendCart.forEach(item => {
-    const key = `${item.itemId}_${item.variantId}`;
-    map.set(key, { ...item });
-  });
-
-  // Step 2: Local cart merge
-  localCart.forEach(localItem => {
-    const key = `${localItem.itemId}_${localItem.variantId}`;
-
-    if (map.has(key)) {
-      let exist = map.get(key);
-      exist.qty = Number(exist.qty) + Number(localItem.qty);
-      exist.total = exist.qty * exist.rate;
-      map.set(key, exist);
+  // Merge local (guest) items
+  localCart.forEach(item => {
+    const k = key(item);
+    if (map.has(k)) {
+      const exist = map.get(k);
+      exist.qty = Number(exist.qty) + Number(item.qty);
+      exist.total = parseFloat((exist.qty * exist.rate).toFixed(2));
+      map.set(k, exist);
     } else {
-      map.set(key, {
-        ...localItem,
-        cartId: "",      
+      // fresh local item → add clean
+      map.set(k, {
+        ...item,
+        cartId: "",
         sessionId: "",
         mobile: "",
         timestamp: ""
@@ -3168,9 +3190,10 @@ function mergeCarts(localCart, backendCart) {
     }
   });
 
-  map.forEach(item => finalCart.push(item));
-  return finalCart;
+  // Return cleaned final list
+  return Array.from(map.values());
 }
+
 async function onUserLogin(mobile) {
 
   // ⭐ Ensure sessionId exists
@@ -3209,6 +3232,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
