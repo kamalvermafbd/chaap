@@ -3318,6 +3318,18 @@ cleanedLocal.forEach(x => localCart.push(x));
 
   // 3) Merge
   const merged = mergeCarts(localCart, backendCart);
+  // STEP 3C → Add backend items which are NOT duplicated
+backendCart.forEach(bItem => {
+  const exists = merged.some(m =>
+    m.itemId == bItem.itemId &&
+    m.variantId == bItem.variantId
+  );
+
+  if (!exists) {
+    merged.push(bItem);
+  }
+});
+
 
  // 4) Save merged cart to backend (IMPORTANT)
 cart = merged;
@@ -3338,6 +3350,7 @@ localStorage.removeItem("guestCart");   // ❗ MISSING
 </script>
 </body>
 </html>
+
 
 
 
