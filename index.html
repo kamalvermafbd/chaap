@@ -902,9 +902,33 @@ function apiGet(api, params = {}) {
     headers: { "Accept": "application/json" }
   }).then(res => res.json());
 }
+console.log("➡️ Calling getMenu...");
 apiGet("getMenu")
-  .then(res => renderMenu(res.menu))
-  .catch(err => console.error("Menu load error:", err));
+  .then(res => {
+    console.log("📥 getMenu response:", res);
+    if (!res || !res.menu) {
+      console.error("❌ getMenu returned no menu!");
+    }
+    renderMenu(res.menu);
+  })
+  .catch(err => {
+    console.error("❌ Menu load error:", err);
+  });
+
+console.log("➡️ Calling getCatAllocations...");
+apiGet("getCatAllocations")
+  .then(res => {
+    console.log("📥 catAlloc response:", res);
+    window.cat_allocations = res.cat_allocations || [];
+  })
+  .catch(err => console.error("❌ cat allocation load error:", err));
+
+console.log("➡️ Calling getRestaurantInfo...");
+apiGet("getRestaurantInfo")
+  .then(res => {
+    console.log("📥 restaurantInfo:", res);
+    // rest code as it was...
+
 // LOAD cat_allocation sheet
 apiGet("getCatAllocations")
   .then(res => {
@@ -3402,6 +3426,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
