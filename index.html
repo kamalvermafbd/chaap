@@ -3228,8 +3228,13 @@ function mergeCarts(localCart, backendCart) {
   });
 
   // Step 2: Local cart merge
-  localCart.forEach(localItem => {
-    const key = `${localItem.itemId}_${localItem.variantId}`;
+ localCart.forEach(localItem => {
+
+  // ❗ skip if invalid IDs
+  if (!localItem.itemId) return;
+  if (localItem.variantId === undefined) return;
+
+  const key = `${localItem.itemId}_${localItem.variantId}`;
 
     if (map.has(key)) {
       let exist = map.get(key);
@@ -3262,9 +3267,40 @@ async function onUserLogin(mobile) {
   // 1) Backend cart fetch
   const backendRes = await apiPost("getCart", { mobile });
   const backendCart = backendRes.cart || [];
+//  Clean backend cart completely
+const cleanedBackend = backendCart.map(i => ({
+  name: i.name || "",
+  unit: i.unit || "",
+  qty: Number(i.qty || 1),
+  rate: Number(i.rate || 0),
+  discPercent: Number(i.discPercent || 0),
+  itemId: i.itemId || "",
+  variantId: i.variantId || "",
+  image: i.image || ""
+}));
 
+backendCart.length = 0;
+cleanedBackend.forEach(x => backendCart.push(x));
+
+  
   // 2) Local cart read
   const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+  //  Clean local cart from backend-only fields
+const cleanedLocal = localCart.map(i => ({
+  name: i.name || "",
+  unit: i.unit || "",
+  qty: Number(i.qty || 1),
+  rate: Number(i.rate || 0),
+  discPercent: Number(i.discPercent || 0),
+  itemId: i.itemId || "",
+  variantId: i.variantId || "",
+  image: i.image || ""
+}));
+
+// replace localCart with cleaned version
+localCart.length = 0;
+cleanedLocal.forEach(x => localCart.push(x));
 
 
   // 3) Merge
@@ -3289,6 +3325,7 @@ localStorage.removeItem("guestCart");   // ❗ MISSING
 </script>
 </body>
 </html>
+
 
 
 
