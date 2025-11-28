@@ -3335,44 +3335,6 @@ function mergeCarts(localCart, backendCart) {
   return Array.from(map.values());
 }
 
-  function sanitizeLocalCart(rawCart) {
-  if (!Array.isArray(rawCart)) return [];
-
-  return rawCart
-    .filter(i => i && i.itemId)
-    .map(i => {
-      const qty = Number(i.qty || 1);
-      const rate = Number(i.rate || 0);
-      const disc = Number(i.discPercent || 0);
-
-      const discAmt = disc > 0 ? parseFloat(((rate * disc) / 100).toFixed(2)) : 0;
-      const netRate = rate - discAmt;
-
-      const total = disc > 0
-        ? parseFloat((netRate * qty).toFixed(2))
-        : parseFloat((rate * qty).toFixed(2));
-
-      return {
-        ...i,
-        qty,
-        rate,
-        discPercent: disc,
-        itemId: i.itemId || "",
-        variantId: i.variantId || "",
-        total,
-        discAmt,
-        netAmt: disc > 0 ? netRate : undefined,
-        name: i.name || "",
-        unit: i.unit || "",
-        image: i.image || ""
-      };
-    });
-}
-
-// After function declaration
-cart = sanitizeLocalCart(cart);
-localStorage.setItem("cart", JSON.stringify(cart));
-
   
 async function onUserLogin(mobile) {
 
@@ -3430,6 +3392,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
