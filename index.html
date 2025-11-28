@@ -3056,36 +3056,85 @@ document.addEventListener("click", function (e) {
   removeItem(index);
 });
 
-function saveCartToBackend() {
+// Helper: compute a stable checksum so identical carts are not saved repeatedly
+function computeCartChecksum(cartArr) {
+  try {
+    const sorted = (cartArr || []).slice().sort((a, b) => {
+      const kA = `${a.itemId || ""}_${a.variantId || ""}`;
+      const kB = `${b.itemId || ""}_${b.variantId || ""}`;
+      return kA.localeCompare(kB);
+    });
 
-  // Only when logged in (important safety)
+    const compact = sorted.map(i => ({
+      id: `${i.itemId || ""}_${i.variantId || ""}`,
+      qty: Number(i.qty || 0),
+      rate: Number(i.rate || 0)
+    }));
+
+    return btoa(JSON.stringify(compact));
+  } catch (err) {
+    return String(Date.now());
+  }
+}
+
+// Debounced + clean backend save
+function saveCartToBackend() {
   if (!isLoggedIn()) return;
 
   const mobile = localStorage.getItem("userMobile");
-  if (!mobile) return;   // double safety
+  if (!mobile) return;
 
-  // Ensure stable sessionId
-  let sessionId = localStorage.getItem("sessionId");
-  if (!sessionId) {
-    sessionId = "SESS-" + Date.now();
-    localStorage.setItem("sessionId", sessionId);
+  // CLEAN cart before sending to backend
+  const cleanedCart = (cart || [])
+    .filter(i => i && i.itemId && Number(i.qty || 0) > 0)
+    .map(i => ({
+      ...i,
+      qty: Number(i.qty || 0),
+      rate: Number(i.rate || 0),
+      discPercent: Number(i.discPercent || 0),
+      total: parseFloat(((Number(i.qty || 0) * Number(i.rate || 0))).toFixed(2)),
+      itemId: i.itemId || "",
+      variantId: i.variantId || ""
+    }));
+
+  // Compute checksum of this cleaned payload
+  const checksum = computeCartChecksum(cleanedCart);
+
+  // If same as previous, skip duplicate save
+  if (window.__lastSavedCartChecksum === checksum) {
+    return; // do nothing
   }
 
-  // Ensure every cart item has mandatory IDs
-  const cleanedCart = cart.map(item => ({
-    ...item,
-    itemId: item.itemId || "",
-    variantId: item.variantId || ""
-  }));
+  // Debounce: cancel previous pending save
+  if (window.__saveCartTimer) {
+    clearTimeout(window.__saveCartTimer);
+  }
 
-  apiPost("saveCart", {
-    mobile,
-    email: localStorage.getItem("userEmail") || "",
-    sessionId,
-    cartItems: cleanedCart
-  })
-  .then(res => console.log("Cart Save OK:", res))
-  .catch(err => console.error("Cart Save Error:", err));
+  window.__saveCartTimer = setTimeout(() => {
+
+    // ensure sessionId exists
+    let sessionId = localStorage.getItem("sessionId");
+    if (!sessionId) {
+      sessionId = "SESS-" + Date.now();
+      localStorage.setItem("sessionId", sessionId);
+    }
+
+    apiPost("saveCart", {
+      mobile,
+      email: localStorage.getItem("userEmail") || "",
+      sessionId,
+      cartItems: cleanedCart
+    })
+    .then(res => {
+      console.log("Cart saved OK:", res);
+      // update checksum to mark this state saved
+      window.__lastSavedCartChecksum = checksum;
+    })
+    .catch(err => {
+      console.error("Cart Save Error:", err);
+    });
+
+  }, 800); // debounce 800ms
 }
 
 
@@ -3093,7 +3142,6 @@ function saveCartToBackend() {
 
  function loadUserCartOnStart() {
 
-  // Only load if user is actually logged in
   if (!isLoggedIn()) return;
 
   const mobile = localStorage.getItem("userMobile");
@@ -3103,24 +3151,70 @@ function saveCartToBackend() {
     .then(res => {
       const backendCart = res.cart || res.data || res.cartItems || [];
 
-      // Sanitize every item to avoid null/missing fields
-      const cleaned = backendCart.map(item => ({
-        ...item,
-        itemId: item.itemId || "",
-        variantId: item.variantId || "",
-        qty: Number(item.qty || 1),
-        rate: Number(item.rate || 0),
-        discPercent: Number(item.discPercent || 0)
-      }));
+      // ----- FULL CLEANING -----
+      const cleaned = backendCart
+        .filter(item => item && item.itemId) // remove corrupt/blank
+        .map(item => {
+          const qty  = Number(item.qty || 1);
+          const rate = Number(item.rate || 0);
+          const disc = Number(item.discPercent || 0);
 
-      // Save merged/cleaned cart locally
-      localStorage.setItem("cart", JSON.stringify(cleaned));
-      cart = cleaned;
-      window.cart = cleaned;
+          // Recalculate discount safely
+          const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
+          const netRate = rate - discAmt;
+          const total   = disc > 0 
+            ? parseFloat((netRate * qty).toFixed(2))
+            : parseFloat((rate * qty).toFixed(2));
 
+          return {
+            ...item,
+            qty,
+            rate,
+            discPercent: disc,
+            itemId: item.itemId || "",
+            variantId: item.variantId || "",
+            total,
+            discAmt: disc > 0 ? discAmt : undefined,
+            netAmt: disc > 0 ? netRate : undefined
+          };
+        });
+
+      // ----- MERGE WITH MENU DATA TO FIX NAME + UNIT + IMAGE -----
+      const finalCart = cleaned.map(item => {
+        const menuItem = (window.menuItems || []).find(m => m.itemId == item.itemId);
+        if (!menuItem) return item;
+
+        // name fallback
+        if (!item.name && menuItem.name) item.name = menuItem.name;
+
+        // image fallback
+        if (!item.image && menuItem.image) item.image = menuItem.image;
+
+        // unit fix for multi
+        if (!item.unit && item.variantId) {
+          const variant = (window.cat_allocations || []).find(v => v.variantId == item.variantId);
+          if (variant) item.unit = variant.unit;
+        }
+
+        // unit fix for single
+        if (!item.unit && menuItem.unit) {
+          item.unit = menuItem.unit;
+        }
+
+        return item;
+      });
+
+      // ----- SAVE LOCALLY -----
+      localStorage.setItem("cart", JSON.stringify(finalCart));
+      cart = finalCart;
+      window.cart = finalCart;
+
+      // ----- RENDER -----
       renderCart();
     })
-    .catch(err => console.error("Load cart on start error:", err));
+    .catch(err => {
+      console.error("Load cart on start error:", err);
+    });
 }
 
 function getBackendCart(mobile) {
@@ -3232,6 +3326,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
