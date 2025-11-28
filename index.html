@@ -1387,10 +1387,27 @@ function updateQty(index, qty) {
       document.getElementById('checkoutModal').style.display = 'none';
     }
 function deleteCart() {
+
+  // Guest mode: clear everything
+  if (!isLoggedIn()) {
     cart = [];
     localStorage.removeItem("cart");
     renderCart();
+    return;
+  }
+
+  // Logged-in mode:
+  // ❗ DO NOT delete backend cart
+  // Only clear local mirror so UI resets,
+  // backend cart will reload on refresh/loadUserCartOnStart()
+
+  cart = [];
+  localStorage.setItem("cart", JSON.stringify(cart));
+  renderCart();
+
+  // No backend delete allowed here
 }
+
 
   function removeItem(index) {
   // Remove the item
@@ -3028,28 +3045,36 @@ document.addEventListener("click", function (e) {
 });
 
 function saveCartToBackend() {
+
+  // Only when logged in (important safety)
+  if (!isLoggedIn()) return;
+
   const mobile = localStorage.getItem("userMobile");
+  if (!mobile) return;   // double safety
 
-  // Guest → no save
-  if (!mobile) return;
-
-  // Always ensure stable sessionId
+  // Ensure stable sessionId
   let sessionId = localStorage.getItem("sessionId");
   if (!sessionId) {
     sessionId = "SESS-" + Date.now();
     localStorage.setItem("sessionId", sessionId);
   }
 
+  // Ensure every cart item has mandatory IDs
+  const cleanedCart = cart.map(item => ({
+    ...item,
+    itemId: item.itemId || "",
+    variantId: item.variantId || ""
+  }));
+
   apiPost("saveCart", {
     mobile,
     email: localStorage.getItem("userEmail") || "",
     sessionId,
-    cartItems: cart
+    cartItems: cleanedCart
   })
-  .then(res => console.log("Cart Save:", res))
+  .then(res => console.log("Cart Save OK:", res))
   .catch(err => console.error("Cart Save Error:", err));
 }
-
 
 
 function sendGuestCartToBackend() {
@@ -3180,6 +3205,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
