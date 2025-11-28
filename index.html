@@ -2679,7 +2679,7 @@ function loginUser() {
       localStorage.setItem("userEmail", res.email || "");
 onUserLogin(mobile);
 
-      sendGuestCartToBackend();
+      
 
       // ↓↓↓ MERGE BACKEND → LOCAL CART (ONLY ONE TIME) ↓↓↓
       apiGet("getCart", { mobile })
@@ -3164,6 +3164,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
