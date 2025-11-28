@@ -754,8 +754,8 @@ style="
   igstPercent: 0
 };
 
-    let cart = sanitizeLocalCart(JSON.parse(localStorage.getItem("cart") || "[]"));
-
+    let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+renderCart();
     function levenshtein(a, b) {
   a = a || ""; b = b || "";
   const m = a.length, n = b.length;
@@ -2796,11 +2796,7 @@ function apiPost(api, data = {}) {
 }
 
 function isLoggedIn() {
-  const mob = localStorage.getItem("userMobile");
-  if (!mob) return false;
-
-  // basic 10-digit mobile check
-  return /^[0-9]{10}$/.test(mob);
+  return Boolean(localStorage.getItem("userMobile"));
 }
 
   
@@ -3061,90 +3057,36 @@ document.addEventListener("click", function (e) {
   removeItem(index);
 });
 
-// Helper: compute a stable checksum so identical carts are not saved repeatedly
-function computeCartChecksum(cartArr) {
-  try {
-    const sorted = (cartArr || []).slice().sort((a, b) => {
-      const kA = `${a.itemId || ""}_${a.variantId || ""}`;
-      const kB = `${b.itemId || ""}_${b.variantId || ""}`;
-      return kA.localeCompare(kB);
-    });
-
-    const compact = sorted.map(i => ({
-      id: `${i.itemId || ""}_${i.variantId || ""}`,
-      qty: Number(i.qty || 0),
-      rate: Number(i.rate || 0)
-    }));
-
-    return btoa(JSON.stringify(compact));
-  } catch (err) {
-    return String(Date.now());
-  }
-}
-
-// Debounced + clean backend save
 function saveCartToBackend() {
+
+  // Only when logged in (important safety)
   if (!isLoggedIn()) return;
-// ⛔ Block backend save during login merge
-if (window.__mergeInProgress) {
-  console.warn("Save blocked — merge in progress.");
-  return;
-}
 
   const mobile = localStorage.getItem("userMobile");
-  if (!mobile) return;
+  if (!mobile) return;   // double safety
 
-  // CLEAN cart before sending to backend
-  const cleanedCart = (cart || [])
-    .filter(i => i && i.itemId && Number(i.qty || 0) > 0)
-    .map(i => ({
-      ...i,
-      qty: Number(i.qty || 0),
-      rate: Number(i.rate || 0),
-      discPercent: Number(i.discPercent || 0),
-      total: parseFloat(((Number(i.qty || 0) * Number(i.rate || 0))).toFixed(2)),
-      itemId: i.itemId || "",
-      variantId: i.variantId || ""
-    }));
-
-  // Compute checksum of this cleaned payload
-  const checksum = computeCartChecksum(cleanedCart);
-
-  // If same as previous, skip duplicate save
-  if (window.__lastSavedCartChecksum === checksum) {
-    return; // do nothing
+  // Ensure stable sessionId
+  let sessionId = localStorage.getItem("sessionId");
+  if (!sessionId) {
+    sessionId = "SESS-" + Date.now();
+    localStorage.setItem("sessionId", sessionId);
   }
 
-  // Debounce: cancel previous pending save
-  if (window.__saveCartTimer) {
-    clearTimeout(window.__saveCartTimer);
-  }
+  // Ensure every cart item has mandatory IDs
+  const cleanedCart = cart.map(item => ({
+    ...item,
+    itemId: item.itemId || "",
+    variantId: item.variantId || ""
+  }));
 
-  window.__saveCartTimer = setTimeout(() => {
-
-    // ensure sessionId exists
-    let sessionId = localStorage.getItem("sessionId");
-    if (!sessionId) {
-      sessionId = "SESS-" + Date.now();
-      localStorage.setItem("sessionId", sessionId);
-    }
-
-    apiPost("saveCart", {
-      mobile,
-      email: localStorage.getItem("userEmail") || "",
-      sessionId,
-      cartItems: cleanedCart
-    })
-    .then(res => {
-      console.log("Cart saved OK:", res);
-      // update checksum to mark this state saved
-      window.__lastSavedCartChecksum = checksum;
-    })
-    .catch(err => {
-      console.error("Cart Save Error:", err);
-    });
-
-  }, 800); // debounce 800ms
+  apiPost("saveCart", {
+    mobile,
+    email: localStorage.getItem("userEmail") || "",
+    sessionId,
+    cartItems: cleanedCart
+  })
+  .then(res => console.log("Cart Save OK:", res))
+  .catch(err => console.error("Cart Save Error:", err));
 }
 
 
@@ -3152,6 +3094,7 @@ if (window.__mergeInProgress) {
 
  function loadUserCartOnStart() {
 
+  // Only load if user is actually logged in
   if (!isLoggedIn()) return;
 
   const mobile = localStorage.getItem("userMobile");
@@ -3161,71 +3104,24 @@ if (window.__mergeInProgress) {
     .then(res => {
       const backendCart = res.cart || res.data || res.cartItems || [];
 
-      // ----- FULL CLEANING -----
-      const cleaned = backendCart
-        .filter(item => item && item.itemId) // remove corrupt/blank
-        .map(item => {
-          const qty  = Number(item.qty || 1);
-          const rate = Number(item.rate || 0);
-          const disc = Number(item.discPercent || 0);
+      // Sanitize every item to avoid null/missing fields
+      const cleaned = backendCart.map(item => ({
+        ...item,
+        itemId: item.itemId || "",
+        variantId: item.variantId || "",
+        qty: Number(item.qty || 1),
+        rate: Number(item.rate || 0),
+        discPercent: Number(item.discPercent || 0)
+      }));
 
-          // Recalculate discount safely
-          const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
-          const netRate = rate - discAmt;
-          const total   = disc > 0 
-            ? parseFloat((netRate * qty).toFixed(2))
-            : parseFloat((rate * qty).toFixed(2));
+      // Save merged/cleaned cart locally
+      localStorage.setItem("cart", JSON.stringify(cleaned));
+      cart = cleaned;
+      window.cart = cleaned;
 
-          return {
-            ...item,
-            qty,
-            rate,
-            discPercent: disc,
-            itemId: item.itemId || "",
-            variantId: item.variantId || "",
-            total,
-            discAmt: disc > 0 ? discAmt : undefined,
-            netAmt: disc > 0 ? netRate : undefined
-          };
-        });
-
-      // ----- MERGE WITH MENU DATA TO FIX NAME + UNIT + IMAGE -----
-      const finalCart = cleaned.map(item => {
-        const menuItem = (window.menuItems || []).find(m => m.itemId == item.itemId);
-        if (!menuItem) return item;
-
-        // name fallback
-        if (!item.name && menuItem.name) item.name = menuItem.name;
-
-        // image fallback
-        if (!item.image && menuItem.image) item.image = menuItem.image;
-
-        // unit fix for multi
-        if (!item.unit && item.variantId) {
-          const variant = (window.cat_allocations || []).find(v => v.variantId == item.variantId);
-          if (variant) item.unit = variant.unit;
-        }
-
-        // unit fix for single
-        if (!item.unit && menuItem.unit) {
-          item.unit = menuItem.unit;
-        }
-
-        return item;
-      });
-
-      // ----- SAVE LOCALLY -----
-      localStorage.setItem("cart", JSON.stringify(finalCart));
-      localStorage.setItem("cart", JSON.stringify(clean));
-      cart = finalCart;
-      window.cart = finalCart;
-
-      // ----- RENDER -----
       renderCart();
     })
-    .catch(err => {
-      console.error("Load cart on start error:", err);
-    });
+    .catch(err => console.error("Load cart on start error:", err));
 }
 
 function getBackendCart(mobile) {
@@ -3241,54 +3137,31 @@ function getBackendCart(mobile) {
       return [];
     });
 }
-window.__mergeInProgress = false;
 
 function mergeCarts(localCart, backendCart) {
+  let finalCart = [];
 
-  // Ensure arrays
-  localCart = Array.isArray(localCart) ? localCart : [];
-  backendCart = Array.isArray(backendCart) ? backendCart : [];
-
-  // CLEAN BACKEND DATA (Remove garbage / invalid)
-  backendCart = backendCart
-    .filter(it => it && it.itemId && Number(it.qty || 0) > 0)
-    .map(it => ({
-      ...it,
-      qty: Number(it.qty || 1),
-      rate: Number(it.rate || 0),
-      discPercent: Number(it.discPercent || 0)
-    }));
-
-  // CLEAN LOCAL DATA
-  localCart = localCart
-    .filter(it => it && it.itemId && Number(it.qty || 0) > 0)
-    .map(it => ({
-      ...it,
-      qty: Number(it.qty || 1),
-      rate: Number(it.rate || 0),
-      discPercent: Number(it.discPercent || 0)
-    }));
-
-  // Unique key function
-  const key = it => `${it.itemId}_${it.variantId || ""}`;
-
-  // Start with backend items
   const map = new Map();
-  backendCart.forEach(item => map.set(key(item), { ...item }));
 
-  // Merge local (guest) items
-  localCart.forEach(item => {
-    const k = key(item);
-    if (map.has(k)) {
-      const exist = map.get(k);
-      exist.qty = Number(exist.qty) + Number(item.qty);
-      exist.total = parseFloat((exist.qty * exist.rate).toFixed(2));
-      map.set(k, exist);
+  // Step 1: Backend items safe
+  backendCart.forEach(item => {
+    const key = `${item.itemId}_${item.variantId}`;
+    map.set(key, { ...item });
+  });
+
+  // Step 2: Local cart merge
+  localCart.forEach(localItem => {
+    const key = `${localItem.itemId}_${localItem.variantId}`;
+
+    if (map.has(key)) {
+      let exist = map.get(key);
+      exist.qty = Number(exist.qty) + Number(localItem.qty);
+      exist.total = exist.qty * exist.rate;
+      map.set(key, exist);
     } else {
-      // fresh local item → add clean
-      map.set(k, {
-        ...item,
-        cartId: "",
+      map.set(key, {
+        ...localItem,
+        cartId: "",      
         sessionId: "",
         mobile: "",
         timestamp: ""
@@ -3296,101 +3169,46 @@ function mergeCarts(localCart, backendCart) {
     }
   });
 
-  // Return cleaned final list
-  return Array.from(map.values());
+  map.forEach(item => finalCart.push(item));
+  return finalCart;
 }
-
-  function sanitizeLocalCart(rawCart) {
-  if (!Array.isArray(rawCart)) return [];
-
-  return rawCart
-    .filter(i => i && i.itemId) // mandatory itemId
-    .map(i => {
-      const qty = Number(i.qty || 1);
-      const rate = Number(i.rate || 0);
-      const disc = Number(i.discPercent || 0);
-
-      const discAmt = disc > 0 ? parseFloat(((rate * disc) / 100).toFixed(2)) : 0;
-      const netRate = rate - discAmt;
-
-      const total = disc > 0
-        ? parseFloat((netRate * qty).toFixed(2))
-        : parseFloat((rate * qty).toFixed(2));
-
-      return {
-        ...i,
-        qty,
-        rate,
-        discPercent: disc,
-        itemId: i.itemId || "",
-        variantId: i.variantId || "",
-        total,
-        discAmt,
-        netAmt: disc > 0 ? netRate : undefined,
-        name: i.name || "",
-        unit: i.unit || "",
-        image: i.image || ""
-      };
-    });
-}
-
-  
 async function onUserLogin(mobile) {
 
-  // 🔐 MERGE LOCK — prevent duplicate parallel execution
-  if (window.__mergeInProgress) {
-    console.warn("Merge already running — skipped duplicate.");
-    return;
+  // ⭐ Ensure sessionId exists
+  let sessionId = localStorage.getItem("sessionId");
+  if (!sessionId) {
+    sessionId = "SESS-" + Date.now();
+    localStorage.setItem("sessionId", sessionId);
   }
-  window.__mergeInProgress = true;
 
-  try {
-    // Ensure sessionId
-    let sessionId = localStorage.getItem("sessionId");
-    if (!sessionId) {
-      sessionId = "SESS-" + Date.now();
-      localStorage.setItem("sessionId", sessionId);
-    }
+  // 1) Backend cart fetch
+  const backendRes = await apiPost("getCart", { mobile });
+  const backendCart = backendRes.cart || [];
 
-    // 1) Fetch backend cart
-    const backendRes = await apiPost("getCart", { mobile });
-    const backendCart = backendRes.cart || [];
+  // 2) Local cart read
+  const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-    // 2) Read guest local cart
-    const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+  // 3) Merge
+  const merged = mergeCarts(localCart, backendCart);
 
-    // 3) Merge both carts
-    const merged = mergeCarts(localCart, backendCart);
+  // 4) Save merged cart to backend
+  await apiPost("saveCart", {
+    mobile,
+    sessionId,   // ⭐ use variable, not re-read
+    cartItems: merged
+  });
 
-    // 4) Save merged to backend
-    await apiPost("saveCart", {
-      mobile,
-      sessionId,
-      cartItems: merged
-    });
+  // 5) Local cart update
+  localStorage.setItem("cart", JSON.stringify(merged));
+  window.cart = merged;
 
-    // 5) Save merged to local
-    localStorage.setItem("cart", JSON.stringify(merged));
-    localStorage.setItem("cart", JSON.stringify(clean));
-    cart = merged;
-    window.cart = merged;
-
-    // 6) Render UI
-    renderCart();
-
-  } catch (err) {
-    console.error("Merge/Login Error:", err);
-
-  } finally {
-    // 🔓 Unlock merge
-    window.__mergeInProgress = false;
-  }
+  // 6) Render UI
+  renderCart();
 }
 
 
 </script>
 </body>
 </html>
-
 
 
