@@ -1931,25 +1931,22 @@ function closeLogin() {
 
 
 function logoutUser() {
+  // UI resets
   document.getElementById("userInfoBox").style.display = "none";
   document.getElementById("loggedEmail").innerText = "";
 
-  // Show Login + Signup buttons again
   document.querySelector("button[onclick='openLogin()']").style.display = "inline-block";
   document.querySelector("button[onclick='openSignup()']").style.display = "inline-block";
 
-  // Hide Logout button
   document.getElementById("logoutBtn").style.display = "none";
   document.getElementById("signupLabelBox").style.display = "block";
   document.getElementById("hamburgerBtn").style.display = "none";
 
-  // Hide Navigation on Logout
   document.getElementById("leftNav").style.display = "none";
 
   document.getElementById("menuWrapper").style.display = "block";
   document.getElementById("pageWrapper").style.display = "none";
 
-  // Hide all sub pages
   document.getElementById("profilePage").style.display = "none";
   document.getElementById("ordersPage").style.display = "none";
   document.getElementById("offersPage").style.display = "none";
@@ -1957,8 +1954,21 @@ function logoutUser() {
   document.querySelectorAll("#premiumMenu li").forEach(li => li.classList.remove("active"));
   document.getElementById("mainContent").style.marginLeft = "0";
 
-  // Remove only login details
+  // Remove login identifiers
   localStorage.removeItem("userMobile");
+  localStorage.removeItem("userEmail");
+
+  // MOST IMPORTANT (Cart Behave Rule)
+  // ❗ Clear only local cart, NOT backend cart
+  localStorage.removeItem("cart");   // remove local mirror
+  cart = [];
+  window.cart = [];
+
+  // ❗ Clear sessionId (start fresh next login)
+  localStorage.removeItem("sessionId");
+
+  // Refresh cart UI
+  renderCart();
 
   alert("Logged out successfully.");
 }
@@ -3156,7 +3166,11 @@ async function sendGuestCartToBackend() {
   }
 }
 
-  function loadUserCartOnStart() {
+ function loadUserCartOnStart() {
+
+  // Only load if user is actually logged in
+  if (!isLoggedIn()) return;
+
   const mobile = localStorage.getItem("userMobile");
   if (!mobile) return;
 
@@ -3164,8 +3178,20 @@ async function sendGuestCartToBackend() {
     .then(res => {
       const backendCart = res.cart || res.data || res.cartItems || [];
 
-      localStorage.setItem("cart", JSON.stringify(backendCart));
-      cart = backendCart;
+      // Sanitize every item to avoid null/missing fields
+      const cleaned = backendCart.map(item => ({
+        ...item,
+        itemId: item.itemId || "",
+        variantId: item.variantId || "",
+        qty: Number(item.qty || 1),
+        rate: Number(item.rate || 0),
+        discPercent: Number(item.discPercent || 0)
+      }));
+
+      // Save merged/cleaned cart locally
+      localStorage.setItem("cart", JSON.stringify(cleaned));
+      cart = cleaned;
+      window.cart = cleaned;
 
       renderCart();
     })
@@ -3249,6 +3275,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
