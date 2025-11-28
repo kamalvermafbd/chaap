@@ -1196,15 +1196,35 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
 
 
 
-  function renderCart() {
+function renderCart() {
+
   const tbody = document.querySelector('#cartTable tbody');
   const thead = document.querySelector('#cartTable thead tr');
   tbody.innerHTML = "";
 
-  // Check: does ANY item have discount?
+  // ===== FIX 1: Merge missing fields from menuItems =====
+  cart = cart.map(item => {
+    const menuItem = (window.menuItems || []).find(m => m.itemId == item.itemId);
+
+    // name fallback
+    if (!item.name && menuItem?.name) item.name = menuItem.name;
+
+    // unit fallback (for multi items find variant)
+    if (!item.unit) {
+      const variant = (window.cat_allocations || []).find(v => v.variantId == item.variantId);
+      if (variant) item.unit = variant.unit;
+    }
+
+    // image fallback
+    if (!item.image && menuItem?.image) item.image = menuItem.image;
+
+    return item;
+  });
+
+  // ===== Check discount usage =====
   const anyDiscount = cart.some(i => Number(i.discPercent) > 0);
 
-  // Build header
+  // ===== Build header =====
   if (anyDiscount) {
     thead.innerHTML = `
       <th>Item</th>
@@ -1228,15 +1248,23 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
 
   let grandTotal = 0;
 
+  // ================================================
+  //               BUILD CART TABLE ROWS
+  // ================================================
   cart.forEach((item, idx) => {
+
     const rate = Number(item.rate);
     const qty  = Number(item.qty);
     const disc = Number(item.discPercent || 0);
 
-    // --- SAFE CALCULATIONS ---
+    // fresh safe calculations
     const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
-    const netAmt  = parseFloat((rate - discAmt).toFixed(2));
-    const total   = parseFloat((netAmt * qty).toFixed(2));
+    const netRate = rate - discAmt;
+
+    // FIX: for no discount → use MRP * qty
+    const total = disc > 0 
+      ? parseFloat((netRate * qty).toFixed(2))
+      : parseFloat((rate * qty).toFixed(2));
 
     grandTotal += total;
 
@@ -1249,7 +1277,7 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
         <td>₹ ${rate.toFixed(2)}</td>
         <td>${disc}%</td>
         <td>₹ ${discAmt.toFixed(2)}</td>
-        <td>₹ ${netAmt.toFixed(2)}</td>
+        <td>₹ ${netRate.toFixed(2)}</td>
         <td>₹ ${total.toFixed(2)}</td>
         <td><button class="delete-btn" data-index="${idx}">Delete</button></td>
       `;
@@ -1266,35 +1294,29 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
     tbody.appendChild(tr);
   });
 
-  // ===== SAFE ROUND FINAL TOTAL =====
+  // ===== FINAL TOTAL SET =====
   let baseTotal = parseFloat(grandTotal.toFixed(2));
   document.getElementById("cartTotal").innerText = baseTotal.toFixed(2);
 
-  // ===== BUILD TAX SUMMARY =====
+  // TAX BLOCK unchanged
   let taxHtml = "";
 
   if (restaurantTax.taxType === "On Bill") {
 
-    // Service Charge
     const serviceAmt = parseFloat(((baseTotal * restaurantTax.servicePercent) / 100).toFixed(2));
-
-    // Taxable amount
     const taxableAmount = parseFloat((baseTotal + serviceAmt).toFixed(2));
 
-    // CGST / SGST / IGST
     const cgstAmt = parseFloat(((taxableAmount * restaurantTax.cgstPercent) / 100).toFixed(2));
     const sgstAmt = parseFloat(((taxableAmount * restaurantTax.sgstPercent) / 100).toFixed(2));
     const igstAmt = parseFloat(((taxableAmount * restaurantTax.igstPercent) / 100).toFixed(2));
 
-    // Grand total final
     const grandTotalCalc = parseFloat((taxableAmount + cgstAmt + sgstAmt + igstAmt).toFixed(2));
 
-    // Multiline summary (clean)
     taxHtml = `
       ${restaurantTax.servicePercent > 0 
-    ? `<p style="margin:2px 0;">Service Charges (${restaurantTax.servicePercent}%): ₹${serviceAmt.toFixed(2)}</p>`
-    : ""
-}
+        ? `<p style="margin:2px 0;">Service Charges (${restaurantTax.servicePercent}%): ₹${serviceAmt.toFixed(2)}</p>`
+        : ""
+      }
 
       <p style="margin:2px 0;">CGST (${restaurantTax.cgstPercent}%): ₹${cgstAmt.toFixed(2)}</p>
       <p style="margin:2px 0;">SGST (${restaurantTax.sgstPercent}%): ₹${sgstAmt.toFixed(2)}</p>
@@ -1303,12 +1325,10 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
     `;
   }
 
-  // ===== INJECT TAX SUMMARY BELOW TOTAL =====
   const taxSummaryEl = document.getElementById("taxSummary");
-  if (taxSummaryEl) {
-    taxSummaryEl.innerHTML = taxHtml;
-  }
+  if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
 }
+
 
 
 function updateQty(index, qty) {
@@ -3143,6 +3163,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
