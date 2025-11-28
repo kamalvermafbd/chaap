@@ -3336,12 +3336,10 @@ function mergeCarts(localCart, backendCart) {
 }
 
   function sanitizeLocalCart(rawCart) {
-
-
   if (!Array.isArray(rawCart)) return [];
 
   return rawCart
-    .filter(i => i && i.itemId) // mandatory itemId
+    .filter(i => i && i.itemId)
     .map(i => {
       const qty = Number(i.qty || 1);
       const rate = Number(i.rate || 0);
@@ -3370,6 +3368,7 @@ function mergeCarts(localCart, backendCart) {
       };
     });
 }
+
 // After function declaration
 cart = sanitizeLocalCart(cart);
 localStorage.setItem("cart", JSON.stringify(cart));
@@ -3431,6 +3430,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
