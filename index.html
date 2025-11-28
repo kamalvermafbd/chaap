@@ -2750,7 +2750,7 @@ function loginUser() {
       onUserLogin(mobile);
 
       // ⭐ Load merged cart into UI
-      setTimeout(() => loadUserCartOnStart(), 300);
+ 
       // UI updates
       document.getElementById("loggedEmail").innerText = res.email || "";
       document.getElementById("userInfoBox").style.display = "block";
@@ -3212,6 +3212,7 @@ localStorage.removeItem("guestCart");   // ❗ MISSING
 </script>
 </body>
 </html>
+
 
 
 
