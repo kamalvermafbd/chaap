@@ -3124,37 +3124,41 @@ document.addEventListener("click", function (e) {
   removeItem(index);
 });
 
-async function saveCartToBackend() {
+async function saveCartToBackend(cartData = null) {
 
-  // Only when logged in (important safety)
+  // Only if logged in
   if (!isLoggedIn()) return;
 
   const mobile = localStorage.getItem("userMobile");
   if (!mobile) return;
 
-  // ---- QUEUE SYSTEM START (RACE FIX) ----
+  // ---- QUEUE SYSTEM (Race fix) ----
   if (window.cartSaveLock) {
     window.cartSaveQueued = true;
     return;
   }
   window.cartSaveLock = true;
-  // ---- QUEUE SYSTEM END ----
 
-  // Ensure stable sessionId
+  // Ensure sessionId
   let sessionId = localStorage.getItem("sessionId");
   if (!sessionId) {
     sessionId = "SESS-" + Date.now();
     localStorage.setItem("sessionId", sessionId);
   }
 
-  // FINAL cleaned cart (mandatory IDs + correct types)
-  const cleanedCart = cart.map(item => ({
-    ...item,
-    itemId: item.itemId || "",
-    variantId: item.variantId || "",
+  // Use passed data OR use global cart
+  const cartToSend = (cartData && Array.isArray(cartData)) ? cartData : cart;
+
+  // Clean final payload
+  const cleanedCart = cartToSend.map(item => ({
+    name: item.name || "",
+    unit: item.unit || "",
     qty: Number(item.qty || 1),
     rate: Number(item.rate || 0),
-    discPercent: Number(item.discPercent || 0)
+    discPercent: Number(item.discPercent || 0),
+    itemId: item.itemId || "",
+    variantId: item.variantId || "",
+    image: item.image || ""
   }));
 
   try {
@@ -3170,13 +3174,11 @@ async function saveCartToBackend() {
 
   } finally {
 
-    // Unlock
     window.cartSaveLock = false;
 
-    // If another save happened during lock → run again
     if (window.cartSaveQueued) {
       window.cartSaveQueued = false;
-      saveCartToBackend(); // re-run
+      saveCartToBackend();
     }
   }
 }
@@ -3371,5 +3373,6 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
