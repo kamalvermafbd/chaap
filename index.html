@@ -2749,6 +2749,8 @@ function loginUser() {
       // 🚀 CORRECT: onUserLogin handles ALL merge + guest transfer
       onUserLogin(mobile);
 
+      // ⭐ Load merged cart into UI
+      setTimeout(() => loadUserCartOnStart(), 300);
       // UI updates
       document.getElementById("loggedEmail").innerText = res.email || "";
       document.getElementById("userInfoBox").style.display = "block";
@@ -3210,5 +3212,6 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
