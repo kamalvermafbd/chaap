@@ -1357,52 +1357,54 @@ function renderCart() {
 
 
 function updateQty(index, qty) {
-  qty = parseInt(qty);
-  if (qty < 1) qty = 1;
 
-  const item = cart[index];
+  clearTimeout(qtyDebounce);
 
-  const rate = Number(item.rate);       // MRP
-  const disc = Number(item.discPercent || 0);
+  qtyDebounce = setTimeout(() => {
 
-  // --- SAFE CALCULATIONS ---
-  const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
-  const netRate = rate - discAmt;
+    qty = parseInt(qty);
+    if (qty < 1) qty = 1;
 
-  // FIX: if no discount → use MRP total
-  const total = disc > 0
-    ? parseFloat((netRate * qty).toFixed(2))
-    : parseFloat((rate * qty).toFixed(2));
+    const item = cart[index];
 
-  // --- Store clean values ---
-  item.qty = qty;
+    const rate = Number(item.rate);
+    const disc = Number(item.discPercent || 0);
 
-  if (disc > 0) {
-    item.discAmt = discAmt;
-    item.netAmt  = parseFloat(netRate.toFixed(2));
-  } else {
-    // remove unwanted fields
-    delete item.discAmt;
-    delete item.netAmt;
-  }
+    const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
+    const netRate = rate - discAmt;
 
-  item.total = total;
+    const total = disc > 0
+      ? parseFloat((netRate * qty).toFixed(2))
+      : parseFloat((rate * qty).toFixed(2));
 
-  // Save updated cart locally
- // Save updated cart locally (guest vs logged-in)
-if (!isLoggedIn()) {
-  localStorage.setItem("guestCart", JSON.stringify(cart));
-} else {
-  localStorage.setItem("cart", JSON.stringify(cart));
-}
+    item.qty = qty;
 
-  // Re-render UI
-  renderCart();
+    if (disc > 0) {
+      item.discAmt = discAmt;
+      item.netAmt  = parseFloat(netRate.toFixed(2));
+    } else {
+      delete item.discAmt;
+      delete item.netAmt;
+    }
 
-  // --- BACKEND UPDATE ONLY IF LOGGED IN ---
-  if (isLoggedIn()) {
-    saveCartToBackend();
-  }
+    item.total = total;
+
+    // SAVE LOCALLY
+    if (!isLoggedIn()) {
+      localStorage.setItem("guestCart", JSON.stringify(cart));
+    } else {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
+
+    renderCart();
+
+    // BACKEND SYNC (safe & debounced)
+    if (isLoggedIn()) {
+      saveCartToBackend(); 
+    }
+
+  }, 200); // 200ms debounce
+
 }
 
     function openCheckout() {
@@ -1440,25 +1442,31 @@ function deleteCart() {
 }
 
 function removeItem(index) {
-  // Remove the item
-  cart.splice(index, 1);
 
-  // Save updated local cart
-  // Save updated cart locally (guest vs logged-in)
-if (!isLoggedIn()) {
-  localStorage.setItem("guestCart", JSON.stringify(cart));
-} else {
-  localStorage.setItem("cart", JSON.stringify(cart));
+  clearTimeout(deleteDebounce);
+
+  deleteDebounce = setTimeout(() => {
+
+    cart.splice(index, 1);
+
+    // SAVE LOCALLY
+    if (!isLoggedIn()) {
+      localStorage.setItem("guestCart", JSON.stringify(cart));
+    } else {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
+
+    renderCart();
+
+    // BACKEND SYNC
+    if (isLoggedIn()) {
+      saveCartToBackend();
+    }
+
+  }, 150); // small debounce for delete
+
 }
 
-  // Re-render UI
-  renderCart();
-
-  // --- Backend sync ONLY if logged-in ---
-  if (isLoggedIn()) {
-    saveCartToBackend();
-  }
-}
 
  function checkCustomerByMobile() {
   const mobile = document.getElementById('mobile').value.trim();
@@ -3272,6 +3280,7 @@ localStorage.removeItem("guestCart");   // ❗ MISSING
 </script>
 </body>
 </html>
+
 
 
 
