@@ -3118,10 +3118,36 @@ function mergeCarts(localCart, backendCart) {
 
   return finalCart;
 }
+async function onUserLogin(mobile) {
+  // 1) Backend cart fetch
+  const backendRes = await apiPost("getCartByMobile", { mobile });
+  const backendCart = backendRes.cart || [];
+
+  // 2) Local cart read
+  const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+  // 3) Merge
+  const merged = mergeCarts(localCart, backendCart);
+
+  // 4) Save merged cart to backend
+  await apiPost("saveCart", {
+    mobile,
+    sessionId: localStorage.getItem("sessionId") || "",
+    cartItems: merged
+  });
+
+  // 5) Local cart update
+  localStorage.setItem("cart", JSON.stringify(merged));
+  window.cart = merged;
+
+  // 6) Render UI
+  renderCart();
+}
 
 </script>
 </body>
 </html>
+
 
 
 
