@@ -281,6 +281,7 @@ body::after {
   border: 1px solid rgba(255, 209, 102, 0.18); /* gold border */
 
   transition: transform .25s ease, box-shadow .25s ease;
+ 
 }
 
 /* Hover lift */
@@ -316,7 +317,9 @@ body::after {
     0 4px 12px rgba(0,0,0,0.18),
     0 0 14px rgba(255,209,102,0.18); /* golden glow */
 }
-
+.menu-item span {
+  margin-right: 0; /* No gap between text and price */
+}
 /* =============================
    Premium Variant Box (Multi)
    ============================= */
@@ -1322,37 +1325,49 @@ button[onclick="openSignup()"],
   color: #000;
 }
 /* MOBILE VIEW (max-width 768px) */
+/* Mobile View */
 @media (max-width: 768px) {
-
-  /* Hide old table */
-  #cartTable {
-    display: none !important;
+  /* Mobile view: Black text color for all elements */
+  body, .cart, .item-name, .cart-card, #variantPopup, select, input, button, p, h1, h2, h3, h4, h5, h6, label {
+    color: #000 !important; /* All text in black */
   }
 
-  /* Make cards full width */
-  #cartCards {
-    display: flex;
+  .cart-card {
+    background-color: rgba(255, 255, 255, 0.9) !important; /* Light background for cards */
   }
-}
-#cartCards {
-  padding-bottom: 80px;
-}
-@media (max-width: 768px) {
-  #variantPopup {
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100% !important;
-    height: 100% !important;
-    max-width: none !important;
-    padding: 20px !important;
-    overflow-y: auto !important;
-    border-radius: 0 !important;
+
+  .cart-card button {
+    background-color: transparent !important; /* Transparent background for buttons */
+    color: #000 !important; /* Black text on buttons */
+  }
+
+  /* Ensure the item name in mobile view is black */
+  .item-name {
+    color: #000 !important; /* Force the item name color to black in mobile */
   }
 }
 
+/* Desktop View */
+@media (min-width: 769px) {
+  /* Desktop view: White text color for all elements */
+  body, .cart, .item-name, .cart-card, #variantPopup, select, input, button, p, h1, h2, h3, h4, h5, h6, label {
+    color: #fff !important; /* All text in white */
+  }
+
+  .cart-card {
+    background-color: rgba(255, 255, 255, 0.08) !important; /* Light background for cards on desktop */
+  }
+
+  .cart-card button {
+    background-color: transparent !important; /* Transparent background for buttons */
+    color: #fff !important; /* White text on buttons for desktop */
+  }
+
+  /* Ensure the item name in desktop view is white */
+  .item-name {
+    color: #fff !important; /* Force the item name color to white on desktop */
+  }
+}
 
   </style>
 </head>
@@ -2051,31 +2066,39 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
     const discAmt = (rate * discPercent) / 100;
     const netRate = rate - discAmt;
 
-    let newItem = {
-      name,
-      unit,
-      qty,
-      rate: Number(rate),
-      total: parseFloat(total.toFixed(2)),
-      itemId,
-      variantId,
-      discPercent: Number(discPercent),
-        };
+    const item = menuItems.find(i => i.itemId == itemId) || {};
+const allocation = (window.cat_allocations || []).find(v => v.variantId == variantId) || {};
+
+
+let newItem = {
+  name: item.name || allocation.name || "",
+  unit: allocation.unit || item.unit || "",
+  qty,
+  rate: Number(rate),
+  total: parseFloat(total.toFixed(2)),
+  itemId,
+  variantId,
+  discPercent: Number(discPercent),
+  image: item.image || allocation.image || ""
+};
+    // 🔥 FULL FIX: if menuItems not loaded then backup name+unit
+    if (!newItem.name) newItem.name = name;
+    if (!newItem.unit) newItem.unit = unit;
 
     if (discPercent > 0) {
       newItem.discAmt = parseFloat(discAmt.toFixed(2));
       newItem.netAmt = parseFloat((netRate * qty).toFixed(2));
     }
-
+ // --- FIX: Always store name + unit ---
+    
     stored.push(newItem);
   }
 
   localStorage.setItem("cart", JSON.stringify(stored));
   cart = stored;
   window.cart = stored;
-
-  renderCart();
-  saveCartToBackend();
+saveCartToBackend(cart);
+setTimeout(renderCart, 50);
   alert(`${name} (${unit}) added to cart`);
 }
 
@@ -2083,6 +2106,14 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
 
 
 function renderCart() {
+console.log("🟥 BEFORE MERGE cart =", JSON.parse(localStorage.getItem("cart")));
+console.log("🟥 BEFORE MERGE render-cart cart =", cart);
+
+ 
+cart = JSON.parse(localStorage.getItem("cart")) || [];
+  mergeCartWithMenuData();   // ✔ TRUE FIX
+  console.log("CART DATA:", cart); 
+
   document.getElementById("cartContainer").innerHTML = `
       <div id="cartCards"></div>
       <table id="cartTable">
@@ -2123,7 +2154,7 @@ function renderCart() {
   let grandTotal = 0;
 
   cart.forEach((item, idx) => {
-
+    console.log("🟦 MOBILE CARD ITEM =", item);
     // ------------------------------------------------------
     // MOVE THESE LINES TO THE TOP (THIS WAS THE REAL FIX)
     // ------------------------------------------------------
@@ -2144,8 +2175,11 @@ function renderCart() {
         <div class="cart-card">
           <div class="cart-left">
             <div class="cart-title">
-              <span class="item-name">${item.name} (${item.unit || item.variant || item.size || ''})
+              <span class="item-name">
+  ${item.name} (${item.unit})
+
 </span>
+
               <span class="delete-icon" onclick="updateQty(${idx}, 0)">×</span>
             </div>
 
@@ -2173,6 +2207,7 @@ function renderCart() {
           <div class="cart-left">
             <div class="cart-title">
               <span class="item-name">${item.name} (${item.unit})</span>
+
               <span class="delete-icon" onclick="updateQty(${idx}, 0)">×</span>
             </div>
 
@@ -2195,7 +2230,8 @@ function renderCart() {
       `;
     }
 
-    document.getElementById("cartCards").innerHTML += cardHTML;
+    document.getElementById("cartCards").insertAdjacentHTML("beforeend", cardHTML);
+
 
     grandTotal += total;
 
@@ -3108,7 +3144,7 @@ window.addEventListener("load", () => {
   const mobile = localStorage.getItem("userMobile");
   const email  = localStorage.getItem("userEmail");
   //  LOAD USER CART FROM BACKEND IF LOGGED IN
-  loadUserCartOnStart();   // <<< ADD THIS LINE
+ // loadUserCartOnStart();   // <<< ADD THIS LINE
 
   // Always reset full UI first
   document.getElementById("menuWrapper").style.display = "block";
@@ -4035,11 +4071,29 @@ localStorage.setItem("sessionId", sessionId);
   apiGet("getCart", { mobile })
     .then(res => {
       if (res.success && Array.isArray(res.cart)) {
-        const backendCart = res.cart;
-        localStorage.setItem("cart", JSON.stringify(backendCart));
-        cart = backendCart;
-        renderCart();
-      }
+
+  const backendCart = res.cart || [];
+  const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+  // --- PERFECT MERGE ---
+  backendCart.forEach(b => {
+    const match = localCart.find(
+      l => l.itemId == b.itemId && l.variantId == b.variantId
+    );
+
+    if (match) {
+      match.qty = Number(match.qty) + Number(b.qty);
+    } else {
+      localCart.push(b);
+    }
+  });
+
+  localStorage.setItem("cart", JSON.stringify(localCart));
+  cart = localCart;
+
+  renderCart();
+}
+
     })
     .catch(err => console.error("Load cart on start error:", err));
 }
@@ -4065,6 +4119,28 @@ window.addEventListener("resize", () => {
   const total = parseFloat(el.innerText || "0");
   updateMobileCartBar(total);
 });
+
+function mergeCartWithMenuData() {
+  console.log("🟩 AFTER MERGE cart =", cart);
+
+  cart = cart.map(ci => {
+    const menuItem = menuItems.find(m => String(m.itemId) === String(ci.itemId));
+    const alloc    = (window.cat_allocations || []).find(
+                       v => String(v.variantId) === String(ci.variantId)
+                     );
+
+    // Name priority: cart > menu
+    if (!ci.name && menuItem) ci.name = menuItem.name;
+
+    // Unit priority: cart > alloc > menu
+    if (!ci.unit) {
+      if (alloc && alloc.unit) ci.unit = alloc.unit;
+      else if (menuItem && menuItem.unit) ci.unit = menuItem.unit;
+    }
+
+    return ci;
+  });
+}
 
 
 </script>
