@@ -2748,9 +2748,6 @@ function loginUser() {
       // 🚀 CORRECT: onUserLogin handles ALL merge + guest transfer
       onUserLogin(mobile);
 
-      // ❌ WRONG: Do NOT call sendGuestCartToBackend() here
-      // sendGuestCartToBackend();  <-- REMOVE THIS LINE COMPLETELY
-
       // UI updates
       document.getElementById("loggedEmail").innerText = res.email || "";
       document.getElementById("userInfoBox").style.display = "block";
@@ -3087,84 +3084,7 @@ function saveCartToBackend() {
 }
 
 
-async function sendGuestCartToBackend() {
 
-  // MUST RUN ONLY AFTER LOGIN
-  if (!isLoggedIn()) return;
-
-  const mobile = localStorage.getItem("userMobile");
-  if (!mobile) return;
-
-  let guestCart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-  // no guest items → nothing to merge
-  if (!guestCart.length) return;
-
-  // ensure sessionId exists
-  let sessionId = localStorage.getItem("sessionId");
-  if (!sessionId) {
-    sessionId = "SESS-" + Date.now();
-    localStorage.setItem("sessionId", sessionId);
-  }
-
-  // ===== STEP 1: FETCH BACKEND CART =====
-  let backendCart = [];
-  try {
-    const res = await apiPost("getCart", { mobile });
-    backendCart = Array.isArray(res.cart) ? res.cart : [];
-  } catch (e) {
-    console.error("Fetch backend cart failed:", e);
-    backendCart = [];
-  }
-
-  // ===== STEP 2: SANITIZE guest cart =====
-  guestCart = guestCart.map(i => ({
-    ...i,
-    itemId: i.itemId || "",
-    variantId: i.variantId || ""
-  }));
-
-  // ===== STEP 3: MERGE =====
-  const merged = [...backendCart];
-
-  guestCart.forEach(g => {
-    const existing = merged.find(
-      m => m.itemId == g.itemId && m.variantId == g.variantId
-    );
-    if (existing) {
-      existing.qty = Number(existing.qty) + Number(g.qty);
-      existing.total = existing.qty * existing.rate;
-    } else {
-      merged.push(g);
-    }
-  });
-
-  // ===== STEP 4: SAVE MERGED CART TO BACKEND =====
-  try {
-    const saveRes = await apiPost("saveCart", {
-      mobile,
-      sessionId,
-      email: localStorage.getItem("userEmail") || "",
-      cartItems: merged
-    });
-
-    console.log("Merged Cart Saved:", saveRes);
-
-    if (saveRes.success) {
-      // ===== STEP 5: Clear guest cart locally =====
-      localStorage.removeItem("cart");
-
-      // ===== STEP 6: Store merged cart as new localStorage =====
-      localStorage.setItem("cart", JSON.stringify(merged));
-      cart = merged;
-
-      // ===== STEP 7: Render final cart =====
-      renderCart();
-    }
-  } catch (e) {
-    console.error("Merge Save Error:", e);
-  }
-}
 
  function loadUserCartOnStart() {
 
@@ -3247,6 +3167,14 @@ function mergeCarts(localCart, backendCart) {
   return finalCart;
 }
 async function onUserLogin(mobile) {
+
+  // ⭐ Ensure sessionId exists
+  let sessionId = localStorage.getItem("sessionId");
+  if (!sessionId) {
+    sessionId = "SESS-" + Date.now();
+    localStorage.setItem("sessionId", sessionId);
+  }
+
   // 1) Backend cart fetch
   const backendRes = await apiPost("getCartByMobile", { mobile });
   const backendCart = backendRes.cart || [];
@@ -3260,7 +3188,7 @@ async function onUserLogin(mobile) {
   // 4) Save merged cart to backend
   await apiPost("saveCart", {
     mobile,
-    sessionId: localStorage.getItem("sessionId") || "",
+    sessionId,   // ⭐ use variable, not re-read
     cartItems: merged
   });
 
@@ -3272,9 +3200,11 @@ async function onUserLogin(mobile) {
   renderCart();
 }
 
+
 </script>
 </body>
 </html>
+
 
 
 
