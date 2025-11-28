@@ -3047,19 +3047,20 @@ localStorage.setItem("sessionId", sessionId);
 
   function loadUserCartOnStart() {
   const mobile = localStorage.getItem("userMobile");
-  if (!mobile) return; // not logged in
+  if (!mobile) return;
 
-  apiGet("getCart", { mobile })
+  apiPost("getCartByMobile", { mobile })
     .then(res => {
-      if (res.success && Array.isArray(res.cart)) {
-        const backendCart = res.cart;
-        localStorage.setItem("cart", JSON.stringify(backendCart));
-        cart = backendCart;
-        renderCart();
-      }
+      const backendCart = res.cart || res.data || res.cartItems || [];
+
+      localStorage.setItem("cart", JSON.stringify(backendCart));
+      cart = backendCart;
+
+      renderCart();
     })
     .catch(err => console.error("Load cart on start error:", err));
 }
+
 function getBackendCart(mobile) {
   return apiPost("getCart", { mobile })
     .then(res => {
@@ -3137,6 +3138,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
