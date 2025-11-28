@@ -3227,7 +3227,7 @@ if (window.__mergeInProgress) {
 
       // ----- SAVE LOCALLY -----
       localStorage.setItem("cart", JSON.stringify(finalCart));
-      localStorage.setItem("cart", JSON.stringify(clean));
+      
       cart = finalCart;
       window.cart = finalCart;
 
@@ -3381,7 +3381,7 @@ async function onUserLogin(mobile) {
 
     // 5) Save merged to local
     localStorage.setItem("cart", JSON.stringify(merged));
-    localStorage.setItem("cart", JSON.stringify(clean));
+    
     cart = merged;
     window.cart = merged;
 
@@ -3401,6 +3401,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
