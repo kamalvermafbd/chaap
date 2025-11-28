@@ -1252,6 +1252,15 @@ function renderCart() {
   //               BUILD CART TABLE ROWS
   // ================================================
   cart.forEach((item, idx) => {
+    // ===== SAFE FALLBACKS (Step-5B) =====
+    const safeName  = item.name  || "Item";
+    const safeUnit  = item.unit  || "";
+    const safeQty   = Number(item.qty || 1);
+    const safeRate  = Number(item.rate || 0);
+    const safeTotal = isNaN(item.total)
+        ? parseFloat((safeQty * safeRate).toFixed(2))
+        : Number(item.total);
+    const safeImage = item.image || "images/default.png";
 
     const rate = Number(item.rate);
     const qty  = Number(item.qty);
@@ -1272,21 +1281,23 @@ function renderCart() {
 
     if (anyDiscount) {
       tr.innerHTML = `
-        <td>${item.name} (${item.unit})</td>
-        <td><input type="number" value="${qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
-        <td>₹ ${rate.toFixed(2)}</td>
-        <td>${disc}%</td>
-        <td>₹ ${discAmt.toFixed(2)}</td>
-        <td>₹ ${netRate.toFixed(2)}</td>
-        <td>₹ ${total.toFixed(2)}</td>
-        <td><button class="delete-btn" data-index="${idx}">Delete</button></td>
+        <td>${safeName} ${safeUnit ? "(" + safeUnit + ")" : ""}</td>
+<td><input type="number" value="${safeQty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
+<td>₹ ${safeRate.toFixed(2)}</td>
+<td>${disc}%</td>
+<td>₹ ${discAmt.toFixed(2)}</td>
+<td>₹ ${netRate.toFixed(2)}</td>
+<td>₹ ${safeTotal.toFixed(2)}</td>
+<td><button class="delete-btn" data-index="${idx}">Delete</button></td>
+
       `;
     } else {
       tr.innerHTML = `
-        <td>${item.name} (${item.unit})</td>
-        <td><input type="number" value="${qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
-        <td>₹ ${rate.toFixed(2)}</td>
-        <td>₹ ${total.toFixed(2)}</td>
+        <td>${safeName} ${safeUnit ? "(" + safeUnit + ")" : ""}</td>
+<td><input type="number" value="${safeQty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
+<td>₹ ${safeRate.toFixed(2)}</td>
+<td>₹ ${safeTotal.toFixed(2)}</td>
+
         <td><button class="delete-btn" data-index="${idx}">Delete</button></td>
       `;
     }
@@ -3391,6 +3402,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
