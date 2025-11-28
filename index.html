@@ -3094,7 +3094,7 @@ function saveCartToBackend() {
   const mobile = localStorage.getItem("userMobile");
   if (!mobile) return;
 
-  apiPost("getCartByMobile", { mobile })
+  apiPost("getCart", { mobile })
     .then(res => {
       const backendCart = res.cart || res.data || res.cartItems || [];
 
@@ -3176,7 +3176,7 @@ async function onUserLogin(mobile) {
   }
 
   // 1) Backend cart fetch
-  const backendRes = await apiPost("getCartByMobile", { mobile });
+  const backendRes = await apiPost("getCart", { mobile });
   const backendCart = backendRes.cart || [];
 
   // 2) Local cart read
@@ -3204,6 +3204,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
