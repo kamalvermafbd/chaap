@@ -1056,7 +1056,13 @@ function clearFilters() {
   renderMenu(menuItems);
 }
 function rebuildCart() {
-  cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+  // Read correct cart based on login state
+  if (!isLoggedIn()) {
+    cart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+  } else {
+    cart = JSON.parse(localStorage.getItem("cart") || "[]");
+  }
 
   cart = cart.map(item => {
     // quantity fix
@@ -1080,19 +1086,29 @@ function rebuildCart() {
     return item;
   });
 
-  // store updated clean cart
-  localStorage.setItem("cart", JSON.stringify(cart));
+  // store updated clean cart (guest vs logged-in)
+  if (!isLoggedIn()) {
+    localStorage.setItem("guestCart", JSON.stringify(cart));
+  } else {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }
 
   // rerender
   renderCart();
 }
+
 function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", variantIdFromBtn = "") {
 
   // STEP 1C – Normalize
   const cleanUnit = String(unit || "").trim().toLowerCase();
   const cleanName = String(name || "").trim().toLowerCase();
-
-  let stored = JSON.parse(localStorage.getItem("cart") || "[]");
+// Read correct cart based on login state
+let stored;
+if (!isLoggedIn()) {
+  stored = JSON.parse(localStorage.getItem("guestCart") || "[]");
+} else {
+  stored = JSON.parse(localStorage.getItem("cart") || "[]");
+}
 
   let itemId = "";
   let variantId = "";
@@ -1370,7 +1386,12 @@ function updateQty(index, qty) {
   item.total = total;
 
   // Save updated cart locally
+ // Save updated cart locally (guest vs logged-in)
+if (!isLoggedIn()) {
+  localStorage.setItem("guestCart", JSON.stringify(cart));
+} else {
   localStorage.setItem("cart", JSON.stringify(cart));
+}
 
   // Re-render UI
   renderCart();
@@ -1396,11 +1417,12 @@ function deleteCart() {
 
   // Guest mode: clear everything
   if (!isLoggedIn()) {
-    cart = [];
-    localStorage.removeItem("cart");
-    renderCart();
-    return;
-  }
+  cart = [];
+  localStorage.removeItem("guestCart");
+  renderCart();
+  return;
+}
+
 
   // Logged-in mode:
   // ❗ DO NOT delete backend cart
@@ -1414,13 +1436,17 @@ function deleteCart() {
   // No backend delete allowed here
 }
 
-
-  function removeItem(index) {
+function removeItem(index) {
   // Remove the item
   cart.splice(index, 1);
 
   // Save updated local cart
+  // Save updated cart locally (guest vs logged-in)
+if (!isLoggedIn()) {
+  localStorage.setItem("guestCart", JSON.stringify(cart));
+} else {
   localStorage.setItem("cart", JSON.stringify(cart));
+}
 
   // Re-render UI
   renderCart();
@@ -3201,7 +3227,8 @@ async function onUserLogin(mobile) {
   const merged = mergeCarts(localCart, backendCart);
 
  // 4) Save merged cart to backend (IMPORTANT)
-window.cart = merged;  // ⭐ Set the global cart first
+cart = merged;
+  window.cart = merged;  // ⭐ Set the global cart first
 await saveCartToBackend();  // ⭐ Call correct backend function
 localStorage.removeItem("guestCart");   // ❗ MISSING
 
@@ -3218,6 +3245,7 @@ localStorage.removeItem("guestCart");   // ❗ MISSING
 </script>
 </body>
 </html>
+
 
 
 
