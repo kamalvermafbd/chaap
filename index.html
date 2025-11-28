@@ -1185,7 +1185,7 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
   window.cart = stored;
 
   renderCart();
-  
+  saveCartToBackend();
   alert(`${name} (${unit}) added to cart`);
 }
 
@@ -2678,7 +2678,8 @@ function loginUser() {
 
       // ✅ Only THIS is correct
       onUserLogin(mobile);
-
+sendGuestCartToBackend();
+  
       document.getElementById("loggedEmail").innerText = res.email || "";
       document.getElementById("userInfoBox").style.display = "block";
 
@@ -3138,6 +3139,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
