@@ -1094,33 +1094,29 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
 
   let stored = JSON.parse(localStorage.getItem("cart") || "[]");
 
-  // Declare itemId & variantId FIRST (important)
   let itemId = "";
   let variantId = "";
 
-  // STEP 1B — If button already passed correct IDs, use them & SKIP mapping
+  // STEP 1B — If button already passed correct IDs, use them
   if (itemIdFromBtn) {
     itemId = itemIdFromBtn;
     variantId = variantIdFromBtn || "";
   } else {
-    // --- FIND REAL itemId & variantId EXACTLY AS PER SHEETS ---
+    // Find menu item
     const menuItem = (window.menuItems || []).find(
       m => String(m.name || "").trim().toLowerCase() === cleanName
     );
 
     if (!menuItem) {
-      console.warn("MenuItem not found:", name, unit);
+      console.warn("MenuItem NOT FOUND:", name, unit);
       return;
     }
 
     itemId = menuItem.itemId;
 
-    // SINGLE
     if ((menuItem.cat2 || "").toLowerCase() === "single") {
       variantId = "";
-    }
-    // MULTI
-    else {
+    } else {
       const variant = (window.cat_allocations || []).find(v =>
         String(v.itemId) === String(itemId) &&
         String(v.unit || "").trim().toLowerCase() === cleanUnit
@@ -1131,22 +1127,17 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
   }
 
   // --------------------------------------------
-  // Correct merge logic: only match by itemId + variantId
+  // Perfect merge logic using itemId + variantId
   const existing = stored.find(i => i.itemId == itemId && i.variantId == variantId);
 
   if (existing) {
     existing.qty = Number(existing.qty || 0) + 1;
-
-    // recalc totals properly
-    const total = existing.qty * existing.rate;
-    existing.total = parseFloat(total.toFixed(2));
+    existing.total = parseFloat((existing.qty * existing.rate).toFixed(2));
 
     if (existing.discPercent > 0) {
       const discAmt = (existing.rate * existing.discPercent) / 100;
       existing.discAmt = parseFloat(discAmt.toFixed(2));
-
-      const netRate = existing.rate - discAmt;
-      existing.netAmt = parseFloat((netRate * existing.qty).toFixed(2));
+      existing.netAmt = parseFloat(((existing.rate - discAmt) * existing.qty).toFixed(2));
     } else {
       delete existing.discAmt;
       delete existing.netAmt;
@@ -1161,6 +1152,11 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
     const discAmt = (rate * discPercent) / 100;
     const netRate = rate - discAmt;
 
+    // Get image from menuItems
+    const menuItem = (window.menuItems || []).find(
+      m => String(m.name || "").trim().toLowerCase() === cleanName
+    );
+
     let newItem = {
       name,
       unit,
@@ -1169,7 +1165,8 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
       total: parseFloat(total.toFixed(2)),
       itemId,
       variantId,
-      discPercent: Number(discPercent)
+      discPercent: Number(discPercent),
+      image: menuItem?.image || ""   // IMPORTANT
     };
 
     if (discPercent > 0) {
@@ -1180,12 +1177,19 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
     stored.push(newItem);
   }
 
+  // SAVE to localStorage only
   localStorage.setItem("cart", JSON.stringify(stored));
   cart = stored;
   window.cart = stored;
 
   renderCart();
-  saveCartToBackend();
+
+  // --------------------------------------------
+  // ❗ Save to backend ONLY WHEN LOGGED IN
+  if (isLoggedIn()) {
+    saveCartToBackend();
+  }
+
   alert(`${name} (${unit}) added to cart`);
 }
 
@@ -3139,6 +3143,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
