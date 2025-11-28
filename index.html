@@ -2677,35 +2677,9 @@ function loginUser() {
 
       localStorage.setItem("userMobile", mobile);
       localStorage.setItem("userEmail", res.email || "");
-onUserLogin(mobile);
 
-      
-
-      // ↓↓↓ MERGE BACKEND → LOCAL CART (ONLY ONE TIME) ↓↓↓
-      apiGet("getCart", { mobile })
-        .then(res => {
-          if (res.success && Array.isArray(res.cart)) {
-            const backendCart = res.cart;
-            const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-            backendCart.forEach(b => {
-              const match = localCart.find(
-                l => l.name === b.name && l.unit === b.unit
-              );
-              if (match) {
-                match.qty += Number(b.qty || 1);
-              } else {
-                localCart.push(b);
-              }
-            });
-
-            localStorage.setItem("cart", JSON.stringify(localCart));
-            cart = localCart;
-            renderCart();
-          }
-        })
-        .catch(err => console.error("Cart restore error:", err));
-
+      // ✅ Only THIS is correct
+      onUserLogin(mobile);
 
       document.getElementById("loggedEmail").innerText = res.email || "";
       document.getElementById("userInfoBox").style.display = "block";
@@ -2729,6 +2703,7 @@ onUserLogin(mobile);
       alert("Login error: " + err.message);
     });
 }
+
 
   function openMenuPageProperly(el) {
   activateMenu(el);
@@ -3164,6 +3139,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
