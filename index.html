@@ -1340,26 +1340,40 @@ function updateQty(index, qty) {
   const rate = Number(item.rate);       // MRP
   const disc = Number(item.discPercent || 0);
 
-  // --- SAFE CALCULATIONS (fixed rounding) ---
+  // --- SAFE CALCULATIONS ---
   const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
-  const netAmt  = parseFloat((rate - discAmt).toFixed(2));
-  const total   = parseFloat((netAmt * qty).toFixed(2));
+  const netRate = rate - discAmt;
+
+  // FIX: if no discount → use MRP total
+  const total = disc > 0
+    ? parseFloat((netRate * qty).toFixed(2))
+    : parseFloat((rate * qty).toFixed(2));
 
   // --- Store clean values ---
   item.qty = qty;
-  item.discAmt = discAmt;
-  item.netAmt  = netAmt;
-  item.total   = total;
 
-  // Save updated cart
+  if (disc > 0) {
+    item.discAmt = discAmt;
+    item.netAmt  = parseFloat(netRate.toFixed(2));
+  } else {
+    // remove unwanted fields
+    delete item.discAmt;
+    delete item.netAmt;
+  }
+
+  item.total = total;
+
+  // Save updated cart locally
   localStorage.setItem("cart", JSON.stringify(cart));
 
-  // Re-render table (safe)
+  // Re-render UI
   renderCart();
-    // STEP 5C — Backend update after qty change
-  saveCartToBackend();
-}
 
+  // --- BACKEND UPDATE ONLY IF LOGGED IN ---
+  if (isLoggedIn()) {
+    saveCartToBackend();
+  }
+}
 
     function openCheckout() {
       if (cart.length === 0) {
@@ -1378,17 +1392,20 @@ function deleteCart() {
     renderCart();
 }
 
-    function removeItem(index) {
-  // Remove from array
+  function removeItem(index) {
+  // Remove the item
   cart.splice(index, 1);
 
-  // Save updated array in localStorage (memory se bhi remove)
+  // Save updated local cart
   localStorage.setItem("cart", JSON.stringify(cart));
 
-  // Re-render cart UI
+  // Re-render UI
   renderCart();
-       // STEP 5D: Sync to backend
-  saveCartToBackend();
+
+  // --- Backend sync ONLY if logged-in ---
+  if (isLoggedIn()) {
+    saveCartToBackend();
+  }
 }
 
  function checkCustomerByMobile() {
@@ -3163,6 +3180,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
