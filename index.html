@@ -754,7 +754,8 @@ style="
   igstPercent: 0
 };
 
-    let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    let cart = sanitizeLocalCart(JSON.parse(localStorage.getItem("cart") || "[]"));
+
     function levenshtein(a, b) {
   a = a || ""; b = b || "";
   const m = a.length, n = b.length;
@@ -3084,6 +3085,11 @@ function computeCartChecksum(cartArr) {
 // Debounced + clean backend save
 function saveCartToBackend() {
   if (!isLoggedIn()) return;
+// ⛔ Block backend save during login merge
+if (window.__mergeInProgress) {
+  console.warn("Save blocked — merge in progress.");
+  return;
+}
 
   const mobile = localStorage.getItem("userMobile");
   if (!mobile) return;
@@ -3210,6 +3216,7 @@ function saveCartToBackend() {
 
       // ----- SAVE LOCALLY -----
       localStorage.setItem("cart", JSON.stringify(finalCart));
+      localStorage.setItem("cart", JSON.stringify(clean));
       cart = finalCart;
       window.cart = finalCart;
 
@@ -3293,6 +3300,41 @@ function mergeCarts(localCart, backendCart) {
   return Array.from(map.values());
 }
 
+  function sanitizeLocalCart(rawCart) {
+  if (!Array.isArray(rawCart)) return [];
+
+  return rawCart
+    .filter(i => i && i.itemId) // mandatory itemId
+    .map(i => {
+      const qty = Number(i.qty || 1);
+      const rate = Number(i.rate || 0);
+      const disc = Number(i.discPercent || 0);
+
+      const discAmt = disc > 0 ? parseFloat(((rate * disc) / 100).toFixed(2)) : 0;
+      const netRate = rate - discAmt;
+
+      const total = disc > 0
+        ? parseFloat((netRate * qty).toFixed(2))
+        : parseFloat((rate * qty).toFixed(2));
+
+      return {
+        ...i,
+        qty,
+        rate,
+        discPercent: disc,
+        itemId: i.itemId || "",
+        variantId: i.variantId || "",
+        total,
+        discAmt,
+        netAmt: disc > 0 ? netRate : undefined,
+        name: i.name || "",
+        unit: i.unit || "",
+        image: i.image || ""
+      };
+    });
+}
+
+  
 async function onUserLogin(mobile) {
 
   // 🔐 MERGE LOCK — prevent duplicate parallel execution
@@ -3329,6 +3371,7 @@ async function onUserLogin(mobile) {
 
     // 5) Save merged to local
     localStorage.setItem("cart", JSON.stringify(merged));
+    localStorage.setItem("cart", JSON.stringify(clean));
     cart = merged;
     window.cart = merged;
 
@@ -3348,6 +3391,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
