@@ -2263,6 +2263,7 @@ window.addEventListener("load", () => {
     const firstMenu = document.querySelector("#premiumMenu li");
     if (firstMenu) firstMenu.classList.add("active");
   }
+   loadUserCartOnStart();
 });
 
 function validateLoginMobile() {
@@ -2794,6 +2795,9 @@ function apiPost(api, data = {}) {
   }).then(res => res.json());
 }
 
+function isLoggedIn() {
+  return Boolean(localStorage.getItem("userMobile"));
+}
 
   
 function buildMenuCardHTML(item, idx) {
@@ -3206,6 +3210,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
