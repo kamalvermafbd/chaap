@@ -2790,14 +2790,10 @@ function hideAllPages() {
 function apiPost(api, data = {}) {
   return fetch(API_BASE + "?api=" + api, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  }).then(async res => {
-    const txt = await res.text();
-    try { return JSON.parse(txt); }
-    catch { return { success: false, raw: txt }; }
-  });
+    body: JSON.stringify(data)  // ??? ?? header ?? ????
+  }).then(res => res.json());
 }
+
 
   
 function buildMenuCardHTML(item, idx) {
@@ -3210,6 +3206,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
