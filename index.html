@@ -3277,96 +3277,99 @@ async function onUserLogin(mobile) {
     localStorage.setItem("sessionId", sessionId);
   }
 
-  // 1) Backend cart fetch
+  // -------------------------------
+  // 1) Fetch backend cart
+  // -------------------------------
   const backendRes = await apiPost("getCart", { mobile });
-  const backendCart = backendRes.cart || [];
-//  Clean backend cart completely
-const cleanedBackend = backendCart.map(i => ({
-  name: i.name || "",
-  unit: i.unit || "",
-  qty: Number(i.qty || 1),
-  rate: Number(i.rate || 0),
-  discPercent: Number(i.discPercent || 0),
-  itemId: i.itemId || "",
-  variantId: i.variantId || "",
-  image: i.image || ""
-}));
+  const backendCartRaw = backendRes.cart || [];
 
-backendCart.length = 0;
-cleanedBackend.forEach(x => backendCart.push(x));
+  const backendCart = backendCartRaw.map(i => ({
+    name: i.name || "",
+    unit: i.unit || "",
+    qty: Number(i.qty || 1),
+    rate: Number(i.rate || 0),
+    discPercent: Number(i.discPercent || 0),
+    itemId: i.itemId || "",
+    variantId: i.variantId || "",
+    image: i.image || ""
+  }));
 
-  
-  // 2) Local cart read
-  const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+  // -------------------------------
+  // 2) Read local guest cart
+  // -------------------------------
+  const guestRaw = JSON.parse(localStorage.getItem("guestCart") || "[]");
 
-  //  Clean local cart from backend-only fields
-const cleanedLocal = localCart.map(i => ({
-  name: i.name || "",
-  unit: i.unit || "",
-  qty: Number(i.qty || 1),
-  rate: Number(i.rate || 0),
-  discPercent: Number(i.discPercent || 0),
-  itemId: i.itemId || "",
-  variantId: i.variantId || "",
-  image: i.image || ""
-}));
+  const guestCart = guestRaw.map(i => ({
+    name: i.name || "",
+    unit: i.unit || "",
+    qty: Number(i.qty || 1),
+    rate: Number(i.rate || 0),
+    discPercent: Number(i.discPercent || 0),
+    itemId: i.itemId || "",
+    variantId: i.variantId || "",
+    image: i.image || ""
+  }));
 
-// replace localCart with cleaned version
-localCart.length = 0;
-cleanedLocal.forEach(x => localCart.push(x));
+  // -------------------------------
+  // 3A) Merge (guest + backend)
+  // -------------------------------
+  let merged = mergeCarts(guestCart, backendCart);  
 
+  // -------------------------------
+  // 3B) Add backend items NOT in merged
+  // -------------------------------
+  backendCart.forEach(b => {
+    const exists = merged.some(m =>
+      m.itemId == b.itemId && m.variantId == b.variantId
+    );
+    if (!exists) merged.push(b);
+  });
 
-  // 3) Merge
-  const merged = mergeCarts(localCart, backendCart);
-  // STEP 3C → Add backend items which are NOT duplicated
-backendCart.forEach(bItem => {
-  const exists = merged.some(m =>
-    m.itemId == bItem.itemId &&
-    m.variantId == bItem.variantId
-  );
+  // -------------------------------
+  // 3D) Final Normalize
+  // -------------------------------
+  const finalMerged = merged.map(item => {
+    item.qty = Number(item.qty || 1);
+    item.rate = Number(item.rate || 0);
+    item.discPercent = Number(item.discPercent || 0);
 
-  if (!exists) {
-    merged.push(bItem);
-  }
-});
+    const discAmt = (item.rate * item.discPercent) / 100;
+    const netRate = item.rate - discAmt;
 
+    item.discAmt = Number(discAmt.toFixed(2));
+    item.netAmt  = Number(netRate.toFixed(2));
 
- // 4) Save merged cart to backend (IMPORTANT)
-cart = merged;
-  window.cart = merged;  // ⭐ Set the global cart first
-await saveCartToBackend();  // ⭐ Call correct backend function
-localStorage.removeItem("guestCart");   // ❗ MISSING
+    item.total = item.discPercent > 0
+      ? Number((netRate * item.qty).toFixed(2))
+      : Number((item.rate * item.qty).toFixed(2));
 
+    return item;
+  });
 
-  // 5) Local cart update
-  localStorage.setItem("cart", JSON.stringify(merged));
-  window.cart = merged;
+  // -------------------------------
+  // 4) Save to backend
+  // -------------------------------
+  cart = finalMerged;
+  window.cart = finalMerged;
 
+  await saveCartToBackend(finalMerged);
+
+  // Clear guest cart
+  localStorage.removeItem("guestCart");
+
+  // -------------------------------
+  // 5) Save local mirror
+  // -------------------------------
+  localStorage.setItem("cart", JSON.stringify(finalMerged));
+
+  // -------------------------------
   // 6) Render UI
+  // -------------------------------
   renderCart();
 }
-
 
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
