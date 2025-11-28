@@ -754,7 +754,7 @@ style="
   igstPercent: 0
 };
 
-    
+    let cart = sanitizeLocalCart(JSON.parse(localStorage.getItem("cart") || "[]"));
 
     function levenshtein(a, b) {
   a = a || ""; b = b || "";
@@ -902,33 +902,9 @@ function apiGet(api, params = {}) {
     headers: { "Accept": "application/json" }
   }).then(res => res.json());
 }
-console.log("➡️ Calling getMenu...");
 apiGet("getMenu")
-  .then(res => {
-    console.log("📥 getMenu response:", res);
-    if (!res || !res.menu) {
-      console.error("❌ getMenu returned no menu!");
-    }
-    renderMenu(res.menu);
-  })
-  .catch(err => {
-    console.error("❌ Menu load error:", err);
-  });
-
-console.log("➡️ Calling getCatAllocations...");
-apiGet("getCatAllocations")
-  .then(res => {
-    console.log("📥 catAlloc response:", res);
-    window.cat_allocations = res.cat_allocations || [];
-  })
-  .catch(err => console.error("❌ cat allocation load error:", err));
-
-console.log("➡️ Calling getRestaurantInfo...");
-apiGet("getRestaurantInfo")
-  .then(res => {
-    console.log("📥 restaurantInfo:", res);
-    // rest code as it was...
-
+  .then(res => renderMenu(res.menu))
+  .catch(err => console.error("Menu load error:", err));
 // LOAD cat_allocation sheet
 apiGet("getCatAllocations")
   .then(res => {
@@ -1276,15 +1252,6 @@ function renderCart() {
   //               BUILD CART TABLE ROWS
   // ================================================
   cart.forEach((item, idx) => {
-    // ===== SAFE FALLBACKS (Step-5B) =====
-    const safeName  = item.name  || "Item";
-    const safeUnit  = item.unit  || "";
-    const safeQty   = Number(item.qty || 1);
-    const safeRate  = Number(item.rate || 0);
-    const safeTotal = isNaN(item.total)
-        ? parseFloat((safeQty * safeRate).toFixed(2))
-        : Number(item.total);
-    const safeImage = item.image || "images/default.png";
 
     const rate = Number(item.rate);
     const qty  = Number(item.qty);
@@ -1305,23 +1272,21 @@ function renderCart() {
 
     if (anyDiscount) {
       tr.innerHTML = `
-        <td>${safeName} ${safeUnit ? "(" + safeUnit + ")" : ""}</td>
-<td><input type="number" value="${safeQty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
-<td>₹ ${safeRate.toFixed(2)}</td>
-<td>${disc}%</td>
-<td>₹ ${discAmt.toFixed(2)}</td>
-<td>₹ ${netRate.toFixed(2)}</td>
-<td>₹ ${safeTotal.toFixed(2)}</td>
-<td><button class="delete-btn" data-index="${idx}">Delete</button></td>
-
+        <td>${item.name} (${item.unit})</td>
+        <td><input type="number" value="${qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
+        <td>₹ ${rate.toFixed(2)}</td>
+        <td>${disc}%</td>
+        <td>₹ ${discAmt.toFixed(2)}</td>
+        <td>₹ ${netRate.toFixed(2)}</td>
+        <td>₹ ${total.toFixed(2)}</td>
+        <td><button class="delete-btn" data-index="${idx}">Delete</button></td>
       `;
     } else {
       tr.innerHTML = `
-        <td>${safeName} ${safeUnit ? "(" + safeUnit + ")" : ""}</td>
-<td><input type="number" value="${safeQty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
-<td>₹ ${safeRate.toFixed(2)}</td>
-<td>₹ ${safeTotal.toFixed(2)}</td>
-
+        <td>${item.name} (${item.unit})</td>
+        <td><input type="number" value="${qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
+        <td>₹ ${rate.toFixed(2)}</td>
+        <td>₹ ${total.toFixed(2)}</td>
         <td><button class="delete-btn" data-index="${idx}">Delete</button></td>
       `;
     }
@@ -2906,8 +2871,7 @@ function buildMenuCardHTML(item, idx) {
 
     let variantsHTML = "";
 
-   (item.variants || []).forEach(v => {
-
+    item.variants.forEach(v => {
 
       // FINAL PRICE CALCULATION (CAT_ALLOCATION SHEET)
       const mrp  = Number(v.price);                  // From cat_allocation sheet
@@ -3252,7 +3216,7 @@ if (window.__mergeInProgress) {
 
       // ----- SAVE LOCALLY -----
       localStorage.setItem("cart", JSON.stringify(finalCart));
-      
+      localStorage.setItem("cart", JSON.stringify(clean));
       cart = finalCart;
       window.cart = finalCart;
 
@@ -3277,6 +3241,7 @@ function getBackendCart(mobile) {
       return [];
     });
 }
+window.__mergeInProgress = false;
 
 function mergeCarts(localCart, backendCart) {
 
@@ -3335,10 +3300,44 @@ function mergeCarts(localCart, backendCart) {
   return Array.from(map.values());
 }
 
+  function sanitizeLocalCart(rawCart) {
+  if (!Array.isArray(rawCart)) return [];
+
+  return rawCart
+    .filter(i => i && i.itemId) // mandatory itemId
+    .map(i => {
+      const qty = Number(i.qty || 1);
+      const rate = Number(i.rate || 0);
+      const disc = Number(i.discPercent || 0);
+
+      const discAmt = disc > 0 ? parseFloat(((rate * disc) / 100).toFixed(2)) : 0;
+      const netRate = rate - discAmt;
+
+      const total = disc > 0
+        ? parseFloat((netRate * qty).toFixed(2))
+        : parseFloat((rate * qty).toFixed(2));
+
+      return {
+        ...i,
+        qty,
+        rate,
+        discPercent: disc,
+        itemId: i.itemId || "",
+        variantId: i.variantId || "",
+        total,
+        discAmt,
+        netAmt: disc > 0 ? netRate : undefined,
+        name: i.name || "",
+        unit: i.unit || "",
+        image: i.image || ""
+      };
+    });
+}
+
   
 async function onUserLogin(mobile) {
 
-  //  MERGE LOCK — prevent duplicate parallel execution
+  // 🔐 MERGE LOCK — prevent duplicate parallel execution
   if (window.__mergeInProgress) {
     console.warn("Merge already running — skipped duplicate.");
     return;
@@ -3372,7 +3371,7 @@ async function onUserLogin(mobile) {
 
     // 5) Save merged to local
     localStorage.setItem("cart", JSON.stringify(merged));
-    
+    localStorage.setItem("cart", JSON.stringify(clean));
     cart = merged;
     window.cart = merged;
 
@@ -3383,7 +3382,7 @@ async function onUserLogin(mobile) {
     console.error("Merge/Login Error:", err);
 
   } finally {
-    // Unlock merge
+    // 🔓 Unlock merge
     window.__mergeInProgress = false;
   }
 }
@@ -3392,19 +3391,6 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
