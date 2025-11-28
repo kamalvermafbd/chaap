@@ -755,7 +755,10 @@ style="
 };
 let cart = [];   // start empty
 
- 
+ // --- CART SAVE LOCK SYSTEM (Fix race condition) ---
+let cartSaveLock = false;
+let cartSaveQueued = false;
+
     function levenshtein(a, b) {
   a = a || ""; b = b || "";
   const m = a.length, n = b.length;
@@ -3091,13 +3094,21 @@ document.addEventListener("click", function (e) {
   removeItem(index);
 });
 
-function saveCartToBackend() {
+async function saveCartToBackend() {
 
   // Only when logged in (important safety)
   if (!isLoggedIn()) return;
 
   const mobile = localStorage.getItem("userMobile");
-  if (!mobile) return;   // double safety
+  if (!mobile) return;
+
+  // ---- QUEUE SYSTEM START (RACE FIX) ----
+  if (window.cartSaveLock) {
+    window.cartSaveQueued = true;
+    return;
+  }
+  window.cartSaveLock = true;
+  // ---- QUEUE SYSTEM END ----
 
   // Ensure stable sessionId
   let sessionId = localStorage.getItem("sessionId");
@@ -3106,23 +3117,39 @@ function saveCartToBackend() {
     localStorage.setItem("sessionId", sessionId);
   }
 
-  // Ensure every cart item has mandatory IDs
+  // FINAL cleaned cart (mandatory IDs + correct types)
   const cleanedCart = cart.map(item => ({
     ...item,
     itemId: item.itemId || "",
-    variantId: item.variantId || ""
+    variantId: item.variantId || "",
+    qty: Number(item.qty || 1),
+    rate: Number(item.rate || 0),
+    discPercent: Number(item.discPercent || 0)
   }));
 
-  apiPost("saveCart", {
-    mobile,
-    email: localStorage.getItem("userEmail") || "",
-    sessionId,
-    cartItems: cleanedCart
-  })
-  .then(res => console.log("Cart Save OK:", res))
-  .catch(err => console.error("Cart Save Error:", err));
-}
+  try {
+    await apiPost("saveCart", {
+      mobile,
+      email: localStorage.getItem("userEmail") || "",
+      sessionId,
+      cartItems: cleanedCart
+    });
 
+  } catch (err) {
+    console.error("Cart Save Error:", err);
+
+  } finally {
+
+    // Unlock
+    window.cartSaveLock = false;
+
+    // If another save happened during lock → run again
+    if (window.cartSaveQueued) {
+      window.cartSaveQueued = false;
+      saveCartToBackend(); // re-run
+    }
+  }
+}
 
 
 
@@ -3245,6 +3272,7 @@ localStorage.removeItem("guestCart");   // ❗ MISSING
 </script>
 </body>
 </html>
+
 
 
 
