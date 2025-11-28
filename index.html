@@ -3252,7 +3252,7 @@ function getBackendCart(mobile) {
       return [];
     });
 }
-window.__mergeInProgress = false;
+//window.__mergeInProgress = false;
 
 function mergeCarts(localCart, backendCart) {
 
@@ -3393,7 +3393,7 @@ async function onUserLogin(mobile) {
     console.error("Merge/Login Error:", err);
 
   } finally {
-    // 🔓 Unlock merge
+    // Unlock merge
     window.__mergeInProgress = false;
   }
 }
@@ -3402,6 +3402,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
