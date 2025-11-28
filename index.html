@@ -2795,7 +2795,11 @@ function apiPost(api, data = {}) {
 }
 
 function isLoggedIn() {
-  return Boolean(localStorage.getItem("userMobile"));
+  const mob = localStorage.getItem("userMobile");
+  if (!mob) return false;
+
+  // basic 10-digit mobile check
+  return /^[0-9]{10}$/.test(mob);
 }
 
   
@@ -3230,6 +3234,7 @@ function getBackendCart(mobile) {
       return [];
     });
 }
+window.__mergeInProgress = false;
 
 function mergeCarts(localCart, backendCart) {
 
@@ -3290,67 +3295,59 @@ function mergeCarts(localCart, backendCart) {
 
 async function onUserLogin(mobile) {
 
-  // ⭐ Ensure sessionId exists
-  let sessionId = localStorage.getItem("sessionId");
-  if (!sessionId) {
-    sessionId = "SESS-" + Date.now();
-    localStorage.setItem("sessionId", sessionId);
+  // 🔐 MERGE LOCK — prevent duplicate parallel execution
+  if (window.__mergeInProgress) {
+    console.warn("Merge already running — skipped duplicate.");
+    return;
   }
+  window.__mergeInProgress = true;
 
-  // 1) Backend cart fetch
-  const backendRes = await apiPost("getCart", { mobile });
-  const backendCart = backendRes.cart || [];
+  try {
+    // Ensure sessionId
+    let sessionId = localStorage.getItem("sessionId");
+    if (!sessionId) {
+      sessionId = "SESS-" + Date.now();
+      localStorage.setItem("sessionId", sessionId);
+    }
 
-  // 2) Local cart read
-  const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+    // 1) Fetch backend cart
+    const backendRes = await apiPost("getCart", { mobile });
+    const backendCart = backendRes.cart || [];
 
-  // 3) Merge
-  const merged = mergeCarts(localCart, backendCart);
+    // 2) Read guest local cart
+    const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-  // 4) Save merged cart to backend
-  await apiPost("saveCart", {
-    mobile,
-    sessionId,   // ⭐ use variable, not re-read
-    cartItems: merged
-  });
+    // 3) Merge both carts
+    const merged = mergeCarts(localCart, backendCart);
 
-  // 5) Local cart update
-  localStorage.setItem("cart", JSON.stringify(merged));
-  window.cart = merged;
+    // 4) Save merged to backend
+    await apiPost("saveCart", {
+      mobile,
+      sessionId,
+      cartItems: merged
+    });
 
-  // 6) Render UI
-  renderCart();
+    // 5) Save merged to local
+    localStorage.setItem("cart", JSON.stringify(merged));
+    cart = merged;
+    window.cart = merged;
+
+    // 6) Render UI
+    renderCart();
+
+  } catch (err) {
+    console.error("Merge/Login Error:", err);
+
+  } finally {
+    // 🔓 Unlock merge
+    window.__mergeInProgress = false;
+  }
 }
 
 
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
