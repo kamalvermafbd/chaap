@@ -1876,37 +1876,35 @@ function logoutUser() {
   document.getElementById("userInfoBox").style.display = "none";
   document.getElementById("loggedEmail").innerText = "";
 
-    // Show Login + Signup buttons again
+  // Show Login + Signup buttons again
   document.querySelector("button[onclick='openLogin()']").style.display = "inline-block";
   document.querySelector("button[onclick='openSignup()']").style.display = "inline-block";
 
-  //  Hide Logout button
+  // Hide Logout button
   document.getElementById("logoutBtn").style.display = "none";
-document.getElementById("signupLabelBox").style.display = "block";
-document.getElementById("hamburgerBtn").style.display = "none";
+  document.getElementById("signupLabelBox").style.display = "block";
+  document.getElementById("hamburgerBtn").style.display = "none";
 
-  //  Hide Navigation on Logout
-  document.getElementById("leftNav").style.display = "none";  
-  
-document.getElementById("menuWrapper").style.display = "block";
-document.getElementById("pageWrapper").style.display = "none";
+  // Hide Navigation on Logout
+  document.getElementById("leftNav").style.display = "none";
 
-//  Hide all sub pages
-document.getElementById("profilePage").style.display = "none";
-document.getElementById("ordersPage").style.display = "none";
-document.getElementById("offersPage").style.display = "none";
+  document.getElementById("menuWrapper").style.display = "block";
+  document.getElementById("pageWrapper").style.display = "none";
 
-//  Reset active menu highlight if any
-document.querySelectorAll("#premiumMenu li").forEach(li => li.classList.remove("active"));
-document.getElementById("mainContent").style.marginLeft = "0";
-localStorage.removeItem("userMobile");
+  // Hide all sub pages
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("ordersPage").style.display = "none";
+  document.getElementById("offersPage").style.display = "none";
+
+  document.querySelectorAll("#premiumMenu li").forEach(li => li.classList.remove("active"));
+  document.getElementById("mainContent").style.marginLeft = "0";
+
+  // Remove only login details
+  localStorage.removeItem("userMobile");
+
   alert("Logged out successfully.");
-  // STEP-5A — Clear cart on logout
-localStorage.removeItem("cart");
-cart = [];
-renderCart();
-
 }
+
 
 </script>
 <script>
@@ -3139,6 +3137,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
