@@ -2882,7 +2882,8 @@ function buildMenuCardHTML(item, idx) {
 
     let variantsHTML = "";
 
-    item.variants.forEach(v => {
+   (item.variants || []).forEach(v => {
+
 
       // FINAL PRICE CALCULATION (CAT_ALLOCATION SHEET)
       const mrp  = Number(v.price);                  // From cat_allocation sheet
@@ -3401,6 +3402,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
