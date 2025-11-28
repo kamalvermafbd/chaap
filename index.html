@@ -1178,7 +1178,13 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
   }
 
   // SAVE to localStorage only
-  localStorage.setItem("cart", JSON.stringify(stored));
+  // ⭐ Guest users MUST save here
+if (!isLoggedIn()) {
+    localStorage.setItem("guestCart", JSON.stringify(stored));
+} else {
+    localStorage.setItem("cart", JSON.stringify(stored));
+}
+
   cart = stored;
   window.cart = stored;
 
@@ -3212,6 +3218,7 @@ localStorage.removeItem("guestCart");   // ❗ MISSING
 </script>
 </body>
 </html>
+
 
 
 
