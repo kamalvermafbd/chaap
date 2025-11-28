@@ -3100,9 +3100,28 @@ function getBackendCart(mobile) {
     });
 }
 
+function mergeCarts(localCart, backendCart) {
+  let finalCart = [...backendCart];
+
+  localCart.forEach(localItem => {
+    const match = finalCart.find(
+      x => x.itemId == localItem.itemId && x.variantId == localItem.variantId
+    );
+
+    if (match) {
+      match.qty = Number(match.qty) + Number(localItem.qty);  // qty merge
+      match.total = match.qty * match.rate;                   // total recalc
+    } else {
+      finalCart.push(localItem); // new item add
+    }
+  });
+
+  return finalCart;
+}
 
 </script>
 </body>
 </html>
+
 
 
