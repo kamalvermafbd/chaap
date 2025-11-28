@@ -3086,9 +3086,23 @@ localStorage.setItem("sessionId", sessionId);
     })
     .catch(err => console.error("Load cart on start error:", err));
 }
+function getBackendCart(mobile) {
+  return apiPost("getCart", { mobile })
+    .then(res => {
+      if (res.success && Array.isArray(res.data)) {
+        return res.data;   // ← backend cart array return
+      }
+      return [];
+    })
+    .catch(err => {
+      console.error("Fetch Backend Cart Error:", err);
+      return [];
+    });
+}
 
 
 </script>
 </body>
 </html>
+
 
