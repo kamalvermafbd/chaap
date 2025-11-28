@@ -3102,21 +3102,37 @@ function getBackendCart(mobile) {
 }
 
 function mergeCarts(localCart, backendCart) {
-  let finalCart = [...backendCart];
+  let finalCart = [];
 
+  const map = new Map();
+
+  // Step 1: Backend items safe
+  backendCart.forEach(item => {
+    const key = `${item.itemId}_${item.variantId}`;
+    map.set(key, { ...item });
+  });
+
+  // Step 2: Local cart merge
   localCart.forEach(localItem => {
-    const match = finalCart.find(
-      x => x.itemId == localItem.itemId && x.variantId == localItem.variantId
-    );
+    const key = `${localItem.itemId}_${localItem.variantId}`;
 
-    if (match) {
-      match.qty = Number(match.qty) + Number(localItem.qty);  // qty merge
-      match.total = match.qty * match.rate;                   // total recalc
+    if (map.has(key)) {
+      let exist = map.get(key);
+      exist.qty = Number(exist.qty) + Number(localItem.qty);
+      exist.total = exist.qty * exist.rate;
+      map.set(key, exist);
     } else {
-      finalCart.push(localItem); // new item add
+      map.set(key, {
+        ...localItem,
+        cartId: "",      
+        sessionId: "",
+        mobile: "",
+        timestamp: ""
+      });
     }
   });
 
+  map.forEach(item => finalCart.push(item));
   return finalCart;
 }
 async function onUserLogin(mobile) {
@@ -3148,6 +3164,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
