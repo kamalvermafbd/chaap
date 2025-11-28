@@ -3252,7 +3252,6 @@ function getBackendCart(mobile) {
       return [];
     });
 }
-//window.__mergeInProgress = false;
 
 function mergeCarts(localCart, backendCart) {
 
@@ -3348,7 +3347,7 @@ function mergeCarts(localCart, backendCart) {
   
 async function onUserLogin(mobile) {
 
-  // 🔐 MERGE LOCK — prevent duplicate parallel execution
+  //  MERGE LOCK — prevent duplicate parallel execution
   if (window.__mergeInProgress) {
     console.warn("Merge already running — skipped duplicate.");
     return;
@@ -3402,6 +3401,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
