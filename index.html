@@ -3188,17 +3188,17 @@ async function onUserLogin(mobile) {
   const backendCart = backendRes.cart || [];
 
   // 2) Local cart read
-  const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+  const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+
 
   // 3) Merge
   const merged = mergeCarts(localCart, backendCart);
 
-  // 4) Save merged cart to backend
-  await apiPost("saveCart", {
-    mobile,
-    sessionId,   // ⭐ use variable, not re-read
-    cartItems: merged
-  });
+ // 4) Save merged cart to backend (IMPORTANT)
+window.cart = merged;  // ⭐ Set the global cart first
+await saveCartToBackend();  // ⭐ Call correct backend function
+localStorage.removeItem("guestCart");   // ❗ MISSING
+
 
   // 5) Local cart update
   localStorage.setItem("cart", JSON.stringify(merged));
@@ -3212,6 +3212,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
