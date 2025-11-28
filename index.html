@@ -2677,6 +2677,7 @@ function loginUser() {
 
       localStorage.setItem("userMobile", mobile);
       localStorage.setItem("userEmail", res.email || "");
+onUserLogin(mobile);
 
       sendGuestCartToBackend();
 
@@ -3147,6 +3148,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
