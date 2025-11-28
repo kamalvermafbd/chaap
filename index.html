@@ -2731,26 +2731,26 @@ function loginUser() {
         return;
       }
 
+      // Store identity
       localStorage.setItem("userMobile", mobile);
       localStorage.setItem("userEmail", res.email || "");
 
-      // ✅ Only THIS is correct
+      // 🚀 CORRECT: onUserLogin handles ALL merge + guest transfer
       onUserLogin(mobile);
-sendGuestCartToBackend();
-  
+
+      // ❌ WRONG: Do NOT call sendGuestCartToBackend() here
+      // sendGuestCartToBackend();  <-- REMOVE THIS LINE COMPLETELY
+
+      // UI updates
       document.getElementById("loggedEmail").innerText = res.email || "";
       document.getElementById("userInfoBox").style.display = "block";
 
-      // hide login + signup
       document.querySelector("button[onclick='openLogin()']").style.display = "none";
       document.querySelector("button[onclick='openSignup()']").style.display = "none";
       document.getElementById("signupLabelBox").style.display = "none";
 
-      // show logout
       document.getElementById("logoutBtn").style.display = "inline-block";
       document.getElementById("hamburgerBtn").style.display = "block";
-
-      // show left nav
       document.getElementById("leftNav").style.display = "block";
 
       closeLogin();
@@ -3249,6 +3249,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
