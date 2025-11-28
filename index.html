@@ -758,6 +758,8 @@ let cart = [];   // start empty
  // --- CART SAVE LOCK SYSTEM (Fix race condition) ---
 let cartSaveLock = false;
 let cartSaveQueued = false;
+// ---- ADD-TO-CART CLICK LOCK ----
+let addClickLock = false;
 
     function levenshtein(a, b) {
   a = a || ""; b = b || "";
@@ -1101,6 +1103,10 @@ function rebuildCart() {
 }
 
 function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", variantIdFromBtn = "") {
+// --- Prevent spam clicking ---
+if (addClickLock) return;
+addClickLock = true;
+setTimeout(() => addClickLock = false, 150);
 
   // STEP 1C – Normalize
   const cleanUnit = String(unit || "").trim().toLowerCase();
@@ -3280,6 +3286,7 @@ localStorage.removeItem("guestCart");   // ❗ MISSING
 </script>
 </body>
 </html>
+
 
 
 
