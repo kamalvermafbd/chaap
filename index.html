@@ -760,6 +760,9 @@ let cartSaveLock = false;
 let cartSaveQueued = false;
 // ---- ADD-TO-CART CLICK LOCK ----
 let addClickLock = false;
+// --- Debounce variables (qty/update/delete) ---
+let qtyDebounce = null;
+let deleteDebounce = null;
 
     function levenshtein(a, b) {
   a = a || ""; b = b || "";
@@ -3286,6 +3289,7 @@ localStorage.removeItem("guestCart");   // ❗ MISSING
 </script>
 </body>
 </html>
+
 
 
 
