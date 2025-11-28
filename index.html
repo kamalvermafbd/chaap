@@ -2057,8 +2057,7 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
       delete existing.netAmt;
     }
   }
-
-  // NEW ITEM
+       // NEW ITEM
   else {
     const qty = 1;
 
@@ -2092,9 +2091,9 @@ let newItem = {
  // --- FIX: Always store name + unit ---
     
     stored.push(newItem);
-  }
-
-  localStorage.setItem("cart", JSON.stringify(stored));
+    }
+localStorage.setItem("cart", JSON.stringify(stored));  // <-- Add this line here
+  
   cart = stored;
   window.cart = stored;
 saveCartToBackend(cart);
@@ -4146,3 +4145,4 @@ function mergeCartWithMenuData() {
 </script>
 </body>
 </html>
+
