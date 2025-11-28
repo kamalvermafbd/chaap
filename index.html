@@ -3336,6 +3336,8 @@ function mergeCarts(localCart, backendCart) {
 }
 
   function sanitizeLocalCart(rawCart) {
+
+
   if (!Array.isArray(rawCart)) return [];
 
   return rawCart
@@ -3368,6 +3370,9 @@ function mergeCarts(localCart, backendCart) {
       };
     });
 }
+// After function declaration
+cart = sanitizeLocalCart(cart);
+localStorage.setItem("cart", JSON.stringify(cart));
 
   
 async function onUserLogin(mobile) {
@@ -3426,6 +3431,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
