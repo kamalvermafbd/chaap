@@ -1235,6 +1235,39 @@ function renderCart() {
   const tbody = document.querySelector('#cartTable tbody');
   const thead = document.querySelector('#cartTable thead tr');
   tbody.innerHTML = "";
+// ---- SUPER SANITIZER (Prevents render bugs) ----
+cart = cart.map(item => {
+  const menuItem = (window.menuItems || []).find(m => m.itemId == item.itemId);
+
+  // 1) NAME FIX
+  if (!item.name && menuItem?.name) item.name = menuItem.name;
+
+  // 2) UNIT FIX (for Multi items)
+  if (!item.unit) {
+    const variant = (window.cat_allocations || []).find(v => v.variantId == item.variantId);
+    if (variant) item.unit = variant.unit;
+  }
+
+  // 3) IMAGE FIX
+  if (!item.image && menuItem?.image) item.image = menuItem.image;
+
+  // 4) TYPE FIX (force correct numeric)
+  item.qty = Number(item.qty || 1);
+  item.rate = Number(item.rate || 0);
+  item.discPercent = Number(item.discPercent || 0);
+
+  // 5) TOTAL RECALC
+  const discAmt = (item.rate * item.discPercent) / 100;
+  item.discAmt = Number(discAmt.toFixed(2));
+
+  const netRate = item.rate - item.discAmt;
+
+  item.total = item.discPercent > 0 
+    ? Number((netRate * item.qty).toFixed(2))
+    : Number((item.rate * item.qty).toFixed(2));
+
+  return item;
+});
 
   // ===== FIX 1: Merge missing fields from menuItems =====
   cart = cart.map(item => {
@@ -1259,26 +1292,23 @@ function renderCart() {
   const anyDiscount = cart.some(i => Number(i.discPercent) > 0);
 
   // ===== Build header =====
-  if (anyDiscount) {
-    thead.innerHTML = `
-      <th>Item</th>
-      <th>Qty</th>
-      <th>Rate (MRP)</th>
-      <th>Disc %</th>
-      <th>Disc Amt</th>
-      <th>Net Amt</th>
-      <th>Total</th>
-      <th>Action</th>
-    `;
-  } else {
-    thead.innerHTML = `
-      <th>Item</th>
-      <th>Qty</th>
-      <th>Rate (MRP)</th>
-      <th>Total</th>
-      <th>Action</th>
-    `;
-  }
+  // ===== PERMANENT FULL HEADER (no flicker) =====
+thead.innerHTML = `
+  <th>Item</th>
+  <th>Qty</th>
+  <th>Rate (MRP)</th>
+  <th class="col-disc">Disc %</th>
+  <th class="col-disc">Disc Amt</th>
+  <th class="col-disc">Net Amt</th>
+  <th>Total</th>
+  <th>Action</th>
+`;
+// ===== Hide / Show discount columns =====
+const showDisc = cart.some(i => Number(i.discPercent) > 0);
+
+document.querySelectorAll(".col-disc").forEach(col => {
+  col.style.display = showDisc ? "table-cell" : "none";
+});
 
   let grandTotal = 0;
 
@@ -1304,26 +1334,19 @@ function renderCart() {
 
     const tr = document.createElement("tr");
 
-    if (anyDiscount) {
-      tr.innerHTML = `
-        <td>${item.name} (${item.unit})</td>
-        <td><input type="number" value="${qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
-        <td>₹ ${rate.toFixed(2)}</td>
-        <td>${disc}%</td>
-        <td>₹ ${discAmt.toFixed(2)}</td>
-        <td>₹ ${netRate.toFixed(2)}</td>
-        <td>₹ ${total.toFixed(2)}</td>
-        <td><button class="delete-btn" data-index="${idx}">Delete</button></td>
-      `;
-    } else {
-      tr.innerHTML = `
-        <td>${item.name} (${item.unit})</td>
-        <td><input type="number" value="${qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
-        <td>₹ ${rate.toFixed(2)}</td>
-        <td>₹ ${total.toFixed(2)}</td>
-        <td><button class="delete-btn" data-index="${idx}">Delete</button></td>
-      `;
-    }
+    tr.innerHTML = `
+  <td>${item.name} (${item.unit})</td>
+  <td><input type="number" value="${qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
+  <td>₹ ${rate.toFixed(2)}</td>
+
+  <td class="col-disc">${disc}%</td>
+  <td class="col-disc">₹ ${discAmt.toFixed(2)}</td>
+  <td class="col-disc">₹ ${netRate.toFixed(2)}</td>
+
+  <td>₹ ${total.toFixed(2)}</td>
+  <td><button class="delete-btn" data-index="${idx}">Delete</button></td>
+`;
+
 
     tbody.appendChild(tr);
   });
@@ -3325,6 +3348,7 @@ localStorage.removeItem("guestCart");   // ❗ MISSING
 </script>
 </body>
 </html>
+
 
 
 
