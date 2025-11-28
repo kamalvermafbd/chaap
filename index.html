@@ -2806,13 +2806,6 @@ function apiPost(api, data = {}) {
   }).then(res => res.json());
 }
 
-function isLoggedIn() {
-  const mob = localStorage.getItem("userMobile");
-  if (!mob) return false;
-
-  // basic 10-digit mobile check
-  return /^[0-9]{10}$/.test(mob);
-}
 
   
 function buildMenuCardHTML(item, idx) {
@@ -3401,6 +3394,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
