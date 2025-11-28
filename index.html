@@ -1269,24 +1269,7 @@ cart = cart.map(item => {
   return item;
 });
 
-  // ===== FIX 1: Merge missing fields from menuItems =====
-  cart = cart.map(item => {
-    const menuItem = (window.menuItems || []).find(m => m.itemId == item.itemId);
-
-    // name fallback
-    if (!item.name && menuItem?.name) item.name = menuItem.name;
-
-    // unit fallback (for multi items find variant)
-    if (!item.unit) {
-      const variant = (window.cat_allocations || []).find(v => v.variantId == item.variantId);
-      if (variant) item.unit = variant.unit;
-    }
-
-    // image fallback
-    if (!item.image && menuItem?.image) item.image = menuItem.image;
-
-    return item;
-  });
+ 
 
   // ===== Check discount usage =====
   const anyDiscount = cart.some(i => Number(i.discPercent) > 0);
@@ -3348,6 +3331,7 @@ localStorage.removeItem("guestCart");   // ❗ MISSING
 </script>
 </body>
 </html>
+
 
 
 
