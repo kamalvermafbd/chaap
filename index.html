@@ -771,7 +771,7 @@ style="
   igstPercent: 0
 };
 let cart = [];   // start empty
-let deletedKeys = new Set();
+
 
  // --- CART SAVE LOCK SYSTEM (Fix race condition) ---
 let cartSaveLock = false;
@@ -3455,6 +3455,7 @@ if (JSON.stringify(latest) !== JSON.stringify(cart)) {
 </script>
 </body>
 </html>
+
 
 
 
