@@ -1652,7 +1652,7 @@ function updateQty(index, qty) {
 
     // --- Re-render cards instantly ---
     renderCart();
-    setTimeout(() => renderCart(), 30); // tiny UI stabilizer
+     // tiny UI stabilizer
 
     // --- Backend sync for logged-in ---
     if (isLoggedIn()) {
@@ -3697,6 +3697,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
