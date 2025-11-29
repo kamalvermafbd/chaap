@@ -448,103 +448,7 @@ body::before {
   transform: translateX(0);
 }
 /// for card layout
-    /* CART CARDS ALWAYS VISIBLE (desktop + mobile) */
-#cartCards {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 10px;
-}
-
-/* single card */
-.cart-card {
-  display: flex;
-  gap: 12px;
-  background: #fff;
-  border-radius: 12px;
-  padding: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  align-items: flex-start;
-}
-
-/* image left */
-.cart-card .thumb {
-  width: 80px;
-  height: 80px;
-  border-radius: 10px;
-  object-fit: cover;
-  background: #f4f4f4;
-}
-
-/* content middle */
-.cart-card .content {
-  flex: 1;
-}
-
-/* title + delete icon */
-.cart-card .title-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 700;
-  font-size: 15px;
-  margin-bottom: 6px;
-}
-
-/* delete circle button */
-.cart-delete {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #eee;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-/* qty controls (A style) */
-.qty-controls {
-  margin-top: 4px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.qty-controls button {
-  width: 28px;
-  height: 28px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: #fff;
-  cursor: pointer;
-  font-size: 18px;
-  line-height: 1;
-}
-.qty-controls input {
-  width: 42px;
-  height: 28px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  text-align: center;
-  font-size: 14px;
-}
-
-/* price lines */
-.card-line {
-  font-size: 13px;
-  color: #444;
-  margin: 2px 0;
-}
-
-/* totals block */
-.total-line {
-  font-weight: 800;
-  margin-top: 3px;
-  font-size: 14px;
-}
-
+    
 //new css for card
     /* ============================
    CART CARD — BASE LAYOUT
@@ -581,7 +485,40 @@ body::before {
   justify-content: space-between;
 }
 
-    
+  /* DELETE BUTTON — floating at top-right */
+.cart-delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: 0.2s;
+}
+
+.cart-delete-btn:hover {
+  background: #e60000;
+  transform: scale(1.05);
+}
+#taxSummary {
+  margin-top: 15px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  font-size: 14px;
+}
+  
   </style>
 </head>
 <body>
@@ -3658,6 +3595,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
