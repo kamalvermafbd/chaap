@@ -3390,12 +3390,32 @@ async function onUserLogin(mobile) {
   renderCart();
   // STEP 5B — Force second render to fix stale UI
 setTimeout(() => renderCart(), 50);
+// === STEP 5C — Final backend verify after login ===
+setTimeout(async () => {
+  try {
+    const check = await apiPost("getCart", { mobile });
+    const latest = check.cart || check.data || [];
+
+    // Compare backend vs local
+    if (JSON.stringify(latest) !== JSON.stringify(cart)) {
+      console.warn("🔧 Login Sync: Backend mismatch → correcting");
+      localStorage.setItem("cart", JSON.stringify(latest));
+      cart = latest;
+      window.cart = latest;
+      renderCart();
+    }
+
+  } catch (err) {
+    console.error("Login final verify error:", err);
+  }
+}, 1000);
 
 }
 
 </script>
 </body>
 </html>
+
 
 
 
