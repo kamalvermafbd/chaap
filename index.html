@@ -771,6 +771,7 @@ style="
   igstPercent: 0
 };
 let cart = [];   // start empty
+let deletedKeys = new Set();
 
  // --- CART SAVE LOCK SYSTEM (Fix race condition) ---
 let cartSaveLock = false;
@@ -1484,6 +1485,8 @@ function removeItem(index) {
 
     // 👍 Mark delete time (IMPORTANT)
     lastDeleteTime = Date.now();
+const key = `${cart[index].itemId}_${cart[index].variantId}`;
+deletedKeys.add(key);
 
     // Delete item
     cart.splice(index, 1);
@@ -3420,12 +3423,26 @@ setTimeout(async () => {
     const latest = check.cart || check.data || [];
 
     // Compare backend vs local
-    if (JSON.stringify(latest) !== JSON.stringify(cart)) {
-      console.warn("🔧 Login Sync: Backend mismatch → correcting");
-      localStorage.setItem("cart", JSON.stringify(latest));
-      cart = latest;
-      window.cart = latest;
-      renderCart();
+   // Compare backend vs local
+if (JSON.stringify(latest) !== JSON.stringify(cart)) {
+
+  // Skip items user deleted locally (NO comeback)
+  const safeLatest = latest.filter(i => {
+    const key = `${i.itemId}_${i.variantId}`;
+    return !deletedKeys.has(key);
+  });
+
+  console.warn("🔧 Login Sync: Backend mismatch → correcting");
+
+  // SAVE SAFE LATEST (not raw latest)
+  localStorage.setItem("cart", JSON.stringify(safeLatest));
+  
+  cart = safeLatest;
+  window.cart = safeLatest;
+
+  renderCart();
+}
+
     }
 
   } catch (err) {
@@ -3438,6 +3455,7 @@ setTimeout(async () => {
 </script>
 </body>
 </html>
+
 
 
 
