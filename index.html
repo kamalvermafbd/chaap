@@ -1523,152 +1523,77 @@ function buildCartCardHTML(item, idx) {
 }
 
 function renderCart() {
-document.getElementById("taxSummary").style.display = "block";
+  const cardsDiv = document.getElementById("cartCards");
+  const taxSummaryEl = document.getElementById("taxSummary");
 
-  
-  // CARD LAYOUT RENDER
-const cardsDiv = document.getElementById("cartCards");
-cardsDiv.innerHTML = "";  // clear old cards
+  // Reset
+  cardsDiv.innerHTML = "";
+  document.querySelector("#cartTable tbody").innerHTML = "";
+  document.getElementById("taxSummary").style.display = "block";
 
-cart.forEach((item, idx) => {
-  cardsDiv.innerHTML += buildCartCardHTML(item, idx);
-});
-
-// ---- SUPER SANITIZER (Prevents render bugs) ----
-cart = cart.map(item => {
-  const menuItem = (window.menuItems || []).find(m => m.itemId == item.itemId);
-
-  // 1) NAME FIX
-  if (!item.name && menuItem?.name) item.name = menuItem.name;
-
-  // 2) UNIT FIX (for Multi items)
-  if (!item.unit) {
-    const variant = (window.cat_allocations || []).find(v => v.variantId == item.variantId);
-    if (variant) item.unit = variant.unit;
-  }
-
-  // 3) IMAGE FIX
-  if (!item.image && menuItem?.image) item.image = menuItem.image;
-
-  // 4) TYPE FIX (force correct numeric)
-  item.qty = Number(item.qty || 1);
-  item.rate = Number(item.rate || 0);
-  item.discPercent = Number(item.discPercent || 0);
-
-  // 5) TOTAL RECALC
-  const discAmt = (item.rate * item.discPercent) / 100;
-  item.discAmt = Number(discAmt.toFixed(2));
-
-  const netRate = item.rate - item.discAmt;
-
-  item.total = item.discPercent > 0 
-    ? Number((netRate * item.qty).toFixed(2))
-    : Number((item.rate * item.qty).toFixed(2));
-
-  return item;
-});
-
- 
-
-  // ===== Check discount usage =====
-  const anyDiscount = cart.some(i => Number(i.discPercent) > 0);
-
-  // ===== Build header =====
-  // ===== PERMANENT FULL HEADER (no flicker) =====
-thead.innerHTML = `
-  <th>Item</th>
-  <th>Qty</th>
-  <th>Rate (MRP)</th>
-  <th class="col-disc">Disc %</th>
-  <th class="col-disc">Disc Amt</th>
-  <th class="col-disc">Net Amt</th>
-  <th>Total</th>
-  <th>Action</th>
-`;
-// ===== Hide / Show discount columns =====
-const showDisc = cart.some(i => Number(i.discPercent) > 0);
-
-  let grandTotal = 0;
-
-  // ================================================
-  //               BUILD CART TABLE ROWS
-  // ================================================
+  // 1) RENDER CARD LAYOUT
   cart.forEach((item, idx) => {
-
-    const rate = Number(item.rate);
-    const qty  = Number(item.qty);
-    const disc = Number(item.discPercent || 0);
-
-    // fresh safe calculations
-    const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
-    const netRate = rate - discAmt;
-
-    // FIX: for no discount → use MRP * qty
-    const total = disc > 0 
-      ? parseFloat((netRate * qty).toFixed(2))
-      : parseFloat((rate * qty).toFixed(2));
-
-    grandTotal += total;
-
-    const tr = document.createElement("tr");
-
-    tr.innerHTML = `
-  <td>${item.name} (${item.unit})</td>
-  <td><input type="number" value="${qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
-  <td>₹ ${rate.toFixed(2)}</td>
-
-  <td class="col-disc">${disc}%</td>
-  <td class="col-disc">₹ ${discAmt.toFixed(2)}</td>
-  <td class="col-disc">₹ ${netRate.toFixed(2)}</td>
-
-  <td>₹ ${total.toFixed(2)}</td>
-  
-`;
-
-
-    tbody.appendChild(tr);
+    cardsDiv.innerHTML += buildCartCardHTML(item, idx);
   });
 
-  // ===== FINAL TOTAL SET =====
-  let baseTotal = parseFloat(grandTotal.toFixed(2));
+  // 2) SANITIZE EACH ITEM
+  cart = cart.map(item => {
+    const menuItem = (window.menuItems || []).find(m => m.itemId == item.itemId);
+    if (menuItem) {
+      if (!item.name) item.name = menuItem.name;
+      if (!item.image) item.image = menuItem.image;
+    }
+    if (!item.unit) {
+      const v = (window.cat_allocations || []).find(v => v.variantId == item.variantId);
+      if (v) item.unit = v.unit;
+    }
+
+    item.qty = Number(item.qty || 1);
+    item.rate = Number(item.rate || 0);
+    item.discPercent = Number(item.discPercent || 0);
+
+    const discAmt = (item.rate * item.discPercent) / 100;
+    const netRate = item.rate - discAmt;
+
+    item.discAmt = Number(discAmt.toFixed(2));
+    item.netAmt  = Number(netRate.toFixed(2));
+    item.total   = item.discPercent > 0
+      ? Number((netRate * item.qty).toFixed(2))
+      : Number((item.rate * item.qty).toFixed(2));
+
+    return item;
+  });
+
+  // 3) CART TOTAL
+  let baseTotal = cart.reduce((sum, i) => sum + i.total, 0);
+  baseTotal = Number(baseTotal.toFixed(2));
   document.getElementById("cartTotal").innerText = baseTotal.toFixed(2);
 
-  // TAX BLOCK unchanged
+  // 4) TAX SECTION
   let taxHtml = "";
-
   if (restaurantTax.taxType === "On Bill") {
-
-    const serviceAmt = parseFloat(((baseTotal * restaurantTax.servicePercent) / 100).toFixed(2));
-    const taxableAmount = parseFloat((baseTotal + serviceAmt).toFixed(2));
-
-    const cgstAmt = parseFloat(((taxableAmount * restaurantTax.cgstPercent) / 100).toFixed(2));
-    const sgstAmt = parseFloat(((taxableAmount * restaurantTax.sgstPercent) / 100).toFixed(2));
-    const igstAmt = parseFloat(((taxableAmount * restaurantTax.igstPercent) / 100).toFixed(2));
-
-    const grandTotalCalc = parseFloat((taxableAmount + cgstAmt + sgstAmt + igstAmt).toFixed(2));
+    const serviceAmt = (baseTotal * restaurantTax.servicePercent) / 100;
+    const taxable = baseTotal + serviceAmt;
+    const cgst = (taxable * restaurantTax.cgstPercent) / 100;
+    const sgst = (taxable * restaurantTax.sgstPercent) / 100;
+    const igst = (taxable * restaurantTax.igstPercent) / 100;
+    const grandTotal = taxable + cgst + sgst + igst;
 
     taxHtml = `
-      ${restaurantTax.servicePercent > 0 
-        ? `<p style="margin:2px 0;">Service Charges (${restaurantTax.servicePercent}%): ₹${serviceAmt.toFixed(2)}</p>`
-        : ""
-      }
-
-      <p style="margin:2px 0;">CGST (${restaurantTax.cgstPercent}%): ₹${cgstAmt.toFixed(2)}</p>
-      <p style="margin:2px 0;">SGST (${restaurantTax.sgstPercent}%): ₹${sgstAmt.toFixed(2)}</p>
-      ${restaurantTax.igstPercent > 0 ? `<p style="margin:2px 0;">IGST (${restaurantTax.igstPercent}%): ₹${igstAmt.toFixed(2)}</p>` : ""}
-      <p style="margin:6px 0 0; font-weight:700; color:#d40000;">Grand Total: ₹${grandTotalCalc.toFixed(2)}</p>
+      ${restaurantTax.servicePercent > 0 ? `<p>Service Charges (${restaurantTax.servicePercent}%): ₹${serviceAmt.toFixed(2)}</p>` : ""}
+      <p>CGST (${restaurantTax.cgstPercent}%): ₹${cgst.toFixed(2)}</p>
+      <p>SGST (${restaurantTax.sgstPercent}%): ₹${sgst.toFixed(2)}</p>
+      ${restaurantTax.igstPercent > 0 ? `<p>IGST (${restaurantTax.igstPercent}%): ₹${igst.toFixed(2)}</p>` : ""}
+      <p style="font-weight:700;color:#d40000;margin-top:5px;">
+        Grand Total: ₹${grandTotal.toFixed(2)}
+      </p>
     `;
   }
 
-  const taxSummaryEl = document.getElementById("taxSummary");
-  if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
-  taxSummaryEl.style.display = "block";
-
-  // ensure tax summary always visible
-
-document.getElementById("taxSummary").style.visibility = "visible";
-
+  taxSummaryEl.innerHTML = taxHtml;
+  taxSummaryEl.style.visibility = "visible";
 }
+
 
 
 
@@ -3752,6 +3677,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
