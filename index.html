@@ -3451,10 +3451,28 @@ function hideCartOverlay() {
   const o = document.getElementById("cartOverlay");
   if (o) o.style.display = "none";
 }
+async function someCartAction() {
+  showCartOverlay("Working...");
+
+  try {
+      // 1) local storage update
+      // 2) cart rebuild
+      // 3) backend save (if logged in)
+      // 4) renderCart()
+      // 5) any recheck or merge
+  }
+  catch(err) {
+     console.error(err);
+  }
+  finally {
+     hideCartOverlay();   // <-- ALWAYS LAST
+  }
+}
 
 </script>
 </body>
 </html>
+
 
 
 
