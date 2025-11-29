@@ -3418,7 +3418,7 @@ async function saveCartToBackend(fastMode = false, cartData = null) {
               console.warn("Backend mismatch detected → fixing...");
               localStorage.setItem("cart", JSON.stringify(backendLatest));
               cart = backendLatest;
-              renderCart();
+              
             }
 
           } catch (err) {
@@ -3685,6 +3685,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
