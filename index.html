@@ -3642,7 +3642,7 @@ localStorage.setItem("userEmail", email);
   // -------------------------------
   renderCart();
   // STEP 5B — Force second render to fix stale UI
-setTimeout(() => renderCart(), 50);
+
 // === STEP 5C — Final backend verify after login ===
 setTimeout(async () => {
   try {
@@ -3697,6 +3697,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
