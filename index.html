@@ -1373,11 +1373,11 @@ function buildCartCardHTML(item, idx) {
         </div>
 
         <div class="cart-card-qty">
-          <span class="qty-label">Qty:</span>
-          <button class="qty-btn" onclick="updateQty(${idx}, ${item.qty - 1})">−</button>
-          <span class="qty-value">${item.qty}</span>
-          <button class="qty-btn" onclick="updateQty(${idx}, ${item.qty + 1})">+</button>
-        </div>
+  <span class="qty-label">Qty:</span>
+  <button class="qty-btn" onclick="updateQty(${idx}, ${item.qty - 1}); renderCart();">−</button>
+  <span class="qty-value">${item.qty}</span>
+  <button class="qty-btn" onclick="updateQty(${idx}, ${item.qty + 1}); renderCart();">+</button>
+</div>
 
         <div class="cart-card-price">
           <div>Rate: ₹${item.rate.toFixed(2)}</div>
@@ -3620,6 +3620,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
