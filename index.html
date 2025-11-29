@@ -448,6 +448,12 @@ body::before {
   transform: translateX(0);
 }
 
+/* Smooth hide during cart refresh */
+.cart-refreshing #cartTable tbody tr {
+  opacity: 0 !important;
+  transition: opacity 0.15s ease-in-out;
+  pointer-events: none;
+}
 
     
   </style>
@@ -1245,6 +1251,12 @@ function renderCart() {
 
   const tbody = document.querySelector('#cartTable tbody');
   const thead = document.querySelector('#cartTable thead tr');
+  // TEMP disable old rows to prevent flicker
+document.body.classList.add("cart-refreshing");
+setTimeout(() => {
+  document.body.classList.remove("cart-refreshing");
+}, 200);
+
   tbody.innerHTML = "";
 // ---- SUPER SANITIZER (Prevents render bugs) ----
 cart = cart.map(item => {
@@ -1376,6 +1388,7 @@ const showDisc = cart.some(i => Number(i.discPercent) > 0);
   if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
 }
 
+let lastDeleteTime = 0;
 
 
 function updateQty(index, qty) {
@@ -1469,6 +1482,10 @@ function removeItem(index) {
 
   deleteDebounce = setTimeout(() => {
 
+    // 👍 Mark delete time (IMPORTANT)
+    lastDeleteTime = Date.now();
+
+    // Delete item
     cart.splice(index, 1);
 
     // SAVE LOCALLY
@@ -1478,6 +1495,7 @@ function removeItem(index) {
       localStorage.setItem("cart", JSON.stringify(cart));
     }
 
+    // Re-render cart UI (with fade-out fix)
     renderCart();
 
     // BACKEND SYNC
@@ -1488,7 +1506,6 @@ function removeItem(index) {
   }, 150); // small debounce for delete
 
 }
-
 
  function checkCustomerByMobile() {
   const mobile = document.getElementById('mobile').value.trim();
@@ -3396,6 +3413,9 @@ setTimeout(() => renderCart(), 50);
 // === STEP 5C — Final backend verify after login ===
 setTimeout(async () => {
   try {
+        // Skip backend verify shortly after delete to avoid flicker
+    if (Date.now() - lastDeleteTime < 500) return;
+
     const check = await apiPost("getCart", { mobile });
     const latest = check.cart || check.data || [];
 
@@ -3418,6 +3438,7 @@ setTimeout(async () => {
 </script>
 </body>
 </html>
+
 
 
 
