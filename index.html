@@ -518,9 +518,7 @@ body::before {
   font-size: 14px;
 }
   /* FULLY HIDE OLD TABLE (but keep it for calculation & compatibility) */
-#cartTable {
-  display: none !important;
-}
+
 /* CART CARD — QTY BUTTON STYLING */
 .cart-card-qty {
   display: flex;
@@ -622,6 +620,15 @@ body::before {
   transition: transform 0.2s ease-out;
   background: #ffeaea; /* light red feedback */
 }
+#cartCards, #cartTable {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+    #cartCards, #cartTable {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
 
   </style>
 </head>
@@ -1520,17 +1527,27 @@ function buildCartCardHTML(item, idx) {
 }
 
 function renderCart() {
+
+  document.getElementById("cartCards").style.display = "flex";
+document.getElementById("cartTable").style.display = "table";
+
   const cardsDiv = document.getElementById("cartCards");
   const taxSummaryEl = document.getElementById("taxSummary");
 
   // Reset
-  cardsDiv.innerHTML = "";
-  document.querySelector("#cartTable tbody").innerHTML = "";
+// Smooth clear — no flicker / no blank frame
+while (cardsDiv.firstChild) cardsDiv.removeChild(cardsDiv.firstChild);
+
+const tableBody = document.querySelector("#cartTable tbody");
+while (tableBody.firstChild) tableBody.removeChild(tableBody.firstChild);
+
+  
   document.getElementById("taxSummary").style.display = "block";
 
   // 1) RENDER CARD LAYOUT
   cart.forEach((item, idx) => {
-    cardsDiv.innerHTML += buildCartCardHTML(item, idx);
+    cardsDiv.insertAdjacentHTML("beforeend", buildCartCardHTML(item, idx));
+
   });
 
   // 2) SANITIZE EACH ITEM
@@ -3685,6 +3702,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
