@@ -453,6 +453,20 @@ body::before {
   </style>
 </head>
 <body>
+<div id="cartOverlay" style="
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.45);
+  z-index:9999;
+  color:white;
+  font-size:22px;
+  font-weight:500;
+  align-items:center;
+  justify-content:center;
+">
+  Updating your cart…
+</div>
 
   <button onclick="openLogin()" 
         style="position:absolute; right:100px; top:60px; z-index:9999;
@@ -3414,10 +3428,23 @@ setTimeout(async () => {
 }, 1000);
 
 }
+function showCartOverlay(msg = "Updating your cart…") {
+  const o = document.getElementById("cartOverlay");
+  if (o) {
+    o.textContent = msg;
+    o.style.display = "flex";
+  }
+}
+
+function hideCartOverlay() {
+  const o = document.getElementById("cartOverlay");
+  if (o) o.style.display = "none";
+}
 
 </script>
 </body>
 </html>
+
 
 
 
