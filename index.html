@@ -575,6 +575,35 @@ body::before {
 .cart-card-pricing {
   margin-top: 6px;
 }
+.cart-delete-btn:active {
+  transform: scale(0.85);
+}
+/* STEP 18 — Responsive spacing tuning */
+@media (max-width: 600px) {
+  .cart-card {
+    padding: 10px;
+    gap: 10px;
+  }
+  .cart-card-img img {
+    width: 70px;
+    height: 70px;
+  }
+}
+
+@media (min-width: 900px) {
+  #cartCards {
+    max-width: 700px;
+    margin: auto;
+  }
+  .cart-card {
+    padding: 14px;
+    gap: 14px;
+  }
+  .cart-card-img img {
+    width: 90px;
+    height: 90px;
+  }
+}
 
   </style>
 </head>
@@ -3658,6 +3687,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
