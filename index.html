@@ -1385,19 +1385,17 @@ function buildCartCardHTML(item, idx) {
   <button class="qty-btn" onclick="updateQty(${idx}, ${item.qty + 1}); renderCart();">+</button>
 </div>
 
-        <div class="cart-card-price">
-          <div>Rate: ₹${item.rate.toFixed(2)}</div>
-          <div>Disc: ${item.discPercent}%</div>
-        </div>
+        <div class="cart-card-pricing">
+  <div class="line">MRP: ₹${item.rate.toFixed(2)}</div>
 
-        <div class="cart-card-calcs">
-          <div>Disc Amt: ₹${(item.discAmt || 0).toFixed(2)}</div>
-          <div>Net: ₹${(item.netAmt || item.rate).toFixed(2)}</div>
-        </div>
+  ${item.discPercent > 0 ? `
+    <div class="line">Disc: ${item.discPercent}% (₹${(item.discAmt||0).toFixed(2)})</div>
+    <div class="line">Net: ₹${(item.netAmt||0).toFixed(2)}</div>
+  ` : ``}
 
-        <div class="cart-card-total">
-  Total: ₹${Number(item.total || (item.rate * item.qty)).toFixed(2)}
+  <div class="total-line">Total: ₹${item.total.toFixed(2)}</div>
 </div>
+
 
       </div>
     </div>
@@ -3634,6 +3632,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
