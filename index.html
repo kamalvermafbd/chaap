@@ -448,12 +448,6 @@ body::before {
   transform: translateX(0);
 }
 
-/* Smooth hide during cart refresh */
-.cart-refreshing #cartTable tbody tr {
-  opacity: 0 !important;
-  transition: opacity 0.15s ease-in-out;
-  pointer-events: none;
-}
 
     
   </style>
@@ -771,7 +765,6 @@ style="
   igstPercent: 0
 };
 let cart = [];   // start empty
-let deletedKeys = new Set();
 
  // --- CART SAVE LOCK SYSTEM (Fix race condition) ---
 let cartSaveLock = false;
@@ -1252,12 +1245,6 @@ function renderCart() {
 
   const tbody = document.querySelector('#cartTable tbody');
   const thead = document.querySelector('#cartTable thead tr');
-  // TEMP disable old rows to prevent flicker
-document.body.classList.add("cart-refreshing");
-setTimeout(() => {
-  document.body.classList.remove("cart-refreshing");
-}, 200);
-
   tbody.innerHTML = "";
 // ---- SUPER SANITIZER (Prevents render bugs) ----
 cart = cart.map(item => {
@@ -1389,7 +1376,6 @@ const showDisc = cart.some(i => Number(i.discPercent) > 0);
   if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
 }
 
-let lastDeleteTime = 0;
 
 
 function updateQty(index, qty) {
@@ -1483,12 +1469,6 @@ function removeItem(index) {
 
   deleteDebounce = setTimeout(() => {
 
-    // 👍 Mark delete time (IMPORTANT)
-    lastDeleteTime = Date.now();
-const key = `${cart[index].itemId}_${cart[index].variantId}`;
-deletedKeys.add(key);
-
-    // Delete item
     cart.splice(index, 1);
 
     // SAVE LOCALLY
@@ -1498,7 +1478,6 @@ deletedKeys.add(key);
       localStorage.setItem("cart", JSON.stringify(cart));
     }
 
-    // Re-render cart UI (with fade-out fix)
     renderCart();
 
     // BACKEND SYNC
@@ -1509,6 +1488,7 @@ deletedKeys.add(key);
   }, 150); // small debounce for delete
 
 }
+
 
  function checkCustomerByMobile() {
   const mobile = document.getElementById('mobile').value.trim();
@@ -3416,33 +3396,17 @@ setTimeout(() => renderCart(), 50);
 // === STEP 5C — Final backend verify after login ===
 setTimeout(async () => {
   try {
-        // Skip backend verify shortly after delete to avoid flicker
-    if (Date.now() - lastDeleteTime < 500) return;
-
     const check = await apiPost("getCart", { mobile });
     const latest = check.cart || check.data || [];
 
     // Compare backend vs local
-   // Compare backend vs local
-if (JSON.stringify(latest) !== JSON.stringify(cart)) {
-
-  // Skip items user deleted locally (NO comeback)
-  const safeLatest = latest.filter(i => {
-    const key = `${i.itemId}_${i.variantId}`;
-    return !deletedKeys.has(key);
-  });
-
-  console.warn("🔧 Login Sync: Backend mismatch → correcting");
-
-  // SAVE SAFE LATEST (not raw latest)
-  localStorage.setItem("cart", JSON.stringify(safeLatest));
-  
-  cart = safeLatest;
-  window.cart = safeLatest;
-
-  renderCart();
-}
-
+    if (JSON.stringify(latest) !== JSON.stringify(cart)) {
+      console.warn("🔧 Login Sync: Backend mismatch → correcting");
+      localStorage.setItem("cart", JSON.stringify(latest));
+      cart = latest;
+      window.cart = latest;
+      renderCart();
+    }
 
   } catch (err) {
     console.error("Login final verify error:", err);
@@ -3454,11 +3418,6 @@ if (JSON.stringify(latest) !== JSON.stringify(cart)) {
 </script>
 </body>
 </html>
-
-
-
-
-
 
 
 
