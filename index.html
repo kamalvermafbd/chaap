@@ -1565,46 +1565,46 @@ function updateQty(index, qty) {
 
     const item = cart[index];
 
+    // --- Recalculate ---
     const rate = Number(item.rate);
     const disc = Number(item.discPercent || 0);
 
     const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
     const netRate = rate - discAmt;
 
-    const total = disc > 0
-      ? parseFloat((netRate * qty).toFixed(2))
-      : parseFloat((rate * qty).toFixed(2));
-
+    // Store updated qty
     item.qty = qty;
 
+    // Store discount + net fields only when disc > 0
     if (disc > 0) {
       item.discAmt = discAmt;
-      item.netAmt  = parseFloat(netRate.toFixed(2));
+      item.netAmt = parseFloat(netRate.toFixed(2));
+      item.total = parseFloat((netRate * qty).toFixed(2));
     } else {
       delete item.discAmt;
       delete item.netAmt;
+      item.total = parseFloat((rate * qty).toFixed(2));
     }
 
-    item.total = total;
-
-    // SAVE LOCALLY
+    // --- Save local ---
     if (!isLoggedIn()) {
       localStorage.setItem("guestCart", JSON.stringify(cart));
     } else {
       localStorage.setItem("cart", JSON.stringify(cart));
     }
 
+    // --- Re-render cards instantly ---
     renderCart();
-setTimeout(() => renderCart(), 50);
+    setTimeout(() => renderCart(), 30); // tiny UI stabilizer
 
-    // BACKEND SYNC (safe & debounced)
+    // --- Backend sync for logged-in ---
     if (isLoggedIn()) {
-      saveCartToBackend(); 
+      saveCartToBackend();
     }
 
-  }, 200); // 200ms debounce
-
+  }, 180); // smooth debounce
 }
+
 
     function openCheckout() {
       if (cart.length === 0) {
@@ -3634,6 +3634,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
