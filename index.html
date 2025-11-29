@@ -1472,24 +1472,11 @@ function deleteCart() {
     return;
   }
 
+  // Logged-in: clear only LOCAL mirror (NEVER delete backend)
   localStorage.setItem("cart", "[]");
   renderCart();
 
-  saveCartToBackend().finally(() => hideCartOverlay());
-}
-
-
-
-  // Logged-in mode:
-  // ❗ DO NOT delete backend cart
-  // Only clear local mirror so UI resets,
-  // backend cart will reload on refresh/loadUserCartOnStart()
-
-  cart = [];
-  localStorage.setItem("cart", JSON.stringify(cart));
-  renderCart();
-
-  // No backend delete allowed here
+  hideCartOverlay();
 }
 
 function removeItem(index) {
@@ -3468,6 +3455,7 @@ function hideCartOverlay() {
 </script>
 </body>
 </html>
+
 
 
 
