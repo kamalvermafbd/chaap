@@ -545,6 +545,41 @@ body::before {
   font-size: 14px;
 }
 
+//new css for card
+    /* ============================
+   CART CARD — BASE LAYOUT
+   ============================ */
+
+#cartCards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 5px;
+}
+
+.cart-card {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  position: relative;
+}
+
+.cart-card-img img {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.cart-card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 
     
   </style>
@@ -1404,6 +1439,14 @@ function renderCart() {
   const tbody = document.querySelector('#cartTable tbody');
   const thead = document.querySelector('#cartTable thead tr');
   tbody.innerHTML = "";
+  // CARD LAYOUT RENDER
+const cardsDiv = document.getElementById("cartCards");
+cardsDiv.innerHTML = "";  // clear old cards
+
+cart.forEach((item, idx) => {
+  cardsDiv.innerHTML += buildCartCardHTML(item, idx);
+});
+
 // ---- SUPER SANITIZER (Prevents render bugs) ----
 cart = cart.map(item => {
   const menuItem = (window.menuItems || []).find(m => m.itemId == item.itemId);
@@ -3615,6 +3658,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
