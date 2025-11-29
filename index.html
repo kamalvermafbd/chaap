@@ -1354,24 +1354,23 @@ function rebuildCart() {
 }
 
 function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", variantIdFromBtn = "") {
-  // --- Prevent spam clicking ---
-  if (addClickLock) return;
-  addClickLock = true;
-  setTimeout(() => addClickLock = false, 150);
+// --- Prevent spam clicking ---
+if (addClickLock) return;
+addClickLock = true;
 
+setTimeout(() => addClickLock = false, 150);
   showCartOverlay("Adding item…");
 
   // STEP 1C – Normalize
   const cleanUnit = String(unit || "").trim().toLowerCase();
   const cleanName = String(name || "").trim().toLowerCase();
-
-  // Read correct cart based on login state
-  let stored;
-  if (!isLoggedIn()) {
-    stored = JSON.parse(localStorage.getItem("guestCart") || "[]");
-  } else {
-    stored = JSON.parse(localStorage.getItem("cart") || "[]");
-  }
+// Read correct cart based on login state
+let stored;
+if (!isLoggedIn()) {
+  stored = JSON.parse(localStorage.getItem("guestCart") || "[]");
+} else {
+  stored = JSON.parse(localStorage.getItem("cart") || "[]");
+}
 
   let itemId = "";
   let variantId = "";
@@ -1387,10 +1386,11 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
     );
 
     if (!menuItem) {
-      console.warn("MenuItem NOT FOUND:", name, unit);
-      hideCartOverlay();
-      return;
-    }
+  console.warn("MenuItem NOT FOUND:", name, unit);
+  hideCartOverlay();
+  return;
+}
+
 
     itemId = menuItem.itemId;
 
@@ -1410,47 +1410,27 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
   // Perfect merge logic using itemId + variantId
   const existing = stored.find(i => i.itemId == itemId && i.variantId == variantId);
 
-  // Normalize incoming numbers
-  const numericRate = Number(rate || 0);
-  const numericDisc = Number(discPercent || 0);
-
-  // Helper to compute amounts (same as renderCart)
-  function computeAmounts(rateVal, discPerc, qtyVal) {
-    const discAmt = (rateVal * discPerc) / 100;
-    const netRate = rateVal - discAmt;
-    const discAmtF = parseFloat(discAmt.toFixed(2));
-    const netRateF = parseFloat(netRate.toFixed(2));
-    const total = discPerc > 0
-      ? parseFloat((netRate * qtyVal).toFixed(2))
-      : parseFloat((rateVal * qtyVal).toFixed(2));
-    return { discAmt: discAmtF, netRate: netRateF, total };
-  }
-
   if (existing) {
-    // ensure numeric fields
-    existing.rate = Number(existing.rate || numericRate);
     existing.qty = Number(existing.qty || 0) + 1;
+    existing.total = parseFloat((existing.qty * existing.rate).toFixed(2));
 
-    // compute using helper
-    const { discAmt, netRate, total } = computeAmounts(existing.rate, existing.discPercent || numericDisc, existing.qty);
-
-    if ((existing.discPercent || 0) > 0) {
-      existing.discPercent = Number(existing.discPercent || numericDisc);
-      existing.discAmt = discAmt;
-      existing.netAmt = netRate;
-      existing.total = total;
+    if (existing.discPercent > 0) {
+      const discAmt = (existing.rate * existing.discPercent) / 100;
+      existing.discAmt = parseFloat(discAmt.toFixed(2));
+      existing.netAmt = parseFloat(((existing.rate - discAmt) * existing.qty).toFixed(2));
     } else {
-      // if no discount
       delete existing.discAmt;
       delete existing.netAmt;
-      existing.total = total;
     }
+  }
 
-  } else {
-    // NEW ITEM
+  // NEW ITEM
+  else {
     const qty = 1;
 
-    const { discAmt, netRate, total } = computeAmounts(numericRate, numericDisc, qty);
+    const total = rate * qty;
+    const discAmt = (rate * discPercent) / 100;
+    const netRate = rate - discAmt;
 
     // Get image from menuItems
     const menuItem = (window.menuItems || []).find(
@@ -1461,52 +1441,49 @@ function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", varian
       name,
       unit,
       qty,
-      rate: numericRate,
-      total: total,
+      rate: Number(rate),
+      total: parseFloat(total.toFixed(2)),
       itemId,
       variantId,
-      discPercent: numericDisc,
-      image: menuItem?.image || ""
+      discPercent: Number(discPercent),
+      image: menuItem?.image || ""   // IMPORTANT
     };
 
-    if (numericDisc > 0) {
-      newItem.discAmt = discAmt;
-      newItem.netAmt = netRate;
+    if (discPercent > 0) {
+      newItem.discAmt = parseFloat(discAmt.toFixed(2));
+      newItem.netAmt = parseFloat((netRate * qty).toFixed(2));
     }
 
     stored.push(newItem);
   }
 
   // SAVE to localStorage only
-  if (!isLoggedIn()) {
+  // ⭐ Guest users MUST save here
+if (!isLoggedIn()) {
     localStorage.setItem("guestCart", JSON.stringify(stored));
-  } else {
+} else {
     localStorage.setItem("cart", JSON.stringify(stored));
-  }
+}
 
   cart = stored;
   window.cart = stored;
 
-  // render once immediately, small stabilizer second time
   renderCart();
   setTimeout(() => renderCart(), 50);
 
-  // --------------------------------------------
-  // Show overlay until backend save finishes (if logged in).
-  // Move alert into finally so overlay hides first.
-  const doneMsg = `${name} (${unit}) added to cart`;
 
-  if (isLoggedIn()) {
-    saveCartToBackend(false, stored)
-      .finally(() => {
-        hideCartOverlay();
-        alert(doneMsg);
-      });
-  } else {
-    hideCartOverlay();
-    alert(doneMsg);
-  }
+  // --------------------------------------------
+ if (isLoggedIn()) {
+saveCartToBackend(false).finally(() => hideCartOverlay());
+
+} else {
+  hideCartOverlay();
 }
+
+
+  alert(`${name} (${unit}) added to cart`);
+}
+
 
 
 function buildCartCardHTML(item, idx) {
@@ -3720,6 +3697,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
