@@ -1358,6 +1358,46 @@ if (!isLoggedIn()) {
 
 
 
+function buildCartCardHTML(item, idx) {
+  return `
+    <div class="cart-card">
+
+      <div class="cart-card-img">
+        <img src="${item.image || ''}" alt="${item.name}">
+      </div>
+
+      <div class="cart-card-info">
+
+        <div class="cart-card-top">
+          <h4 class="cart-card-name">${item.name} (${item.unit})</h4>
+          <button class="cart-delete-btn" onclick="removeItem(${idx})">✕</button>
+        </div>
+
+        <div class="cart-card-qty">
+          <span class="qty-label">Qty:</span>
+          <button class="qty-btn" onclick="updateQty(${idx}, ${item.qty - 1})">−</button>
+          <span class="qty-value">${item.qty}</span>
+          <button class="qty-btn" onclick="updateQty(${idx}, ${item.qty + 1})">+</button>
+        </div>
+
+        <div class="cart-card-price">
+          <div>Rate: ₹${item.rate.toFixed(2)}</div>
+          <div>Disc: ${item.discPercent}%</div>
+        </div>
+
+        <div class="cart-card-calcs">
+          <div>Disc Amt: ₹${(item.discAmt || 0).toFixed(2)}</div>
+          <div>Net: ₹${(item.netAmt || item.rate).toFixed(2)}</div>
+        </div>
+
+        <div class="cart-card-total">
+          Total: ₹${item.total.toFixed(2)}
+        </div>
+
+      </div>
+    </div>
+  `;
+}
 
 function renderCart() {
 
@@ -3575,6 +3615,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
