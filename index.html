@@ -2503,16 +2503,21 @@ window.addEventListener("load", () => {
   const mobile = localStorage.getItem("userMobile");
   const email  = localStorage.getItem("userEmail");
   //  LOAD USER CART FROM BACKEND IF LOGGED IN
-document.getElementById("menuWrapper").style.display = "block";
-document.getElementById("pageWrapper").style.display = "none";
-
+// Always reset full UI first 
+document.getElementById("menuWrapper").style.display = "block"; 
+document.getElementById("pageWrapper").style.display = "none"; 
 document.getElementById("profilePage").style.display = "none";
 document.getElementById("ordersPage").style.display = "none";
 document.getElementById("offersPage").style.display = "none";
-
 document.getElementById("leftNav").classList.remove("active");
 document.getElementById("leftNav").style.display = "none";
 document.getElementById("mainContent").style.marginLeft = "0";
+document.getElementById("hamburgerBtn").style.display = "none";
+document.getElementById("logoutBtn").style.display = "none";
+document.getElementById("userInfoBox").style.display = "none";
+document.querySelector("button[onclick='openLogin()']").style.display = "inline-block";
+document.querySelector("button[onclick='openSignup()']").style.display = "inline-block";
+document.getElementById("signupLabelBox").style.display = "block"; 
 
 
   // ----- if logged in -----
@@ -3667,6 +3672,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
