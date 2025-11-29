@@ -3406,31 +3406,41 @@ async function saveCartToBackend(fastMode = false, cartData = null) {
       }
 
       // === STEP 4C: VERIFY BACKEND CART (FULL AWAIT) ===
-      if (!fastMode) setTimeout(async () => {
-        try {
-          const mobile = localStorage.getItem("userMobile");
-          const check = await apiPost("getCart", { mobile });
-          const backendLatest = check.cart || check.data || [];
+      if (!fastMode) {
 
-          if (JSON.stringify(backendLatest) !== JSON.stringify(cart)) {
-            console.warn("Backend mismatch detected → fixing...");
-            localStorage.setItem("cart", JSON.stringify(backendLatest));
-            cart = backendLatest;
-            renderCart();
+        setTimeout(async () => {
+          try {
+            const mobile = localStorage.getItem("userMobile");
+            const check = await apiPost("getCart", { mobile });
+            const backendLatest = check.cart || check.data || [];
+
+            if (JSON.stringify(backendLatest) !== JSON.stringify(cart)) {
+              console.warn("Backend mismatch detected → fixing...");
+              localStorage.setItem("cart", JSON.stringify(backendLatest));
+              cart = backendLatest;
+              renderCart();
+            }
+
+          } catch (err) {
+            console.error("Backend verify error:", err);
           }
 
-        } catch (err) {
-          console.error("Backend verify error:", err);
-        }
+          // ⭐ Resolve ONLY after verify done
+          resolve();
 
-        // ⭐ Resolve ONLY after verify done
+        }, 1500);
+
+      } else {
+
+        // ⭐ FAST MODE → MUST RESOLVE IMMEDIATELY  
+        // (THIS WAS MISSING & overlay stuck because promise never resolved)
         resolve();
-
-      }, 1500);
+      }
 
     }
   });
 }
+
 
 
  function loadUserCartOnStart() {
@@ -3675,6 +3685,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
