@@ -3150,84 +3150,89 @@ document.addEventListener("click", function (e) {
 });
 
 async function saveCartToBackend(cartData = null) {
+  return new Promise(async (resolve) => {
 
-  // Only if logged in
-  if (!isLoggedIn()) return;
+    // Only if logged in
+    if (!isLoggedIn()) return resolve();
 
-  const mobile = localStorage.getItem("userMobile");
-  if (!mobile) return;
-
-  // ---- QUEUE SYSTEM (Race fix) ----
-  if (window.cartSaveLock) {
-    window.cartSaveQueued = true;
-    return;
-  }
-  window.cartSaveLock = true;
-
-  // Ensure sessionId
-  let sessionId = localStorage.getItem("sessionId");
-  if (!sessionId) {
-    sessionId = "SESS-" + Date.now();
-    localStorage.setItem("sessionId", sessionId);
-  }
-
-  // Use passed data OR use global cart
-  const cartToSend = (cartData && Array.isArray(cartData)) ? cartData : cart;
-
-  // Clean final payload
-  const cleanedCart = cartToSend.map(item => ({
-    name: item.name || "",
-    unit: item.unit || "",
-    qty: Number(item.qty || 1),
-    rate: Number(item.rate || 0),
-    discPercent: Number(item.discPercent || 0),
-    itemId: item.itemId || "",
-    variantId: item.variantId || "",
-    image: item.image || ""
-  }));
-
-  try {
-    await apiPost("saveCart", {
-      mobile,
-      email: localStorage.getItem("userEmail") || "",
-      sessionId,
-      cartItems: cleanedCart
-    });
-
-  } catch (err) {
-    console.error("Cart Save Error:", err);
-
-  } finally {
-
-    window.cartSaveLock = false;
-
-    if (window.cartSaveQueued) {
-      window.cartSaveQueued = false;
-      saveCartToBackend();
-    }
-
-  // === STEP 4C: VERIFY BACKEND CART ===
-setTimeout(async () => {
-  try {
     const mobile = localStorage.getItem("userMobile");
-    const check = await apiPost("getCart", { mobile });
-    const backendLatest = check.cart || check.data || [];
+    if (!mobile) return resolve();
 
-    // stringify compare
-    if (JSON.stringify(backendLatest) !== JSON.stringify(cart)) {
-      console.warn("Backend mismatch detected → fixing...");
-      localStorage.setItem("cart", JSON.stringify(backendLatest));
-      cart = backendLatest;
-      renderCart();
+    // ---- QUEUE SYSTEM (Race fix) ----
+    if (window.cartSaveLock) {
+      window.cartSaveQueued = true;
+      return resolve();
     }
-  } catch (err) {
-    console.error("Backend verify error:", err);
-  }
-}, 1500);
+    window.cartSaveLock = true;
 
-  }
+    // Ensure sessionId
+    let sessionId = localStorage.getItem("sessionId");
+    if (!sessionId) {
+      sessionId = "SESS-" + Date.now();
+      localStorage.setItem("sessionId", sessionId);
+    }
+
+    // Use passed data OR use global cart
+    const cartToSend = (cartData && Array.isArray(cartData)) ? cartData : cart;
+
+    // Clean final payload
+    const cleanedCart = cartToSend.map(item => ({
+      name: item.name || "",
+      unit: item.unit || "",
+      qty: Number(item.qty || 1),
+      rate: Number(item.rate || 0),
+      discPercent: Number(item.discPercent || 0),
+      itemId: item.itemId || "",
+      variantId: item.variantId || "",
+      image: item.image || ""
+    }));
+
+    try {
+      await apiPost("saveCart", {
+        mobile,
+        email: localStorage.getItem("userEmail") || "",
+        sessionId,
+        cartItems: cleanedCart
+      });
+
+    } catch (err) {
+      console.error("Cart Save Error:", err);
+
+    } finally {
+
+      window.cartSaveLock = false;
+
+      if (window.cartSaveQueued) {
+        window.cartSaveQueued = false;
+        await saveCartToBackend();
+      }
+
+      // === STEP 4C: VERIFY BACKEND CART (FULL AWAIT) ===
+      setTimeout(async () => {
+        try {
+          const mobile = localStorage.getItem("userMobile");
+          const check = await apiPost("getCart", { mobile });
+          const backendLatest = check.cart || check.data || [];
+
+          if (JSON.stringify(backendLatest) !== JSON.stringify(cart)) {
+            console.warn("Backend mismatch detected → fixing...");
+            localStorage.setItem("cart", JSON.stringify(backendLatest));
+            cart = backendLatest;
+            renderCart();
+          }
+
+        } catch (err) {
+          console.error("Backend verify error:", err);
+        }
+
+        // ⭐ Resolve ONLY after verify done
+        resolve();
+
+      }, 1500);
+
+    }
+  });
 }
-
 
 
  function loadUserCartOnStart() {
@@ -3472,6 +3477,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
