@@ -3425,34 +3425,29 @@ async function saveCartToBackend(fastMode = false, cartData = null) {
       // === STEP 4C: VERIFY BACKEND CART (FULL AWAIT) ===
       if (!fastMode) {
 
-        setTimeout(async () => {
-          try {
-            const mobile = localStorage.getItem("userMobile");
-            const check = await apiPost("getCart", { mobile });
-            const backendLatest = check.cart || check.data || [];
+  setTimeout(async () => {
+    try {
+      const mobile = localStorage.getItem("userMobile");
+      const check = await apiPost("getCart", { mobile });
+      const backendLatest = check.cart || check.data || [];
 
-            if (JSON.stringify(backendLatest) !== JSON.stringify(cart)) {
-              console.warn("Backend mismatch detected → fixing...");
-              localStorage.setItem("cart", JSON.stringify(backendLatest));
-              cart = backendLatest;
-              
-            }
+      // Trust backend completely (discount fix)
+      localStorage.setItem("cart", JSON.stringify(backendLatest));
+      cart = backendLatest;
 
-          } catch (err) {
-            console.error("Backend verify error:", err);
-          }
+    } catch (err) {
+      console.error("Backend verify error:", err);
+    }
 
-          // ⭐ Resolve ONLY after verify done
-          resolve();
+    // resolve after verify
+    resolve();
 
-        }, 350);
+  }, 350);
 
-      } else {
+} else {
 
-        // ⭐ FAST MODE → MUST RESOLVE IMMEDIATELY  
-        // (THIS WAS MISSING & overlay stuck because promise never resolved)
-        resolve();
-      }
+  resolve(); // fast mode
+}
 
     }
   });
@@ -3702,6 +3697,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
