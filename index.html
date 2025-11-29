@@ -1455,14 +1455,23 @@ function updateQty(index, qty) {
       document.getElementById('checkoutModal').style.display = 'none';
     }
 function deleteCart() {
+  showCartOverlay("Clearing cart…");
 
-  // Guest mode: clear everything
-  if (!isLoggedIn()) {
   cart = [];
-  localStorage.removeItem("guestCart");
+
+  if (!isLoggedIn()) {
+    localStorage.removeItem("guestCart");
+    renderCart();
+    hideCartOverlay();
+    return;
+  }
+
+  localStorage.setItem("cart", "[]");
   renderCart();
-  return;
+
+  saveCartToBackend().finally(() => hideCartOverlay());
 }
+
 
 
   // Logged-in mode:
@@ -1478,6 +1487,13 @@ function deleteCart() {
 }
 
 function removeItem(index) {
+ showCartOverlay();
+
+  const item = cart[index];
+  if (!item) {
+    hideCartOverlay();
+    return;
+  }
 
   clearTimeout(deleteDebounce);
 
@@ -1496,8 +1512,10 @@ function removeItem(index) {
 
     // BACKEND SYNC
     if (isLoggedIn()) {
-      saveCartToBackend();
-    }
+    saveCartToBackend().finally(() => hideCartOverlay());
+  } else {
+    hideCartOverlay();
+  }
 
   }, 150); // small debounce for delete
 
@@ -3444,6 +3462,7 @@ function hideCartOverlay() {
 </script>
 </body>
 </html>
+
 
 
 
