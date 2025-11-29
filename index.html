@@ -1541,6 +1541,10 @@ const showDisc = cart.some(i => Number(i.discPercent) > 0);
 
   const taxSummaryEl = document.getElementById("taxSummary");
   if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
+  // ensure tax summary always visible
+document.getElementById("taxSummary").style.display = "block";
+document.getElementById("taxSummary").style.visibility = "visible";
+
 }
 
 
@@ -3624,6 +3628,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
