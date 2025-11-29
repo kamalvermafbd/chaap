@@ -2787,7 +2787,7 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 <script>
-function loginUser() {
+async function loginUser() {
   const mobile = document.getElementById("loginMobile").value.trim();
   const password = document.getElementById("loginPassword").value.trim();
 
@@ -2799,7 +2799,7 @@ function loginUser() {
   lockLoginForm();
 
   apiPost("login", { mobile, password })
-    .then(res => {
+    .then(async res => {   // <-- make this async
       unlockLoginForm();
 
       if (!res.success) {
@@ -2807,17 +2807,17 @@ function loginUser() {
         return;
       }
 
-      // Store identity
+      // 1️⃣ Save identity FIRST (IMPORTANT)
       localStorage.setItem("userMobile", mobile);
       localStorage.setItem("userEmail", res.email || "");
 
-      // 🚀 CORRECT: onUserLogin handles ALL merge + guest transfer
-      onUserLogin(mobile);
-
-      // ⭐ Load merged cart into UI
- 
-      // UI updates
+      // 2️⃣ Update UI email immediately
       document.getElementById("loggedEmail").innerText = res.email || "";
+
+      // 3️⃣ NOW do cart merge (MUST happen AFTER email saved)
+      await onUserLogin(mobile);
+
+      // 4️⃣ UI panel updates
       document.getElementById("userInfoBox").style.display = "block";
 
       document.querySelector("button[onclick='openLogin()']").style.display = "none";
@@ -3415,6 +3415,7 @@ setTimeout(async () => {
 </script>
 </body>
 </html>
+
 
 
 
