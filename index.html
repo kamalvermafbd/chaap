@@ -3180,6 +3180,26 @@ async function saveCartToBackend(cartData = null) {
       window.cartSaveQueued = false;
       saveCartToBackend();
     }
+
+  // === STEP 4C: VERIFY BACKEND CART ===
+setTimeout(async () => {
+  try {
+    const mobile = localStorage.getItem("userMobile");
+    const check = await apiPost("getCart", { mobile });
+    const backendLatest = check.cart || check.data || [];
+
+    // stringify compare
+    if (JSON.stringify(backendLatest) !== JSON.stringify(cart)) {
+      console.warn("Backend mismatch detected → fixing...");
+      localStorage.setItem("cart", JSON.stringify(backendLatest));
+      cart = backendLatest;
+      renderCart();
+    }
+  } catch (err) {
+    console.error("Backend verify error:", err);
+  }
+}, 1500);
+
   }
 }
 
@@ -3373,6 +3393,7 @@ async function onUserLogin(mobile) {
 </script>
 </body>
 </html>
+
 
 
 
