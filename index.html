@@ -3037,7 +3037,7 @@ async function loginUser() {
       document.getElementById("loggedEmail").innerText = res.email || "";
 
       // 3️⃣ NOW do cart merge (MUST happen AFTER email saved)
-      await onUserLogin(mobile);
+      onUserLogin(mobile);
 
       // 4️⃣ UI panel updates
       document.getElementById("userInfoBox").style.display = "block";
@@ -3675,6 +3675,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
