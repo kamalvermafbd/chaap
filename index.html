@@ -2503,6 +2503,16 @@ window.addEventListener("load", () => {
   const mobile = localStorage.getItem("userMobile");
   const email  = localStorage.getItem("userEmail");
   //  LOAD USER CART FROM BACKEND IF LOGGED IN
+document.getElementById("menuWrapper").style.display = "block";
+document.getElementById("pageWrapper").style.display = "none";
+
+document.getElementById("profilePage").style.display = "none";
+document.getElementById("ordersPage").style.display = "none";
+document.getElementById("offersPage").style.display = "none";
+
+document.getElementById("leftNav").classList.remove("active");
+document.getElementById("leftNav").style.display = "none";
+document.getElementById("mainContent").style.marginLeft = "0";
 
 
   // ----- if logged in -----
@@ -3657,6 +3667,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
