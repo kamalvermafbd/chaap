@@ -1347,6 +1347,8 @@ if (!isLoggedIn()) {
   window.cart = stored;
 
   renderCart();
+  setTimeout(() => renderCart(), 50);
+
 
   // --------------------------------------------
  if (isLoggedIn()) {
@@ -1590,6 +1592,7 @@ function updateQty(index, qty) {
     }
 
     renderCart();
+setTimeout(() => renderCart(), 50);
 
     // BACKEND SYNC (safe & debounced)
     if (isLoggedIn()) {
@@ -3628,6 +3631,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
