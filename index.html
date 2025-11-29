@@ -3387,7 +3387,9 @@ async function saveCartToBackend(fastMode = false, cartData = null) {
       }
 
       // === STEP 4C: VERIFY BACKEND CART (FULL AWAIT) ===
-      if (!fastMode) setTimeout(async () => {
+      if (!fastMode) {
+  setTimeout(async () => {
+
         try {
           const mobile = localStorage.getItem("userMobile");
           const check = await apiPost("getCart", { mobile });
@@ -3656,6 +3658,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
