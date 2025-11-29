@@ -3292,7 +3292,7 @@ function mergeCarts(localCart, backendCart) {
 }
 async function onUserLogin(mobile) {
 
-  // ⭐ Ensure sessionId exists
+  //  Ensure sessionId exists
   let sessionId = localStorage.getItem("sessionId");
   if (!sessionId) {
     sessionId = "SESS-" + Date.now();
@@ -3388,11 +3388,15 @@ async function onUserLogin(mobile) {
   // 6) Render UI
   // -------------------------------
   renderCart();
+  // STEP 5B — Force second render to fix stale UI
+setTimeout(() => renderCart(), 50);
+
 }
 
 </script>
 </body>
 </html>
+
 
 
 
