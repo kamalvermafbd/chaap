@@ -1467,7 +1467,7 @@ if (!isLoggedIn()) {
 
   // --------------------------------------------
  if (isLoggedIn()) {
-  saveCartToBackend(true).finally(() => hideCartOverlay());
+saveCartToBackend(false).finally(() => hideCartOverlay());
 
 } else {
   hideCartOverlay();
@@ -3675,6 +3675,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
