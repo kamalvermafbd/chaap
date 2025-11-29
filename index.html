@@ -3292,6 +3292,8 @@ function mergeCarts(localCart, backendCart) {
 }
 async function onUserLogin(mobile) {
 
+  // ALWAYS load email first (IMPORTANT)
+  const email = localStorage.getItem("userEmail") || "";
   //  Ensure sessionId exists
   let sessionId = localStorage.getItem("sessionId");
   if (!sessionId) {
@@ -3373,6 +3375,7 @@ async function onUserLogin(mobile) {
   // -------------------------------
   cart = finalMerged;
   window.cart = finalMerged;
+localStorage.setItem("userEmail", email);
 
   await saveCartToBackend(finalMerged);
 
@@ -3415,6 +3418,7 @@ setTimeout(async () => {
 </script>
 </body>
 </html>
+
 
 
 
