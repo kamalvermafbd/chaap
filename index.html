@@ -621,6 +621,11 @@ body::before {
     transform: translateY(0);
   }
 }
+/* Swipe delete background */
+.cart-card.swipe-delete {
+  transition: transform 0.2s ease-out;
+  background: #ffeaea; /* light red feedback */
+}
 
   </style>
 </head>
@@ -944,6 +949,48 @@ style="
   </div>
 
   <script>
+    /* STEP 20 — SWIPE TO DELETE (Mobile) */
+let swipeStartX = 0;
+
+document.addEventListener("touchstart", (e) => {
+  const card = e.target.closest(".cart-card");
+  if (!card) return;
+  swipeStartX = e.touches[0].clientX;
+});
+
+document.addEventListener("touchmove", (e) => {
+  const card = e.target.closest(".cart-card");
+  if (!card) return;
+
+  const currentX = e.touches[0].clientX;
+  const diff = currentX - swipeStartX;
+
+  // Swipe left only
+  if (diff < -20) {
+    card.classList.add("swipe-delete");
+    card.style.transform = `translateX(${diff}px)`;
+  }
+});
+
+document.addEventListener("touchend", (e) => {
+  const card = e.target.closest(".cart-card");
+  if (!card) return;
+
+  const endX = e.changedTouches[0].clientX;
+  const diff = endX - swipeStartX;
+
+  // If swiped more than 80px → delete
+  if (diff < -80) {
+    const index = Number(card.dataset.index);
+    removeItem(index);
+    return;
+  }
+
+  // Otherwise reset
+  card.classList.remove("swipe-delete");
+  card.style.transform = "translateX(0)";
+});
+
     let restaurantTax = {
   taxType: "",
   servicePercent: 0,
@@ -3704,6 +3751,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
