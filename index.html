@@ -604,6 +604,23 @@ body::before {
     height: 90px;
   }
 }
+/* STEP 19 — fade-in animation */
+.cart-card {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: cartFadeIn 0.25s ease-out forwards;
+}
+
+@keyframes cartFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
   </style>
 </head>
@@ -3687,6 +3704,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
