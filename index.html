@@ -1471,7 +1471,8 @@ if (!isLoggedIn()) {
 
   // --------------------------------------------
  if (isLoggedIn()) {
-  saveCartToBackend().finally(() => hideCartOverlay());
+  saveCartToBackend(true).finally(() => hideCartOverlay());
+
 } else {
   hideCartOverlay();
 }
@@ -3349,7 +3350,8 @@ document.addEventListener("click", function (e) {
   removeItem(index);
 });
 
-async function saveCartToBackend(cartData = null) {
+async function saveCartToBackend(fastMode = false, cartData = null) {
+
   return new Promise(async (resolve) => {
 
     // Only if logged in
@@ -3408,7 +3410,7 @@ async function saveCartToBackend(cartData = null) {
       }
 
       // === STEP 4C: VERIFY BACKEND CART (FULL AWAIT) ===
-      setTimeout(async () => {
+      if (!fastMode) setTimeout(async () => {
         try {
           const mobile = localStorage.getItem("userMobile");
           const check = await apiPost("getCart", { mobile });
@@ -3677,6 +3679,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
