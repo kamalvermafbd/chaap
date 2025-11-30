@@ -3632,7 +3632,8 @@ async function onUserLogin(mobile) {
   window.cart = finalMerged;
 localStorage.setItem("userEmail", email);
 
-  await saveCartToBackend(finalMerged);
+  await saveCartToBackend(false, finalMerged);
+
 
   // Clear guest cart
   localStorage.removeItem("guestCart");
@@ -3702,6 +3703,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
