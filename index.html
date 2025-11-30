@@ -930,8 +930,17 @@ function apiGet(api, params = {}) {
   }).then(res => res.json());
 }
 apiGet("getMenu")
-  .then(res => renderMenu(res.menu))
+  .then(res => {
+    // ⭐ Add image field to each menu item
+    res.menu = (res.menu || []).map(row => ({
+      ...row,
+      image: row.image || row.Image || row.img || ""   // auto-detect column
+    }));
+
+    renderMenu(res.menu);
+  })
   .catch(err => console.error("Menu load error:", err));
+
 // LOAD cat_allocation sheet
 apiGet("getCatAllocations")
   .then(res => {
@@ -3511,6 +3520,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
