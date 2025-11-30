@@ -3419,10 +3419,12 @@ async function saveCartToBackend(fastMode = false, cartData = null) {
 
       window.cartSaveLock = false;
 
-      // Process queued save (NO RECURSIVE VERIFY)
+      // Process queued save ALWAYS in FAST MODE with latest local data
       if (window.cartSaveQueued) {
         window.cartSaveQueued = false;
-        saveCartToBackend(false, cart);
+
+        const latestLocal = JSON.parse(localStorage.getItem("cart"));
+        saveCartToBackend(true, latestLocal);
       }
 
       resolve();  // finish instantly
@@ -3676,6 +3678,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
