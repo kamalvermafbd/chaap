@@ -2927,6 +2927,7 @@ function isLoggedIn() {
 
   
 function buildMenuCardHTML(item, idx) {
+item.itemId = item.itemId || item.ItemId || item.id || item.ID;
 
   let priceSection = "";
   let cartSection = "";
@@ -3511,6 +3512,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
