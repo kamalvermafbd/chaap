@@ -3424,7 +3424,7 @@ async function saveCartToBackend(fastMode = false, cartData = null) {
 
       if (window.cartSaveQueued) {
         window.cartSaveQueued = false;
-        await saveCartToBackend(cart);
+        await saveCartToBackend();
 
       }
 
@@ -3704,6 +3704,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
