@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   
@@ -446,198 +447,9 @@ body::before {
 #leftNav.active {
   transform: translateX(0);
 }
-/// for card layout
+
+
     
-//new css for card
-    /* ============================
-   CART CARD — BASE LAYOUT
-   ============================ */
-
-#cartCards {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 5px;
-}
-
-.cart-card {
-  display: flex;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 10px;
-  background: #ffffff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  position: relative;
-}
-
-.cart-card-img img {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  object-fit: cover;
-}
-
-.cart-card-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-  /* DELETE BUTTON — floating at top-right */
-.cart-delete-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #ff4d4d;
-  color: white;
-  border: none;
-  font-size: 18px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  transition: 0.2s;
-}
-
-.cart-delete-btn:hover {
-  background: #e60000;
-  transform: scale(1.05);
-}
-#taxSummary {
-  margin-top: 15px;
-  padding: 12px;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  font-size: 14px;
-}
-  /* FULLY HIDE OLD TABLE (but keep it for calculation & compatibility) */
-
-/* CART CARD — QTY BUTTON STYLING */
-.cart-card-qty {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 4px 0;
-}
-
-.cart-card-qty .qty-btn {
-  background: #ffffff !important;
-  border: 1px solid #999 !important;
-  color: #333 !important;
-}
-
-
-.cart-card-qty .qty-value {
-  min-width: 22px;
-  text-align: center;
-  font-weight: 600;
-}
-#taxSummary {
-  display: block !important;
-  visibility: visible !important;
-}
-
-    .cart-card-pricing .line {
-  font-size: 13px;
-  color: #555;
-  margin: 2px 0;
-}
-
-.cart-card-pricing .total-line {
-  font-weight: 700;
-  font-size: 14px;
-  margin-top: 4px;
-  color: #d40000;
-}
-.cart-card {
-  padding: 14px;
-  gap: 14px;
-}
-
-.cart-card-name {
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.cart-card-pricing {
-  margin-top: 6px;
-}
-.cart-delete-btn:active {
-  transform: scale(0.85);
-}
-/* STEP 18 — Responsive spacing tuning */
-@media (max-width: 600px) {
-  .cart-card {
-    padding: 10px;
-    gap: 10px;
-  }
-  .cart-card-img img {
-    width: 70px;
-    height: 70px;
-  }
-}
-
-@media (min-width: 900px) {
-  #cartCards {
-    max-width: 700px;
-    margin: auto;
-  }
-  .cart-card {
-    padding: 14px;
-    gap: 14px;
-  }
-  .cart-card-img img {
-    width: 90px;
-    height: 90px;
-  }
-}
-/* STEP 19 — fade-in animation */
-.cart-card {
-  opacity: 0;
-  transform: translateY(6px);
-  animation: cartFadeIn 0.25s ease-out forwards;
-}
-
-@keyframes cartFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-/* Swipe delete background */
-.cart-card.swipe-delete {
-  transition: transform 0.2s ease-out;
-  background: #ffeaea; /* light red feedback */
-}
-#cartCards, #cartTable {
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-    #cartCards, #cartTable {
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-/* FINAL CART CARD LAYOUT FIX */
-#cartCards {
-  display: flex !important;
-  flex-direction: column !important;
-  flex-wrap: nowrap !important;
-  width: 100%;
-  gap: 12px;
-}
-
-
   </style>
 </head>
 <body>
@@ -864,8 +676,7 @@ style="
       </thead>
       <tbody></tbody>
     </table>
-               <!-- NEW CART CARDS SECTION HERE -->
-  <div id="cartCards"></div>
+  
 <p id="cartBaseTotal" 
    style="text-align:right;font-weight:bold;margin:10px 0;">
   Total: ₹<span id="cartTotal">0.00</span>
@@ -960,48 +771,6 @@ style="
   </div>
 
   <script>
-    /* STEP 20 — SWIPE TO DELETE (Mobile) */
-let swipeStartX = 0;
-
-document.addEventListener("touchstart", (e) => {
-  const card = e.target.closest(".cart-card");
-  if (!card) return;
-  swipeStartX = e.touches[0].clientX;
-});
-
-document.addEventListener("touchmove", (e) => {
-  const card = e.target.closest(".cart-card");
-  if (!card) return;
-
-  const currentX = e.touches[0].clientX;
-  const diff = currentX - swipeStartX;
-
-  // Swipe left only
-  if (diff < -20) {
-    card.classList.add("swipe-delete");
-    card.style.transform = `translateX(${diff}px)`;
-  }
-});
-
-document.addEventListener("touchend", (e) => {
-  const card = e.target.closest(".cart-card");
-  if (!card) return;
-
-  const endX = e.changedTouches[0].clientX;
-  const diff = endX - swipeStartX;
-
-  // If swiped more than 80px → delete
-  if (diff < -80) {
-    const index = Number(card.dataset.index);
-    removeItem(index);
-    return;
-  }
-
-  // Otherwise reset
-  card.classList.remove("swipe-delete");
-  card.style.transform = "translateX(0)";
-});
-
     let restaurantTax = {
   taxType: "",
   servicePercent: 0,
@@ -1477,13 +1246,10 @@ if (!isLoggedIn()) {
   window.cart = stored;
 
   renderCart();
-  
-
 
   // --------------------------------------------
  if (isLoggedIn()) {
-saveCartToBackend(true).finally(() => hideCartOverlay());
-
+  saveCartToBackend().finally(() => hideCartOverlay());
 } else {
   hideCartOverlay();
 }
@@ -1494,128 +1260,141 @@ saveCartToBackend(true).finally(() => hideCartOverlay());
 
 
 
-function buildCartCardHTML(item, idx) {
-  return `
-    <div class="cart-card" data-index="${idx}">
-
-
-      <div class="cart-card-img">
-        <img src="${item.image || ''}" alt="${item.name}">
-      </div>
-
-      <div class="cart-card-info">
-
-        <div class="cart-card-top">
-          <h4 class="cart-card-name">${item.name} (${item.unit})</h4>
-          <button class="cart-delete-btn" onclick="removeItem(${idx})">✕</button>
-        </div>
-
-        <div class="cart-card-qty">
-  <span class="qty-label">Qty:</span>
-  <button class="qty-btn" onclick="updateQty(${idx}, ${item.qty - 1}); renderCart();">−</button>
-  <span class="qty-value">${item.qty}</span>
-  <button class="qty-btn" onclick="updateQty(${idx}, ${item.qty + 1}); renderCart();">+</button>
-</div>
-
-        <div class="cart-card-pricing">
-  <div class="line">MRP: ₹${item.rate.toFixed(2)}</div>
-
-  ${item.discPercent > 0 ? `
-    <div class="line">Disc: ${item.discPercent}% (₹${(item.discAmt||0).toFixed(2)})</div>
-    <div class="line">Net: ₹${(item.netAmt||0).toFixed(2)}</div>
-  ` : ``}
-
-  <div class="total-line">Total: ₹${item.total.toFixed(2)}</div>
-</div>
-
-
-      </div>
-    </div>
-  `;
-}
 
 function renderCart() {
 
-  document.getElementById("cartCards").style.display = "flex";
-document.getElementById("cartTable").style.display = "table";
+  const tbody = document.querySelector('#cartTable tbody');
+  const thead = document.querySelector('#cartTable thead tr');
+  tbody.innerHTML = "";
+// ---- SUPER SANITIZER (Prevents render bugs) ----
+cart = cart.map(item => {
+  const menuItem = (window.menuItems || []).find(m => m.itemId == item.itemId);
 
-  const cardsDiv = document.getElementById("cartCards");
-  const taxSummaryEl = document.getElementById("taxSummary");
+  // 1) NAME FIX
+  if (!item.name && menuItem?.name) item.name = menuItem.name;
 
-  // Reset
-// Smooth clear — no flicker / no blank frame
-while (cardsDiv.firstChild) cardsDiv.removeChild(cardsDiv.firstChild);
+  // 2) UNIT FIX (for Multi items)
+  if (!item.unit) {
+    const variant = (window.cat_allocations || []).find(v => v.variantId == item.variantId);
+    if (variant) item.unit = variant.unit;
+  }
 
-const tableBody = document.querySelector("#cartTable tbody");
-while (tableBody.firstChild) tableBody.removeChild(tableBody.firstChild);
+  // 3) IMAGE FIX
+  if (!item.image && menuItem?.image) item.image = menuItem.image;
 
-  
-  document.getElementById("taxSummary").style.display = "block";
+  // 4) TYPE FIX (force correct numeric)
+  item.qty = Number(item.qty || 1);
+  item.rate = Number(item.rate || 0);
+  item.discPercent = Number(item.discPercent || 0);
 
-  // 1) RENDER CARD LAYOUT
+  // 5) TOTAL RECALC
+  const discAmt = (item.rate * item.discPercent) / 100;
+  item.discAmt = Number(discAmt.toFixed(2));
+
+  const netRate = item.rate - item.discAmt;
+
+  item.total = item.discPercent > 0 
+    ? Number((netRate * item.qty).toFixed(2))
+    : Number((item.rate * item.qty).toFixed(2));
+
+  return item;
+});
+
+ 
+
+  // ===== Check discount usage =====
+  const anyDiscount = cart.some(i => Number(i.discPercent) > 0);
+
+  // ===== Build header =====
+  // ===== PERMANENT FULL HEADER (no flicker) =====
+thead.innerHTML = `
+  <th>Item</th>
+  <th>Qty</th>
+  <th>Rate (MRP)</th>
+  <th class="col-disc">Disc %</th>
+  <th class="col-disc">Disc Amt</th>
+  <th class="col-disc">Net Amt</th>
+  <th>Total</th>
+  <th>Action</th>
+`;
+// ===== Hide / Show discount columns =====
+const showDisc = cart.some(i => Number(i.discPercent) > 0);
+
+  let grandTotal = 0;
+
+  // ================================================
+  //               BUILD CART TABLE ROWS
+  // ================================================
   cart.forEach((item, idx) => {
-    cardsDiv.insertAdjacentHTML("beforeend", buildCartCardHTML(item, idx));
 
+    const rate = Number(item.rate);
+    const qty  = Number(item.qty);
+    const disc = Number(item.discPercent || 0);
+
+    // fresh safe calculations
+    const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
+    const netRate = rate - discAmt;
+
+    // FIX: for no discount → use MRP * qty
+    const total = disc > 0 
+      ? parseFloat((netRate * qty).toFixed(2))
+      : parseFloat((rate * qty).toFixed(2));
+
+    grandTotal += total;
+
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+  <td>${item.name} (${item.unit})</td>
+  <td><input type="number" value="${qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
+  <td>₹ ${rate.toFixed(2)}</td>
+
+  <td class="col-disc">${disc}%</td>
+  <td class="col-disc">₹ ${discAmt.toFixed(2)}</td>
+  <td class="col-disc">₹ ${netRate.toFixed(2)}</td>
+
+  <td>₹ ${total.toFixed(2)}</td>
+  <td><button class="delete-btn" data-index="${idx}">Delete</button></td>
+`;
+
+
+    tbody.appendChild(tr);
   });
 
-  // 2) SANITIZE EACH ITEM
-  cart = cart.map(item => {
-    const menuItem = (window.menuItems || []).find(m => m.itemId == item.itemId);
-    if (menuItem) {
-      if (!item.name) item.name = menuItem.name;
-      if (!item.image) item.image = menuItem.image;
-    }
-    if (!item.unit) {
-      const v = (window.cat_allocations || []).find(v => v.variantId == item.variantId);
-      if (v) item.unit = v.unit;
-    }
-
-    item.qty = Number(item.qty || 1);
-    item.rate = Number(item.rate || 0);
-    item.discPercent = Number(item.discPercent || 0);
-
-    const discAmt = (item.rate * item.discPercent) / 100;
-    const netRate = item.rate - discAmt;
-
-    item.discAmt = Number(discAmt.toFixed(2));
-    item.netAmt  = Number(netRate.toFixed(2));
-    item.total   = item.discPercent > 0
-      ? Number((netRate * item.qty).toFixed(2))
-      : Number((item.rate * item.qty).toFixed(2));
-
-    return item;
-  });
-
-  // 3) CART TOTAL
-  let baseTotal = cart.reduce((sum, i) => sum + i.total, 0);
-  baseTotal = Number(baseTotal.toFixed(2));
+  // ===== FINAL TOTAL SET =====
+  let baseTotal = parseFloat(grandTotal.toFixed(2));
   document.getElementById("cartTotal").innerText = baseTotal.toFixed(2);
 
-  // 4) TAX SECTION
+  // TAX BLOCK unchanged
   let taxHtml = "";
+
   if (restaurantTax.taxType === "On Bill") {
-    const serviceAmt = (baseTotal * restaurantTax.servicePercent) / 100;
-    const taxable = baseTotal + serviceAmt;
-    const cgst = (taxable * restaurantTax.cgstPercent) / 100;
-    const sgst = (taxable * restaurantTax.sgstPercent) / 100;
-    const igst = (taxable * restaurantTax.igstPercent) / 100;
-    const grandTotal = taxable + cgst + sgst + igst;
+
+    const serviceAmt = parseFloat(((baseTotal * restaurantTax.servicePercent) / 100).toFixed(2));
+    const taxableAmount = parseFloat((baseTotal + serviceAmt).toFixed(2));
+
+    const cgstAmt = parseFloat(((taxableAmount * restaurantTax.cgstPercent) / 100).toFixed(2));
+    const sgstAmt = parseFloat(((taxableAmount * restaurantTax.sgstPercent) / 100).toFixed(2));
+    const igstAmt = parseFloat(((taxableAmount * restaurantTax.igstPercent) / 100).toFixed(2));
+
+    const grandTotalCalc = parseFloat((taxableAmount + cgstAmt + sgstAmt + igstAmt).toFixed(2));
 
     taxHtml = `
-      ${restaurantTax.servicePercent > 0 ? `<p>Service Charges (${restaurantTax.servicePercent}%): ₹${serviceAmt.toFixed(2)}</p>` : ""}
-      <p>CGST (${restaurantTax.cgstPercent}%): ₹${cgst.toFixed(2)}</p>
-      <p>SGST (${restaurantTax.sgstPercent}%): ₹${sgst.toFixed(2)}</p>
-      ${restaurantTax.igstPercent > 0 ? `<p>IGST (${restaurantTax.igstPercent}%): ₹${igst.toFixed(2)}</p>` : ""}
-      <p style="font-weight:700;color:#d40000;margin-top:5px;">
-        Grand Total: ₹${grandTotal.toFixed(2)}
-      </p>
+      ${restaurantTax.servicePercent > 0 
+        ? `<p style="margin:2px 0;">Service Charges (${restaurantTax.servicePercent}%): ₹${serviceAmt.toFixed(2)}</p>`
+        : ""
+      }
+
+      <p style="margin:2px 0;">CGST (${restaurantTax.cgstPercent}%): ₹${cgstAmt.toFixed(2)}</p>
+      <p style="margin:2px 0;">SGST (${restaurantTax.sgstPercent}%): ₹${sgstAmt.toFixed(2)}</p>
+      ${restaurantTax.igstPercent > 0 ? `<p style="margin:2px 0;">IGST (${restaurantTax.igstPercent}%): ₹${igstAmt.toFixed(2)}</p>` : ""}
+      <p style="margin:6px 0 0; font-weight:700; color:#d40000;">Grand Total: ₹${grandTotalCalc.toFixed(2)}</p>
     `;
   }
 
-  taxSummaryEl.innerHTML = taxHtml;
-  taxSummaryEl.style.visibility = "visible";
+  const taxSummaryEl = document.getElementById("taxSummary");
+  if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
 }
-
 
 
 
@@ -1630,46 +1409,45 @@ function updateQty(index, qty) {
 
     const item = cart[index];
 
-    // --- Recalculate ---
     const rate = Number(item.rate);
     const disc = Number(item.discPercent || 0);
 
     const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
     const netRate = rate - discAmt;
 
-    // Store updated qty
+    const total = disc > 0
+      ? parseFloat((netRate * qty).toFixed(2))
+      : parseFloat((rate * qty).toFixed(2));
+
     item.qty = qty;
 
-    // Store discount + net fields only when disc > 0
     if (disc > 0) {
       item.discAmt = discAmt;
-      item.netAmt = parseFloat(netRate.toFixed(2));
-      item.total = parseFloat((netRate * qty).toFixed(2));
+      item.netAmt  = parseFloat(netRate.toFixed(2));
     } else {
       delete item.discAmt;
       delete item.netAmt;
-      item.total = parseFloat((rate * qty).toFixed(2));
     }
 
-    // --- Save local ---
+    item.total = total;
+
+    // SAVE LOCALLY
     if (!isLoggedIn()) {
       localStorage.setItem("guestCart", JSON.stringify(cart));
     } else {
       localStorage.setItem("cart", JSON.stringify(cart));
     }
 
-    // --- Re-render cards instantly ---
     renderCart();
-     // tiny UI stabilizer
 
-    // --- Backend sync for logged-in ---
+    // BACKEND SYNC (safe & debounced)
     if (isLoggedIn()) {
-      saveCartToBackend();
+      saveCartToBackend(); 
     }
 
-  }, 180); // smooth debounce
-}
+  }, 200); // 200ms debounce
 
+}
 
     function openCheckout() {
       if (cart.length === 0) {
@@ -3062,7 +2840,7 @@ async function loginUser() {
       document.getElementById("loggedEmail").innerText = res.email || "";
 
       // 3️⃣ NOW do cart merge (MUST happen AFTER email saved)
-      onUserLogin(mobile);
+      await onUserLogin(mobile);
 
       // 4️⃣ UI panel updates
       document.getElementById("userInfoBox").style.display = "block";
@@ -3371,8 +3149,7 @@ document.addEventListener("click", function (e) {
   removeItem(index);
 });
 
-async function saveCartToBackend(fastMode = false, cartData = null) {
-
+async function saveCartToBackend(cartData = null) {
   return new Promise(async (resolve) => {
 
     // Only if logged in
@@ -3431,36 +3208,31 @@ async function saveCartToBackend(fastMode = false, cartData = null) {
       }
 
       // === STEP 4C: VERIFY BACKEND CART (FULL AWAIT) ===
-      if (!fastMode) {
+      setTimeout(async () => {
+        try {
+          const mobile = localStorage.getItem("userMobile");
+          const check = await apiPost("getCart", { mobile });
+          const backendLatest = check.cart || check.data || [];
 
-  setTimeout(async () => {
-    try {
-      const mobile = localStorage.getItem("userMobile");
-      const check = await apiPost("getCart", { mobile });
-      const backendLatest = check.cart || check.data || [];
+          if (JSON.stringify(backendLatest) !== JSON.stringify(cart)) {
+            console.warn("Backend mismatch detected → fixing...");
+            localStorage.setItem("cart", JSON.stringify(backendLatest));
+            cart = backendLatest;
+            renderCart();
+          }
 
-      // Trust backend completely (discount fix)
-      localStorage.setItem("cart", JSON.stringify(backendLatest));
-      cart = backendLatest;
+        } catch (err) {
+          console.error("Backend verify error:", err);
+        }
 
-    } catch (err) {
-      console.error("Backend verify error:", err);
-    }
+        // ⭐ Resolve ONLY after verify done
+        resolve();
 
-    // resolve after verify
-    resolve();
-
-  }, 350);
-
-} else {
-
-  resolve(); // fast mode
-}
+      }, 1500);
 
     }
   });
 }
-
 
 
  function loadUserCartOnStart() {
@@ -3650,7 +3422,7 @@ localStorage.setItem("userEmail", email);
   // -------------------------------
   renderCart();
   // STEP 5B — Force second render to fix stale UI
-
+setTimeout(() => renderCart(), 50);
 // === STEP 5C — Final backend verify after login ===
 setTimeout(async () => {
   try {
@@ -3663,7 +3435,7 @@ setTimeout(async () => {
       localStorage.setItem("cart", JSON.stringify(latest));
       cart = latest;
       window.cart = latest;
-      
+      renderCart();
     }
 
   } catch (err) {
@@ -3705,4 +3477,5 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
