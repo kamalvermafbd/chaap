@@ -934,9 +934,10 @@ apiGet("getMenu")
     // ⭐ Add image field to each menu item
     res.menu = (res.menu || []).map(row => ({
       ...row,
-      image: row.image || row.Image || row.img || ""   // auto-detect column
+      image: row["Image Url"] || row.image || row.Image || row.img || ""
+   // auto-detect column
     }));
-
+   window.menuItems = res.menu;
     renderMenu(res.menu);
   })
   .catch(err => console.error("Menu load error:", err));
@@ -3515,6 +3516,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
