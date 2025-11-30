@@ -1259,6 +1259,9 @@ cartItemsContainer.innerHTML = '';
   
 // ---- SUPER SANITIZER (Prevents render bugs) ----
 cart = cart.map(item => {
+   // ADD THIS FIX 
+  const menuMatch = window.menuItems?.find(m => m.itemId == item.itemId);
+  if (menuMatch) item.image = menuMatch.image;
   const menuItem = (window.menuItems || []).find(m => m.itemId == item.itemId);
 
   // 1) NAME FIX
@@ -3512,6 +3515,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
