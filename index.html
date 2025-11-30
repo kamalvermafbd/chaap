@@ -1159,32 +1159,12 @@ if (!isLoggedIn()) {
   if (itemIdFromBtn) {
     itemId = itemIdFromBtn;
     variantId = variantIdFromBtn || "";
-  } else {
-    // Find menu item
-    const menuItem = (window.menuItems || []).find(
-      m => String(m.name || "").trim().toLowerCase() === cleanName
-    );
-
-    if (!menuItem) {
-  console.warn("MenuItem NOT FOUND:", name, unit);
-  hideCartOverlay();
-  return;
+} else {
+    console.warn("FATAL: addToCart called WITHOUT itemIdFromBtn. Button must send correct IDs.");
+    hideCartOverlay();
+    return;
 }
 
-
-    itemId = menuItem.itemId;
-
-    if ((menuItem.cat2 || "").toLowerCase() === "single") {
-      variantId = "";
-    } else {
-      const variant = (window.cat_allocations || []).find(v =>
-        String(v.itemId) === String(itemId) &&
-        String(v.unit || "").trim().toLowerCase() === cleanUnit
-      );
-
-      variantId = variant ? variant.variantId : "";
-    }
-  }
 
   // --------------------------------------------
   // Perfect merge logic using itemId + variantId
@@ -3183,9 +3163,9 @@ btn.dataset.disc = "";
     return;
   }
 
-  addToCart(name, unit, price, discPercent,
-          menuItems.find(m => m.name === name)?.itemId,
-          "");
+  addToCart(name, unit, price, discPercent, btn.dataset.itemId, "");
+
+
 
 });
 
@@ -3527,6 +3507,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
