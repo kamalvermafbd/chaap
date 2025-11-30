@@ -448,6 +448,11 @@ body::before {
   transform: translateX(0);
 }
 
+@media (max-width: 768px) {
+  #miniCartPanel {
+    display: block !important;
+  }
+}
 
     
   </style>
@@ -1394,7 +1399,14 @@ const showDisc = cart.some(i => Number(i.discPercent) > 0);
 
   const taxSummaryEl = document.getElementById("taxSummary");
   if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
+ // --- MINI CART LIVE SYNC ---
+  const mini = document.getElementById("miniCartContent");
+  if (mini) {
+    mini.innerHTML = document.getElementById("cartWrapper").innerHTML;
+  }
 }
+
+    }
 
 
 
@@ -3473,9 +3485,30 @@ async function someCartAction() {
      hideCartOverlay();   // <-- ALWAYS LAST
   }
 }
+<div id="miniCartPanel" style="
+  position: fixed;
+  top: 80px;
+  right: 0;
+  width: 260px;
+  height: calc(100% - 80px);
+  background: #ffffff;
+  border-left: 2px solid #ddd;
+  box-shadow: -3px 0 8px rgba(0,0,0,0.15);
+  z-index: 99999;
+  overflow-y: auto;
+  padding: 10px;
+  display: none; /* mobile only */
+">
+
+  <h3 style="margin-top:0;">Cart</h3>
+  
+  <div id="miniCartContent"></div>
+
+</div>
 
 </script>
 </body>
 </html>
+
 
 
