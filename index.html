@@ -1306,7 +1306,13 @@ cart = cart.map(item => {
   return item;
 });
 
- 
+ // ⭐ SAVE sanitized image back to storage
+if (!isLoggedIn()) {
+  localStorage.setItem("guestCart", JSON.stringify(cart));
+} else {
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
 
   // ===== Check discount usage =====
   const anyDiscount = cart.some(i => Number(i.discPercent) > 0);
@@ -3520,6 +3526,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
