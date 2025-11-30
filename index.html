@@ -3422,41 +3422,17 @@ async function saveCartToBackend(fastMode = false, cartData = null) {
 
       window.cartSaveLock = false;
 
-     if (window.cartSaveQueued) {
-  window.cartSaveQueued = false;
-  await saveCartToBackend();
-}
+      // Process queued save (NO RECURSIVE VERIFY)
+      if (window.cartSaveQueued) {
+        window.cartSaveQueued = false;
+        await saveCartToBackend(true);   // fastMode true
+      }
 
-      // === STEP 4C: VERIFY BACKEND CART (FULL AWAIT) ===
-      if (!fastMode) {
-
-  setTimeout(async () => {
-    try {
-      const mobile = localStorage.getItem("userMobile");
-      const check = await apiPost("getCart", { mobile });
-      const backendLatest = check.cart || check.data || [];
-
-      // Trust backend completely (discount fix)
-      localStorage.setItem("cart", JSON.stringify(backendLatest));
-      cart = backendLatest;
-
-    } catch (err) {
-      console.error("Backend verify error:", err);
-    }
-
-    // resolve after verify
-    resolve();
-
-  }, 350);
-
-} else {
-
-  resolve(); // fast mode
-}
-
+      resolve();  // finish instantly
     }
   });
 }
+
 
 
 
@@ -3703,6 +3679,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
