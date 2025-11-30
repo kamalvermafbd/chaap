@@ -1838,12 +1838,13 @@ function filterMenu() {
       div.className = "menu-item fadeIn";
 
       // Use the same card builder as the main view (handles Single / Multi)
-      div.innerHTML = buildMenuCardHTML(item);
+      div.innerHTML = buildMenuCardHTML(item, renderIndex);
+renderIndex++;
       menuDiv.appendChild(div);
 
       // Activate variant selector if item is multi (so radio -> button enabling works)
       try {
-        activateVariantSelector(item);
+        activateVariantSelector(item, renderIndex - 1);
       } catch (e) {
         // fail-safe: don't break UI on JS errors
         console.error("activateVariantSelector error:", e);
@@ -3512,6 +3513,7 @@ async function someCartAction() {
 </div>
 </body>
 </html>
+
 
 
 
