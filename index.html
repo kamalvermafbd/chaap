@@ -1038,6 +1038,8 @@ let renderIndex = 0;
     menuDiv.appendChild(heading);
 
     chefSpecialItems.forEach(item => {
+      item.itemId = item.itemId || item.ItemId || item.id || item.ID;
+
       const div = document.createElement("div");
       div.className = "menu-item fadeIn";
 
@@ -1070,6 +1072,8 @@ let renderIndex = 0;
       menuDiv.appendChild(heading);
 
       group.forEach(item => {
+        item.itemId = item.itemId || item.ItemId || item.id || item.ID;
+
         const div = document.createElement('div');
         div.className = 'menu-item fadeIn';
 
@@ -3507,6 +3511,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
