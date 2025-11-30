@@ -1197,17 +1197,17 @@ if (!isLoggedIn()) {
 
   // NEW ITEM
   else {
+      // Find exact menu item using itemId (best method)
+    const menuItemFull = (window.menuItems || []).find(
+      m => String(m.itemId) === String(itemId)
+    );
     const qty = 1;
 
     const total = rate * qty;
     const discAmt = (rate * discPercent) / 100;
     const netRate = rate - discAmt;
 
-    // Get image from menuItems
-    const menuItem = (window.menuItems || []).find(
-      m => String(m.name || "").trim().toLowerCase() === cleanName
-    );
-
+   
     let newItem = {
       name,
       unit,
@@ -1217,7 +1217,7 @@ if (!isLoggedIn()) {
       itemId,
       variantId,
       discPercent: Number(discPercent),
-      image: menuItem?.image || ""   // IMPORTANT
+       image: menuItemFull?.image || ""
     };
 
     if (discPercent > 0) {
@@ -3511,6 +3511,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
