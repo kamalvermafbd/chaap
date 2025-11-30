@@ -1349,7 +1349,9 @@ const card = document.createElement("div");
 card.className = "cart-card mb-3 p-4 bg-white rounded-lg shadow flex items-center justify-between gap-4"; // Added gap-4 and padding increased
 
 card.innerHTML = `
-<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 w-full">
+<div class="w-full flex flex-col gap-3">
+   <!-- TOP ROW: IMAGE + INFO -->
+    <div class="flex items-start gap-3">
  <img 
       src="${item.image || 'https://via.placeholder.com/60'}" 
       class="w-20 h-20 object-cover rounded-md"
@@ -1360,7 +1362,7 @@ card.innerHTML = `
    <div class="text-gray-500 text-sm">Rate: ₹${rate.toFixed(2)}</div>
    </div>
  ${disc > 0 ? `
-   <div class="text-right text-sm text-gray-600 leading-tight">
+   <div class="text-gray-600 text-sm leading-tight mt-1">
     <div class="text-sm text-gray-500">Disc %: <span class="font-semibold">${disc}%</span></div>
     <div class="text-sm text-gray-500">Disc Amt: <span class="font-semibold">₹${discAmt.toFixed(2)}</span></div>
     <div class="text-sm text-gray-500">Net Rate: <span class="font-semibold">₹${netRate.toFixed(2)}</span></div>
@@ -3519,6 +3521,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
