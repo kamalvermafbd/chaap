@@ -1045,6 +1045,7 @@ let renderIndex = 0;
 
        div.innerHTML = buildMenuCardHTML(item, renderIndex);
   renderIndex++;
+      
       menuDiv.appendChild(div);
       activateVariantSelector(item, renderIndex - 1);
 
@@ -1077,7 +1078,7 @@ let renderIndex = 0;
 
          div.innerHTML = buildMenuCardHTML(item, renderIndex);
   renderIndex++;
-        
+        activateVariantSelector(item, renderIndex - 1);
         menuDiv.appendChild(div);
         activateVariantSelector(item, renderIndex - 1);
       });
@@ -2905,6 +2906,8 @@ function isLoggedIn() {
 
   
 function buildMenuCardHTML(item, idx) {
+  if (item.cat2 === "Multi" && !Array.isArray(item.variants)) item.variants = [];
+
 
   let priceSection = "";
   let cartSection = "";
@@ -3509,6 +3512,7 @@ async function someCartAction() {
 </div>
 </body>
 </html>
+
 
 
 
