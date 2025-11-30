@@ -679,17 +679,17 @@ style="
 </table>
 
   
-<p id="cartBaseTotal" 
-   style="text-align:right;font-weight:bold;margin:10px 0;">
+<p id="cartBaseTotal" class="text-right font-semibold mt-2 mb-4">
   Total: ₹<span id="cartTotal">0.00</span>
 </p>
-               <!-- Tax Summary Comes Here -->
-<div id="taxSummary" style="text-align:right; margin-top:10px; font-weight:bold;"></div>
 
-<button onclick="openCheckout()" class="checkout-btn" 
-        style="display:block; margin-top:15px;">
+<!-- Tax Summary Comes Here -->
+<div id="taxSummary" class="text-right font-semibold mt-2"></div>
+
+<button onclick="openCheckout()" class="w-full bg-orange-500 text-white py-3 rounded-lg mt-4 hover:bg-orange-600">
   Checkout
 </button>
+
   </div>
         </div>
     </div>
@@ -3479,6 +3479,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
