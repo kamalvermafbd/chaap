@@ -1401,11 +1401,15 @@ const showDisc = cart.some(i => Number(i.discPercent) > 0);
   const taxSummaryEl = document.getElementById("taxSummary");
   if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
  // --- MINI CART LIVE SYNC ---
-  const mini = document.getElementById("miniCartContent");
-  const wrap = document.getElementById("cartWrapper");
-if (mini && wrap) {
+// MINI CART LIVE SYNC (Safe)
+const mini = document.getElementById("miniCartContent");
+const wrap = document.getElementById("cartWrapper");
+
+if (mini && wrap && wrap.innerHTML !== undefined) {
   mini.innerHTML = wrap.innerHTML;
-}}}
+}
+
+}}
 
 
 
@@ -3511,6 +3515,7 @@ async function someCartAction() {
 </div>
 </body>
 </html>
+
 
 
 
