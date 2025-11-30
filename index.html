@@ -1630,33 +1630,44 @@ function updateQty(index, qty) {
 
     const item = cart[index];
 
+    // --- Recalculate ---
     const rate = Number(item.rate);
     const disc = Number(item.discPercent || 0);
 
-    const discAmt = (rate * disc) / 100;
+    const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
     const netRate = rate - discAmt;
 
+    // Store updated qty
     item.qty = qty;
 
+    // Store discount + net fields only when disc > 0
     if (disc > 0) {
       item.discAmt = discAmt;
-      item.netAmt = netRate;
+      item.netAmt = parseFloat(netRate.toFixed(2));
       item.total = parseFloat((netRate * qty).toFixed(2));
     } else {
       delete item.discAmt;
       delete item.netAmt;
-      item.total = rate * qty;
+      item.total = parseFloat((rate * qty).toFixed(2));
     }
 
-    // 🔥 MASTER UPDATE (Makes everything stable)
-    localStorage.setItem("cart", JSON.stringify([...cart]));
-    window.cart = JSON.parse(localStorage.getItem("cart"));
+    // --- Save local ---
+    if (!isLoggedIn()) {
+      localStorage.setItem("guestCart", JSON.stringify(cart));
+    } else {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
 
+    // --- Re-render cards instantly ---
     renderCart();
+     // tiny UI stabilizer
 
-    if (isLoggedIn()) saveCartToBackend(true);
+    // --- Backend sync for logged-in ---
+    if (isLoggedIn()) {
+      saveCartToBackend();
+    }
 
-  }, 180);
+  }, 180); // smooth debounce
 }
 
 
@@ -1691,7 +1702,13 @@ function deleteCart() {
 }
 
 function removeItem(index) {
-  showCartOverlay();
+ showCartOverlay();
+
+  const item = cart[index];
+  if (!item) {
+    hideCartOverlay();
+    return;
+  }
 
   clearTimeout(deleteDebounce);
 
@@ -1699,19 +1716,24 @@ function removeItem(index) {
 
     cart.splice(index, 1);
 
-    // 🔥 MASTER UPDATE
-    localStorage.setItem("cart", JSON.stringify([...cart]));
-    window.cart = JSON.parse(localStorage.getItem("cart"));
+    // SAVE LOCALLY
+    if (!isLoggedIn()) {
+      localStorage.setItem("guestCart", JSON.stringify(cart));
+    } else {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
 
     renderCart();
 
+    // BACKEND SYNC
     if (isLoggedIn()) {
-      saveCartToBackend(true).finally(() => hideCartOverlay());
-    } else {
-      hideCartOverlay();
-    }
+    saveCartToBackend().finally(() => hideCartOverlay());
+  } else {
+    hideCartOverlay();
+  }
 
-  }, 150);
+  }, 150); // small debounce for delete
+
 }
 
 
@@ -3341,33 +3363,42 @@ btn.dataset.disc = "";
 
 
 // DELETE HANDLER — MUST BE BELOW ADD HANDLER
+document.addEventListener("click", function (e) {
+  const del = e.target.closest(".delete-btn");
+  if (!del) return;
 
+  const index = Number(del.dataset.index);
+  removeItem(index);
+});
 
 async function saveCartToBackend(fastMode = false, cartData = null) {
 
   return new Promise(async (resolve) => {
 
+    // Only if logged in
     if (!isLoggedIn()) return resolve();
 
     const mobile = localStorage.getItem("userMobile");
     if (!mobile) return resolve();
 
+    // ---- QUEUE SYSTEM (Race fix) ----
     if (window.cartSaveLock) {
       window.cartSaveQueued = true;
       return resolve();
     }
     window.cartSaveLock = true;
 
+    // Ensure sessionId
     let sessionId = localStorage.getItem("sessionId");
     if (!sessionId) {
       sessionId = "SESS-" + Date.now();
       localStorage.setItem("sessionId", sessionId);
     }
 
-    // 🔥 ALWAYS use latest localStorage cart as master
-    const latestLocal = JSON.parse(localStorage.getItem("cart") || "[]");
-    const cartToSend = (cartData && Array.isArray(cartData)) ? cartData : latestLocal;
+    // Use passed data OR use global cart
+    const cartToSend = (cartData && Array.isArray(cartData)) ? cartData : cart;
 
+    // Clean final payload
     const cleanedCart = cartToSend.map(item => ({
       name: item.name || "",
       unit: item.unit || "",
@@ -3389,18 +3420,43 @@ async function saveCartToBackend(fastMode = false, cartData = null) {
 
     } catch (err) {
       console.error("Cart Save Error:", err);
+
     } finally {
 
       window.cartSaveLock = false;
 
       if (window.cartSaveQueued) {
         window.cartSaveQueued = false;
-
-        const latestRetry = JSON.parse(localStorage.getItem("cart") || "[]");
-        saveCartToBackend(true, latestRetry);
+        await saveCartToBackend();
       }
 
-      resolve();
+      // === STEP 4C: VERIFY BACKEND CART (FULL AWAIT) ===
+      if (!fastMode) {
+
+  setTimeout(async () => {
+    try {
+      const mobile = localStorage.getItem("userMobile");
+      const check = await apiPost("getCart", { mobile });
+      const backendLatest = check.cart || check.data || [];
+
+      // Trust backend completely (discount fix)
+      localStorage.setItem("cart", JSON.stringify(backendLatest));
+      cart = backendLatest;
+
+    } catch (err) {
+      console.error("Backend verify error:", err);
+    }
+
+    // resolve after verify
+    resolve();
+
+  }, 350);
+
+} else {
+
+  resolve(); // fast mode
+}
+
     }
   });
 }
@@ -3579,8 +3635,7 @@ async function onUserLogin(mobile) {
   window.cart = finalMerged;
 localStorage.setItem("userEmail", email);
 
-  await saveCartToBackend(false, finalMerged);
-
+  await saveCartToBackend(finalMerged);
 
   // Clear guest cart
   localStorage.removeItem("guestCart");
@@ -3650,91 +3705,4 @@ async function someCartAction() {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
