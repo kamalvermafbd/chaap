@@ -454,20 +454,10 @@ body::before {
   </style>
 </head>
 <body>
-<div id="cartOverlay" style="
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.45);
-  z-index:9999;
-  color:white;
-  font-size:22px;
-  font-weight:500;
-  align-items:center;
-  justify-content:center;
-">
+<div id="cartOverlay" class="fixed inset-0 bg-black bg-opacity-45 z-50 text-white text-xl font-medium flex items-center justify-center hidden">
   Updating your cart…
 </div>
+
 
   <button onclick="openLogin()" 
         style="position:absolute; right:100px; top:60px; z-index:9999;
@@ -1265,7 +1255,8 @@ if (!isLoggedIn()) {
 
 function renderCart() {
 
-  const tbody = document.querySelector('#cartTable tbody');
+  const cartItemsContainer = document.querySelector('#cartItems');
+
   const thead = document.querySelector('#cartTable thead tr');
   tbody.innerHTML = "";
 // ---- SUPER SANITIZER (Prevents render bugs) ----
@@ -1344,23 +1335,37 @@ const showDisc = cart.some(i => Number(i.discPercent) > 0);
 
     grandTotal += total;
 
-    const tr = document.createElement("tr");
+    
 
-    tr.innerHTML = `
-  <td>${item.name} (${item.unit})</td>
-  <td><input type="number" value="${qty}" min="1" onchange="updateQty(${idx}, this.value)"></td>
-  <td>₹ ${rate.toFixed(2)}</td>
+   const card = document.createElement("div");
+card.className = "cart-card mb-3 p-3 bg-white rounded-lg shadow flex items-center justify-between";
+card.innerHTML = `
+<div class="flex-1">
+  <div class="font-semibold text-gray-800">${item.name} (${item.unit})</div>
+   <div class="text-gray-500 text-sm">Rate: ₹${rate.toFixed(2)}</div>
+   </div>
+<div class="flex items-center gap-2">
+    <button onclick="updateQty(${idx}, ${qty - 1})" class="px-2 py-1 bg-gray-200 rounded">-</button>
+    <div class="w-8 text-center">${qty}</div>
+    <button onclick="updateQty(${idx}, ${qty + 1})" class="px-2 py-1 bg-gray-200 rounded">+</button>
+  </div>
 
-  <td class="col-disc">${disc}%</td>
-  <td class="col-disc">₹ ${discAmt.toFixed(2)}</td>
-  <td class="col-disc">₹ ${netRate.toFixed(2)}</td>
+  ${disc > 0 ? `
+  <div class="text-right mr-4">
+    <div class="text-sm text-gray-500">Disc %: <span class="font-semibold">${disc}%</span></div>
+    <div class="text-sm text-gray-500">Disc Amt: <span class="font-semibold">₹${discAmt.toFixed(2)}</span></div>
+    <div class="text-sm text-gray-500">Net Rate: <span class="font-semibold">₹${netRate.toFixed(2)}</span></div>
+  </div>
+` : ""}
 
-  <td>₹ ${total.toFixed(2)}</td>
-  <td><button class="delete-btn" data-index="${idx}">Delete</button></td>
+
+ <div class="font-semibold text-gray-800">₹${total.toFixed(2)}</div>
+ 
+  <button class="text-red-500" onclick="removeItem(${idx})">Delete</button>
 `;
+cartItemsContainer.appendChild(card);
 
 
-    tbody.appendChild(tr);
   });
 
   // ===== FINAL TOTAL SET =====
@@ -3479,6 +3484,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
