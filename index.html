@@ -1630,44 +1630,33 @@ function updateQty(index, qty) {
 
     const item = cart[index];
 
-    // --- Recalculate ---
     const rate = Number(item.rate);
     const disc = Number(item.discPercent || 0);
 
-    const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
+    const discAmt = (rate * disc) / 100;
     const netRate = rate - discAmt;
 
-    // Store updated qty
     item.qty = qty;
 
-    // Store discount + net fields only when disc > 0
     if (disc > 0) {
       item.discAmt = discAmt;
-      item.netAmt = parseFloat(netRate.toFixed(2));
+      item.netAmt = netRate;
       item.total = parseFloat((netRate * qty).toFixed(2));
     } else {
       delete item.discAmt;
       delete item.netAmt;
-      item.total = parseFloat((rate * qty).toFixed(2));
+      item.total = rate * qty;
     }
 
-    // --- Save local ---
-    if (!isLoggedIn()) {
-      localStorage.setItem("guestCart", JSON.stringify(cart));
-    } else {
-      localStorage.setItem("cart", JSON.stringify(cart));
-    }
+    // 🔥 MASTER UPDATE (Makes everything stable)
+    localStorage.setItem("cart", JSON.stringify([...cart]));
+    window.cart = JSON.parse(localStorage.getItem("cart"));
 
-    // --- Re-render cards instantly ---
     renderCart();
-     // tiny UI stabilizer
 
-    // --- Backend sync for logged-in ---
-    if (isLoggedIn()) {
-      saveCartToBackend();
-    }
+    if (isLoggedIn()) saveCartToBackend(true);
 
-  }, 180); // smooth debounce
+  }, 180);
 }
 
 
@@ -1702,13 +1691,7 @@ function deleteCart() {
 }
 
 function removeItem(index) {
- showCartOverlay();
-
-  const item = cart[index];
-  if (!item) {
-    hideCartOverlay();
-    return;
-  }
+  showCartOverlay();
 
   clearTimeout(deleteDebounce);
 
@@ -1716,24 +1699,19 @@ function removeItem(index) {
 
     cart.splice(index, 1);
 
-    // SAVE LOCALLY
-    if (!isLoggedIn()) {
-      localStorage.setItem("guestCart", JSON.stringify(cart));
-    } else {
-      localStorage.setItem("cart", JSON.stringify(cart));
-    }
+    // 🔥 MASTER UPDATE
+    localStorage.setItem("cart", JSON.stringify([...cart]));
+    window.cart = JSON.parse(localStorage.getItem("cart"));
 
     renderCart();
 
-    // BACKEND SYNC
     if (isLoggedIn()) {
-    saveCartToBackend().finally(() => hideCartOverlay());
-  } else {
-    hideCartOverlay();
-  }
+      saveCartToBackend(true).finally(() => hideCartOverlay());
+    } else {
+      hideCartOverlay();
+    }
 
-  }, 150); // small debounce for delete
-
+  }, 150);
 }
 
 
@@ -3369,30 +3347,27 @@ async function saveCartToBackend(fastMode = false, cartData = null) {
 
   return new Promise(async (resolve) => {
 
-    // Only if logged in
     if (!isLoggedIn()) return resolve();
 
     const mobile = localStorage.getItem("userMobile");
     if (!mobile) return resolve();
 
-    // ---- QUEUE SYSTEM (Race fix) ----
     if (window.cartSaveLock) {
       window.cartSaveQueued = true;
       return resolve();
     }
     window.cartSaveLock = true;
 
-    // Ensure sessionId
     let sessionId = localStorage.getItem("sessionId");
     if (!sessionId) {
       sessionId = "SESS-" + Date.now();
       localStorage.setItem("sessionId", sessionId);
     }
 
-    // Use passed data OR use global cart
-    const cartToSend = (cartData && Array.isArray(cartData)) ? cartData : cart;
+    // 🔥 ALWAYS use latest localStorage cart as master
+    const latestLocal = JSON.parse(localStorage.getItem("cart") || "[]");
+    const cartToSend = (cartData && Array.isArray(cartData)) ? cartData : latestLocal;
 
-    // Clean final payload
     const cleanedCart = cartToSend.map(item => ({
       name: item.name || "",
       unit: item.unit || "",
@@ -3414,24 +3389,21 @@ async function saveCartToBackend(fastMode = false, cartData = null) {
 
     } catch (err) {
       console.error("Cart Save Error:", err);
-
     } finally {
 
       window.cartSaveLock = false;
 
-      // Process queued save ALWAYS in FAST MODE with latest local data
       if (window.cartSaveQueued) {
         window.cartSaveQueued = false;
 
-        const latestLocal = JSON.parse(localStorage.getItem("cart"));
-        saveCartToBackend(true, latestLocal);
+        const latestRetry = JSON.parse(localStorage.getItem("cart") || "[]");
+        saveCartToBackend(true, latestRetry);
       }
 
-      resolve();  // finish instantly
+      resolve();
     }
   });
 }
-
 
 
 
@@ -3678,6 +3650,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
