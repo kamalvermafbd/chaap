@@ -1352,6 +1352,13 @@ card.innerHTML = `
   <div class="font-semibold text-gray-800">${item.name} (${item.unit})</div>
    <div class="text-gray-500 text-sm">Rate: ₹${rate.toFixed(2)}</div>
    </div>
+ ${disc > 0 ? `
+  <div class="text-right mr-4">
+    <div class="text-sm text-gray-500">Disc %: <span class="font-semibold">${disc}%</span></div>
+    <div class="text-sm text-gray-500">Disc Amt: <span class="font-semibold">₹${discAmt.toFixed(2)}</span></div>
+    <div class="text-sm text-gray-500">Net Rate: <span class="font-semibold">₹${netRate.toFixed(2)}</span></div>
+  </div>
+` : ""}
 <div class="flex items-center gap-2">
     <div class="flex items-center gap-2">
   <button 
@@ -1369,13 +1376,7 @@ card.innerHTML = `
 
   </div>
 
-  ${disc > 0 ? `
-  <div class="text-right mr-4">
-    <div class="text-sm text-gray-500">Disc %: <span class="font-semibold">${disc}%</span></div>
-    <div class="text-sm text-gray-500">Disc Amt: <span class="font-semibold">₹${discAmt.toFixed(2)}</span></div>
-    <div class="text-sm text-gray-500">Net Rate: <span class="font-semibold">₹${netRate.toFixed(2)}</span></div>
-  </div>
-` : ""}
+ 
 
 
  <div class="font-semibold text-lg text-gray-800">
@@ -3510,6 +3511,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
