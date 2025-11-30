@@ -1402,12 +1402,10 @@ const showDisc = cart.some(i => Number(i.discPercent) > 0);
   if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
  // --- MINI CART LIVE SYNC ---
   const mini = document.getElementById("miniCartContent");
-  if (mini) {
-    mini.innerHTML = document.getElementById("cartWrapper").innerHTML;
-  }
-}
-
-    }
+  const wrap = document.getElementById("cartWrapper");
+if (mini && wrap) {
+  mini.innerHTML = wrap.innerHTML;
+}}}
 
 
 
@@ -3513,6 +3511,7 @@ async function someCartAction() {
 </div>
 </body>
 </html>
+
 
 
 
