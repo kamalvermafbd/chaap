@@ -3366,13 +3366,7 @@ btn.dataset.disc = "";
 
 
 // DELETE HANDLER — MUST BE BELOW ADD HANDLER
-document.addEventListener("click", function (e) {
-  const del = e.target.closest(".delete-btn");
-  if (!del) return;
 
-  const index = Number(del.dataset.index);
-  removeItem(index);
-});
 
 async function saveCartToBackend(fastMode = false, cartData = null) {
 
@@ -3708,6 +3702,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
