@@ -1260,7 +1260,7 @@ function renderCart() {
    console.log(cart);
 
   const cartItemsContainer = document.querySelector('#cartItems');
-
+cartItemsContainer.innerHTML = '';
   const thead = document.querySelector('#cartTable thead tr');
   
 // ---- SUPER SANITIZER (Prevents render bugs) ----
@@ -3510,6 +3510,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
