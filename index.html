@@ -1353,9 +1353,20 @@ card.innerHTML = `
    <div class="text-gray-500 text-sm">Rate: ₹${rate.toFixed(2)}</div>
    </div>
 <div class="flex items-center gap-2">
-    <button onclick="updateQty(${idx}, ${qty - 1})" class="px-2 py-1 bg-gray-200 rounded">-</button>
-    <div class="w-8 text-center">${qty}</div>
-    <button onclick="updateQty(${idx}, ${qty + 1})" class="px-2 py-1 bg-gray-200 rounded">+</button>
+    <div class="flex items-center gap-2">
+  <button 
+    onclick="updateQty(${idx}, ${qty - 1})" 
+    class="w-8 h-8 flex items-center justify-center border border-gray-400 rounded-full text-xl"
+  >−</button>
+
+  <div class="w-10 text-center font-semibold">${qty}</div>
+
+  <button 
+    onclick="updateQty(${idx}, ${qty + 1})" 
+    class="w-8 h-8 flex items-center justify-center border border-gray-400 rounded-full text-xl"
+  >+</button>
+</div>
+
   </div>
 
   ${disc > 0 ? `
@@ -3492,6 +3503,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
