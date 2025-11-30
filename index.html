@@ -1262,7 +1262,7 @@ function renderCart() {
   const cartItemsContainer = document.querySelector('#cartItems');
 
   const thead = document.querySelector('#cartTable thead tr');
-  tbody.innerHTML = "";
+  
 // ---- SUPER SANITIZER (Prevents render bugs) ----
 cart = cart.map(item => {
   const menuItem = (window.menuItems || []).find(m => m.itemId == item.itemId);
@@ -1341,8 +1341,9 @@ const showDisc = cart.some(i => Number(i.discPercent) > 0);
 
     
 
-   const card = document.createElement("div");
-card.className = "cart-card mb-3 p-3 bg-white rounded-lg shadow flex items-center justify-between";
+const card = document.createElement("div");
+card.className = "cart-card mb-3 p-4 bg-white rounded-lg shadow flex items-center justify-between gap-4"; // Added gap-4 and padding increased
+
 card.innerHTML = `
 <div class="flex-1">
   <div class="font-semibold text-gray-800">${item.name} (${item.unit})</div>
@@ -3488,6 +3489,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
