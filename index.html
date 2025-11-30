@@ -3422,11 +3422,10 @@ async function saveCartToBackend(fastMode = false, cartData = null) {
 
       window.cartSaveLock = false;
 
-      if (window.cartSaveQueued) {
-        window.cartSaveQueued = false;
-        await saveCartToBackend();
-
-      }
+     if (window.cartSaveQueued) {
+  window.cartSaveQueued = false;
+  await saveCartToBackend();
+}
 
       // === STEP 4C: VERIFY BACKEND CART (FULL AWAIT) ===
       if (!fastMode) {
@@ -3704,6 +3703,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
