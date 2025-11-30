@@ -662,23 +662,22 @@ style="
              <div class="cart">
     <h3 class="text-xl font-semibold mb-3 text-gray-800">Your Cart</h3>
 
-    <table id="cartTable">
-      <thead>
-        <tr>
-<th>Item</th>
-<th>Qty</th>
-<th>Rate (MRP)</th>
-<th class="col-disc">Disc %</th>
-<th class="col-disc">Disc Amt</th>
-<th class="col-disc">Net Amt</th>
-<th>Total</th>
-<th>Action</th>
+    <table id="cartTable" class="min-w-full table-auto border-collapse">
+  <thead>
+    <tr class="bg-gray-100 border-b">
+      <th class="px-4 py-2 text-left">Item</th>
+      <th class="px-4 py-2 text-left">Qty</th>
+      <th class="px-4 py-2 text-left">Rate (MRP)</th>
+      <th class="px-4 py-2 text-left">Disc %</th>
+      <th class="px-4 py-2 text-left">Disc Amt</th>
+      <th class="px-4 py-2 text-left">Net Amt</th>
+      <th class="px-4 py-2 text-left">Total</th>
+      <th class="px-4 py-2 text-left">Action</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
-          
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
   
 <p id="cartBaseTotal" 
    style="text-align:right;font-weight:bold;margin:10px 0;">
@@ -3480,6 +3479,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
