@@ -1702,7 +1702,7 @@ function deleteCart() {
 }
 
 function removeItem(index) {
-  showCartOverlay();
+ showCartOverlay();
 
   const item = cart[index];
   if (!item) {
@@ -1714,29 +1714,26 @@ function removeItem(index) {
 
   deleteDebounce = setTimeout(() => {
 
-    try {
-      cart.splice(index, 1);
+    cart.splice(index, 1);
 
-      if (!isLoggedIn()) {
-        localStorage.setItem("guestCart", JSON.stringify(cart));
-      } else {
-        localStorage.setItem("cart", JSON.stringify(cart));
-      }
-
-      renderCart();
-
-      if (isLoggedIn()) {
-        saveCartToBackend().finally(() => hideCartOverlay());
-      } else {
-        hideCartOverlay();
-      }
-    }
-    catch(err) {
-      console.error(err);
-      hideCartOverlay();
+    // SAVE LOCALLY
+    if (!isLoggedIn()) {
+      localStorage.setItem("guestCart", JSON.stringify(cart));
+    } else {
+      localStorage.setItem("cart", JSON.stringify(cart));
     }
 
-  }, 150);
+    renderCart();
+
+    // BACKEND SYNC
+    if (isLoggedIn()) {
+    saveCartToBackend().finally(() => hideCartOverlay());
+  } else {
+    hideCartOverlay();
+  }
+
+  }, 150); // small debounce for delete
+
 }
 
 
@@ -3679,6 +3676,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
