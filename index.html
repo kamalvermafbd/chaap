@@ -1208,8 +1208,9 @@ if (!isLoggedIn()) {
   else {
       // Find exact menu item using itemId (best method)
     const menuItemFull = (window.menuItems || []).find(
-      m => String(m.itemId) === String(itemId)
-    );
+  m => m.itemId == itemId
+);
+
     const qty = 1;
 
     const total = rate * qty;
@@ -3526,6 +3527,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
