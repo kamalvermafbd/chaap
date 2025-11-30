@@ -3422,7 +3422,7 @@ async function saveCartToBackend(fastMode = false, cartData = null) {
       // Process queued save (NO RECURSIVE VERIFY)
       if (window.cartSaveQueued) {
         window.cartSaveQueued = false;
-        await saveCartToBackend();   // fastMode true
+        saveCartToBackend(false, cart);
       }
 
       resolve();  // finish instantly
@@ -3676,6 +3676,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
