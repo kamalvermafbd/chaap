@@ -1984,66 +1984,51 @@ function filterMenu() {
 
   <div class="bg-white w-11/12 max-w-sm rounded-xl p-6 shadow-lg text-center relative">
 
-    <!-- NEW: Overlay inside card -->
-    <div id="fpOverlay" style="
-      display:none;
-      position:absolute;
-      inset:0;
-      background:rgba(0,0,0,0.35);
-      color:white;
-      font-size:18px;
-      font-weight:600;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:12px;
-      z-index:50;
-    ">
+    <h2 class="text-[18px] text-gray-800 mb-2">Reset Your Password</h2>
+
+    <!-- Mobile -->
+    <input id="fpMobile" type="tel" maxlength="10"
+      placeholder="Enter Mobile Number"
+      class="w-full border border-gray-300 rounded-lg px-4 py-3 mt-2" />
+
+    <!-- Send OTP -->
+    <button onclick="sendResetOTP()"
+      class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold mt-3">
+      Send OTP
+    </button>
+
+    <!-- OTP -->
+    <input id="fpOTP" type="text" style="display:none"
+      placeholder="Enter OTP"
+      class="w-full border border-gray-300 rounded-lg px-4 py-3 mt-3" />
+
+    <!-- New Password -->
+    <input id="fpNewPass" type="password" style="display:none"
+      placeholder="Enter New Password"
+      class="w-full border border-gray-300 rounded-lg px-4 py-3 mt-3" />
+
+    <!-- Update Button -->
+    <button id="resetBtn" onclick="resetPassword()" style="display:none"
+      class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold mt-3">
+      Update Password
+    </button>
+
+    <!-- Close -->
+    <button onclick="closeForgotPassword()"
+      class="w-full bg-gray-200 text-gray-800 py-3 rounded-lg mt-3">
+      Close
+    </button>
+
+    <!-- 🟢 OVERLAY INSIDE CARD -->
+    <div id="fpOverlay"
+      class="absolute inset-0 bg-black bg-opacity-40 text-white font-semibold text-lg
+             flex items-center justify-center rounded-xl hidden">
       Sending OTP...
     </div>
 
-    <h2 style="font-size:18px;color:#333;margin-bottom:10px;">
-      Reset Your Password
-    </h2>
-
-    <!-- Mobile -->
-<input type="tel" id="fpMobile" placeholder="Enter Mobile Number" maxlength="10"
-  class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base 
-         focus:ring-2 focus:ring-orange-400 outline-none"
-/>
-
-   <!-- Send OTP -->
-<button onclick="sendResetOTP()"
-  class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold 
-         shadow hover:bg-blue-600 transition">
-  Send OTP
-</button>
-
-<!-- OTP -->
-<input type="text" id="fpOTP" placeholder="Enter OTP" style="display:none"
-  class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base 
-         focus:ring-2 focus:ring-orange-400 outline-none"
-/>
-  <!-- New Password -->
-<input type="password" id="fpNewPass" placeholder="Enter New Password" style="display:none"
-  class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base 
-         focus:ring-2 focus:ring-orange-400 outline-none"
-/>
-   <!-- Reset Password -->
-<button id="resetBtn" onclick="resetPassword()" style="display:none"
-  class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold 
-         shadow hover:bg-green-700 transition mt-3">
-  Update Password
-</button>
-
-   <!-- Close -->
-<button onclick="closeForgotPassword()"
-  class="w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-medium 
-         shadow hover:bg-gray-300 transition mt-3">
-  Close
-</button>
   </div>
 </div>
+
 
 <!-- SIGNUP MODAL (COMPACT + CLEAN) -->
 <div id="signupModal"
@@ -3619,6 +3604,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
