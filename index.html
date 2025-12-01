@@ -2044,6 +2044,12 @@ function filterMenu() {
          focus:ring-2 focus:ring-orange-400 outline-none"
 />
 
+    <!-- Send OTP -->
+<button type="button" onclick="sendEmailOTP()"
+  class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold 
+         shadow hover:bg-blue-600 transition">
+  Send OTP
+</button>
 <!-- Email OTP -->
 <input type="text" id="suEmailOTP" placeholder="Enter Email OTP"
   class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base
@@ -2052,7 +2058,7 @@ function filterMenu() {
 
   
 
-<button type="button" onclick="sendEmailOTP()">Send OTP</button>
+
 
 
    <textarea id="suAddress" placeholder="Address"></textarea>
@@ -2066,8 +2072,18 @@ function filterMenu() {
     <!-- STATE (Auto-filled) -->
     <input type="text" id="suState" placeholder="State" readonly>
 
-    <button onclick="verifyAndSignup()">Submit</button>
-    <button onclick="closeSignup()">Close</button>
+   <!-- Submit -->
+<button onclick="verifyAndSignup()"
+  class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold 
+         shadow hover:bg-green-700 transition">
+  Submit
+</button>
+    <!-- Close -->
+<button onclick="closeSignup()"
+  class="w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-medium 
+         shadow hover:bg-gray-300 transition">
+  Close
+</button>
   </div>
 </div>
 
@@ -3536,6 +3552,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
