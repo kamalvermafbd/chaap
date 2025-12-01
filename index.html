@@ -1931,19 +1931,42 @@ function filterMenu() {
     <!-- Mobile -->
     <input id="loginMobile" type="tel" maxlength="10"
       placeholder="Enter Mobile Number"
-      class="w-full border border-gray-300 rounded-lg px-4 py-2 mb-3 focus:ring focus:ring-orange-300" />
+      class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base 
+       focus:ring-2 focus:ring-orange-400 outline-none"
+      />
 
     <!-- Password -->
     <input id="loginPassword" type="password"
       placeholder="Enter Password"
-      class="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4 focus:ring focus:ring-orange-300" />
+      class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base 
+       focus:ring-2 focus:ring-orange-400 outline-none"
+ 
+      />
 
     <!-- Login Button -->
     <button onclick="loginUser()"
-      class="w-full bg-orange-500 text-white py-2 rounded-lg font-medium hover:bg-orange-600">
+      class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold 
+       shadow-md hover:bg-orange-600 transition"
+
+      >
       Login
     </button>
 
+<!-- Forgot Password -->
+<button onclick="openForgotPassword()"
+  class="w-full text-orange-600 text-sm font-medium mt-3">
+  Forgot Password?
+</button>
+
+<!-- Signup Link -->
+<div class="text-center text-sm text-gray-600 mt-2">
+  Not registered?
+  <span onclick="openSignup()" class="text-orange-600 font-semibold cursor-pointer">
+    Sign Up
+  </span>
+</div>
+
+      
   </div>
 </div>
 
@@ -1987,7 +2010,8 @@ function filterMenu() {
 <!-- SIGNUP MODAL (simple welcome text) -->
 <div id="signupModal"
      class="fixed inset-0 bg-black bg-opacity-50 z-[9999] hidden flex items-center justify-center">
-  <div class="bg-white w-11/12 max-w-md rounded-xl p-6 shadow-lg">
+  <div class="bg-white w-11/12 max-w-md rounded-xl p-6 shadow-lg space-y-3">
+
 
     <h2>Welcome User</h2>
 
@@ -1996,17 +2020,40 @@ function filterMenu() {
       No backend code is triggered.
     </p>
 
-      <input type="text" id="suMobile" placeholder="Mobile">
+<!-- Mobile -->
+<input type="text" id="suMobile" placeholder="Mobile Number"
+  class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base
+         focus:ring-2 focus:ring-orange-400 outline-none"
+/>
 
-    <input type="password" id="suPassword" placeholder="Password">
+<!-- Password -->
+<input type="password" id="suPassword" placeholder="Password"
+  class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base
+         focus:ring-2 focus:ring-orange-400 outline-none"
+/>
 
-    <input type="text" id="suName" placeholder="Name">
+<!-- Name -->
+<input type="text" id="suName" placeholder="Full Name"
+  class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base
+         focus:ring-2 focus:ring-orange-400 outline-none"
+/>
 
-    <input type="email" id="suEmail" placeholder="Email">
+<!-- Email -->
+<input type="email" id="suEmail" placeholder="Email Address"
+  class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base
+         focus:ring-2 focus:ring-orange-400 outline-none"
+/>
+
+<!-- Email OTP -->
+<input type="text" id="suEmailOTP" placeholder="Enter Email OTP"
+  class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base
+         focus:ring-2 focus:ring-orange-400 outline-none"
+/>
+
+  
 
 <button type="button" onclick="sendEmailOTP()">Send OTP</button>
 
-<input type="text" id="suEmailOTP" placeholder="Enter Email OTP">
 
    <textarea id="suAddress" placeholder="Address"></textarea>
    <!-- NEW PINCODE FIELD -->
@@ -3489,6 +3536,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
