@@ -756,6 +756,7 @@ style="
 </div>
 
 <!-- CHECKOUT MODAL (Tailwind Updated) -->
+<!-- CHECKOUT MODAL (Tailwind Updated — with ALL your original fields) -->
 <div id="checkoutModal"
      class="fixed inset-0 bg-black bg-opacity-50 hidden z-[9999] flex items-center justify-center p-4">
 
@@ -767,64 +768,81 @@ style="
       ✕
     </button>
 
-    <!-- Title -->
     <h2 class="text-2xl font-semibold text-gray-800 mb-5">
       Checkout
     </h2>
 
-    <!-- FORM -->
     <form id="checkoutForm" class="space-y-4">
 
-      <!-- Name -->
+      <!-- Order Type -->
       <div>
-        <label for="checkoutName" class="block text-sm font-medium text-gray-700 mb-1">
-          Name
-        </label>
-        <input id="checkoutName" type="text" required
-          class="w-full border border-gray-300 rounded-lg p-3 text-gray-800 
+        <label class="block text-sm font-medium text-gray-700 mb-1">Order Type</label>
+        <select id="orderType" onchange="toggleAddressField()" required
+          class="w-full border border-gray-300 rounded-lg p-3 bg-white
                  focus:outline-none focus:ring-2 focus:ring-orange-500">
+          <option value="">Select Order Type</option>
+          <option value="Dine In">Dine In</option>
+          <option value="Take Away">Take Away</option>
+          <option value="Home Delivery">Home Delivery</option>
+        </select>
       </div>
 
-      <!-- Mobile (readonly) -->
+      <!-- Customer Name -->
       <div>
-        <label for="checkoutMobile" class="block text-sm font-medium text-gray-700 mb-1">
-          Mobile
-        </label>
-        <input id="checkoutMobile" type="tel" readonly
-          class="w-full border border-gray-300 bg-gray-100 rounded-lg p-3 text-gray-700 
-                 focus:outline-none cursor-not-allowed">
-      </div>
-
-      <!-- Address -->
-      <div>
-        <label for="checkoutAddress" class="block text-sm font-medium text-gray-700 mb-1">
-          Address
-        </label>
-        <textarea id="checkoutAddress" rows="3" required
-          class="w-full border border-gray-300 rounded-lg p-3 text-gray-800 
-                 focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
-      </div>
-
-      <!-- Note -->
-      <div>
-        <label for="checkoutNote" class="block text-sm font-medium text-gray-700 mb-1">
-          Delivery Note (optional)
-        </label>
-        <input id="checkoutNote" type="text"
+        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+        <input id="customerName" type="text" placeholder="Your Name" required
           class="w-full border border-gray-300 rounded-lg p-3 text-gray-800
                  focus:outline-none focus:ring-2 focus:ring-orange-500">
       </div>
 
-      <!-- PLACE ORDER BUTTON -->
-      <button type="submit"
-        class="w-full bg-orange-600 text-white py-3 rounded-lg text-lg font-semibold 
-               hover:bg-orange-700 active:scale-95 transition">
-        Place Order
-      </button>
+      <!-- Email -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+        <input id="email" type="email" placeholder="Email" required
+          class="w-full border border-gray-300 rounded-lg p-3 text-gray-800
+                 focus:outline-none focus:ring-2 focus:ring-orange-500">
+      </div>
+
+      <!-- Address -->
+      <div id="addressWrapper">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+        <textarea id="address" placeholder="Address"
+          class="w-full border border-gray-300 rounded-lg p-3 text-gray-800
+                 focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+      </div>
+
+      <!-- Payment Method -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+        <select id="paymentMethod" required
+          class="w-full border border-gray-300 rounded-lg p-3 bg-white
+                 focus:outline-none focus:ring-2 focus:ring-orange-500">
+          <option value="">Select Payment</option>
+          <option value="Cash on Delivery">Cash on Delivery</option>
+          <option value="Online">Online</option>
+        </select>
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex items-center gap-3 pt-2">
+        <button type="submit"
+          class="flex-1 bg-orange-600 text-white py-3 rounded-lg text-lg font-semibold 
+                 hover:bg-orange-700 active:scale-95 transition">
+          Place Order
+        </button>
+
+        <button type="button" onclick="closeCheckout()"
+          class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg text-lg font-semibold 
+                 hover:bg-gray-300 active:scale-95 transition">
+          Cancel
+        </button>
+      </div>
 
     </form>
+
   </div>
 </div>
+
 
 
 
@@ -3710,6 +3728,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
