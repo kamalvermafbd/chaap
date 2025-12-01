@@ -2610,7 +2610,6 @@ function resetPassword() {
   lockForgotForm();
   updateForgotOverlay("Updating password...");
 
-  // ? Netlify POST API
   apiPost("resetPassword", { mobile, otp, newPass })
     .then(res => {
       document.getElementById("fpOverlay").style.display = "none";
@@ -2618,7 +2617,14 @@ function resetPassword() {
 
       if (res.success) {
         alert("Password updated successfully!");
+
         closeForgotPassword();
+
+        //  FIX 1 — ensure login form is unlocked
+        unlockLoginForm();
+
+        //  FIX 2 — open login modal again
+        document.getElementById("loginModal").style.display = "flex";
       } else {
         alert(res.message);
       }
@@ -2627,9 +2633,11 @@ function resetPassword() {
       document.getElementById("fpOverlay").style.display = "none";
       unlockForgotForm();
       alert("Error: " + err.message);
+
+      //  Ensure login is not stuck locked
+      unlockLoginForm();
     });
 }
-
 
 function lockForgotForm() {
   const modal = document.querySelector("#forgotPasswordModal > div");
@@ -3604,6 +3612,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
