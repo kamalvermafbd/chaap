@@ -2345,6 +2345,7 @@ function sendEmailOTP() {
 
       if (res.success) {
         alert("OTP sent to your email!");
+        document.getElementById("suEmailOTP").style.display = "block";
       } else {
         alert(res.message);
       }
@@ -3578,6 +3579,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
