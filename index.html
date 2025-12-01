@@ -2128,11 +2128,17 @@ modal.classList.remove("hidden");
 
 function closeLogin() {
   const modal = document.getElementById("loginModal");
-  modal.style.display = "none";          // <-- real close
-  modal.classList.add("hidden");         // tailwind safety
-  
-  // Extra safety: unlock form ALWAYS
+
+  modal.classList.add("hidden");   // close modal
+
+  // Force unlock every time (safest)
   unlockLoginForm();
+
+  // Clear login fields for safety
+  const loginMobile = document.getElementById("loginMobile");
+  const loginPassword = document.getElementById("loginPassword");
+  if (loginMobile) loginMobile.value = "";
+  if (loginPassword) loginPassword.value = "";
 }
 
 
@@ -3621,6 +3627,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
