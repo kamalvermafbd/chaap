@@ -452,6 +452,15 @@ body::before {
     outline: none !important;
     box-shadow: none !important;
   }
+/* Disable ripple on specific buttons */
+.no-ripple::after {
+  display: none !important;
+  content: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+  background: transparent !important;
+}
 
 
     
@@ -1966,10 +1975,11 @@ function filterMenu() {
 
 <!-- Forgot Password -->
 <button onclick="openForgotPassword()"
-  class="w-full text-orange-600 text-sm font-medium mt-3 
+  class="no-ripple w-full text-orange-600 text-sm font-medium mt-3 
          focus:outline-none focus:ring-0 active:outline-none active:ring-0 active:bg-transparent">
   Forgot Password?
 </button>
+
 
 
 
@@ -3594,6 +3604,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
