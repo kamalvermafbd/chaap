@@ -1874,19 +1874,12 @@ function filterMenu() {
 
 
   </script>
-<div id="loginProgressOverlay" style="
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.35);
-  z-index:9999;
-  color:white;
-  font-size:22px;
-  align-items:center;
-  justify-content:center;
-">
+<div id="loginProgressOverlay"
+     class="fixed inset-0 bg-black bg-opacity-40 z-[10000] hidden 
+            flex items-center justify-center text-white text-xl font-semibold">
   Login in progress…
 </div>
+
 
   <div id="loadingOverlay" style="
     display: none;
@@ -2414,28 +2407,21 @@ function validateLoginMobile() {
 }
 
 function lockLoginForm() {
-  const modal = document.querySelector("#loginModal .modal-content");
+  document.querySelectorAll("#loginModal input, #loginModal button")
+    .forEach(el => el.disabled = true);
 
-  // Disable everything
-  [...modal.querySelectorAll("input, button")].forEach(el => {
-    el.disabled = true;
-  });
-
-  // Show overlay
-  document.getElementById("loginProgressOverlay").style.display = "flex";
+  document.getElementById("loginProgressOverlay").classList.remove("hidden");
 }
+
 
 function unlockLoginForm() {
-  const modal = document.querySelector("#loginModal .modal-content");
+  document.querySelectorAll("#loginModal input, #loginModal button")
+    .forEach(el => el.disabled = false);
 
-  // Enable everything
-  [...modal.querySelectorAll("input, button")].forEach(el => {
-    el.disabled = false;
-  });
-
-  // Hide overlay
-  document.getElementById("loginProgressOverlay").style.display = "none";
+  document.getElementById("loginProgressOverlay").classList.add("hidden");
 }
+
+
 
 function openForgotPassword() {
   document.getElementById("forgotPasswordModal").style.display = "flex";
@@ -3501,6 +3487,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
