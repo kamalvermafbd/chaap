@@ -1596,9 +1596,15 @@ function updateQty(index, qty) {
         alert("Your cart is empty!");
         return;
       }
+      
        // 
   document.getElementById("cartOverlay").style.display = "none";
-      
+      if (!isLoggedIn()) {
+    document.getElementById("mobile").value = "";
+    document.getElementById("customerName").value = "";
+    document.getElementById("email").value = "";
+    document.getElementById("address").value = "";
+  }
       document.getElementById('checkoutModal').style.display = 'flex';
       
     }
@@ -1722,14 +1728,15 @@ function toggleAddressField() {
       emailField.style.display = "block";
 
       // Show address only if Home Delivery
-      if (orderType === "Home Delivery") {
-        addressField.style.display = "block";
-        addressField.required = true;
-      } else {
-        addressField.style.display = "none";
-        addressField.required = false;
-        addressField.value = "";
-      }
+     if (orderType === "Home Delivery") {
+    addressField.style.display = "block";
+    addressField.required = true;
+} else {
+    addressField.style.display = "none";
+    addressField.required = false;
+    // ❌ DO NOT CLEAR ADDRESS here
+}
+
 
       // Make fields editable
       nameField.readOnly = false;
@@ -2267,7 +2274,9 @@ function logoutUser() {
   document.getElementById("hamburgerBtn").style.display = "none";
 
   document.getElementById("leftNav").style.display = "none";
-
+document.getElementById("leftNav").classList.remove("active");
+document.getElementById("leftNav").style.display = "none";
+  
   document.getElementById("menuWrapper").style.display = "block";
   document.getElementById("pageWrapper").style.display = "none";
 
@@ -2293,7 +2302,10 @@ function logoutUser() {
 
   // Refresh cart UI
   renderCart();
-
+document.getElementById("mobile").value = "";
+document.getElementById("customerName").value = "";
+document.getElementById("email").value = "";
+document.getElementById("address").value = "";
   alert("Logged out successfully.");
 }
 
@@ -3124,6 +3136,7 @@ async function loginUser() {
       // close modal with slight delay
  setTimeout(() => {
   closeLogin();
+   unlockLoginForm();   
 }, 50);
 
     })
@@ -3751,6 +3764,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
