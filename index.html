@@ -2498,6 +2498,18 @@ window.addEventListener("load", () => {
     if (firstMenu) firstMenu.classList.add("active");
   }
    loadUserCartOnStart();
+  if (!isLoggedIn()) {
+  const guest = JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+  // Render only if actually a valid array
+  if (Array.isArray(guest) && guest.length > 0) {
+    cart = guest;
+    window.cart = guest;
+    renderCart();
+    openCart();  
+     document.getElementById("cartToggleBar")?.classList.add("active-cart");
+  }
+}
 });
 
 function validateLoginMobile() {
@@ -3648,6 +3660,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
