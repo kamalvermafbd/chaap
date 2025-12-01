@@ -1577,7 +1577,11 @@ function updateQty(index, qty) {
         alert("Your cart is empty!");
         return;
       }
+       // 
+  document.getElementById("cartOverlay").style.display = "none";
+      
       document.getElementById('checkoutModal').style.display = 'flex';
+      
     }
 
     function closeCheckout() {
@@ -3728,6 +3732,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
