@@ -2647,14 +2647,15 @@ function resetPassword() {
 
 
 function lockForgotForm() {
-  const modal = document.querySelector("#forgotPasswordModal .modal-content");
-  [...modal.querySelectorAll("input, button")].forEach(el => el.disabled = true);
+  const modal = document.querySelector("#forgotPasswordModal > div");
+  modal.querySelectorAll("input, button").forEach(el => el.disabled = true);
 }
 
 function unlockForgotForm() {
-  const modal = document.querySelector("#forgotPasswordModal .modal-content");
-  [...modal.querySelectorAll("input, button")].forEach(el => el.disabled = false);
+  const modal = document.querySelector("#forgotPasswordModal > div");
+  modal.querySelectorAll("input, button").forEach(el => el.disabled = false);
 }
+
 
 function updateForgotOverlay(msg) {
   document.getElementById("fpOverlay").textContent = msg;
@@ -3618,6 +3619,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
