@@ -464,6 +464,13 @@ body::before {
   box-shadow: none !important;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.animate-fadeIn {
+  animation: fadeIn .25s ease-out;
+}
     
   </style>
 </head>
@@ -748,35 +755,78 @@ style="
 
 </div>
 
-  <div id="checkoutModal" class="modal">
-    <div class="modal-content">
-      <h3>Checkout</h3>
-      <form id="checkoutForm" onsubmit="event.preventDefault(); placeOrder();">
-        <input type="tel" id="mobile" pattern="^[0-9]{10}$" placeholder="Enter 10-digit Mobile" required oninput="checkCustomerByMobile()">
-        <p id="infoMsg" style="color:green;font-size:14px;display:none;margin-top:4px;"></p>
+<!-- CHECKOUT MODAL (Tailwind Updated) -->
+<div id="checkoutModal"
+     class="fixed inset-0 bg-black bg-opacity-50 hidden z-[9999] flex items-center justify-center p-4">
 
-        <select id="orderType" onchange="toggleAddressField()" required>
-          <option value="">Select Order Type</option>
-          <option value="Dine In">Dine In</option>
-          <option value="Take Away">Take Away</option>
-          <option value="Home Delivery">Home Delivery</option>
-        </select>
+  <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-6 relative animate-fadeIn">
 
-        <input type="text" id="customerName" placeholder="Name" required>
-        <input type="email" id="email" placeholder="Email" required>
-        <textarea id="address" placeholder="Address"></textarea>
+    <!-- Close Button -->
+    <button onclick="closeCheckout()"
+            class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-xl font-semibold">
+      ✕
+    </button>
 
-        <select id="paymentMethod" required>
-          <option value="">Select Payment</option>
-          <option value="Cash on Delivery">Cash on Delivery</option>
-          <option value="Online">Online</option>
-        </select>
+    <!-- Title -->
+    <h2 class="text-2xl font-semibold text-gray-800 mb-5">
+      Checkout
+    </h2>
 
-        <button type="submit" class="checkout-btn">Place Order</button>
-        <button type="button" onclick="closeCheckout()">Cancel</button>
-      </form>
-    </div>
+    <!-- FORM -->
+    <form id="checkoutForm" class="space-y-4">
+
+      <!-- Name -->
+      <div>
+        <label for="checkoutName" class="block text-sm font-medium text-gray-700 mb-1">
+          Name
+        </label>
+        <input id="checkoutName" type="text" required
+          class="w-full border border-gray-300 rounded-lg p-3 text-gray-800 
+                 focus:outline-none focus:ring-2 focus:ring-orange-500">
+      </div>
+
+      <!-- Mobile (readonly) -->
+      <div>
+        <label for="checkoutMobile" class="block text-sm font-medium text-gray-700 mb-1">
+          Mobile
+        </label>
+        <input id="checkoutMobile" type="tel" readonly
+          class="w-full border border-gray-300 bg-gray-100 rounded-lg p-3 text-gray-700 
+                 focus:outline-none cursor-not-allowed">
+      </div>
+
+      <!-- Address -->
+      <div>
+        <label for="checkoutAddress" class="block text-sm font-medium text-gray-700 mb-1">
+          Address
+        </label>
+        <textarea id="checkoutAddress" rows="3" required
+          class="w-full border border-gray-300 rounded-lg p-3 text-gray-800 
+                 focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+      </div>
+
+      <!-- Note -->
+      <div>
+        <label for="checkoutNote" class="block text-sm font-medium text-gray-700 mb-1">
+          Delivery Note (optional)
+        </label>
+        <input id="checkoutNote" type="text"
+          class="w-full border border-gray-300 rounded-lg p-3 text-gray-800
+                 focus:outline-none focus:ring-2 focus:ring-orange-500">
+      </div>
+
+      <!-- PLACE ORDER BUTTON -->
+      <button type="submit"
+        class="w-full bg-orange-600 text-white py-3 rounded-lg text-lg font-semibold 
+               hover:bg-orange-700 active:scale-95 transition">
+        Place Order
+      </button>
+
+    </form>
   </div>
+</div>
+
+
 
   <script>
     let restaurantTax = {
@@ -3660,6 +3710,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
