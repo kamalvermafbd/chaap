@@ -192,14 +192,15 @@ button:active::after {
     th:nth-child(2), td:nth-child(2) {
       width: 60px;
     }
-    button {
-      background: #ff6347;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+    button.default-btn {
+  background: #ff6347;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
     button:hover { background: #e7533d; }
     checkout-btn {
       width: auto;
@@ -462,6 +463,14 @@ body::before {
   background: transparent !important;
 }
 
+#loginModal button,
+#forgotPasswordModal button {
+  background: transparent !important;
+  color: inherit !important;
+  padding: inherit !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
 
     
   </style>
@@ -1975,10 +1984,11 @@ function filterMenu() {
 
 <!-- Forgot Password -->
 <button onclick="openForgotPassword()"
-  class="no-ripple w-full text-orange-600 text-sm font-medium mt-3 
-         focus:outline-none focus:ring-0 active:outline-none active:ring-0 active:bg-transparent">
+  class="no-ripple"
+  style="background:transparent !important; color:#ff6a00;">
   Forgot Password?
 </button>
+
 
 
 
@@ -3604,6 +3614,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
