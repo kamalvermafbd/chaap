@@ -1988,8 +1988,10 @@ function filterMenu() {
 </div>
 
 <!-- SIGNUP MODAL (simple welcome text) -->
-<div id="signupModal" class="modal">
-  <div class="modal-content">
+<div id="signupModal"
+     class="fixed inset-0 bg-black bg-opacity-50 z-[9999] hidden flex items-center justify-center">
+  <div class="bg-white w-11/12 max-w-md rounded-xl p-6 shadow-lg">
+
     <h2>Welcome User</h2>
 
     <p style="font-size:14px;color:#555;margin-top:10px;">
@@ -3497,5 +3499,6 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
