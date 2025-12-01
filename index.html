@@ -2129,16 +2129,20 @@ modal.classList.remove("hidden");
 function closeLogin() {
   const modal = document.getElementById("loginModal");
 
-  modal.classList.add("hidden");   // close modal
+  // FULL HARD CLOSE
+  modal.style.display = "none";
+  modal.classList.add("hidden");
 
-  // Force unlock every time (safest)
+  // REMOVE ANY POSSIBLE OVERLAY FREEZE
   unlockLoginForm();
 
-  // Clear login fields for safety
-  const loginMobile = document.getElementById("loginMobile");
-  const loginPassword = document.getElementById("loginPassword");
-  if (loginMobile) loginMobile.value = "";
-  if (loginPassword) loginPassword.value = "";
+  // Force hide all overlays inside login
+  const overlay = document.getElementById("loginProgressOverlay");
+  if (overlay) overlay.classList.add("hidden");
+
+  // Clear fields (safety)
+  document.getElementById("loginMobile").value = "";
+  document.getElementById("loginPassword").value = "";
 }
 
 
@@ -3627,6 +3631,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
