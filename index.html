@@ -1925,57 +1925,41 @@ function filterMenu() {
   Sending OTP...
 </div>
 
-<div id="loginModal" class="modal">
-  <div class="modal-content" style="text-align:center;">
-   <h2 style="
-  font-size: 16px; 
-  color: #cc0000; 
-  font-weight: 500; 
-  margin-bottom: 12px;
-  text-transform: none;
-">
-  Please enter your registered mobile number and password
-</h2>
+<!-- LOGIN OVERLAY (NEW TAILWIND VERSION) -->
+<div id="loginModal"
+  class="fixed inset-0 bg-black bg-opacity-50 z-[9999] hidden flex items-center justify-center">
 
-<input type="text" style="display:none" autocomplete="username">
-<input type="password" style="display:none" autocomplete="current-password">
+  <div class="bg-white w-11/12 max-w-sm rounded-xl p-6 shadow-lg relative">
 
-<input 
-  type="tel" 
-  id="loginMobile" 
-  placeholder="Mobile Number" 
-  maxlength="10" 
-  autocomplete="off"
-  autocorrect="off"
-  autocapitalize="off"
-  oninput="validateLoginMobile()"
-  spellcheck="false">
-  <p id="mobileError" style="color:red;font-size:12px;display:none;margin:5px 0 0;"></p>
-<input 
-  type="password" 
-  id="loginPassword" 
-  placeholder="Password"
-  autocomplete="new-password"
-  autocorrect="off"
-  autocapitalize="off"
-  spellcheck="false">
-
-    
-<button onclick="loginUser()">Login</button>
-<button onclick="openForgotPassword()" 
-        style="margin-top:10px;background:#ff6347;
-               color:white;border:none;border-radius:6px;
-               padding:8px 12px;cursor:pointer;">
-  Forgot Password
-</button>
-
-    <button onclick="closeLogin()" 
-            style="margin-top:15px;padding:8px 12px;;color:ff6347;
-                   border:none;border-radius:6px;">
-      Close
+    <!-- Close -->
+    <button onclick="closeLogin()"
+      class="absolute top-3 right-3 text-gray-600 text-2xl font-semibold">
+      &times;
     </button>
+
+    <h2 class="text-xl font-semibold text-gray-800 text-center mb-6">
+      Login to Continue
+    </h2>
+
+    <!-- Mobile -->
+    <input id="loginMobile" type="tel" maxlength="10"
+      placeholder="Enter Mobile Number"
+      class="w-full border border-gray-300 rounded-lg px-4 py-2 mb-3 focus:ring focus:ring-orange-300" />
+
+    <!-- Password -->
+    <input id="loginPassword" type="password"
+      placeholder="Enter Password"
+      class="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4 focus:ring focus:ring-orange-300" />
+
+    <!-- Login Button -->
+    <button onclick="loginUser()"
+      class="w-full bg-orange-500 text-white py-2 rounded-lg font-medium hover:bg-orange-600">
+      Login
+    </button>
+
   </div>
 </div>
+
 
 
 <!-- FORGOT PASSWORD MODAL -->
@@ -2053,11 +2037,13 @@ function filterMenu() {
 
 //open login
 function openLogin() {
-  document.getElementById("loginModal").style.display = "flex";
+  const modal = document.getElementById("loginModal");
+  modal.classList.remove("hidden");
 }
 
 function closeLogin() {
-  document.getElementById("loginModal").style.display = "none";
+  const modal = document.getElementById("loginModal");
+  modal.classList.add("hidden");
 }
 
 
@@ -3519,3 +3505,4 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
