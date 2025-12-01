@@ -1982,28 +1982,42 @@ function filterMenu() {
       Reset Your Password
     </h2>
 
-    <input type="tel" id="fpMobile" placeholder="Enter Mobile Number"
-           maxlength="10"
-           style="margin-bottom:10px;">
+    <!-- Mobile -->
+<input type="tel" id="fpMobile" placeholder="Enter Mobile Number" maxlength="10"
+  class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base 
+         focus:ring-2 focus:ring-orange-400 outline-none"
+/>
 
-    <button onclick="sendResetOTP()">Send OTP</button>
+   <!-- Send OTP -->
+<button onclick="sendResetOTP()"
+  class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold 
+         shadow hover:bg-blue-600 transition">
+  Send OTP
+</button>
 
-    <input type="text" id="fpOTP" placeholder="Enter OTP"
-           style="display:none;margin-top:10px;">
+<!-- OTP -->
+<input type="text" id="fpOTP" placeholder="Enter OTP" style="display:none"
+  class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base 
+         focus:ring-2 focus:ring-orange-400 outline-none"
+/>
+  <!-- New Password -->
+<input type="password" id="fpNewPass" placeholder="Enter New Password" style="display:none"
+  class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base 
+         focus:ring-2 focus:ring-orange-400 outline-none"
+/>
+   <!-- Reset Password -->
+<button id="resetBtn" onclick="resetPassword()" style="display:none"
+  class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold 
+         shadow hover:bg-green-700 transition mt-3">
+  Update Password
+</button>
 
-    <input type="password" id="fpNewPass" placeholder="Enter New Password"
-           style="display:none;margin-top:10px;">
-
-    <button id="resetBtn" onclick="resetPassword()" 
-            style="display:none;margin-top:10px;">
-      Update Password
-    </button>
-
-    <button onclick="closeForgotPassword()" 
-            style="margin-top:15px;padding:8px 12px;background:#444;
-                   color:#fff;border:none;border-radius:6px;">
-      Close
-    </button>
+   <!-- Close -->
+<button onclick="closeForgotPassword()"
+  class="w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-medium 
+         shadow hover:bg-gray-300 transition mt-3">
+  Close
+</button>
   </div>
 </div>
 
@@ -2903,13 +2917,16 @@ async function loginUser() {
     return;
   }
 
-  lockLoginForm();
+  lockLoginForm(); // overlay ON
 
   apiPost("login", { mobile, password })
-    .then(async res => {   // <-- make this async
-      unlockLoginForm();
+    .then(async res => {   // <-- keep async
+
+      // ❌ remove overlay unlock from here (success case)
+      // unlockLoginForm();  <-- REMOVE THIS LINE ONLY
 
       if (!res.success) {
+        unlockLoginForm();   // fail case → overlay off
         alert(res.message || "Login failed.");
         return;
       }
@@ -2921,24 +2938,26 @@ async function loginUser() {
       // 2️⃣ Update UI email immediately
       document.getElementById("loggedEmail").innerText = res.email || "";
 
-      // 3️⃣ NOW do cart merge (MUST happen AFTER email saved)
+      // 3️⃣ NOW do cart merge (AFTER email saved)
       await onUserLogin(mobile);
 
       // 4️⃣ UI panel updates
       document.getElementById("userInfoBox").style.display = "block";
-
       document.querySelector("button[onclick='openLogin()']").style.display = "none";
       document.querySelector("button[onclick='openSignup()']").style.display = "none";
       document.getElementById("signupLabelBox").style.display = "none";
-
       document.getElementById("logoutBtn").style.display = "inline-block";
       document.getElementById("hamburgerBtn").style.display = "block";
       document.getElementById("leftNav").style.display = "block";
 
+      // ✅ SUCCESS → overlay OFF now
+      unlockLoginForm();
+
+      // close modal with slight delay
       setTimeout(() => closeLogin(), 50);
     })
     .catch(err => {
-      unlockLoginForm();
+      unlockLoginForm();  // error → overlay off
       alert("Login error: " + err.message);
     });
 }
@@ -3560,6 +3579,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
