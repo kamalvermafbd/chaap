@@ -453,6 +453,16 @@ body::before {
     outline: none !important;
     box-shadow: none !important;
   }
+.nohighlight {
+  -webkit-tap-highlight-color: transparent !important;
+  background: transparent !important;
+}
+.nohighlight:active,
+.nohighlight:focus {
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
 
     
   </style>
@@ -1955,10 +1965,11 @@ function filterMenu() {
 
 <!-- Forgot Password -->
 <button onclick="openForgotPassword()"
-  class="text-orange-600 text-sm font-medium mt-3 
-         focus:outline-none focus:ring-0 active:outline-none active:ring-0">
+  class="text-orange-600 text-sm font-medium mt-3 nohighlight"
+  style="background:none; border:none; padding:0;">
   Forgot Password?
 </button>
+
 
 
 
@@ -3637,6 +3648,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
