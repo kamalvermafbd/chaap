@@ -441,6 +441,19 @@ body::before {
   transform: translateX(0);
 }
 
+<style>
+  button:focus,
+  button:active,
+  button:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  *:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+</style>
 
     
   </style>
@@ -3581,6 +3594,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
