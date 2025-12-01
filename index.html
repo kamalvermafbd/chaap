@@ -2527,8 +2527,18 @@ function unlockLoginForm() {
 
 
 function openForgotPassword() {
+  // hide login if you WANT (optional)
+  // document.getElementById("loginModal").style.display = "none";
+
+  // show forgot modal
   document.getElementById("forgotPasswordModal").style.display = "flex";
+
+  // reset visible fields
+  document.getElementById("fpOTP").style.display = "none";
+  document.getElementById("fpNewPass").style.display = "none";
+  document.getElementById("resetBtn").style.display = "none";
 }
+
 
 function closeForgotPassword() {
   document.getElementById("forgotPasswordModal").style.display = "none";
@@ -3596,6 +3606,7 @@ async function someCartAction() {
 </script>
 </body>
 </html>
+
 
 
 
