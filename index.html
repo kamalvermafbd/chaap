@@ -1804,6 +1804,44 @@ document.getElementById("changeAddressBtn").addEventListener("click", async () =
 
 });
 
+document.getElementById("savedAddressDropdown").addEventListener("change", async function () {
+  const selected = this.value;
+
+  const formBox = document.getElementById("newAddressForm");
+  const dropdownBox = document.getElementById("addressSelectContainer");
+  const addressField = document.getElementById("address");
+
+  // Reset forms
+  formBox.classList.add("hidden");
+
+  // If Add New Address selected → open new form
+  if (selected === "__ADD_NEW__") {
+    formBox.classList.remove("hidden");
+
+    // Autofill mobile into new form
+    document.getElementById("newAddressMobile").value =
+      localStorage.getItem("userMobile") || "";
+
+    return;
+  }
+
+  // LOAD ALL ADDRESSES AGAIN (to access values properly)
+  const data = await loadSavedAddresses();
+
+  // 1️⃣ Primary Address Selected
+  if (selected === "__PRIMARY__") {
+    addressField.value = data.primaryAddress || "";
+    return;
+  }
+
+  // 2️⃣ Multi Addresses
+  if (selected.startsWith("__MULTI__")) {
+    const index = parseInt(selected.replace("__MULTI__", ""));
+    const selectedAddress = data.multiAddresses[index] || "";
+    addressField.value = selectedAddress;
+    return;
+  }
+});
 
     function closeCheckout() {
       document.getElementById('checkoutModal').style.display = 'none';
@@ -4098,4 +4136,5 @@ document.addEventListener("DOMContentLoaded", autofillMobileForLoggedIn);
 </script>
 </body>
 </html>
+
 
