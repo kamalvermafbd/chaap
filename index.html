@@ -1993,6 +1993,10 @@ function removeItem(index) {
 
 
 function checkCustomerByMobile() {
+  if (isLoggedIn()) {
+  document.getElementById('mobile').readOnly = true;
+  return; // stop guest mobile logic
+}
   const mobile = document.getElementById('mobile').value.trim();
 
   // If mobile incomplete -> reset and hide complete row (label + input)
@@ -4278,6 +4282,7 @@ function autofillMobileForLoggedIn() {
 </script>
 </body>
 </html>
+
 
 
 
