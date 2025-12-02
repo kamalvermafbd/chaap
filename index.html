@@ -1652,6 +1652,8 @@ function updateQty(index, qty) {
 }
 
   function openCheckout() {
+      // Always auto-fill mobile for logged-in users
+  autofillMobileForLoggedIn();
   if (cart.length === 0) {
     alert("Your cart is empty!");
     return;
@@ -3914,79 +3916,58 @@ function resetCheckoutFieldsDefault() {
   document.getElementById("paymentMethod").style.display = "block";
 }
 
+function isUserLoggedIn() {
+  return !!localStorage.getItem("userMobile");
+}
 
+
+function setupAddressUIVisibility() {
+  const changeBtn = document.getElementById("changeAddressBtn");
+  const dropdownContainer = document.getElementById("addressSelectContainer");
+  const newAddressForm = document.getElementById("newAddressForm");
+
+  if (!changeBtn || !dropdownContainer || !newAddressForm) return;
+
+  if (isUserLoggedIn()) {
+    // ONLY logged-in users see the button
+    changeBtn.classList.remove("hidden");
+
+    // Dropdown & New address form remain hidden until user clicks
+    dropdownContainer.classList.add("hidden");
+    newAddressForm.classList.add("hidden");
+  } else {
+    // Guest User → everything OFF
+    changeBtn.classList.add("hidden");
+    dropdownContainer.classList.add("hidden");
+    newAddressForm.classList.add("hidden");
+  }
+}
+
+// run on page load
+document.addEventListener("DOMContentLoaded", setupAddressUIVisibility);
+
+function autofillMobileForLoggedIn() {
+  const mobileInput = document.getElementById("mobile");
+
+  if (!mobileInput) return;
+
+  // Only logged-in users
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) {
+    // Guest → allow typing
+    mobileInput.value = "";
+    mobileInput.readOnly = false;
+    return;
+  }
+
+  // Logged-in user → auto-fill and lock the field
+  mobileInput.value = mobile;
+  mobileInput.readOnly = true;
+}
+
+// Run when checkout modal shows up
+document.addEventListener("DOMContentLoaded", autofillMobileForLoggedIn);
 
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
