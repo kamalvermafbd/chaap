@@ -1651,9 +1651,13 @@ function updateQty(index, qty) {
 
 }
 
-  function openCheckout() {
-      // Always auto-fill mobile for logged-in users
+ function openCheckout() {
+  // Always auto-fill mobile for logged-in users
   autofillMobileForLoggedIn();
+
+  // 👉 Add this line here
+  loadPrimaryAddress();
+
   if (cart.length === 0) {
     alert("Your cart is empty!");
     return;
@@ -1676,6 +1680,129 @@ function updateQty(index, qty) {
   // Now show checkout modal
   document.getElementById('checkoutModal').style.display = 'flex';
 }
+
+
+    
+async function loadPrimaryAddress() {
+  // Only logged-in users
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) return;
+
+  try {
+    const response = await fetch(
+      `https://script.google.com/macros/s/AKfycbz8B-nwXivGHzKgcWT8zTvS4sAWG6dKfsDh8rsn29CGXCeIxxeNJ9NaPcL03cQBGHEf/exec?action=getUserByMobile&mobile=${mobile}`
+    );
+
+    const data = await response.json();
+
+    if (data && data.address) {
+      document.getElementById("address").value = data.address;
+    } else {
+      // No address saved → textarea stays empty
+      document.getElementById("address").value = "";
+    }
+
+  } catch (error) {
+    console.error("Primary address load error:", error);
+  }
+}
+async function loadSavedAddresses() {
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) {
+    return {
+      primaryAddress: "",
+      multiAddresses: [],
+      hasMulti: false
+    };
+  }
+
+  try {
+    // 1️⃣ Fetch PRIMARY address (user sheet)
+    const primaryRes = await fetch(
+      `https://script.google.com/macros/s/AKfycbz8B-nwXivGHzKgcWT8zTvS4sAWG6dKfsDh8rsn29CGXCeIxxeNJ9NaPcL03cQBGHEf/exec?action=getUserByMobile&mobile=${mobile}`
+    );
+    const primaryData = await primaryRes.json();
+
+    const primaryAddress = primaryData?.address || "";
+
+    // 2️⃣ Fetch MULTI addresses (multi_add sheet)
+    const multiRes = await fetch(
+      `https://script.google.com/macros/s/AKfycbz8B-nwXivGHzKgcWT8zTvS4sAWG6dKfsDh8rsn29CGXCeIxxeNJ9NaPcL03cQBGHEf/exec?action=getMultiAddress&mobile=${mobile}`
+    );
+    const multiData = await multiRes.json();
+
+    const multiAddresses =
+      Array.isArray(multiData?.addresses) ? multiData.addresses : [];
+
+    return {
+      primaryAddress,
+      multiAddresses,
+      hasMulti: multiAddresses.length > 0
+    };
+
+  } catch (err) {
+    console.error("Address Load Error:", err);
+
+    return {
+      primaryAddress: "",
+      multiAddresses: [],
+      hasMulti: false
+    };
+  }
+}
+document.getElementById("changeAddressBtn").addEventListener("click", async () => {
+
+  // Load all saved addresses
+  const data = await loadSavedAddresses();
+
+  const dropdown = document.getElementById("savedAddressDropdown");
+  const ddlBox   = document.getElementById("addressSelectContainer");
+  const formBox  = document.getElementById("newAddressForm");
+
+  // Reset UI
+  dropdown.innerHTML = "";
+  ddlBox.classList.add("hidden");
+  formBox.classList.add("hidden");
+
+  // CASE 2 — No multi_add addresses
+  if (!data.hasMulti) {
+
+    // Open Add New Address form directly
+    formBox.classList.remove("hidden");
+
+    // Autofill mobile inside form
+    document.getElementById("newAddressMobile").value =
+      localStorage.getItem("userMobile") || "";
+
+    return;
+  }
+
+  // CASE 1 — User HAS saved addresses → populate dropdown
+  ddlBox.classList.remove("hidden");
+
+  // --- 1️⃣ Primary Address ---
+  if (data.primaryAddress && data.primaryAddress.trim() !== "") {
+    const opt1 = document.createElement("option");
+    opt1.value = "__PRIMARY__";
+    opt1.textContent = "Primary Address";
+    dropdown.appendChild(opt1);
+  }
+
+  // --- 2️⃣ Multi-address list ---
+  data.multiAddresses.forEach((addr, index) => {
+    const opt = document.createElement("option");
+    opt.value = "__MULTI__" + index;
+    opt.textContent = addr;
+    dropdown.appendChild(opt);
+  });
+
+  // --- 3️⃣ Add New Address (last option) ---
+  const addNew = document.createElement("option");
+  addNew.value = "__ADD_NEW__";
+  addNew.textContent = "➕ Add New Address";
+  dropdown.appendChild(addNew);
+
+});
 
 
     function closeCheckout() {
@@ -3971,3 +4098,4 @@ document.addEventListener("DOMContentLoaded", autofillMobileForLoggedIn);
 </script>
 </body>
 </html>
+
