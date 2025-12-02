@@ -2098,7 +2098,9 @@ function toggleAddressField() {
           break;
         }
       }
-
+if (isLoggedIn()) {
+  latestHDAddress = "";
+}
       // Fill HD address only if HD selected
       if (orderType === "Home Delivery") {
         addressWrapper.style.display = "block";
@@ -2149,13 +2151,14 @@ function toggleAddressField() {
       addressField.readOnly = false;
 
       // Optional: less intrusive than alert, but keeping your current behavior
-      alert(
-        "Customer details loaded:\n\n" +
-        "Name: " + (nameField.value || "(not found)") + "\n" +
-        "Email: " + (emailField.value || "(not found)") + "\n" +
-        "Latest HD Address: " + (latestHDAddress || "(not found)")
-      );
-
+      if (!isLoggedIn()) {
+  alert(
+    "Customer details loaded:\n\n" +
+    "Name: " + (nameField.value || "(not found)") + "\n" +
+    "Email: " + (emailField.value || "(not found)") + "\n" +
+    "Latest HD Address: " + (latestHDAddress || "(not found)")
+  );
+}
     })
     .catch(err => {
       console.error("Lookup error:", err);
@@ -4237,6 +4240,7 @@ document.addEventListener("DOMContentLoaded", autofillMobileForLoggedIn);
 </script>
 </body>
 </html>
+
 
 
 
