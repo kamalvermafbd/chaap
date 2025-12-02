@@ -4218,10 +4218,6 @@ function resetCheckoutFieldsDefault() {
   document.getElementById("paymentMethod").style.display = "block";
 }
 
-function isUserLoggedIn() {
-  return !!localStorage.getItem("userMobile");
-}
-
 
 function setupAddressUIVisibility() {
   const changeBtn = document.getElementById("changeAddressBtn");
@@ -4273,6 +4269,7 @@ document.addEventListener("DOMContentLoaded", autofillMobileForLoggedIn);
 </script>
 </body>
 </html>
+
 
 
 
