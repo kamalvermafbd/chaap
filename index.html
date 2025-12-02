@@ -3811,21 +3811,27 @@ async function someCartAction() {
 
 function resetCheckoutFieldsDefault() {
   // Only 3 fields visible
-  document.getElementById("mobile").style.display = "block";
-  document.getElementById("orderType").style.display = "block";
-  document.getElementById("paymentMethod").style.display = "block";
+  document.getElementById("mobile").parentElement.style.display = "block";
+  document.getElementById("orderType").parentElement.style.display = "block";
+  document.getElementById("paymentMethod").parentElement.style.display = "block";
 
-  // Hide these
+  // Hide these 3 together (label + input)
   document.getElementById("customerName").parentElement.style.display = "none";
-document.getElementById("email").parentElement.style.display = "none";
-document.getElementById("addressWrapper").style.display = "none";
+  document.getElementById("email").parentElement.style.display = "none";
+  document.getElementById("addressWrapper").style.display = "none";
 
+  // Also ensure inputs are visible when needed
+  document.getElementById("customerName").style.display = "block";
+  document.getElementById("email").style.display = "block";
+  document.getElementById("paymentMethod").style.display = "block";
 }
+
 
 
 </script>
 </body>
 </html>
+
 
 
 
