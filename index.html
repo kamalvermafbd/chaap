@@ -1591,24 +1591,30 @@ function updateQty(index, qty) {
 
 }
 
-    function openCheckout() {
-      if (cart.length === 0) {
-        alert("Your cart is empty!");
-        return;
-      }
-      
-       // 
+  function openCheckout() {
+  if (cart.length === 0) {
+    alert("Your cart is empty!");
+    return;
+  }
+
+  // Close cart overlay
   document.getElementById("cartOverlay").style.display = "none";
-      if (!isLoggedIn()) {
+
+  // IMPORTANT: First reset visibility (only 3 fields visible)
+  resetCheckoutFieldsDefault();
+
+  // Clear old values only for guest user
+  if (!isLoggedIn()) {
     document.getElementById("mobile").value = "";
     document.getElementById("customerName").value = "";
     document.getElementById("email").value = "";
     document.getElementById("address").value = "";
   }
-      resetCheckoutFieldsDefault();
-      document.getElementById('checkoutModal').style.display = 'flex';
-      
-    }
+
+  // Now show checkout modal
+  document.getElementById('checkoutModal').style.display = 'flex';
+}
+
 
     function closeCheckout() {
       document.getElementById('checkoutModal').style.display = 'none';
@@ -1692,6 +1698,17 @@ function removeItem(index) {
   // When valid mobile ? show Order Type
   document.getElementById('orderType').style.display = "block";
 }
+
+    document.getElementById("orderType").addEventListener("change", toggleAddressField);
+document.getElementById("mobile").addEventListener("input", function () {
+  const mobile = document.getElementById('mobile').value.trim();
+  if (/^[0-9]{10}$/.test(mobile)) {
+    // Only run when Order Type already selected
+    if (document.getElementById('orderType').value) {
+      toggleAddressField();
+    }
+  }
+});
 
 function toggleAddressField() {
   const orderType = document.getElementById('orderType').value;
@@ -3802,6 +3819,7 @@ function resetCheckoutFieldsDefault() {
 </script>
 </body>
 </html>
+
 
 
 
