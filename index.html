@@ -1718,41 +1718,43 @@ function toggleAddressField() {
   const mobile = document.getElementById('mobile').value.trim();
   const orderType = document.getElementById('orderType').value;
 
-  // 🔥 Prevent double popup (after valid mobile + orderType)
+  // 🔥 Prevent double popup
   if (mobile === lastLookupMobile && orderType === lastLookupOrderType) {
     return;
   }
   lastLookupMobile = mobile;
   lastLookupOrderType = orderType;
 
+  // Validate order type
   if (!orderType) return;
 
+  // Validate mobile
   if (!/^[0-9]{10}$/.test(mobile)) {
     alert("Enter a valid 10-digit mobile number first.");
     return;
   }
 
+  // Fields
   const nameField = document.getElementById('customerName');
   const emailField = document.getElementById('email');
   const addressField = document.getElementById('address');
   const addressWrapper = document.getElementById('addressWrapper');
   const paymentField = document.getElementById('paymentMethod');
-  const infoMsg = document.getElementById('infoMsg');
   const overlay = document.getElementById('loadingOverlay');
   const orderSelect = document.getElementById('orderType');
 
-  // Show & lock fields before lookup
+  // ⭐ SHOW PARENTS (label + field)
   nameField.parentElement.style.display = "block";
   emailField.parentElement.style.display = "block";
 
-  nameField.readOnly = false;
-  emailField.readOnly = false;
-  addressField.readOnly = false;
- 
-  // ✔ Payment ALWAYS visible
+  // ⭐ PAYMENT ALWAYS VISIBLE
   paymentField.style.display = "block";
 
-  // Show loading overlay
+  // Lock (readonly while lookup)
+  nameField.readOnly = true;
+  emailField.readOnly = true;
+  addressField.readOnly = true;
+
   overlay.style.display = "flex";
   orderSelect.disabled = true;
 
@@ -1770,22 +1772,22 @@ function toggleAddressField() {
         }
       }
 
-      // Fill name+email using latest order (NOT HD)
+      // Latest NAME + EMAIL (not HD based)
       if (orders.length > 0) {
         const latest = orders[orders.length - 1];
         nameField.value = latest.name || "";
         emailField.value = latest.email || "";
       }
 
-      // Store HD address (blank acceptable)
+      // HD Address
       addressField.value = latestHDAddress;
 
-      // Unlock
+      // Unlock fields
       nameField.readOnly = false;
       emailField.readOnly = false;
       addressField.readOnly = false;
 
-      // Address UI
+      // Show Address only for HD
       if (orderType === "Home Delivery") {
         addressWrapper.style.display = "block";
         addressField.required = true;
@@ -1794,7 +1796,7 @@ function toggleAddressField() {
         addressField.required = false;
       }
 
-      // Alert summary (only once ― popup fixed)
+      // Single Alert
       alert(
         "Customer details loaded:\n\n" +
         "Name: " + (nameField.value || "(not found)") + "\n" +
@@ -1803,17 +1805,16 @@ function toggleAddressField() {
       );
 
     })
-
     .catch(err => {
       console.error("Lookup error:", err);
       alert("Error loading customer details. Please try again.");
     })
-
     .finally(() => {
       overlay.style.display = "none";
       orderSelect.disabled = false;
     });
 }
+
 
 function placeOrder() {
   if (window._orderLock) return;
@@ -3835,6 +3836,7 @@ function resetCheckoutFieldsDefault() {
 </script>
 </body>
 </html>
+
 
 
 
