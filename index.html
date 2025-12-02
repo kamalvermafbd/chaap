@@ -2120,6 +2120,7 @@ if (isLoggedIn()) {
           // Logged-in user → keep address as loaded by primary/multi system
           // loadPrimaryAddress() is called elsewhere when opening checkout
           // so do not overwrite the address here
+           addressField.value = addressField.value;
         }
 
       } else {
@@ -4254,6 +4255,7 @@ document.addEventListener("DOMContentLoaded", autofillMobileForLoggedIn);
 </script>
 </body>
 </html>
+
 
 
 
