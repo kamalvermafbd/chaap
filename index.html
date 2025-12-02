@@ -2145,34 +2145,32 @@ if (isLoggedIn()) {
   // Stop repeated UI redraw
   addressWrapper.style.display = addressWrapper.style.display;
 }
-      // Fill HD address only if HD selected
-      if (orderType === "Home Delivery") {
-         if (isLoggedIn()) return;   // STEP-4A FIX
-        addressWrapper.style.display = "block";
-        addressField.required = true;
+     // Fill HD address only if HD selected
+if (orderType === "Home Delivery") {
 
-        if (!isLoggedIn()) {
-          // Guest user → use history lookup address
-          addressField.value = latestHDAddress || "";
-        } else {
-          // Logged-in user → keep address as loaded by primary/multi system
-          // loadPrimaryAddress() is called elsewhere when opening checkout
-          // so do not overwrite the address here
-           addressField.value = addressField.value;
-        }
+  // logged-in → do NOT overwrite saved address
+  if (isLoggedIn()) {
+    addressWrapper.style.display = "block";
+    addressField.required = true;
 
-      } else {
-        // Takeaway
-        addressWrapper.style.display = "none";
-        addressField.required = false;
-
-        if (!isLoggedIn()) {
-          addressField.value = "";
-        }
-          if (isLoggedIn()) {
-    // keep address (do not clear or overwrite)
+  } else {
+    // guest → use lookup address
+    addressWrapper.style.display = "block";
+    addressField.required = true;
+    addressField.value = latestHDAddress || "";
   }
-      }
+
+} else {
+
+  // Takeaway
+  addressWrapper.style.display = "none";
+  addressField.required = false;
+
+  if (!isLoggedIn()) {
+    addressField.value = "";
+  }
+}
+
 
       // --- STEP 4B: Address UI Visibility Controls ---
      // --- STEP 4B: Address UI Visibility Controls ---
@@ -4290,6 +4288,7 @@ function autofillMobileForLoggedIn() {
 </script>
 </body>
 </html>
+
 
 
 
