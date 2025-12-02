@@ -1710,11 +1710,23 @@ document.getElementById("mobile").addEventListener("input", function () {
   }
 });
 
+let lastLookupMobile = "";
+let lastLookupOrderType = "";
+
 function toggleAddressField() {
-  const orderType = document.getElementById('orderType').value;
-  if (!orderType) return;
 
   const mobile = document.getElementById('mobile').value.trim();
+  const orderType = document.getElementById('orderType').value;
+
+  // 🔥 Prevent double popup (after valid mobile + orderType)
+  if (mobile === lastLookupMobile && orderType === lastLookupOrderType) {
+    return;
+  }
+  lastLookupMobile = mobile;
+  lastLookupOrderType = orderType;
+
+  if (!orderType) return;
+
   if (!/^[0-9]{10}$/.test(mobile)) {
     alert("Enter a valid 10-digit mobile number first.");
     return;
@@ -1729,12 +1741,16 @@ function toggleAddressField() {
   const overlay = document.getElementById('loadingOverlay');
   const orderSelect = document.getElementById('orderType');
 
-  // Initially show Name + Email (readonly until lookup finishes)
-  nameField.style.display = "block";
-  emailField.style.display = "block";
+  // Show & lock fields before lookup
+  nameField.parentElement.style.display = "block";
+  emailField.parentElement.style.display = "block";
+
   nameField.readOnly = true;
   emailField.readOnly = true;
   addressField.readOnly = true;
+
+  // ✔ Payment ALWAYS visible
+  paymentField.style.display = "block";
 
   // Show loading overlay
   overlay.style.display = "flex";
@@ -1743,67 +1759,56 @@ function toggleAddressField() {
   apiGet("getCustomerDetailsByMobile", { mobile })
     .then(data => {
 
-      // If backend returned a single object → convert to array for safety
       let orders = Array.isArray(data) ? data : (data ? [data] : []);
 
-      // ===============================
-      // ⭐ LATEST HOME DELIVERY ADDRESS
-      // ===============================
+      // ⭐ Latest Home Delivery Address
       let latestHDAddress = "";
-      if (orders.length > 0) {
-        for (let i = orders.length - 1; i >= 0; i--) {
-          if (orders[i].orderType === "Home Delivery" && orders[i].address) {
-            latestHDAddress = orders[i].address;
-            break;
-          }
+      for (let i = orders.length - 1; i >= 0; i--) {
+        if (orders[i].orderType === "Home Delivery" && orders[i].address) {
+          latestHDAddress = orders[i].address;
+          break;
         }
       }
 
-      // Auto-fill Name + Email (latest entry)
+      // Fill name+email using latest order (NOT HD)
       if (orders.length > 0) {
         const latest = orders[orders.length - 1];
         nameField.value = latest.name || "";
         emailField.value = latest.email || "";
       }
 
-      // Always store Home Delivery address (even if blank)
+      // Store HD address (blank acceptable)
       addressField.value = latestHDAddress;
 
-      // Make fields editable
+      // Unlock
       nameField.readOnly = false;
       emailField.readOnly = false;
       addressField.readOnly = false;
 
-      // ADDRESS SHOW / HIDE
+      // Address UI
       if (orderType === "Home Delivery") {
         addressWrapper.style.display = "block";
         addressField.required = true;
       } else {
         addressWrapper.style.display = "none";
         addressField.required = false;
-        // DO NOT CLEAR addressField.value
       }
 
-      // Alert summary (requested)
-      const addrText = latestHDAddress ? latestHDAddress : "(not found)";
+      // Alert summary (only once ― popup fixed)
       alert(
         "Customer details loaded:\n\n" +
         "Name: " + (nameField.value || "(not found)") + "\n" +
         "Email: " + (emailField.value || "(not found)") + "\n" +
-        "Latest Home Delivery Address: " + addrText
+        "Latest Home Delivery Address: " + (latestHDAddress || "(not found)")
       );
 
-      // Optional info text
-      if (infoMsg) {
-        infoMsg.style.display = "block";
-        infoMsg.innerText = "Details loaded from previous order. Please verify.";
-      }
-
     })
+
     .catch(err => {
-      console.error("Customer lookup error:", err);
+      console.error("Lookup error:", err);
       alert("Error loading customer details. Please try again.");
     })
+
     .finally(() => {
       overlay.style.display = "none";
       orderSelect.disabled = false;
@@ -3810,15 +3815,18 @@ function resetCheckoutFieldsDefault() {
   document.getElementById("orderType").style.display = "block";
   document.getElementById("paymentMethod").style.display = "block";
 
-  // Hide rest
-  document.getElementById("customerName").style.display = "none";
-  document.getElementById("email").style.display = "none";
-  document.getElementById("addressWrapper").style.display = "none"; 
+  // Hide these
+  document.getElementById("customerName").parentElement.style.display = "none";
+document.getElementById("email").parentElement.style.display = "none";
+document.getElementById("addressWrapper").style.display = "none";
+
 }
+
 
 </script>
 </body>
 </html>
+
 
 
 
