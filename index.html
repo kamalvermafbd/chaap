@@ -1848,22 +1848,26 @@ document.getElementById("savedAddressDropdown").addEventListener("change", async
   }
 });
 document.getElementById("saveNewAddressBtn").addEventListener("click", async () => {
+
   const mobile = localStorage.getItem("userMobile");
   if (!mobile) return alert("You must be logged in to save address.");
 
-  const addr = document.getElementById("newAddressText").value.trim();
-  const pin = document.getElementById("newAddressPincode").value.trim();
-  const city = document.getElementById("newAddressCity").value.trim();
+  // Read fields
+  const addr  = document.getElementById("newAddressText").value.trim();
+  const pin   = document.getElementById("newAddressPincode").value.trim();
+  const city  = document.getElementById("newAddressCity").value.trim();
   const state = document.getElementById("newAddressState").value.trim();
 
+  // Validations
   if (!addr) return alert("Please enter address.");
-  if (!pin || pin.length !== 6) return alert("Enter valid pincode.");
-  if (!city) return alert("City missing.");
-  if (!state) return alert("State missing.");
+  if (!pin || pin.length !== 6) return alert("Enter valid 6-digit pincode.");
+  if (!city) return alert("City is missing.");
+  if (!state) return alert("State is missing.");
 
-  // 🔄 show loading
-  document.getElementById("saveNewAddressBtn").innerText = "Saving...";
-  document.getElementById("saveNewAddressBtn").disabled = true;
+  // Disable button
+  const btn = document.getElementById("saveNewAddressBtn");
+  btn.innerText = "Saving...";
+  btn.disabled = true;
 
   try {
     const res = await fetch(
@@ -1886,24 +1890,28 @@ document.getElementById("saveNewAddressBtn").addEventListener("click", async () 
     } else {
       alert("Address saved successfully!");
 
-      // 1️⃣ Fill main checkout textarea
+      // Step-1: Autofill the checkout Address textbox
       document.getElementById("address").value = addr;
 
-      // 2️⃣ Hide form again
+      // Step-2: Hide the new address form
       document.getElementById("newAddressForm").classList.add("hidden");
 
-      // 3️⃣ Reload dropdown on next open
-      // (No need now — dropdown remains hidden until button click)
+      // Step-3: Clear form fields
+      document.getElementById("newAddressText").value = "";
+      document.getElementById("newAddressPincode").value = "";
+      document.getElementById("newAddressCity").value = "";
+      document.getElementById("newAddressState").value = "";
     }
 
   } catch (err) {
     alert("Error saving address: " + err.message);
   }
 
-  // reset button back
-  document.getElementById("saveNewAddressBtn").innerText = "Save Address";
-  document.getElementById("saveNewAddressBtn").disabled = false;
+  // Reset button
+  btn.innerText = "Save Address";
+  btn.disabled = false;
 });
+
 
     function closeCheckout() {
       document.getElementById('checkoutModal').style.display = 'none';
@@ -4227,6 +4235,7 @@ document.addEventListener("DOMContentLoaded", autofillMobileForLoggedIn);
 </script>
 </body>
 </html>
+
 
 
 
