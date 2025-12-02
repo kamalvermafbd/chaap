@@ -1706,74 +1706,90 @@ function toggleAddressField() {
   const nameField = document.getElementById('customerName');
   const emailField = document.getElementById('email');
   const addressField = document.getElementById('address');
-  const addressWrapper = document.getElementById('addressWrapper') || document.getElementById('address'); // fallback
+  const addressWrapper = document.getElementById('addressWrapper');
   const paymentField = document.getElementById('paymentMethod');
   const infoMsg = document.getElementById('infoMsg');
   const overlay = document.getElementById('loadingOverlay');
-
-  // === IMMEDIATE UI: show basic fields (but keep them readonly until lookup finishes) ===
-  if (nameField)  { nameField.style.display = "block"; nameField.readOnly = true; }
-  if (emailField) { emailField.style.display = "block"; emailField.readOnly = true; }
-  // Payment field default behaviour left unchanged (should already be visible by default)
-
-  // Show overlay while lookup is in progress
-  if (overlay) overlay.style.display = "flex";
-
-  // Disable only the Order Type select temporarily to avoid double calls
   const orderSelect = document.getElementById('orderType');
-  if (orderSelect) orderSelect.disabled = true;
 
-  // Fetch latest customer details
+  // Initially show Name + Email (readonly until lookup finishes)
+  nameField.style.display = "block";
+  emailField.style.display = "block";
+  nameField.readOnly = true;
+  emailField.readOnly = true;
+  addressField.readOnly = true;
+
+  // Show loading overlay
+  overlay.style.display = "flex";
+  orderSelect.disabled = true;
+
   apiGet("getCustomerDetailsByMobile", { mobile })
     .then(data => {
-      // Fill fields with whatever we received (if empty, stays empty)
-      if (nameField)  nameField.value = data?.name || "";
-      if (emailField) emailField.value = data?.email || "";
-      if (addressField) addressField.value = data?.address || "";
 
-      // Make fields editable now (user can correct if needed)
-      if (nameField)  nameField.readOnly = false;
-      if (emailField) emailField.readOnly = false;
-      if (addressField) addressField.readOnly = false;
+      // If backend returned a single object → convert to array for safety
+      let orders = Array.isArray(data) ? data : (data ? [data] : []);
 
-      // Address visibility: show only for Home Delivery, but DO NOT clear its value when hiding
-      if (orderType === "Home Delivery") {
-        if (addressWrapper) addressWrapper.style.display = "block";
-        if (addressField) addressField.required = true;
-      } else {
-        if (addressWrapper) addressWrapper.style.display = "none";
-        if (addressField) addressField.required = false;
-        // IMPORTANT: do NOT clear addressField.value here (preserve value)
-      }
-
-      // Payment field: leave as is (assumes default visibility handled elsewhere)
-
-      // Show info alert ALWAYS (as requested) with the retrieved details so user reviews them
-      const summary = [
-        data?.name ? `Name: ${data.name}` : "Name: (not found)",
-        data?.email ? `Email: ${data.email}` : "Email: (not found)",
-        data?.address ? `Address: ${data.address}` : "Address: (not found)"
-      ].join("\n");
-      alert("Customer details loaded:\n\n" + summary);
-
-      // Optional small info text element handling
-      if (infoMsg) {
-        if (data && (data.name || data.email || data.address)) {
-          infoMsg.style.display = "block";
-          infoMsg.innerText = "Previous details loaded — please verify.";
-        } else {
-          infoMsg.style.display = "none";
+      // ===============================
+      // ⭐ LATEST HOME DELIVERY ADDRESS
+      // ===============================
+      let latestHDAddress = "";
+      if (orders.length > 0) {
+        for (let i = orders.length - 1; i >= 0; i--) {
+          if (orders[i].orderType === "Home Delivery" && orders[i].address) {
+            latestHDAddress = orders[i].address;
+            break;
+          }
         }
       }
+
+      // Auto-fill Name + Email (latest entry)
+      if (orders.length > 0) {
+        const latest = orders[orders.length - 1];
+        nameField.value = latest.name || "";
+        emailField.value = latest.email || "";
+      }
+
+      // Always store Home Delivery address (even if blank)
+      addressField.value = latestHDAddress;
+
+      // Make fields editable
+      nameField.readOnly = false;
+      emailField.readOnly = false;
+      addressField.readOnly = false;
+
+      // ADDRESS SHOW / HIDE
+      if (orderType === "Home Delivery") {
+        addressWrapper.style.display = "block";
+        addressField.required = true;
+      } else {
+        addressWrapper.style.display = "none";
+        addressField.required = false;
+        // DO NOT CLEAR addressField.value
+      }
+
+      // Alert summary (requested)
+      const addrText = latestHDAddress ? latestHDAddress : "(not found)";
+      alert(
+        "Customer details loaded:\n\n" +
+        "Name: " + (nameField.value || "(not found)") + "\n" +
+        "Email: " + (emailField.value || "(not found)") + "\n" +
+        "Latest Home Delivery Address: " + addrText
+      );
+
+      // Optional info text
+      if (infoMsg) {
+        infoMsg.style.display = "block";
+        infoMsg.innerText = "Details loaded from previous order. Please verify.";
+      }
+
     })
     .catch(err => {
       console.error("Customer lookup error:", err);
-      alert("Error loading customer details. Please check network and try again.");
+      alert("Error loading customer details. Please try again.");
     })
     .finally(() => {
-      // Hide overlay & re-enable order select in all cases
-      if (overlay) overlay.style.display = "none";
-      if (orderSelect) orderSelect.disabled = false;
+      overlay.style.display = "none";
+      orderSelect.disabled = false;
     });
 }
 
@@ -3786,6 +3802,7 @@ function resetCheckoutFieldsDefault() {
 </script>
 </body>
 </html>
+
 
 
 
