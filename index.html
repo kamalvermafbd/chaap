@@ -1674,29 +1674,28 @@ function removeItem(index) {
 }
 
 
- function checkCustomerByMobile() {
+function checkCustomerByMobile() {
   const mobile = document.getElementById('mobile').value.trim();
 
-  // If mobile incomplete ? reset everything
+  // If mobile incomplete -> reset and hide complete row (label + input)
   if (mobile.length !== 10) {
 
-    // Reset Order Type
-    const orderSelect = document.getElementById('orderType');
-    orderSelect.value = ""; 
-    orderSelect.style.display = "none"; 
+    // Reset Order Type row
+    document.getElementById('orderType').parentElement.style.display = "none";
 
-    // Hide customer fields
-    document.getElementById('customerName').style.display = "none";
-    document.getElementById('email').style.display = "none";
-    document.getElementById('address').style.display = "none";
-    document.getElementById('paymentMethod').style.display = "none";
+    // Hide full rows (label + input)
+    document.getElementById('customerName').parentElement.style.display = "none";
+    document.getElementById('email').parentElement.style.display = "none";
+    document.getElementById('addressWrapper').style.display = "none";
+
+    // Hide optional info text
     document.getElementById('infoMsg').style.display = "none";
 
     return;
   }
 
-  // When valid mobile ? show Order Type
-  document.getElementById('orderType').style.display = "block";
+  // Valid mobile → show orderType row
+  document.getElementById('orderType').parentElement.style.display = "block";
 }
 
     document.getElementById("orderType").addEventListener("change", toggleAddressField);
@@ -3839,6 +3838,7 @@ function resetCheckoutFieldsDefault() {
 </script>
 </body>
 </html>
+
 
 
 
