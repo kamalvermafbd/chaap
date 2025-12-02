@@ -832,6 +832,55 @@ style="
                   class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
                          focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
       </div>
+<!-- CHANGE ADDRESS BUTTON (shown only for logged-in users via JS) -->
+<button id="changeAddressBtn"
+  class="mt-2 px-3 py-1 bg-blue-600 text-white rounded text-sm hidden">
+  Change Address
+</button>
+
+<!-- SAVED ADDRESS DROPDOWN -->
+<div id="addressSelectContainer" class="mt-3 hidden">
+  <label class="block text-sm font-medium mb-1">Select Saved Address</label>
+  <select id="savedAddressDropdown"
+          class="w-full border rounded px-2 py-2 text-sm">
+    <!-- Options added dynamically -->
+  </select>
+</div>
+
+<!-- ADD NEW ADDRESS FORM -->
+<div id="newAddressForm" class="mt-4 hidden border p-3 rounded bg-gray-50">
+
+  <label class="text-sm font-medium">Mobile</label>
+  <input id="newAddressMobile"
+         class="w-full border px-2 py-2 rounded bg-gray-200 text-gray-700"
+         readonly />
+
+  <label class="text-sm font-medium mt-3">Address</label>
+  <textarea id="newAddressField"
+            class="w-full border px-2 py-2 rounded"
+            placeholder="Enter full address"></textarea>
+
+  <label class="text-sm font-medium mt-3">Pincode</label>
+  <input id="newPincode"
+         class="w-full border px-2 py-2 rounded"
+         maxlength="6"
+         placeholder="Enter pincode" />
+
+  <label class="text-sm font-medium mt-3">City</label>
+  <input id="newCity"
+         class="w-full border px-2 py-2 rounded"
+         placeholder="Enter city" />
+
+  <label class="text-sm font-medium mt-3">State</label>
+  <input id="newState"
+         class="w-full border px-2 py-2 rounded"
+         placeholder="Enter state" />
+
+  <button id="saveNewAddressBtn"
+          class="mt-4 w-full bg-green-600 text-white py-2 rounded">
+    Save Address
+  </button>
+</div>
 
       <!-- Payment -->
       <div>
@@ -3870,6 +3919,7 @@ function resetCheckoutFieldsDefault() {
 </script>
 </body>
 </html>
+
 
 
 
