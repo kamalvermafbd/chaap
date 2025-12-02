@@ -1668,6 +1668,11 @@ function updateQty(index, qty) {
 
   // IMPORTANT: First reset visibility (only 3 fields visible)
   resetCheckoutFieldsDefault();
+// STEP 5A — Reset Saved Address UI (every time checkout opens)
+document.getElementById("changeAddressBtn").classList.add("hidden");
+document.getElementById("addressSelectContainer").classList.add("hidden");
+document.getElementById("newAddressForm").classList.add("hidden");
+document.getElementById("savedAddressDropdown").innerHTML = "";
 
   // Clear old values only for guest user
   if (!isLoggedIn()) {
@@ -4222,6 +4227,7 @@ document.addEventListener("DOMContentLoaded", autofillMobileForLoggedIn);
 </script>
 </body>
 </html>
+
 
 
 
