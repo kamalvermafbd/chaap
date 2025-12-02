@@ -469,7 +469,12 @@ body::before {
 .animate-fadeIn {
   animation: fadeIn .25s ease-out;
 }
-    
+  .disabled-btn {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background: #ccc !important;
+  pointer-events: auto !important; /* click allowed for alert */
+}  
   </style>
 </head>
 <body>
@@ -2117,15 +2122,18 @@ if (isLoggedIn()) {
   emailField.value = localStorage.getItem("userEmail") || emailField.value;
 }
       // Latest Home Delivery Address from history
-      let latestHDAddress = "";
-      for (let i = orders.length - 1; i >= 0; i--) {
-        const row = orders[i];
-        const hdAddress = row.Address || row.address || "";
-        if (row.orderType === "Home Delivery" && hdAddress.trim() !== "") {
-          latestHDAddress = hdAddress;
-          break;
-        }
-      }
+     // STEP 2A — extract latest HD address
+let latestHDAddress = "";
+for (let i = orders.length - 1; i >= 0; i--) {
+  const row = orders[i];
+  const hd = row.Address || row.address || "";
+
+  if (row.orderType === "Home Delivery" && hd.trim() !== "") {
+    latestHDAddress = hd.trim();
+    break;
+  }
+}
+
 if (isLoggedIn()) {
   latestHDAddress = "";
 }
@@ -4226,7 +4234,7 @@ function setupAddressUIVisibility() {
 
   if (!changeBtn || !dropdownContainer || !newAddressForm) return;
 
-  if (isUserLoggedIn()) {
+  if (isLoggedIn()) {
     // ONLY logged-in users see the button
     changeBtn.classList.remove("hidden");
 
@@ -4269,6 +4277,7 @@ document.addEventListener("DOMContentLoaded", autofillMobileForLoggedIn);
 </script>
 </body>
 </html>
+
 
 
 
