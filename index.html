@@ -1743,9 +1743,10 @@ function toggleAddressField() {
   const overlay = document.getElementById('loadingOverlay');
   const orderSelect = document.getElementById('orderType');
 
-  //  SHOW PARENTS (label + field)
-nameField.parentElement.style.display = "block";
-emailField.parentElement.style.display = "block";
+ 
+// Show full wrapper for name & email
+nameField.closest("div").style.display = "block";
+emailField.closest("div").style.display = "block";
 
 
 
@@ -3838,6 +3839,7 @@ function resetCheckoutFieldsDefault() {
 </script>
 </body>
 </html>
+
 
 
 
