@@ -1605,6 +1605,7 @@ function updateQty(index, qty) {
     document.getElementById("email").value = "";
     document.getElementById("address").value = "";
   }
+      resetCheckoutFieldsDefault();
       document.getElementById('checkoutModal').style.display = 'flex';
       
     }
@@ -3760,10 +3761,22 @@ async function someCartAction() {
   }
 }
 
+function resetCheckoutFieldsDefault() {
+  // Only 3 fields visible
+  document.getElementById("mobile").style.display = "block";
+  document.getElementById("orderType").style.display = "block";
+  document.getElementById("paymentMethod").style.display = "block";
+
+  // Hide rest
+  document.getElementById("customerName").style.display = "none";
+  document.getElementById("email").style.display = "none";
+  document.getElementById("addressWrapper").style.display = "none"; 
+}
 
 </script>
 </body>
 </html>
+
 
 
 
