@@ -2033,6 +2033,11 @@ function toggleAddressField() {
   const nameField = document.getElementById('customerName');
   const emailField = document.getElementById('email');
   const addressField = document.getElementById('address');
+  //  Prevent mobile browsers auto-scrolling to fields
+nameField.setAttribute("autocomplete", "off");
+emailField.setAttribute("autocomplete", "off");
+addressField.setAttribute("autocomplete", "off");
+
   const addressWrapper = document.getElementById('addressWrapper');
   const paymentField = document.getElementById('paymentMethod');
   const overlay = document.getElementById('loadingOverlay');
@@ -2059,6 +2064,8 @@ if (!isLoggedIn()) {
 
 
   overlay.style.display = "flex";
+  overlay.offsetHeight; // ⭐ forces one clean redraw, stops flicker
+
   orderSelect.disabled = true;
 
   apiGet("getCustomerDetailsByMobile", { mobile })
@@ -2107,6 +2114,10 @@ if (isLoggedIn()) {
       }
 if (isLoggedIn()) {
   latestHDAddress = "";
+}
+      if (orderType === lastLookupOrderType) {
+  // Stop repeated UI redraw
+  addressWrapper.style.display = addressWrapper.style.display;
 }
       // Fill HD address only if HD selected
       if (orderType === "Home Delivery") {
@@ -4262,6 +4273,7 @@ document.addEventListener("DOMContentLoaded", autofillMobileForLoggedIn);
 </script>
 </body>
 </html>
+
 
 
 
