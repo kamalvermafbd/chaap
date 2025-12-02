@@ -1744,8 +1744,9 @@ function toggleAddressField() {
   const orderSelect = document.getElementById('orderType');
 
   // ⭐ SHOW PARENTS (label + field)
-  nameField.parentElement.style.display = "block";
-  emailField.parentElement.style.display = "block";
+  nameField.closest('.input-group').style.display = "block";
+emailField.closest('.input-group').style.display = "block";
+
 
   // ⭐ PAYMENT ALWAYS VISIBLE
   paymentField.style.display = "block";
@@ -3836,6 +3837,7 @@ function resetCheckoutFieldsDefault() {
 </script>
 </body>
 </html>
+
 
 
 
