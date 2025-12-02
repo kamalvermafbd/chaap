@@ -2050,9 +2050,13 @@ function toggleAddressField() {
   paymentField.style.display = "block";
 
   // Lock fields during lookup
+  // Lock fields during lookup (guest only)
+if (!isLoggedIn()) {
   nameField.readOnly = true;
   emailField.readOnly = true;
   addressField.readOnly = true;
+}
+
 
   overlay.style.display = "flex";
   orderSelect.disabled = true;
@@ -2087,7 +2091,10 @@ function toggleAddressField() {
       // Latest Name & Email
       nameField.value = latest.name || "";
       emailField.value = latest.email || "";
-
+if (isLoggedIn()) {
+  nameField.value = localStorage.getItem("userName") || nameField.value;
+  emailField.value = localStorage.getItem("userEmail") || emailField.value;
+}
       // Latest Home Delivery Address from history
       let latestHDAddress = "";
       for (let i = orders.length - 1; i >= 0; i--) {
@@ -2123,6 +2130,9 @@ if (isLoggedIn()) {
         if (!isLoggedIn()) {
           addressField.value = "";
         }
+          if (isLoggedIn()) {
+    // keep address (do not clear or overwrite)
+  }
       }
 
       // --- STEP 4B: Address UI Visibility Controls ---
@@ -2146,9 +2156,13 @@ if (isLoggedIn()) {
       }
 
       // Unlock fields
-      nameField.readOnly = false;
-      emailField.readOnly = false;
-      addressField.readOnly = false;
+     // Unlock fields (guest only)
+if (!isLoggedIn()) {
+  nameField.readOnly = false;
+  emailField.readOnly = false;
+  addressField.readOnly = false;
+}
+
 
       // Optional: less intrusive than alert, but keeping your current behavior
       if (!isLoggedIn()) {
@@ -4240,6 +4254,7 @@ document.addEventListener("DOMContentLoaded", autofillMobileForLoggedIn);
 </script>
 </body>
 </html>
+
 
 
 
