@@ -2149,6 +2149,13 @@ if (isLoggedIn()) {
         }
         if (dropdownBox) dropdownBox.classList.add("hidden");
         if (newFormBox) newFormBox.classList.add("hidden");
+          if (!isLoggedIn()) changeBtn?.classList.add("hidden");
+        if (dropdownBox) dropdownBox.selectedIndex = 0;  // reset dropdown selection
+if (newFormBox) {
+  const inputs = newFormBox.querySelectorAll("input, textarea");
+  inputs.forEach(i => i.value = ""); // clear new-address inputs
+}
+
 
       } else {
         if (changeBtn) changeBtn.classList.add("hidden");
@@ -4255,6 +4262,7 @@ document.addEventListener("DOMContentLoaded", autofillMobileForLoggedIn);
 </script>
 </body>
 </html>
+
 
 
 
