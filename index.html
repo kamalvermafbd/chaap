@@ -1853,10 +1853,11 @@ document.getElementById("saveNewAddressBtn").addEventListener("click", async () 
   if (!mobile) return alert("You must be logged in to save address.");
 
   // Read fields
-  const addr  = document.getElementById("newAddressText").value.trim();
-  const pin   = document.getElementById("newAddressPincode").value.trim();
-  const city  = document.getElementById("newAddressCity").value.trim();
-  const state = document.getElementById("newAddressState").value.trim();
+  const addr  = document.getElementById("newAddressField").value.trim();
+const pin   = document.getElementById("newPincode").value.trim();
+const city  = document.getElementById("newCity").value.trim();
+const state = document.getElementById("newState").value.trim();
+
 
   // Validations
   if (!addr) return alert("Please enter address.");
@@ -1897,10 +1898,11 @@ document.getElementById("saveNewAddressBtn").addEventListener("click", async () 
       document.getElementById("newAddressForm").classList.add("hidden");
 
       // Step-3: Clear form fields
-      document.getElementById("newAddressText").value = "";
-      document.getElementById("newAddressPincode").value = "";
-      document.getElementById("newAddressCity").value = "";
-      document.getElementById("newAddressState").value = "";
+      document.getElementById("newAddressField").value = "";
+document.getElementById("newPincode").value = "";
+document.getElementById("newCity").value = "";
+document.getElementById("newState").value = "";
+
     }
 
   } catch (err) {
@@ -4235,6 +4237,7 @@ document.addEventListener("DOMContentLoaded", autofillMobileForLoggedIn);
 </script>
 </body>
 </html>
+
 
 
 
