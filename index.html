@@ -923,6 +923,20 @@ style="
 
 
 
+<div id="loadingOverlay" style="
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 24px;
+  ">
+    Processing your order...
+  </div>
 
 
   <script>
@@ -2438,21 +2452,7 @@ function filterMenu() {
 </div>
 
 
-  <div id="loadingOverlay" style="
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 9999;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-size: 24px;
-  ">
-    Processing your order...
-  </div>
-
+  
 
 
 
@@ -4273,6 +4273,7 @@ document.addEventListener("DOMContentLoaded", autofillMobileForLoggedIn);
 </script>
 </body>
 </html>
+
 
 
 
