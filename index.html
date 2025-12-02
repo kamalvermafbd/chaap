@@ -1015,7 +1015,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbweWixBaVjgouORVVEQ2A39i7sLpphBxCh6WuXPmUtW_E6RmPDPu-S6jE6Xa6EVuYsNyw/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbyFvoqKgqvNfCPRqzJS1aU5oxa2OCYxXj6vNzoImCh49WSy_db6napDFtp_2rs9-BVWqA/exec";
 
 function apiGet(api, params = {}) {
   const url = new URL(API_BASE);
@@ -1755,8 +1755,11 @@ function toggleAddressField() {
 
   apiGet("getCustomerDetailsByMobile", { mobile })
     .then(rows => {
+      console.log("ORDERS RAW RESPONSE:", rows);
+
 
       let orders = Array.isArray(rows) ? rows : (rows ? [rows] : []);
+console.log("ORDERS NORMALIZED:", orders);
 
       // No data found
       if (orders.length === 0) {
@@ -3856,6 +3859,7 @@ function resetCheckoutFieldsDefault() {
 </script>
 </body>
 </html>
+
 
 
 
