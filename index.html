@@ -1745,10 +1745,10 @@ function toggleAddressField() {
   nameField.parentElement.style.display = "block";
   emailField.parentElement.style.display = "block";
 
-  nameField.readOnly = true;
-  emailField.readOnly = true;
-  addressField.readOnly = true;
-
+  nameField.readOnly = false;
+  emailField.readOnly = false;
+  addressField.readOnly = false;
+ 
   // ✔ Payment ALWAYS visible
   paymentField.style.display = "block";
 
@@ -3810,19 +3810,23 @@ async function someCartAction() {
 }
 
 function resetCheckoutFieldsDefault() {
-  // Only 3 fields visible
+
+  // SHOW only these 3 rows
   document.getElementById("mobile").parentElement.style.display = "block";
   document.getElementById("orderType").parentElement.style.display = "block";
   document.getElementById("paymentMethod").parentElement.style.display = "block";
 
-  // Hide these 3 together (label + input)
+  // HIDE Name + Email + Address (label + input together)
   document.getElementById("customerName").parentElement.style.display = "none";
   document.getElementById("email").parentElement.style.display = "none";
   document.getElementById("addressWrapper").style.display = "none";
 
-  // Also ensure inputs are visible when needed
-  document.getElementById("customerName").style.display = "block";
-  document.getElementById("email").style.display = "block";
+  // Ensure fields remain editable when shown later
+  document.getElementById("customerName").readOnly = false;
+  document.getElementById("email").readOnly = false;
+  document.getElementById("address").readOnly = false;
+
+  // Payment MUST remain visible always
   document.getElementById("paymentMethod").style.display = "block";
 }
 
@@ -3831,6 +3835,7 @@ function resetCheckoutFieldsDefault() {
 </script>
 </body>
 </html>
+
 
 
 
