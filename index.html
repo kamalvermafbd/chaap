@@ -1717,14 +1717,11 @@ function toggleAddressField() {
   const mobile = document.getElementById('mobile').value.trim();
   const orderType = document.getElementById('orderType').value;
 
-  // 🔥 Prevent double popup
-  if (mobile === lastLookupMobile && orderType === lastLookupOrderType) {
-    return;
-  }
+  // Prevent duplicate lookup
+  if (mobile === lastLookupMobile && orderType === lastLookupOrderType) return;
   lastLookupMobile = mobile;
   lastLookupOrderType = orderType;
 
-  // Validate order type
   if (!orderType) return;
 
   // Validate mobile
@@ -1742,17 +1739,13 @@ function toggleAddressField() {
   const overlay = document.getElementById('loadingOverlay');
   const orderSelect = document.getElementById('orderType');
 
- 
-// Show full wrapper for name & email
-nameField.closest("div").style.display = "block";
-emailField.closest("div").style.display = "block";
+  // Show name & email container
+  nameField.closest("div").style.display = "block";
+  emailField.closest("div").style.display = "block";
 
-
-
-  // ⭐ PAYMENT ALWAYS VISIBLE
   paymentField.style.display = "block";
 
-  // Lock (readonly while lookup)
+  // Lock fields during lookup
   nameField.readOnly = true;
   emailField.readOnly = true;
   addressField.readOnly = true;
@@ -1761,49 +1754,73 @@ emailField.closest("div").style.display = "block";
   orderSelect.disabled = true;
 
   apiGet("getCustomerDetailsByMobile", { mobile })
-    .then(data => {
+    .then(rows => {
 
-      let orders = Array.isArray(data) ? data : (data ? [data] : []);
+      let orders = Array.isArray(rows) ? rows : (rows ? [rows] : []);
+
+      // No data found
+      if (orders.length === 0) {
+        nameField.value = "";
+        emailField.value = "";
+        addressField.value = "";
+        return;
+      }
+
+      // ⭐ Pick the REAL latest order (max rowNumber OR last index)
+      let latest = orders[0]; // assume latest first
+
+      // If rowNumber exists → pick highest row
+      if (orders[0].rowNumber !== undefined) {
+        latest = orders.reduce((max, row) =>
+          row.rowNumber > max.rowNumber ? row : max
+        );
+      }
+
+      // ⭐ Fallback if API returns oldest → latest is last element
+      if (latest.orderDate === undefined && orders.length > 1) {
+        latest = orders[orders.length - 1];
+      }
+
+      // ⭐ Latest Name & Email
+      nameField.value = latest.name || "";
+      emailField.value = latest.email || "";
 
       // ⭐ Latest Home Delivery Address
       let latestHDAddress = "";
       for (let i = orders.length - 1; i >= 0; i--) {
-        if (orders[i].orderType === "Home Delivery" && orders[i].Address) {
-          latestHDAddress = orders[i].Address;
+        let row = orders[i];
+
+        // sheet me column "Address" hai
+        let hdAddress = row.Address || row.address || "";
+
+        if (row.orderType === "Home Delivery" && hdAddress.trim() !== "") {
+          latestHDAddress = hdAddress;
           break;
         }
       }
 
-      // Latest NAME + EMAIL (not HD based)
-      if (orders.length > 0) {
-        const latest = orders[orders.length - 1];
-        nameField.value = latest.name || "";
-        emailField.value = latest.email || "";
+      // ⭐ Fill HD address only if HD selected
+      if (orderType === "Home Delivery") {
+        addressWrapper.style.display = "block";
+        addressField.required = true;
+        addressField.value = latestHDAddress;
+      } else {
+        addressWrapper.style.display = "none";
+        addressField.required = false;
+        addressField.value = "";
       }
 
-      // HD Address
-      addressField.value = latestHDAddress;
-
-      // Unlock fields
+      // Unlock
       nameField.readOnly = false;
       emailField.readOnly = false;
       addressField.readOnly = false;
 
-      // Show Address only for HD
-      if (orderType === "Home Delivery") {
-        addressWrapper.style.display = "block";
-        addressField.required = true;
-      } else {
-        addressWrapper.style.display = "none";
-        addressField.required = false;
-      }
-
-      // Single Alert
+      // Success popup
       alert(
         "Customer details loaded:\n\n" +
         "Name: " + (nameField.value || "(not found)") + "\n" +
         "Email: " + (emailField.value || "(not found)") + "\n" +
-        "Latest Home Delivery Address: " + (latestHDAddress || "(not found)")
+        "Latest HD Address: " + (latestHDAddress || "(not found)")
       );
 
     })
@@ -1816,6 +1833,7 @@ emailField.closest("div").style.display = "block";
       orderSelect.disabled = false;
     });
 }
+
 
 
 function placeOrder() {
@@ -3838,6 +3856,7 @@ function resetCheckoutFieldsDefault() {
 </script>
 </body>
 </html>
+
 
 
 
