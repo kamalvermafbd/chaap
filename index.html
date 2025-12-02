@@ -2147,6 +2147,7 @@ if (isLoggedIn()) {
 }
       // Fill HD address only if HD selected
       if (orderType === "Home Delivery") {
+         if (isLoggedIn()) return;   // STEP-4A FIX
         addressWrapper.style.display = "block";
         addressField.required = true;
 
@@ -2174,31 +2175,38 @@ if (isLoggedIn()) {
       }
 
       // --- STEP 4B: Address UI Visibility Controls ---
-      const changeBtn = document.getElementById("changeAddressBtn");
-      const dropdownBox = document.getElementById("addressSelectContainer");
-      const newFormBox = document.getElementById("newAddressForm");
+     // --- STEP 4B: Address UI Visibility Controls ---
+const changeBtn = document.getElementById("changeAddressBtn");
+const dropdownBox = document.getElementById("addressSelectContainer");
+const newFormBox = document.getElementById("newAddressForm");
 
-      // Use guards before touching classList
-      if (orderType === "Home Delivery") {
-        if (changeBtn) {
-          if (isLoggedIn()) changeBtn.classList.remove("hidden");
-          else changeBtn.classList.add("hidden");
-        }
-        if (dropdownBox) dropdownBox.classList.add("hidden");
-        if (newFormBox) newFormBox.classList.add("hidden");
-          if (!isLoggedIn()) changeBtn?.classList.add("hidden");
-        if (dropdownBox) dropdownBox.selectedIndex = 0;  // reset dropdown selection
-if (newFormBox) {
-  const inputs = newFormBox.querySelectorAll("input, textarea");
-  inputs.forEach(i => i.value = ""); // clear new-address inputs
+if (orderType === "Home Delivery") {
+
+  // Logged-in → only then show Change Address button
+  if (isLoggedIn()) {
+    changeBtn?.classList.remove("hidden");
+  } else {
+    changeBtn?.classList.add("hidden");
+  }
+
+  // Dropdown + New-form always hidden until user clicks Change
+  dropdownBox?.classList.add("hidden");
+  newFormBox?.classList.add("hidden");
+
+  // Reset dropdown
+  if (dropdownBox) dropdownBox.selectedIndex = 0;
+
+  // Clear fields
+  if (newFormBox) {
+    newFormBox.querySelectorAll("input, textarea").forEach(i => i.value = "");
+  }
+
+} else {
+  // Takeaway → everything hidden
+  changeBtn?.classList.add("hidden");
+  dropdownBox?.classList.add("hidden");
+  newFormBox?.classList.add("hidden");
 }
-
-
-      } else {
-        if (changeBtn) changeBtn.classList.add("hidden");
-        if (dropdownBox) dropdownBox.classList.add("hidden");
-        if (newFormBox) newFormBox.classList.add("hidden");
-      }
 
       // Unlock fields
      // Unlock fields (guest only)
@@ -4282,6 +4290,7 @@ function autofillMobileForLoggedIn() {
 </script>
 </body>
 </html>
+
 
 
 
