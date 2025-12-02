@@ -1842,6 +1842,63 @@ document.getElementById("savedAddressDropdown").addEventListener("change", async
     return;
   }
 });
+document.getElementById("saveNewAddressBtn").addEventListener("click", async () => {
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) return alert("You must be logged in to save address.");
+
+  const addr = document.getElementById("newAddressText").value.trim();
+  const pin = document.getElementById("newAddressPincode").value.trim();
+  const city = document.getElementById("newAddressCity").value.trim();
+  const state = document.getElementById("newAddressState").value.trim();
+
+  if (!addr) return alert("Please enter address.");
+  if (!pin || pin.length !== 6) return alert("Enter valid pincode.");
+  if (!city) return alert("City missing.");
+  if (!state) return alert("State missing.");
+
+  // 🔄 show loading
+  document.getElementById("saveNewAddressBtn").innerText = "Saving...";
+  document.getElementById("saveNewAddressBtn").disabled = true;
+
+  try {
+    const res = await fetch(
+      "https://script.google.com/macros/s/AKfycbz8B-nwXivGHzKgcWT8zTvS4sAWG6dKfsDh8rsn29CGXCeIxxeNJ9NaPcL03cQBGHEf/exec",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          action: "addMultiAddress",
+          mobile,
+          address: addr,
+          pincode: pin,
+          city,
+          state
+        })
+      }
+    ).then(r => r.json());
+
+    if (!res.success) {
+      alert(res.message || "Failed to save address.");
+    } else {
+      alert("Address saved successfully!");
+
+      // 1️⃣ Fill main checkout textarea
+      document.getElementById("address").value = addr;
+
+      // 2️⃣ Hide form again
+      document.getElementById("newAddressForm").classList.add("hidden");
+
+      // 3️⃣ Reload dropdown on next open
+      // (No need now — dropdown remains hidden until button click)
+    }
+
+  } catch (err) {
+    alert("Error saving address: " + err.message);
+  }
+
+  // reset button back
+  document.getElementById("saveNewAddressBtn").innerText = "Save Address";
+  document.getElementById("saveNewAddressBtn").disabled = false;
+});
 
     function closeCheckout() {
       document.getElementById('checkoutModal').style.display = 'none';
@@ -1996,7 +2053,7 @@ console.log("ORDERS NORMALIZED:", orders);
         return;
       }
 
-      // ⭐ Pick the REAL latest order (max rowNumber OR last index)
+      //  Pick the REAL latest order (max rowNumber OR last index)
       let latest = orders[0]; // assume latest first
 
       // If rowNumber exists → pick highest row
@@ -2006,16 +2063,16 @@ console.log("ORDERS NORMALIZED:", orders);
         );
       }
 
-      // ⭐ Fallback if API returns oldest → latest is last element
+      //  Fallback if API returns oldest → latest is last element
       if (latest.orderDate === undefined && orders.length > 1) {
         latest = orders[orders.length - 1];
       }
 
-      // ⭐ Latest Name & Email
+      //  Latest Name & Email
       nameField.value = latest.name || "";
       emailField.value = latest.email || "";
 
-      // ⭐ Latest Home Delivery Address
+      //  Latest Home Delivery Address
       let latestHDAddress = "";
       for (let i = orders.length - 1; i >= 0; i--) {
         let row = orders[i];
@@ -2029,16 +2086,32 @@ console.log("ORDERS NORMALIZED:", orders);
         }
       }
 
-      // ⭐ Fill HD address only if HD selected
-      if (orderType === "Home Delivery") {
-        addressWrapper.style.display = "block";
-        addressField.required = true;
-        addressField.value = latestHDAddress;
-      } else {
-        addressWrapper.style.display = "none";
-        addressField.required = false;
-        addressField.value = "";
-      }
+      //  Fill HD address only if HD selected
+      // ⭐ For Home Delivery
+if (orderType === "Home Delivery") {
+  addressWrapper.style.display = "block";
+  addressField.required = true;
+
+  if (!isLoggedIn()) {
+    // Guest user → old lookup address
+    addressField.value = latestHDAddress || "";
+  } else {
+    // Logged-in user → DO NOT use order history
+    // Use PRIMARY or multi_add selection system
+    // So do NOT overwrite the address here
+    // (loadPrimaryAddress() already did its work)
+  }
+
+} else {
+  // Takeaway
+  addressWrapper.style.display = "none";
+  addressField.required = false;
+
+  if (!isLoggedIn()) {
+    addressField.value = "";
+  }
+}
+
 
       // Unlock
       nameField.readOnly = false;
@@ -4136,5 +4209,6 @@ document.addEventListener("DOMContentLoaded", autofillMobileForLoggedIn);
 </script>
 </body>
 </html>
+
 
 
