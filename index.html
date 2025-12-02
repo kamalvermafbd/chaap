@@ -1997,22 +1997,22 @@ let lastLookupMobile = "";
 let lastLookupOrderType = "";
 
 function toggleAddressField() {
-
   const mobile = document.getElementById('mobile').value.trim();
   const orderType = document.getElementById('orderType').value;
 
-  // Prevent duplicate lookup
-  if (mobile === lastLookupMobile && orderType === lastLookupOrderType) return;
-  lastLookupMobile = mobile;
-  lastLookupOrderType = orderType;
-
+  // If no orderType chosen, nothing to do
   if (!orderType) return;
 
-  // Validate mobile
+  // Validate mobile first (don't update lastLookup yet)
   if (!/^[0-9]{10}$/.test(mobile)) {
     alert("Enter a valid 10-digit mobile number first.");
     return;
   }
+
+  // Prevent duplicate lookup (update lastLookup after validation)
+  if (mobile === lastLookupMobile && orderType === lastLookupOrderType) return;
+  lastLookupMobile = mobile;
+  lastLookupOrderType = orderType;
 
   // Fields
   const nameField = document.getElementById('customerName');
@@ -2023,10 +2023,15 @@ function toggleAddressField() {
   const overlay = document.getElementById('loadingOverlay');
   const orderSelect = document.getElementById('orderType');
 
+  // defensive guards (in case elements are missing)
+  if (!nameField || !emailField || !addressField || !addressWrapper || !paymentField || !overlay || !orderSelect) {
+    console.warn("toggleAddressField: required DOM nodes missing");
+    return;
+  }
+
   // Show name & email container
   nameField.closest("div").style.display = "block";
   emailField.closest("div").style.display = "block";
-
   paymentField.style.display = "block";
 
   // Lock fields during lookup
@@ -2039,86 +2044,96 @@ function toggleAddressField() {
 
   apiGet("getCustomerDetailsByMobile", { mobile })
     .then(rows => {
-      console.log("ORDERS RAW RESPONSE:", rows);
-
-
       let orders = Array.isArray(rows) ? rows : (rows ? [rows] : []);
-console.log("ORDERS NORMALIZED:", orders);
 
       // No data found
       if (orders.length === 0) {
         nameField.value = "";
         emailField.value = "";
         addressField.value = "";
+
+        // also handle address UI visibility for Takeaway
+        if (orderType !== "Home Delivery") {
+          addressWrapper.style.display = "none";
+          addressField.required = false;
+        }
         return;
       }
 
-      //  Pick the REAL latest order (max rowNumber OR last index)
-      let latest = orders[0]; // assume latest first
-
-      // If rowNumber exists → pick highest row
+      // Pick the REAL latest order (max rowNumber OR last index)
+      let latest = orders[0];
       if (orders[0].rowNumber !== undefined) {
-        latest = orders.reduce((max, row) =>
-          row.rowNumber > max.rowNumber ? row : max
-        );
+        latest = orders.reduce((max, row) => row.rowNumber > max.rowNumber ? row : max);
       }
-
-      //  Fallback if API returns oldest → latest is last element
       if (latest.orderDate === undefined && orders.length > 1) {
         latest = orders[orders.length - 1];
       }
 
-      //  Latest Name & Email
+      // Latest Name & Email
       nameField.value = latest.name || "";
       emailField.value = latest.email || "";
 
-      //  Latest Home Delivery Address
+      // Latest Home Delivery Address from history
       let latestHDAddress = "";
       for (let i = orders.length - 1; i >= 0; i--) {
-        let row = orders[i];
-
-        // sheet me column "Address" hai
-        let hdAddress = row.Address || row.address || "";
-
+        const row = orders[i];
+        const hdAddress = row.Address || row.address || "";
         if (row.orderType === "Home Delivery" && hdAddress.trim() !== "") {
           latestHDAddress = hdAddress;
           break;
         }
       }
 
-      //  Fill HD address only if HD selected
-      // ⭐ For Home Delivery
-if (orderType === "Home Delivery") {
-  addressWrapper.style.display = "block";
-  addressField.required = true;
+      // Fill HD address only if HD selected
+      if (orderType === "Home Delivery") {
+        addressWrapper.style.display = "block";
+        addressField.required = true;
 
-  if (!isLoggedIn()) {
-    // Guest user → old lookup address
-    addressField.value = latestHDAddress || "";
-  } else {
-    // Logged-in user → DO NOT use order history
-    // Use PRIMARY or multi_add selection system
-    // So do NOT overwrite the address here
-    // (loadPrimaryAddress() already did its work)
-  }
+        if (!isLoggedIn()) {
+          // Guest user → use history lookup address
+          addressField.value = latestHDAddress || "";
+        } else {
+          // Logged-in user → keep address as loaded by primary/multi system
+          // loadPrimaryAddress() is called elsewhere when opening checkout
+          // so do not overwrite the address here
+        }
 
-} else {
-  // Takeaway
-  addressWrapper.style.display = "none";
-  addressField.required = false;
+      } else {
+        // Takeaway
+        addressWrapper.style.display = "none";
+        addressField.required = false;
 
-  if (!isLoggedIn()) {
-    addressField.value = "";
-  }
-}
+        if (!isLoggedIn()) {
+          addressField.value = "";
+        }
+      }
 
+      // --- STEP 4B: Address UI Visibility Controls ---
+      const changeBtn = document.getElementById("changeAddressBtn");
+      const dropdownBox = document.getElementById("addressSelectContainer");
+      const newFormBox = document.getElementById("newAddressForm");
 
-      // Unlock
+      // Use guards before touching classList
+      if (orderType === "Home Delivery") {
+        if (changeBtn) {
+          if (isLoggedIn()) changeBtn.classList.remove("hidden");
+          else changeBtn.classList.add("hidden");
+        }
+        if (dropdownBox) dropdownBox.classList.add("hidden");
+        if (newFormBox) newFormBox.classList.add("hidden");
+
+      } else {
+        if (changeBtn) changeBtn.classList.add("hidden");
+        if (dropdownBox) dropdownBox.classList.add("hidden");
+        if (newFormBox) newFormBox.classList.add("hidden");
+      }
+
+      // Unlock fields
       nameField.readOnly = false;
       emailField.readOnly = false;
       addressField.readOnly = false;
 
-      // Success popup
+      // Optional: less intrusive than alert, but keeping your current behavior
       alert(
         "Customer details loaded:\n\n" +
         "Name: " + (nameField.value || "(not found)") + "\n" +
@@ -2136,8 +2151,6 @@ if (orderType === "Home Delivery") {
       orderSelect.disabled = false;
     });
 }
-
-
 
 function placeOrder() {
   if (window._orderLock) return;
@@ -4209,6 +4222,7 @@ document.addEventListener("DOMContentLoaded", autofillMobileForLoggedIn);
 </script>
 </body>
 </html>
+
 
 
 
