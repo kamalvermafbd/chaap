@@ -839,9 +839,11 @@ style="
       </div>
 <!-- CHANGE ADDRESS BUTTON (shown only for logged-in users via JS) -->
 <button id="changeAddressBtn"
+  onclick="onChangeAddressClick()"
   class="mt-2 px-3 py-1 bg-blue-600 text-white rounded text-sm hidden">
   Change Address
 </button>
+
 
 <!-- SAVED ADDRESS DROPDOWN -->
 <div id="addressSelectContainer" class="mt-3 hidden">
@@ -4299,10 +4301,59 @@ function autofillMobileForLoggedIn() {
 
 // Run when checkout modal shows up
 
+function onChangeAddressClick() {
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) return; // guest safety
+
+  const dropdownBox = document.getElementById("addressSelectContainer");
+  const newFormBox = document.getElementById("newAddressForm");
+
+  // Always hide both first
+  dropdownBox.classList.add("hidden");
+  newFormBox.classList.add("hidden");
+
+  // 🔵 Fetch multi address list for this user
+  apiGet("getUserMultiAddresses", { mobile })
+    .then(res => {
+      const list = res.addresses || [];
+
+      if (list.length === 0) {
+        // 🔴 CASE 2 — no saved addresses → directly show add new
+        newFormBox.classList.remove("hidden");
+        return;
+      }
+
+      // 🟢 CASE 1 — saved addresses exist → show dropdown
+      dropdownBox.classList.remove("hidden");
+
+      // Step 4 me dropdown fill karenge
+      // === STEP 3C: Fill dropdown with saved addresses ===
+const ddl = document.getElementById("savedAddressList");
+ddl.innerHTML = ""; // reset
+
+list.forEach((addr, index) => {
+  const opt = document.createElement("option");
+  opt.value = addr.address;
+  opt.textContent = `${index + 1}) ${addr.address}`;
+  ddl.appendChild(opt);
+});
+
+// When user selects from dropdown → update main address
+ddl.onchange = () => {
+  const selected = ddl.value;
+  document.getElementById("address").value = selected;
+};
+    })
+    .catch(err => {
+      console.error("Address load error:", err);
+      alert("Unable to load saved addresses.");
+    });
+}
 
 </script>
 </body>
 </html>
+
 
 
 
