@@ -4369,15 +4369,19 @@ ddl.onchange = () => {
 }
 
   function onChangeAddressAddNew() {
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) return;
+
   const dropdownBox = document.getElementById("addressSelectContainer");
   const newFormBox = document.getElementById("newAddressForm");
 
-  // Hide dropdown, show new address form
   dropdownBox.classList.add("hidden");
   newFormBox.classList.remove("hidden");
-     // STEP 8 CALL
-  autofillNewAddressMobile();
+
+  // Autofill mobile inside new-address form
+  document.getElementById("newAddressMobile").value = mobile;
 }
+
 function saveNewAddress() {
   const mobile = localStorage.getItem("userMobile");
   if (!mobile) return alert("Login required.");
@@ -4392,20 +4396,26 @@ function saveNewAddress() {
   if (!city) return alert("Enter city.");
   if (!state) return alert("Enter state.");
 
-  // Save to backend
   apiPost("saveUserNewAddress", { mobile, address: addr, pincode: pin, city, state })
     .then(res => {
       if (res.success) {
         alert("Address saved successfully!");
 
-        // close form and update main address box
+        // Update main address field instantly
         document.getElementById("address").value = addr;
 
-        // hide new form
+        // Close the new form
         document.getElementById("newAddressForm").classList.add("hidden");
 
-        // After save → reload address list (Step 5c will handle)
+        // Refresh dropdown AFTER save
         onChangeAddressClick();
+
+        // Pre-select this new address in dropdown & main box
+        const ddl = document.getElementById("savedAddressDropdown");
+        if (ddl) {
+          ddl.value = addr;
+        }
+
       } else {
         alert(res.message || "Failed to save address.");
       }
@@ -4415,6 +4425,7 @@ function saveNewAddress() {
       alert("Error saving address.");
     });
 }
+
 // STEP 8 — Autofill New Address Form with logged-in mobile
 function autofillNewAddressMobile() {
   const mobile = localStorage.getItem("userMobile") || "";
@@ -4428,6 +4439,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
