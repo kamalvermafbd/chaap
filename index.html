@@ -2020,7 +2020,15 @@ function checkCustomerByMobile() {
   document.getElementById('orderType').parentElement.style.display = "block";
 }
 
-    document.getElementById("orderType").addEventListener("change", toggleAddressField);
+
+
+    
+ document.getElementById("orderType").addEventListener("change", () => {
+  toggleAddressField();
+  setupAddressUIVisibility();   // ✅ STEP 1B correct location
+});
+
+    
 document.getElementById("mobile").addEventListener("input", function () {
   const mobile = document.getElementById('mobile').value.trim();
   if (/^[0-9]{10}$/.test(mobile)) {
@@ -2152,7 +2160,14 @@ if (orderType === "Home Delivery") {
   if (isLoggedIn()) {
     addressWrapper.style.display = "block";
     addressField.required = true;
-
+   // STEP 2 — Auto-fetch primary address from user sheet
+    apiGet("getUserProfile", { mobile })
+      .then(res => {
+        if (res.success && res.address) {
+          addressField.value = res.address.trim();
+        }
+      })
+      .catch(err => console.error("Primary address load error:", err));
   } else {
     // guest → use lookup address
     addressWrapper.style.display = "block";
@@ -4288,6 +4303,7 @@ function autofillMobileForLoggedIn() {
 </script>
 </body>
 </html>
+
 
 
 
