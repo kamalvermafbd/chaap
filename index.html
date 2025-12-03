@@ -4401,20 +4401,30 @@ function saveNewAddress() {
       if (res.success) {
         alert("Address saved successfully!");
 
-        // Update main address field instantly
-        document.getElementById("address").value = addr;
+        // Hide form
+        const form = document.getElementById("newAddressForm");
+        form.classList.add("hidden");
 
-        // Close the new form
-        document.getElementById("newAddressForm").classList.add("hidden");
+        // Clear new form inputs
+        document.getElementById("newAddressField").value = "";
+        document.getElementById("newPincode").value = "";
+        document.getElementById("newCity").value = "";
+        document.getElementById("newState").value = "";
 
-        // Refresh dropdown AFTER save
+        // Show dropdown
+        document.getElementById("addressSelectContainer").classList.remove("hidden");
+
+        // Reload dropdown list
         onChangeAddressClick();
 
-        // Pre-select this new address in dropdown & main box
-        const ddl = document.getElementById("savedAddressDropdown");
-        if (ddl) {
-          ddl.value = addr;
-        }
+        // Auto-select new address
+        setTimeout(() => {
+          const ddl = document.getElementById("savedAddressDropdown");
+          if (ddl) {
+            ddl.value = addr;  // Pre-select newly added address
+          }
+          document.getElementById("address").value = addr; // Update main textarea
+        }, 400);
 
       } else {
         alert(res.message || "Failed to save address.");
@@ -4425,6 +4435,7 @@ function saveNewAddress() {
       alert("Error saving address.");
     });
 }
+
 
 // STEP 8 — Autofill New Address Form with logged-in mobile
 function autofillNewAddressMobile() {
@@ -4439,6 +4450,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
