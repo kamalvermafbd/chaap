@@ -1680,30 +1680,29 @@ function updateQty(index, qty) {
 
 }
 
- function openCheckout() {
-  // Always auto-fill mobile for logged-in users
+function openCheckout() {
   autofillMobileForLoggedIn();
- setupAddressUIVisibility();   //  FIX — show Change Address correctly
-  // 👉 Add this line here
-  loadPrimaryAddress();
+  
+  resetCheckoutFieldsDefault();   // FIRST reset UI
+
+  setupAddressUIVisibility();      // THEN show/hide Change Address
+
+  // MOVE THIS LINE ↓ HERE (after login autofill + reset)
+  loadPrimaryAddress();  
 
   if (cart.length === 0) {
     alert("Your cart is empty!");
     return;
   }
 
-  // Close cart overlay
   document.getElementById("cartOverlay").style.display = "none";
 
-  // IMPORTANT: First reset visibility (only 3 fields visible)
-  resetCheckoutFieldsDefault();
-// STEP 5A — Reset Saved Address UI (every time checkout opens)
-document.getElementById("changeAddressBtn").classList.add("hidden");
-document.getElementById("addressSelectContainer").classList.add("hidden");
-document.getElementById("newAddressForm").classList.add("hidden");
-document.getElementById("savedAddressDropdown").innerHTML = "";
+  // Reset Saved-Address UI
+  document.getElementById("changeAddressBtn").classList.add("hidden");
+  document.getElementById("addressSelectContainer").classList.add("hidden");
+  document.getElementById("newAddressForm").classList.add("hidden");
+  document.getElementById("savedAddressDropdown").innerHTML = "";
 
-  // Clear old values only for guest user
   if (!isLoggedIn()) {
     document.getElementById("mobile").value = "";
     document.getElementById("customerName").value = "";
@@ -1711,10 +1710,8 @@ document.getElementById("savedAddressDropdown").innerHTML = "";
     document.getElementById("address").value = "";
   }
 
-  // Now show checkout modal
   document.getElementById('checkoutModal').style.display = 'flex';
 }
-
 
     
 async function loadPrimaryAddress() {
@@ -4422,6 +4419,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
