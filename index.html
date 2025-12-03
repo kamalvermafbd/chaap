@@ -2011,6 +2011,7 @@ function checkCustomerByMobile() {
   return; // stop guest mobile logic
 }
   const mobile = document.getElementById('mobile').value.trim();
+  
 
   // If mobile incomplete -> reset and hide complete row (label + input)
   if (mobile.length !== 10) {
@@ -2057,6 +2058,14 @@ let lastLookupOrderType = "";
 
 function toggleAddressField() {
   const mobile = document.getElementById('mobile').value.trim();
+  // STEP 6 — Lock/unlock mobile field correctly
+const mobileField = document.getElementById("mobile");
+if (isLoggedIn()) {
+  mobileField.readOnly = true;
+} else {
+  mobileField.readOnly = false;
+}
+
   const orderType = document.getElementById('orderType').value;
 
   // If no orderType chosen, nothing to do
@@ -2210,7 +2219,8 @@ if (orderType === "Home Delivery") {
 }
 // When switching from HD → Takeaway/Dine-In,
 // hide saved-address dropdown + new-address form
-const dropdownBox = document.getElementById("addressSelectContainer");
+const dropdownBox = document.getElementById("savedAddressDropdown");
+
 const newFormBox = document.getElementById("newAddressForm");
 
 
@@ -4306,7 +4316,8 @@ function onChangeAddressClick() {
   const mobile = localStorage.getItem("userMobile");
   if (!mobile) return; // guest safety
 
-  const dropdownBox = document.getElementById("addressSelectContainer");
+  const dropdownBox = document.getElementById("savedAddressDropdown");
+
   const newFormBox = document.getElementById("newAddressForm");
 
   // Always hide both first
@@ -4415,6 +4426,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
