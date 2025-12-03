@@ -890,9 +890,11 @@ style="
          placeholder="Enter state" />
 
   <button id="saveNewAddressBtn"
-          class="mt-4 w-full bg-green-600 text-white py-2 rounded">
-    Save Address
-  </button>
+        onclick="saveNewAddress()"
+        class="mt-4 w-full bg-green-600 text-white py-2 rounded">
+  Save Address
+</button>
+
 </div>
 
       <!-- Payment -->
@@ -4334,7 +4336,9 @@ function onChangeAddressClick() {
 
       // Step 4 me dropdown fill karenge
       // === STEP 3C: Fill dropdown with saved addresses ===
-const ddl = document.getElementById("savedAddressList");
+const ddl = document.getElementById("savedAddressDropdown");
+
+      
 ddl.innerHTML = ""; // reset
 
 list.forEach((addr, index) => {
@@ -4364,10 +4368,49 @@ ddl.onchange = () => {
   dropdownBox.classList.add("hidden");
   newFormBox.classList.remove("hidden");
 }
+function saveNewAddress() {
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) return alert("Login required.");
 
+  const addr = document.getElementById("newAddressField").value.trim();
+  const pin  = document.getElementById("newPincode").value.trim();
+  const city = document.getElementById("newCity").value.trim();
+  const state = document.getElementById("newState").value.trim();
+
+  if (!addr) return alert("Please enter address.");
+  if (pin.length !== 6) return alert("Please enter valid 6-digit pincode.");
+  if (!city) return alert("Enter city.");
+  if (!state) return alert("Enter state.");
+
+  // Save to backend
+  apiPost("saveUserNewAddress", { mobile, address: addr, pincode: pin, city, state })
+    .then(res => {
+      if (res.success) {
+        alert("Address saved successfully!");
+
+        // close form and update main address box
+        document.getElementById("address").value = addr;
+
+        // hide new form
+        document.getElementById("newAddressForm").classList.add("hidden");
+
+        // After save → reload address list (Step 5c will handle)
+        onChangeAddressClick();
+      } else {
+        alert(res.message || "Failed to save address.");
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error saving address.");
+    });
+}
+
+  
 </script>
 </body>
 </html>
+
 
 
 
