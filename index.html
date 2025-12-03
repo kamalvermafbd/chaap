@@ -852,6 +852,12 @@ style="
           class="w-full border rounded px-2 py-2 text-sm">
     <!-- Options added dynamically -->
   </select>
+  <!-- STEP 3D BUTTON BELOW DROPDOWN -->
+  <button onclick="onChangeAddressAddNew()"
+          class="mt-2 px-3 py-1 bg-gray-600 text-white rounded text-sm">
+    + Add New Address
+  </button>
+</div>
 </div>
 
 <!-- ADD NEW ADDRESS FORM -->
@@ -4350,9 +4356,19 @@ ddl.onchange = () => {
     });
 }
 
+  function onChangeAddressAddNew() {
+  const dropdownBox = document.getElementById("addressSelectContainer");
+  const newFormBox = document.getElementById("newAddressForm");
+
+  // Hide dropdown, show new address form
+  dropdownBox.classList.add("hidden");
+  newFormBox.classList.remove("hidden");
+}
+
 </script>
 </body>
 </html>
+
 
 
 
