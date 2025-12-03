@@ -2157,6 +2157,27 @@ else {
         addressField.value = "";
     }
 }
+// STEP 1F — Stabilize Change Address button + Dropdown + New Form
+if (orderType === "Home Delivery") {
+
+    // Logged-in only can change address
+    if (isLoggedIn()) {
+        changeBtn?.classList.remove("hidden");
+        document.getElementById("addressSelectContainer")?.classList.remove("hidden");
+    } else {
+        changeBtn?.classList.add("hidden");
+        document.getElementById("addressSelectContainer")?.classList.add("hidden");
+    }
+
+    // Always hide new-address form by default unless user opens it manually
+    document.getElementById("newAddressForm")?.classList.add("hidden");
+}
+else {
+    // Takeaway / Dine-In → hide all address controls
+    changeBtn?.classList.add("hidden");
+    document.getElementById("addressSelectContainer")?.classList.add("hidden");
+    document.getElementById("newAddressForm")?.classList.add("hidden");
+}
 
   
 // STEP 1A — Logged-in users must skip Orders sheet lookup completely
@@ -4472,6 +4493,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
