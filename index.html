@@ -2059,245 +2059,166 @@ let lastLookupMobile = "";
 let lastLookupOrderType = "";
 
 function toggleAddressField() {
-  const mobile = document.getElementById('mobile').value.trim();
 
-  const mobileField = document.getElementById("mobile");
-  mobileField.readOnly = isLoggedIn();
+  const mobile = document.getElementById("mobile").value.trim();
+  const orderType = document.getElementById("orderType").value;
 
-  const orderType = document.getElementById('orderType').value;
+  const nameField    = document.getElementById("customerName");
+  const emailField   = document.getElementById("email");
+  const addressField = document.getElementById("address");
+
+  const addressWrapper = document.getElementById("addressWrapper");
+  const paymentField   = document.getElementById("paymentMethod");
+
+  const overlay    = document.getElementById("loadingOverlay");
+  const changeBtn  = document.getElementById("changeAddressBtn");
+  const ddlBox     = document.getElementById("addressSelectContainer");
+  const newForm    = document.getElementById("newAddressForm");
+
   if (!orderType) return;
 
+  // Basic validation for BOTH user types
   if (!/^[0-9]{10}$/.test(mobile)) {
     alert("Enter a valid 10-digit mobile number first.");
     return;
   }
 
-  if (mobile === lastLookupMobile && orderType === lastLookupOrderType) return;
-  lastLookupMobile = mobile;
-  lastLookupOrderType = orderType;
+  // Always show overlay for both logged-in + guest
+  overlay.style.display = "flex";
 
-  const nameField = document.getElementById('customerName');
-  const emailField = document.getElementById('email');
-  const addressField = document.getElementById('address');
+  // Lock orderType briefly
+  document.getElementById("orderType").disabled = true;
 
-  nameField.setAttribute("autocomplete", "off");
-  emailField.setAttribute("autocomplete", "off");
-  addressField.setAttribute("autocomplete", "off");
 
-  const addressWrapper = document.getElementById('addressWrapper');
-  const paymentField = document.getElementById('paymentMethod');
-  const overlay = document.getElementById('loadingOverlay');
-  const orderSelect = document.getElementById('orderType');
-  if (!nameField || !emailField || !addressField || !addressWrapper || !paymentField || !overlay || !orderSelect) {
-    console.warn("toggleAddressField: required DOM nodes missing");
-    return;
-  }
-if (isLoggedIn()) {
+  // ============================
+  // 🔵 1) LOGGED-IN USER (USER SHEET)
+  // ============================
+  if (isLoggedIn()) {
 
-  nameField.value = localStorage.getItem("userName") || "";
-  emailField.value = localStorage.getItem("userEmail") || "";
+    // Pre-fill name/email from localStorage
+    nameField.value  = localStorage.getItem("userName")  || "";
+    emailField.value = localStorage.getItem("userEmail") || "";
 
-  apiGet("getUserProfile", { mobile })
-    .then(res => {
-      if (res.success && res.address) {
-        addressField.value = res.address.trim();
-      }
-    });
+    // Hard lock name/email
+    nameField.readOnly = true;
+    emailField.readOnly = true;
+    addressField.readOnly = false;
 
-  if (orderType === "Home Delivery") {
-    addressWrapper.style.display = "block";
-    addressField.required = true;
-  } else {
-    addressWrapper.style.display = "none";
-    addressField.required = false;
-  }
-}
-  
-  
-
-  nameField.closest("div").style.display = "block";
-  emailField.closest("div").style.display = "block";
-  paymentField.style.display = "block";
-
-  const changeBtn = document.getElementById("changeAddressBtn");
-  if (orderType === "Home Delivery") {
-    if (isLoggedIn()) changeBtn?.classList.remove("hidden");
-    else changeBtn?.classList.add("hidden");
-  }
-
-  if (!isLoggedIn()) {
-    // Guest can edit name & email freely
-    nameField.readOnly = false;
-    emailField.readOnly = false;
-
-    // Address editable only if HD
+    // Show change address button only in Home Delivery
     if (orderType === "Home Delivery") {
-      addressField.readOnly = false;
+      changeBtn?.classList.remove("hidden");
+      ddlBox?.classList.add("hidden");
+      newForm?.classList.add("hidden");
+      addressWrapper.style.display = "block";
+      addressField.required = true;
     } else {
-      addressField.readOnly = true; // takeaway me hide hoga anyway
+      changeBtn?.classList.add("hidden");
+      ddlBox?.classList.add("hidden");
+      newForm?.classList.add("hidden");
+      addressWrapper.style.display = "none";
+      addressField.required = false;
     }
-}
 
-  
-// STEP 1E — Centralized Address Wrapper Logic
-if (orderType === "Home Delivery") {
-    addressWrapper.style.display = "block";
-    addressField.required = true;
+    // Fetch primary address from "user" sheet
+    apiGet("getUserProfile", { mobile })
+      .then(res => {
+        if (res.success) {
+          if (res.address) addressField.value = res.address.trim();
+          if (res.name)    nameField.value  = res.name;
+          if (res.email)   emailField.value = res.email;
+        }
+      })
+      .finally(() => {
+        overlay.style.display = "none";
+        document.getElementById("orderType").disabled = false;
+      });
 
-    if (!isLoggedIn()) {
-        addressField.readOnly = false;
-    }
-} 
-else {
+    return; // IMPORTANT → guest lookup skip
+  }
+
+
+
+  // ============================
+  // 🔴 2) GUEST USER (ORDERS SHEET)
+  // ============================
+
+  // Guest can edit name/email/address
+  nameField.readOnly = false;
+  emailField.readOnly = false;
+
+  // For takeaway/dine-in → address hide
+  if (orderType !== "Home Delivery") {
     addressWrapper.style.display = "none";
     addressField.required = false;
+    addressField.readOnly = true;
+  } else {
+    addressWrapper.style.display = "block";
+    addressField.required = true;
+    addressField.readOnly = false;
+  }
 
-    if (!isLoggedIn()) {
-        addressField.readOnly = true;
-        addressField.value = "";
-    }
-}
-// STEP 1F — Stabilize Change Address button + Dropdown + New Form
-if (orderType === "Home Delivery") {
+  // ALWAYS hide address change controls for guests
+  changeBtn?.classList.add("hidden");
+  ddlBox?.classList.add("hidden");
+  newForm?.classList.add("hidden");
 
-    // Logged-in only can change address
-    if (isLoggedIn()) {
-        changeBtn?.classList.remove("hidden");
-        document.getElementById("addressSelectContainer")?.classList.remove("hidden");
-    } else {
-        changeBtn?.classList.add("hidden");
-        document.getElementById("addressSelectContainer")?.classList.add("hidden");
-    }
 
-    // Always hide new-address form by default unless user opens it manually
-    document.getElementById("newAddressForm")?.classList.add("hidden");
-}
-else {
-    // Takeaway / Dine-In → hide all address controls
-    changeBtn?.classList.add("hidden");
-    document.getElementById("addressSelectContainer")?.classList.add("hidden");
-    document.getElementById("newAddressForm")?.classList.add("hidden");
-}
-
-  
-// STEP 1A — Logged-in users must skip Orders sheet lookup completely
-if (isLoggedIn()) {
-  overlay.style.display = "none";
-  orderSelect.disabled = false;
-  return;
-}
-
+  // ---- Lookup in Orders sheet ----
   apiGet("getCustomerDetailsByMobile", { mobile })
     .then(rows => {
 
       let orders = Array.isArray(rows) ? rows : (rows ? [rows] : []);
 
+      // No history found
       if (orders.length === 0) {
         nameField.value = "";
         emailField.value = "";
-        addressField.value = "";
-
-        if (orderType !== "Home Delivery") {
-          addressWrapper.style.display = "none";
-          addressField.required = false;
-        }
+        if (orderType === "Home Delivery") addressField.value = "";
         return;
       }
 
-      let latest = orders[0];
-      if (orders[0].rowNumber !== undefined) {
-        latest = orders.reduce((max, row) => row.rowNumber > max.rowNumber ? row : max);
-      }
-      if (latest.orderDate === undefined && orders.length > 1) {
-        latest = orders[orders.length - 1];
-      }
+      // Latest order row
+      let latest = orders.reduce((a, b) =>
+        (a.rowNumber > b.rowNumber ? a : b)
+      );
 
-      nameField.value = latest.name || "";
+      // Fill name/email from latest order
+      nameField.value  = latest.name  || "";
       emailField.value = latest.email || "";
 
-      if (isLoggedIn()) {
-        nameField.value = localStorage.getItem("userName") || nameField.value;
-        emailField.value = localStorage.getItem("userEmail") || emailField.value;
-      }
-
-      let latestHDAddress = "";
-      for (let i = orders.length - 1; i >= 0; i--) {
-        const row = orders[i];
-        const hd = row.Address || row.address || "";
-        if (row.orderType === "Home Delivery" && hd.trim() !== "") {
-          latestHDAddress = hd.trim();
-          break;
-        }
-      }
-
-      if (isLoggedIn()) {
-        latestHDAddress = "";
-      }
-
-      if (orderType === lastLookupOrderType) {
-        addressWrapper.style.display = addressWrapper.style.display;
-      }
-
+      // Latest HD address
       if (orderType === "Home Delivery") {
-        if (isLoggedIn()) {
-          addressWrapper.style.display = "block";
-          addressField.required = true;
-
-          apiGet("getUserProfile", { mobile })
-            .then(res => {
-              if (res.success && res.address) {
-                addressField.value = res.address.trim();
-              }
-            })
-            .catch(err => console.error("Primary address load error:", err));
-        } else {
-          addressWrapper.style.display = "block";
-          addressField.required = true;
-          addressField.value = latestHDAddress || "";
+        let hd = "";
+        for (let i = orders.length - 1; i >= 0; i--) {
+          const row = orders[i];
+          const raw = row.Address || row.address || "";
+          if (row.orderType === "Home Delivery" && raw.trim() !== "") {
+            hd = raw.trim();
+            break;
+          }
         }
-
-      } else {
-        addressWrapper.style.display = "none";
-        addressField.required = false;
-
-        if (!isLoggedIn()) {
-          addressField.value = "";
-        }
+        addressField.value = hd || "";
       }
 
-      const dropdownBox = document.getElementById("addressSelectContainer");
-      const newFormBox = document.getElementById("newAddressForm");
+      // Small popup (guest only)
+      alert(
+        "Customer details loaded:\n\n" +
+        "Name: " + (nameField.value || "(not found)") + "\n" +
+        "Email: " + (emailField.value || "(not found)") + "\n" +
+        (orderType === "Home Delivery"
+          ? "Latest HD Address: " + (addressField.value || "(not found)")
+          : "")
+      );
 
-      if (orderType !== "Home Delivery") {
-        dropdownBox?.classList.add("hidden");
-        newFormBox?.classList.add("hidden");
-        changeBtn?.classList.add("hidden");
-      }
-
-      if (!isLoggedIn()) {
-        nameField.readOnly = false;
-        emailField.readOnly = false;
-        addressField.readOnly = false;
-      }
-
-      if (!isLoggedIn()) {
-        alert(
-          "Customer details loaded:\n\n" +
-          "Name: " + (nameField.value || "(not found)") + "\n" +
-          "Email: " + (emailField.value || "(not found)") + "\n" +
-          "Latest HD Address: " + (latestHDAddress || "(not found)")
-        );
-      }
-
-    })  // <-- ONLY FIX: this bracket was wrong earlier
-    .catch(err => {
-      console.error("Lookup error:", err);
-      alert("Error loading customer details. Please try again.");
+    })
+    .catch(() => {
+      alert("Error loading customer details.");
     })
     .finally(() => {
       overlay.style.display = "none";
-      orderSelect.disabled = false;
+      document.getElementById("orderType").disabled = false;
     });
+
 }
 
 function placeOrder() {
@@ -4493,6 +4414,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
