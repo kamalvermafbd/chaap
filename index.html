@@ -1683,7 +1683,7 @@ function updateQty(index, qty) {
  function openCheckout() {
   // Always auto-fill mobile for logged-in users
   autofillMobileForLoggedIn();
-
+ setupAddressUIVisibility();   //  FIX — show Change Address correctly
   // 👉 Add this line here
   loadPrimaryAddress();
 
@@ -4422,6 +4422,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
