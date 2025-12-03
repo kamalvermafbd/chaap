@@ -4328,6 +4328,8 @@ function onChangeAddressClick() {
       if (list.length === 0) {
         // 🔴 CASE 2 — no saved addresses → directly show add new
         newFormBox.classList.remove("hidden");
+        autofillNewAddressMobile();
+
         return;
       }
 
@@ -4367,6 +4369,8 @@ ddl.onchange = () => {
   // Hide dropdown, show new address form
   dropdownBox.classList.add("hidden");
   newFormBox.classList.remove("hidden");
+     // STEP 8 CALL
+  autofillNewAddressMobile();
 }
 function saveNewAddress() {
   const mobile = localStorage.getItem("userMobile");
@@ -4405,11 +4409,20 @@ function saveNewAddress() {
       alert("Error saving address.");
     });
 }
+// STEP 8 — Autofill New Address Form with logged-in mobile
+function autofillNewAddressMobile() {
+  const mobile = localStorage.getItem("userMobile") || "";
+  const field = document.getElementById("newAddressMobile");
+  if (field && mobile) {
+    field.value = mobile;
+  }
+}
 
   
 </script>
 </body>
 </html>
+
 
 
 
