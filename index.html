@@ -2126,10 +2126,18 @@ if (isLoggedIn()) {
   }
 
   if (!isLoggedIn()) {
-    nameField.readOnly = true;
-    emailField.readOnly = true;
-    addressField.readOnly = true;
-  }
+    // Guest can edit name & email freely
+    nameField.readOnly = false;
+    emailField.readOnly = false;
+
+    // Address editable only if HD
+    if (orderType === "Home Delivery") {
+      addressField.readOnly = false;
+    } else {
+      addressField.readOnly = true; // takeaway me hide hoga anyway
+    }
+}
+
 
   overlay.style.display = "flex";
   overlay.offsetHeight;
@@ -4443,6 +4451,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
