@@ -2088,11 +2088,32 @@ function toggleAddressField() {
   const paymentField = document.getElementById('paymentMethod');
   const overlay = document.getElementById('loadingOverlay');
   const orderSelect = document.getElementById('orderType');
-
   if (!nameField || !emailField || !addressField || !addressWrapper || !paymentField || !overlay || !orderSelect) {
     console.warn("toggleAddressField: required DOM nodes missing");
     return;
   }
+if (isLoggedIn()) {
+
+  nameField.value = localStorage.getItem("userName") || "";
+  emailField.value = localStorage.getItem("userEmail") || "";
+
+  apiGet("getUserProfile", { mobile })
+    .then(res => {
+      if (res.success && res.address) {
+        addressField.value = res.address.trim();
+      }
+    });
+
+  if (orderType === "Home Delivery") {
+    addressWrapper.style.display = "block";
+    addressField.required = true;
+  } else {
+    addressWrapper.style.display = "none";
+    addressField.required = false;
+  }
+}
+  
+  
 
   nameField.closest("div").style.display = "block";
   emailField.closest("div").style.display = "block";
@@ -2113,6 +2134,8 @@ function toggleAddressField() {
   overlay.style.display = "flex";
   overlay.offsetHeight;
   orderSelect.disabled = true;
+// STEP 1A — Logged-in users must skip Orders sheet lookup completely
+if (isLoggedIn()) return;
 
   apiGet("getCustomerDetailsByMobile", { mobile })
     .then(rows => {
@@ -4420,6 +4443,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
