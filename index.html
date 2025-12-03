@@ -1106,7 +1106,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbxxTd1eS9Ncu37oMnyiwwBMLd4ytcSFvBzgi6F80xW6DxPwYyL6Y_2LMSXCyfTViqba6g/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbwlYAAVie3VWdJl6QtfxW1dNcVKz_YGHUWvtH5FKuXrukop5m5n5O5dP-uewI7W7v4dMA/exec";
 
 function apiGet(api, params = {}) {
   const url = new URL(API_BASE);
@@ -4316,7 +4316,8 @@ function autofillMobileForLoggedIn() {
 // Run when checkout modal shows up
 
 function onChangeAddressClick() {
-  const mobile = localStorage.getItem("userMobile");
+  const mobile = localStorage.getItem("mobile") || localStorage.getItem("userMobile");
+
   if (!mobile) return; // guest safety
 
   const dropdownBox = document.getElementById("addressSelectContainer");
@@ -4371,7 +4372,8 @@ ddl.onchange = () => {
 }
 
   function onChangeAddressAddNew() {
-  const mobile = localStorage.getItem("userMobile");
+ const mobile = localStorage.getItem("mobile") || localStorage.getItem("userMobile");
+
   if (!mobile) return;
 
   const dropdownBox = document.getElementById("addressSelectContainer");
@@ -4452,6 +4454,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
