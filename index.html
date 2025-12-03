@@ -2139,11 +2139,13 @@ if (isLoggedIn()) {
 }
 
 
-  overlay.style.display = "flex";
-  overlay.offsetHeight;
-  orderSelect.disabled = true;
+  
 // STEP 1A — Logged-in users must skip Orders sheet lookup completely
-if (isLoggedIn()) return;
+if (isLoggedIn()) {
+  overlay.style.display = "none";
+  orderSelect.disabled = false;
+  return;
+}
 
   apiGet("getCustomerDetailsByMobile", { mobile })
     .then(rows => {
@@ -4451,6 +4453,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
