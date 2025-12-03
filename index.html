@@ -2138,6 +2138,25 @@ if (isLoggedIn()) {
     }
 }
 
+  
+// STEP 1E — Centralized Address Wrapper Logic
+if (orderType === "Home Delivery") {
+    addressWrapper.style.display = "block";
+    addressField.required = true;
+
+    if (!isLoggedIn()) {
+        addressField.readOnly = false;
+    }
+} 
+else {
+    addressWrapper.style.display = "none";
+    addressField.required = false;
+
+    if (!isLoggedIn()) {
+        addressField.readOnly = true;
+        addressField.value = "";
+    }
+}
 
   
 // STEP 1A — Logged-in users must skip Orders sheet lookup completely
@@ -4453,6 +4472,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
