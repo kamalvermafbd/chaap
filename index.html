@@ -2061,27 +2061,21 @@ let lastLookupOrderType = "";
 function toggleAddressField() {
   const mobile = document.getElementById('mobile').value.trim();
 
-  // STEP 6 — Lock/unlock mobile field correctly
   const mobileField = document.getElementById("mobile");
   mobileField.readOnly = isLoggedIn();
 
   const orderType = document.getElementById('orderType').value;
-
-  // If no orderType chosen, nothing to do
   if (!orderType) return;
 
-  // Validate mobile first
   if (!/^[0-9]{10}$/.test(mobile)) {
     alert("Enter a valid 10-digit mobile number first.");
     return;
   }
 
-  // Prevent duplicate lookup
   if (mobile === lastLookupMobile && orderType === lastLookupOrderType) return;
   lastLookupMobile = mobile;
   lastLookupOrderType = orderType;
 
-  // Fields
   const nameField = document.getElementById('customerName');
   const emailField = document.getElementById('email');
   const addressField = document.getElementById('address');
@@ -2100,19 +2094,16 @@ function toggleAddressField() {
     return;
   }
 
-  // Show name & email container
   nameField.closest("div").style.display = "block";
   emailField.closest("div").style.display = "block";
   paymentField.style.display = "block";
 
-  // Show/hide Change Address button
   const changeBtn = document.getElementById("changeAddressBtn");
   if (orderType === "Home Delivery") {
     if (isLoggedIn()) changeBtn?.classList.remove("hidden");
     else changeBtn?.classList.add("hidden");
   }
 
-  // Lock fields (guest only)
   if (!isLoggedIn()) {
     nameField.readOnly = true;
     emailField.readOnly = true;
@@ -2120,37 +2111,14 @@ function toggleAddressField() {
   }
 
   overlay.style.display = "flex";
-
-  // ⭐ Pre-fill before overlay
-  if (isLoggedIn()) {
-    nameField.value = localStorage.getItem("userName") || "";
-    emailField.value = localStorage.getItem("userEmail") || "";
-
-    apiGet("getUserProfile", { mobile }).then(res => {
-      if (res.success && res.address) {
-        addressField.value = res.address.trim();
-      }
-    });
-  }
-
-  overlay.offsetHeight; // redraw
-
+  overlay.offsetHeight;
   orderSelect.disabled = true;
 
-  // Logged-in → skip Orders-sheet lookup
-  if (isLoggedIn()) {
-    overlay.style.display = "none";
-    orderSelect.disabled = false;
-    return;
-  }
-
-  // ⭐ Guest lookup starts here
   apiGet("getCustomerDetailsByMobile", { mobile })
     .then(rows => {
 
       let orders = Array.isArray(rows) ? rows : (rows ? [rows] : []);
 
-      // No data found
       if (orders.length === 0) {
         nameField.value = "";
         emailField.value = "";
@@ -2163,7 +2131,6 @@ function toggleAddressField() {
         return;
       }
 
-      // Pick latest order
       let latest = orders[0];
       if (orders[0].rowNumber !== undefined) {
         latest = orders.reduce((max, row) => row.rowNumber > max.rowNumber ? row : max);
@@ -2175,7 +2142,11 @@ function toggleAddressField() {
       nameField.value = latest.name || "";
       emailField.value = latest.email || "";
 
-      // STEP 2A — latest HD address
+      if (isLoggedIn()) {
+        nameField.value = localStorage.getItem("userName") || nameField.value;
+        emailField.value = localStorage.getItem("userEmail") || emailField.value;
+      }
+
       let latestHDAddress = "";
       for (let i = orders.length - 1; i >= 0; i--) {
         const row = orders[i];
@@ -2186,42 +2157,66 @@ function toggleAddressField() {
         }
       }
 
-      // Fill HD address only if HD selected
-      if (orderType === "Home Delivery") {
-        addressWrapper.style.display = "block";
-        addressField.required = true;
+      if (isLoggedIn()) {
+        latestHDAddress = "";
+      }
 
-        // guest → use history address
-        addressField.value = latestHDAddress || "";
+      if (orderType === lastLookupOrderType) {
+        addressWrapper.style.display = addressWrapper.style.display;
+      }
+
+      if (orderType === "Home Delivery") {
+        if (isLoggedIn()) {
+          addressWrapper.style.display = "block";
+          addressField.required = true;
+
+          apiGet("getUserProfile", { mobile })
+            .then(res => {
+              if (res.success && res.address) {
+                addressField.value = res.address.trim();
+              }
+            })
+            .catch(err => console.error("Primary address load error:", err));
+        } else {
+          addressWrapper.style.display = "block";
+          addressField.required = true;
+          addressField.value = latestHDAddress || "";
+        }
+
       } else {
         addressWrapper.style.display = "none";
         addressField.required = false;
-        addressField.value = "";
+
+        if (!isLoggedIn()) {
+          addressField.value = "";
+        }
       }
 
-      // hide saved-address UI when switching to Takeaway
       const dropdownBox = document.getElementById("addressSelectContainer");
       const newFormBox = document.getElementById("newAddressForm");
+
       if (orderType !== "Home Delivery") {
         dropdownBox?.classList.add("hidden");
         newFormBox?.classList.add("hidden");
         changeBtn?.classList.add("hidden");
       }
 
-      // Unlock guest fields now
-      nameField.readOnly = false;
-      emailField.readOnly = false;
-      addressField.readOnly = false;
+      if (!isLoggedIn()) {
+        nameField.readOnly = false;
+        emailField.readOnly = false;
+        addressField.readOnly = false;
+      }
 
-      // Optional alert
-      alert(
-        "Customer details loaded:\n\n" +
-        "Name: " + (nameField.value || "(not found)") + "\n" +
-        "Email: " + (emailField.value || "(not found)") + "\n" +
-        "Latest HD Address: " + (latestHDAddress || "(not found)")
-      );
+      if (!isLoggedIn()) {
+        alert(
+          "Customer details loaded:\n\n" +
+          "Name: " + (nameField.value || "(not found)") + "\n" +
+          "Email: " + (emailField.value || "(not found)") + "\n" +
+          "Latest HD Address: " + (latestHDAddress || "(not found)")
+        );
+      }
 
-    })
+    })  // <-- ONLY FIX: this bracket was wrong earlier
     .catch(err => {
       console.error("Lookup error:", err);
       alert("Error loading customer details. Please try again.");
@@ -2231,7 +2226,6 @@ function toggleAddressField() {
       orderSelect.disabled = false;
     });
 }
-
 
 function placeOrder() {
   if (window._orderLock) return;
@@ -4426,6 +4420,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
