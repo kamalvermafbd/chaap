@@ -1714,29 +1714,35 @@ function openCheckout() {
 }
 
     
-async function loadPrimaryAddress() {
-  // Only logged-in users
-  const mobile = localStorage.getItem("userMobile");
+function loadPrimaryAddress() {
+  // Logged-in users only
+  if (!isLoggedIn()) return;
+
+  const mobile = localStorage.getItem("mobile");
   if (!mobile) return;
 
-  try {
-    const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbz8B-nwXivGHzKgcWT8zTvS4sAWG6dKfsDh8rsn29CGXCeIxxeNJ9NaPcL03cQBGHEf/exec?action=getUserByMobile&mobile=${mobile}`
-    );
+  const orderType = document.getElementById("orderType")?.value;
 
-    const data = await response.json();
+  // Only apply primary address for Home Delivery
+  if (orderType !== "Home Delivery") return;
 
-    if (data && data.address) {
-      document.getElementById("address").value = data.address;
-    } else {
-      // No address saved → textarea stays empty
-      document.getElementById("address").value = "";
-    }
+  const addressField = document.getElementById("address");
+  const addressWrapper = document.getElementById("addressWrapper");
+  if (!addressField || !addressWrapper) return;
 
-  } catch (error) {
-    console.error("Primary address load error:", error);
-  }
+  // Show wrapper
+  addressWrapper.style.display = "block";
+
+  // Fetch user profile
+  apiGet("getUserProfile", { mobile })
+    .then(res => {
+      if (res.success && res.address) {
+        addressField.value = res.address.trim();
+      }
+    })
+    .catch(err => console.error("loadPrimaryAddress error:", err));
 }
+
 async function loadSavedAddresses() {
   const mobile = localStorage.getItem("userMobile");
   if (!mobile) {
@@ -4409,6 +4415,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
