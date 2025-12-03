@@ -2160,14 +2160,22 @@ function toggleAddressField() {
       emailField.value = latest.email || "";
 
       // Latest home delivery address
-      let latestHD = "";
-      for (let i = orders.length - 1; i >= 0; i--) {
-        if (orders[i].orderType === "Home Delivery" &&
-            orders[i].address?.trim()) {
-          latestHD = orders[i].address.trim();
-          break;
-        }
-      }
+      // FULLY SAFE latest Home Delivery address (handles Address / address)
+let latestHD = "";
+for (let i = orders.length - 1; i >= 0; i--) {
+  const row = orders[i];
+  const hd =
+    row.Address?.trim() ||
+    row.address?.trim() ||
+    row.Address1?.trim() ||
+    row.Address2?.trim() ||
+    "";
+
+  if (row.orderType === "Home Delivery" && hd !== "") {
+    latestHD = hd;
+    break;
+  }
+}
 
       // Address rules
       if (orderType === "Home Delivery") {
@@ -4386,6 +4394,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
