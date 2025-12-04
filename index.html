@@ -836,6 +836,21 @@ style="
                   class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
                          focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
       </div>
+      <div id="pincodeWrapper" style="display:none;">
+   <label>Pincode</label>
+   <input id="pincode" readonly>
+</div>
+
+<div id="cityWrapper" style="display:none;">
+   <label>City</label>
+   <input id="city" readonly>
+</div>
+
+<div id="stateWrapper" style="display:none;">
+   <label>State</label>
+   <input id="state" readonly>
+</div>
+
 <!-- CHANGE ADDRESS BUTTON (shown only for logged-in users via JS) -->
 <div class="space-y-3">
       <button id="changeAddressBtn"
@@ -2058,149 +2073,28 @@ document.getElementById("mobile").addEventListener("input", function () {
 let lastLookupMobile = "";
 let lastLookupOrderType = "";
 
-function toggleAddressField() {
+    <!-- Address -->
+      <div id="addressWrapper">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+        <textarea id="address"
+                  placeholder="Address"
+                  class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
+                         focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+      </div>
+      <div id="pincodeWrapper" style="display:none;">
+   <label>Pincode</label>
+   <input id="pincode" readonly>
+</div>
 
-  const mobile = document.getElementById("mobile").value.trim();
-  const orderType = document.getElementById("orderType").value;
+<div id="cityWrapper" style="display:none;">
+   <label>City</label>
+   <input id="city" readonly>
+</div>
 
-  if (!orderType) return;
-
-  // --- 1) Validate mobile ---
-  if (!/^[0-9]{10}$/.test(mobile)) {
-    alert("Enter a valid 10-digit mobile number.");
-    return;
-  }
-
-  // --- 2) Basic DOM references ---
-  const nameField = document.getElementById("customerName");
-  const emailField = document.getElementById("email");
-  const addressField = document.getElementById("address");
-  const addressWrapper = document.getElementById("addressWrapper");
-  const paymentField = document.getElementById("paymentMethod");
-  const overlay = document.getElementById("loadingOverlay");
-  const changeBtn = document.getElementById("changeAddressBtn");
-  const orderSelect = document.getElementById("orderType");
-
-  if (!nameField || !emailField || !addressField || !addressWrapper) return;
-
-  // --- 3) Make fields visible (IMPORTANT FIX) ---
-  nameField.closest("div").style.display = "block";
-  emailField.closest("div").style.display = "block";
-  paymentField.style.display = "block";
-
-  // --- 4) Always show overlay ---
-  overlay.style.display = "flex";
-  orderSelect.disabled = true;
-
-  // --- 5) Logged-in: Always fetch from USER SHEET ---
-  if (isLoggedIn()) {
-
-    nameField.readOnly = true;
-    emailField.readOnly = true;
-
-    // Mobile already autofilled separately
-
-    apiGet("getUserProfile", { mobile })
-      .then(res => {
-        if (res.success) {
-          nameField.value = res.name || "";
-          emailField.value = res.email || "";
-          if (orderType === "Home Delivery") {
-            addressField.value = res.address || "";
-          }
-        }
-      })
-      .finally(() => {
-        // Address rules
-        if (orderType === "Home Delivery") {
-          addressWrapper.style.display = "block";
-          changeBtn?.classList.remove("hidden");
-          addressField.required = true;
-        } else {
-          addressWrapper.style.display = "none";
-          changeBtn?.classList.add("hidden");
-          addressField.required = false;
-        }
-
-        overlay.style.display = "none";
-        orderSelect.disabled = false;
-      });
-
-    return; // STOP HERE (NO ORDERS SHEET LOOKUP)
-  }
-
-  // --- 6) Guest User: Lookup from Orders sheet ---
-  nameField.readOnly = false;
-  emailField.readOnly = false;
-
-  apiGet("getCustomerDetailsByMobile", { mobile })
-    .then(rows => {
-      let orders = Array.isArray(rows) ? rows : [];
-
-      if (orders.length === 0) {
-        // No history
-        nameField.value = "";
-        emailField.value = "";
-        addressField.value = "";
-
-        if (orderType !== "Home Delivery") {
-          addressWrapper.style.display = "none";
-        }
-
-        return;
-      }
-
-      // Pick latest order row
-      let latest = orders.reduce((max, row) =>
-        row.rowNumber > max.rowNumber ? row : max
-      );
-
-      // Fill Name + Email
-      nameField.value = latest.name || "";
-      emailField.value = latest.email || "";
-
-      // Latest home delivery address
-      // FULLY SAFE latest Home Delivery address (handles Address / address)
-let latestHD = "";
-for (let i = orders.length - 1; i >= 0; i--) {
-  const row = orders[i];
-  const hd =
-    row.Address?.trim() ||
-    row.address?.trim() ||
-    row.Address1?.trim() ||
-    row.Address2?.trim() ||
-    "";
-
-  if (row.orderType === "Home Delivery" && hd !== "") {
-    latestHD = hd;
-    break;
-  }
-}
-
-      // Address rules
-      if (orderType === "Home Delivery") {
-        addressWrapper.style.display = "block";
-        addressField.required = true;
-        addressField.readOnly = false;
-        addressField.value = latestHD || "";
-      } else {
-        addressWrapper.style.display = "none";
-        addressField.required = false;
-        addressField.value = "";
-      }
-
-    })
-    .catch(err => {
-      alert("Error loading customer details.");
-      console.error(err);
-    })
-    .finally(() => {
-      overlay.style.display = "none";
-      orderSelect.disabled = false;
-    });
-}
-
-
+<div id="stateWrapper" style="display:none;">
+   <label>State</label>
+   <input id="state" readonly>
+</div>
 function placeOrder() {
   if (window._orderLock) return;
 window._orderLock = true;
@@ -4394,6 +4288,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
