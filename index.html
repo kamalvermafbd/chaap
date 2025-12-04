@@ -1691,7 +1691,7 @@ function openCheckout() {
 
   // MOVE THIS LINE ↓ HERE (after login autofill + reset)
   loadPrimaryAddress();  
-
+ setTimeout(() => toggleAddressField(), 50);
   if (cart.length === 0) {
     alert("Your cart is empty!");
     return;
@@ -4394,6 +4394,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
