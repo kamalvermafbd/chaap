@@ -4777,7 +4777,7 @@ function saveNewAddress() {
     });
 }
 
-
+const originalBodyOverflow = document.body.style.overflow || "";  
 // STEP 8 — Autofill New Address Form with logged-in mobile
 function autofillNewAddressMobile() {
   const mobile = localStorage.getItem("userMobile") || "";
@@ -4840,11 +4840,13 @@ function openCartDrawer() {
   openCartPanel();          // Always load latest cart
   document.getElementById("cartBackdrop").classList.add("active");
   document.getElementById("cartDrawer").classList.add("active");
+    document.body.style.overflow = "hidden";
 }
 
 function closeCartDrawer() {
   document.getElementById("cartBackdrop").classList.remove("active");
   document.getElementById("cartDrawer").classList.remove("active");
+document.body.style.overflow = originalBodyOverflow;
 }
 
 function toggleCartDrawer() {
@@ -4854,13 +4856,46 @@ function toggleCartDrawer() {
   } else {
     openCartDrawer();
   }
+   
 }
 
+  document.addEventListener("DOMContentLoaded", updateCartBadge);
   
-document.addEventListener("DOMContentLoaded", updateCartBadge);
+// ===== SWIPE TO CLOSE Drawer (Zomato style) =====
+let touchStartX = 0;
+
+document.addEventListener("touchstart", function(e) {
+  const drawer = document.getElementById("cartDrawer");
+  if (!drawer.classList.contains("active")) return;
+
+  touchStartX = e.touches[0].clientX;
+});
+
+document.addEventListener("touchmove", function(e) {
+  const drawer = document.getElementById("cartDrawer");
+  if (!drawer.classList.contains("active")) return;
+
+  const currentX = e.touches[0].clientX;
+  const diff = currentX - touchStartX;
+
+  // Swipe right only
+  if (diff > 60) {
+    closeCartDrawer();
+  }
+});
+// ===== ESC Key Close =====
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape") {
+    closeCartDrawer();
+  }
+});
+
+  
+
   
 </script>
 </body>
 </html>
+
 
 
