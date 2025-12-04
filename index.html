@@ -537,6 +537,21 @@ body::before {
 #cartItems .cart-card {
   padding: 12px !important;
 }
+#cartDrawer {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 90%;
+  max-width: 380px;
+  height: 100vh;
+  background: #ffffff;
+  box-shadow: -4px 0 12px rgba(0,0,0,0.12);
+  z-index: 99999;
+  padding: 20px;
+  overflow-y: auto;
+  transition: right 0.35s ease-out;
+  position: fixed;
+}
 
   </style>
 </head>
@@ -588,6 +603,10 @@ style="
 
   <div id="cartBackdrop" onclick="closeCartDrawer()"></div> 
 <div id="cartDrawer"> 
+   <button onclick="closeCartDrawer()" 
+    class="absolute right-3 top-3 text-gray-500 hover:text-gray-800 text-2xl font-bold">
+    &times;
+  </button>
 <h2 class="text-xl font-semibold mb-3">Your Cart</h2> 
 <div id="cartItems"></div> 
 <div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold"> <span>Total:</span> <span>₹<span id="cartTotal">0</span></span> </div> 
@@ -4909,6 +4928,7 @@ document.addEventListener("keydown", function(e) {
 </script>
 </body>
 </html>
+
 
 
 
