@@ -1007,6 +1007,7 @@ let addClickLock = false;
 // --- Debounce variables (qty/update/delete) ---
 let qtyDebounce = null;
 let deleteDebounce = null;
+let blockRender = false;
 
     function levenshtein(a, b) {
   a = a || ""; b = b || "";
@@ -1476,7 +1477,8 @@ if (!isLoggedIn()) {
 
 
 function renderCart() {
-   console.log("Rendering Cart...");
+if (blockRender) return;
+  console.log("Rendering Cart...");
    console.log(cart);
 
   const cartItemsContainer = document.querySelector('#cartItems');
@@ -4094,6 +4096,31 @@ document.addEventListener("click", function (e) {
   const index = Number(del.dataset.index);
   removeItem(index);
 });
+  // QTY HANDLER (INCREASE / DECREASE) — Prevent double events
+document.addEventListener("click", async function (e) {
+
+  const inc = e.target.closest(".qty-inc");
+  const dec = e.target.closest(".qty-dec");
+
+  if (!inc && !dec) return;
+
+  const index = Number((inc || dec).dataset.index);
+  if (isNaN(index)) return;
+
+  // 1 — Modify qty safely
+  if (inc) cart[index].qty++;
+  if (dec) cart[index].qty = Math.max(1, cart[index].qty - 1);
+
+  // 2 — Update local cart immediately (NO flicker)
+  localStorage.setItem("cart", JSON.stringify(cart));
+
+  // 3 — Re-render cart smoothly
+  renderCart();
+
+  // 4 — Backend save (but only ONE at a time)
+  await saveCartToBackend();
+});
+
 
 async function saveCartToBackend(cartData = null) {
   return new Promise(async (resolve) => {
@@ -4118,7 +4145,7 @@ async function saveCartToBackend(cartData = null) {
       localStorage.setItem("sessionId", sessionId);
     }
 
-    // Use passed data OR use global cart
+    // Use passed data OR global cart
     const cartToSend = (cartData && Array.isArray(cartData)) ? cartData : cart;
 
     // Clean final payload
@@ -4134,6 +4161,7 @@ async function saveCartToBackend(cartData = null) {
     }));
 
     try {
+       blockRender = true;  
       await apiPost("saveCart", {
         mobile,
         email: localStorage.getItem("userEmail") || "",
@@ -4145,7 +4173,7 @@ async function saveCartToBackend(cartData = null) {
       console.error("Cart Save Error:", err);
 
     } finally {
-
+ blockRender = false;  
       window.cartSaveLock = false;
 
       if (window.cartSaveQueued) {
@@ -4153,32 +4181,13 @@ async function saveCartToBackend(cartData = null) {
         await saveCartToBackend();
       }
 
-      // === STEP 4C: VERIFY BACKEND CART (FULL AWAIT) ===
-      setTimeout(async () => {
-        try {
-          const mobile = localStorage.getItem("userMobile");
-          const check = await apiPost("getCart", { mobile });
-          const backendLatest = check.cart || check.data || [];
-
-          if (JSON.stringify(backendLatest) !== JSON.stringify(cart)) {
-            console.warn("Backend mismatch detected → fixing...");
-            localStorage.setItem("cart", JSON.stringify(backendLatest));
-            cart = backendLatest;
-            renderCart();
-          }
-
-        } catch (err) {
-          console.error("Backend verify error:", err);
-        }
-
-        // ⭐ Resolve ONLY after verify done
-        resolve();
-
-      }, 1500);
-
+      // === STEP 4C: DISABLED BACKEND VERIFY TO PREVENT QTY ROLLBACK ===
+      resolve();
     }
+
   });
 }
+
 
 
  function loadUserCartOnStart() {
@@ -4700,4 +4709,5 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
