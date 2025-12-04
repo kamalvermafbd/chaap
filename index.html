@@ -4732,12 +4732,34 @@ function autofillNewAddressMobile() {
     field.value = mobile;
   }
 }
-
 function updateCartBadge() {
-  const count = cart.reduce((sum, item) => sum + Number(item.qty), 0);
+  let count = 0;
+
+  // Logged-in → count from backend/local cart
+  if (isLoggedIn()) {
+    const saved = localStorage.getItem("cart");
+    const arr = saved ? JSON.parse(saved) : [];
+    count = arr.reduce((a, b) => a + Number(b.qty || 1), 0);
+  }
+  // Guest
+  else {
+    const guest = localStorage.getItem("guestCart");
+    const arr = guest ? JSON.parse(guest) : [];
+    count = arr.reduce((a, b) => a + Number(b.qty || 1), 0);
+  }
+
   const badge = document.getElementById("cartCount");
-  if (badge) badge.innerText = count > 0 ? count : "";
-}  
+  if (!badge) return;
+
+  // Show / hide logic
+  if (count > 0) {
+    badge.innerText = count;
+    badge.style.display = "inline-block";
+  } else {
+    badge.innerText = "";
+    badge.style.display = "none";
+  }
+}
 
 async function openCheckout() {
 
@@ -4761,6 +4783,7 @@ async function openCheckout() {
 </script>
 </body>
 </html>
+
 
 
 
