@@ -1,4 +1,4 @@
-
+  
 <!DOCTYPE html>
 <html lang="en">
   
@@ -4575,7 +4575,13 @@ function onChangeAddressClick() {
         document.getElementById("city").value    = obj.city;
         document.getElementById("state").value   = obj.state;
       }
-
+//  HIDE OVERLAY ONLY AFTER DROPDOWN OPTIONS LOADED
+const waitForDropdown = setInterval(() => {
+  if (ddl.options.length > 0) {
+    clearInterval(waitForDropdown);
+    if (overlay) overlay.style.display = "none";
+  }
+}, 50);
       // 5️⃣ Change handler for dropdown
       ddl.onchange = () => {
         if (ddl.value === "__ADD_NEW__") return;
@@ -4587,10 +4593,7 @@ function onChangeAddressClick() {
           document.getElementById("state").value   = obj.state;
         } catch (e) {}
       };
-setTimeout(() => {
-  if (overlay) overlay.style.display = "none";
-}, 150);
-      if (overlay) overlay.style.display = "none";
+
     })
     .catch(err => {
       console.error("Address load error:", err);
@@ -4683,6 +4686,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
