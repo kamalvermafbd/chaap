@@ -491,6 +491,39 @@ body::before {
   40%  { transform: scale(1.25); }
   100% { transform: scale(1); }
 }
+#cartDrawer {
+  position: fixed;
+  top: 0;
+  right: -100%;           /* hidden by default */
+  width: 90%;
+  max-width: 380px;
+  height: 100vh;
+  background: #ffffff;
+  box-shadow: -4px 0 12px rgba(0,0,0,0.12);
+  z-index: 99999;
+  padding: 20px;
+  overflow-y: auto;
+  transition: right 0.35s ease-out;   /* smooth slide */
+}
+
+/* Drawer Visible */
+#cartDrawer.active {
+  right: 0;
+}
+
+/* Dim Background */
+#cartBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: none;
+  z-index: 99998;
+}
+
+/* Active State */
+#cartBackdrop.active {
+  display: block;
+}
 
   </style>
 </head>
@@ -539,6 +572,16 @@ style="
   Are you not registered? <br> Just Sign Up
   </span>
 </div>
+
+  <div id="cartBackdrop" onclick="closeCartDrawer()"></div> 
+<div id="cartDrawer"> 
+<h2 class="text-xl font-semibold mb-3">Your Cart</h2> 
+<div id="cartItems"></div> 
+<div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold"> <span>Total:</span> <span>₹<span id="cartTotal">0</span></span> </div> 
+<button onclick="openCheckout()" class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg"> Checkout </button> </div> 
+
+<button onclick="openCartDrawer()" style="position:absolute; right:160px; top:60px; background:#ff6347; color:white; padding:8px 12px; border-radius:6px; border:none;"> View Cart (<span id="cartCount">0</span>) </button>
+  
 
  <!-- HAMBURGER BUTTON (appears only after login) -->
 <button id="hamburgerBtn"
@@ -4792,17 +4835,32 @@ async function openCheckout() {
 
   document.getElementById("checkoutModal").style.display = "flex";
 }
+function openCartDrawer() {
+  updateCartBadge();
+  openCartPanel();          // Always load latest cart
+  document.getElementById("cartBackdrop").classList.add("active");
+  document.getElementById("cartDrawer").classList.add("active");
+}
 
+function closeCartDrawer() {
+  document.getElementById("cartBackdrop").classList.remove("active");
+  document.getElementById("cartDrawer").classList.remove("active");
+}
+
+function toggleCartDrawer() {
+  const drawer = document.getElementById("cartDrawer");
+  if (drawer.classList.contains("active")) {
+    closeCartDrawer();
+  } else {
+    openCartDrawer();
+  }
+}
+
+  
 document.addEventListener("DOMContentLoaded", updateCartBadge);
   
 </script>
 </body>
 </html>
-
-
-
-
-
-
 
 
