@@ -1666,56 +1666,33 @@ cartItemsContainer.appendChild(card);
 
 
 
-function updateQty(index, qty) {
+// Ultra-stable qty update handler (no debounce, no rollback)
+async function updateQty(index, newQty) {
 
-  clearTimeout(qtyDebounce);
+  // If backend save is running → skip UI update
+  if (blockRender) return;
 
-  qtyDebounce = setTimeout(() => {
+  // 1 — Validate qty
+  newQty = Number(newQty);
+  if (isNaN(newQty) || newQty < 1) newQty = 1;
 
-    qty = parseInt(qty);
-    if (qty < 1) qty = 1;
+  // 2 — Update cart safely
+  cart[index].qty = newQty;
 
-    const item = cart[index];
+  // 3 — Save immediately to local storage
+  if (!isLoggedIn()) {
+    localStorage.setItem("guestCart", JSON.stringify(cart));
+  } else {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }
 
-    const rate = Number(item.rate);
-    const disc = Number(item.discPercent || 0);
+  // 4 — Re-render cart instantly (no delay, no flicker)
+  renderCart();
 
-    const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
-    const netRate = rate - discAmt;
-
-    const total = disc > 0
-      ? parseFloat((netRate * qty).toFixed(2))
-      : parseFloat((rate * qty).toFixed(2));
-
-    item.qty = qty;
-
-    if (disc > 0) {
-      item.discAmt = discAmt;
-      item.netAmt  = parseFloat(netRate.toFixed(2));
-    } else {
-      delete item.discAmt;
-      delete item.netAmt;
-    }
-
-    item.total = total;
-
-    // SAVE LOCALLY
-    if (!isLoggedIn()) {
-      localStorage.setItem("guestCart", JSON.stringify(cart));
-    } else {
-      localStorage.setItem("cart", JSON.stringify(cart));
-    }
-
-    renderCart();
-
-    // BACKEND SYNC (safe & debounced)
-    if (isLoggedIn()) {
-      saveCartToBackend(); 
-    }
-
-  }, 200); // 200ms debounce
-
+  // 5 — Backend save (queued, safe, no double-event)
+  await saveCartToBackend();
 }
+
 
 function openCheckout() {
   autofillMobileForLoggedIn();
@@ -4180,7 +4157,10 @@ async function saveCartToBackend(cartData = null) {
         window.cartSaveQueued = false;
         await saveCartToBackend();
       }
-
+  // FINAL SAFE CHECK
+    if (isLoggedIn()) {
+        localStorage.setItem("cart", JSON.stringify(cart));
+    }
       // === STEP 4C: DISABLED BACKEND VERIFY TO PREVENT QTY ROLLBACK ===
       resolve();
     }
@@ -4709,5 +4689,6 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
