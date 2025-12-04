@@ -2086,29 +2086,192 @@ document.getElementById("mobile").addEventListener("input", function () {
 
 let lastLookupMobile = "";
 let lastLookupOrderType = "";
+    function toggleAddressField() {
 
-    <!-- Address -->
-      <div id="addressWrapper">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-        <textarea id="address"
-                  placeholder="Address"
-                  class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
-                         focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
-      </div>
-      <div id="pincodeWrapper" style="display:none;">
-   <label>Pincode</label>
-   <input id="pincode" readonly>
-</div>
+  const mobile = document.getElementById("mobile").value.trim();
+  const orderType = document.getElementById("orderType").value;
 
-<div id="cityWrapper" style="display:none;">
-   <label>City</label>
-   <input id="city" readonly>
-</div>
+  if (!orderType) return;
 
-<div id="stateWrapper" style="display:none;">
-   <label>State</label>
-   <input id="state" readonly>
-</div>
+  // --- 1) Validate mobile ---
+  if (!/^[0-9]{10}$/.test(mobile)) {
+    alert("Enter a valid 10-digit mobile number.");
+    return;
+  }
+
+  // --- 2) Base references ---
+  const nameField = document.getElementById("customerName");
+  const emailField = document.getElementById("email");
+  const addressField = document.getElementById("address");
+
+  const addressWrapper = document.getElementById("addressWrapper");
+  const paymentField = document.getElementById("paymentMethod");
+  const overlay = document.getElementById("loadingOverlay");
+  const orderSelect = document.getElementById("orderType");
+  const changeBtn = document.getElementById("changeAddressBtn");
+
+  // NEW FIELDS
+  const pincodeField = document.getElementById("pincode");
+  const cityField    = document.getElementById("city");
+  const stateField   = document.getElementById("state");
+
+  const pincodeWrapper = document.getElementById("pincodeWrapper");
+  const cityWrapper    = document.getElementById("cityWrapper");
+  const stateWrapper   = document.getElementById("stateWrapper");
+
+  if (!nameField || !emailField || !addressField) return;
+
+  // --- 3) Make name + email always visible ---
+  nameField.closest("div").style.display = "block";
+  emailField.closest("div").style.display = "block";
+  paymentField.style.display = "block";
+
+  // --- 4) Always show overlay (both cases) ---
+  overlay.style.display = "flex";
+  orderSelect.disabled = true;
+
+  // ==========================================================
+  //                LOGGED-IN USER LOGIC
+  // ==========================================================
+  if (isLoggedIn()) {
+
+    nameField.readOnly = true;
+    emailField.readOnly = true;
+    addressField.readOnly = true;
+
+    // Fetch everything from USER SHEET
+    apiGet("getUserProfile", { mobile })
+      .then(res => {
+        if (res.success) {
+
+          // Fill all fields FROM USER SHEET
+          nameField.value = res.name || "";
+          emailField.value = res.email || "";
+          addressField.value = res.address || "";
+
+          pincodeField.value = res.Pincode || "";
+          cityField.value    = res.city || "";
+          stateField.value   = res.state || "";
+        }
+      })
+      .finally(() => {
+
+        // UI rules based on order type
+        if (orderType === "Home Delivery") {
+
+          // Address + 3 other fields visible
+          addressWrapper.style.display = "block";
+          pincodeWrapper.style.display = "block";
+          cityWrapper.style.display    = "block";
+          stateWrapper.style.display   = "block";
+          changeBtn?.classList.remove("hidden");
+
+          addressField.required = true;
+
+        } else {
+          // Takeaway / Dine-In → hide address + pincode/city/state
+          addressWrapper.style.display = "none";
+          pincodeWrapper.style.display = "none";
+          cityWrapper.style.display    = "none";
+          stateWrapper.style.display   = "none";
+
+          changeBtn?.classList.add("hidden");
+
+          addressField.required = false;
+        }
+
+        overlay.style.display = "none";
+        orderSelect.disabled = false;
+
+      });
+
+    return; // STOP HERE — DO NOT TOUCH GUEST LOGIC
+  }
+
+  // ==========================================================
+  //                GUEST USER LOGIC (UNTOUCHED)
+  // ==========================================================
+
+  nameField.readOnly = false;
+  emailField.readOnly = false;
+  addressField.readOnly = false;
+
+  // Hide pincode/city/state for guest always
+  pincodeWrapper.style.display = "none";
+  cityWrapper.style.display    = "none";
+  stateWrapper.style.display   = "none";
+
+  apiGet("getCustomerDetailsByMobile", { mobile })
+    .then(rows => {
+
+      let orders = Array.isArray(rows) ? rows : [];
+
+      if (orders.length === 0) {
+        nameField.value = "";
+        emailField.value = "";
+        addressField.value = "";
+
+        if (orderType !== "Home Delivery") {
+          addressWrapper.style.display = "none";
+        }
+        return;
+      }
+
+      // ----- Pick latest row -----
+      let latest = orders.reduce((max, row) =>
+        row.rowNumber > max.rowNumber ? row : max
+      );
+
+      // Fill name/email
+      nameField.value = latest.name || "";
+      emailField.value = latest.email || "";
+
+      // ----- Latest HD Address -----
+      let latestHD = "";
+      for (let i = orders.length - 1; i >= 0; i--) {
+        const row = orders[i];
+        const hd =
+          row.Address?.trim() ||
+          row.address?.trim() ||
+          row.Address1?.trim() ||
+          row.Address2?.trim() ||
+          "";
+
+        if (row.orderType === "Home Delivery" && hd !== "") {
+          latestHD = hd;
+          break;
+        }
+      }
+
+      // ----- Show/hide based on order type -----
+      if (orderType === "Home Delivery") {
+        addressWrapper.style.display = "block";
+        addressField.required = true;
+        addressField.readOnly = false;
+        addressField.value = latestHD || "";
+
+      } else {
+        addressWrapper.style.display = "none";
+        addressField.value = "";
+        addressField.required = false;
+      }
+
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error loading customer details.");
+    })
+    .finally(() => {
+      overlay.style.display = "none";
+      orderSelect.disabled = false;
+    });
+
+}
+
+
+
+
+  
 function placeOrder() {
   if (window._orderLock) return;
 window._orderLock = true;
@@ -4302,6 +4465,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
