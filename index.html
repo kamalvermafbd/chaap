@@ -4581,7 +4581,7 @@ const waitForDropdown = setInterval(() => {
     clearInterval(waitForDropdown);
     if (overlay) overlay.style.display = "none";
   }
-}, 50);
+}, 350);
       // 5️⃣ Change handler for dropdown
       ddl.onchange = () => {
         if (ddl.value === "__ADD_NEW__") return;
@@ -4686,6 +4686,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
