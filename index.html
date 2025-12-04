@@ -1921,6 +1921,31 @@ document.getElementById("changeAddressBtn").addEventListener("click", async () =
   addNew.value = "__ADD_NEW__";
   addNew.textContent = "➕ Add New Address";
   dropdown.appendChild(addNew);
+// ---------------------------
+// STEP-5: Auto Default Selection
+// ---------------------------
+
+let defaultAddressObj = null;
+
+// 1️⃣ If primary exists → select primary automatically
+if (data.primaryObj) {
+  defaultAddressObj = data.primaryObj;
+  dropdown.value = JSON.stringify(data.primaryObj);
+}
+
+// 2️⃣ Else if multiAdd available → auto-select first address
+else if (data.multiObjList.length > 0) {
+  defaultAddressObj = data.multiObjList[0];
+  dropdown.value = JSON.stringify(data.multiObjList[0]);
+}
+
+// 3️⃣ If default address found → autofill fields
+if (defaultAddressObj) {
+  document.getElementById("address").value  = defaultAddressObj.address || "";
+  document.getElementById("pincode").value = defaultAddressObj.pincode || "";
+  document.getElementById("city").value    = defaultAddressObj.city || "";
+  document.getElementById("state").value   = defaultAddressObj.state || "";
+}
 
   // STEP 4 — Smooth fade animation
   ddlBox.style.opacity = "0";
@@ -4613,6 +4638,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
