@@ -1828,7 +1828,8 @@ async function loadSavedAddresses() {
     return {
       primaryObj,
       multiObjList,
-      hasMulti: multiObjList.length > 0
+      hasMulti: (primaryObj !== null) || (multiObjList.length > 0)
+
 
     };
   }
@@ -4496,6 +4497,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
