@@ -4485,60 +4485,114 @@ function autofillMobileForLoggedIn() {
 // Run when checkout modal shows up
 
 function onChangeAddressClick() {
-  const mobile = localStorage.getItem("mobile") || localStorage.getItem("userMobile");
 
-  if (!mobile) return; // guest safety
+  const mobile = localStorage.getItem("mobile") || localStorage.getItem("userMobile");
+  if (!mobile) return;
+
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) overlay.style.display = "flex";
 
   const dropdownBox = document.getElementById("addressSelectContainer");
-
-
   const newFormBox = document.getElementById("newAddressForm");
 
-  // Always hide both first
   dropdownBox.classList.add("hidden");
   newFormBox.classList.add("hidden");
 
-  // 🔵 Fetch multi address list for this user
-  apiGet("getUserMultiAddresses", { mobile })
-    .then(res => {
-      const list = res.addresses || [];
+  const ddl = document.getElementById("savedAddressDropdown");
+  ddl.innerHTML = "";
+  ddl.classList.remove("hidden");
 
-      if (list.length === 0) {
-        // 🔴 CASE 2 — no saved addresses → directly show add new
+  // 1️⃣ Fetch both primary & multi-add
+  Promise.all([
+    apiGet("getUserProfile", { mobile }),          // primary from user sheet
+    apiGet("getUserMultiAddresses", { mobile })    // multi_add
+  ])
+    .then(([userRes, multiRes]) => {
+
+      const primary = userRes?.address
+        ? {
+            address: userRes.address,
+            pincode: userRes.pincode || "",
+            city: userRes.city || "",
+            state: userRes.state || "",
+            type: "primary"
+          }
+        : null;
+
+      const multiList = Array.isArray(multiRes?.addresses)
+        ? multiRes.addresses.map(a => ({
+            address: a.address || "",
+            pincode: a.pincode || "",
+            city: a.city || "",
+            state: a.state || "",
+            type: "multi"
+          }))
+        : [];
+
+      // 2️⃣ If both empty → show new form
+      if (!primary && multiList.length === 0) {
         newFormBox.classList.remove("hidden");
         autofillNewAddressMobile();
-
+        if (overlay) overlay.style.display = "none";
         return;
       }
 
-      // 🟢 CASE 1 — saved addresses exist → show dropdown
+      // 3️⃣ Show dropdown
       dropdownBox.classList.remove("hidden");
 
-      // Step 4 me dropdown fill karenge
-   
-const ddl = document.getElementById("savedAddressDropdown");
-ddl.classList.remove("hidden");
-      
-ddl.innerHTML = ""; // reset
+      // --- Primary first ---
+      if (primary) {
+        const opt = document.createElement("option");
+        opt.value = JSON.stringify(primary);
+        opt.textContent =
+          `Primary: ${primary.address} | ${primary.pincode} | ${primary.city} | ${primary.state}`;
+        ddl.appendChild(opt);
+      }
 
-list.forEach((addr, index) => {
-  const opt = document.createElement("option");
-  opt.value = addr.address;
-  opt.textContent = `${index + 1}) ${addr.address}`;
-  ddl.appendChild(opt);
-});
+      // --- Then multi_add ---
+      multiList.forEach((a, index) => {
+        const opt = document.createElement("option");
+        opt.value = JSON.stringify(a);
+        opt.textContent =
+          `${index + 1}) ${a.address} | ${a.pincode} | ${a.city} | ${a.state}`;
+        ddl.appendChild(opt);
+      });
 
-// When user selects from dropdown → update main address
-ddl.onchange = () => {
-  const selected = ddl.value;
-  document.getElementById("address").value = selected;
-};
+      // --- Add new button is below dropdown (no change)
+
+      // 4️⃣ Auto select first option + fill main form
+      const first = ddl.options[0];
+      if (first) {
+        ddl.value = first.value;
+        const obj = JSON.parse(first.value);
+
+        document.getElementById("address").value  = obj.address;
+        document.getElementById("pincode").value = obj.pincode;
+        document.getElementById("city").value    = obj.city;
+        document.getElementById("state").value   = obj.state;
+      }
+
+      // 5️⃣ Change handler for dropdown
+      ddl.onchange = () => {
+        if (ddl.value === "__ADD_NEW__") return;
+        try {
+          const obj = JSON.parse(ddl.value);
+          document.getElementById("address").value  = obj.address;
+          document.getElementById("pincode").value = obj.pincode;
+          document.getElementById("city").value    = obj.city;
+          document.getElementById("state").value   = obj.state;
+        } catch (e) {}
+      };
+
+      if (overlay) overlay.style.display = "none";
     })
     .catch(err => {
       console.error("Address load error:", err);
       alert("Unable to load saved addresses.");
+      if (overlay) overlay.style.display = "none";
     });
 }
+
 
   function onChangeAddressAddNew() {
  const mobile = localStorage.getItem("mobile") || localStorage.getItem("userMobile");
@@ -4623,4 +4677,5 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
