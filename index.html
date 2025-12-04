@@ -4505,12 +4505,12 @@ function onChangeAddressClick() {
   ddl.innerHTML = "";
   ddl.classList.remove("hidden");
 
-  // 1️⃣ Fetch both primary & multi-add
+  // 1️⃣ Fetch Primary + MultiAdd together
   Promise.all([
-    apiGet("getUserProfile", { mobile }),          // primary from user sheet
-    apiGet("getUserMultiAddresses", { mobile })    // multi_add
+    apiGet("getUserProfile", { mobile }),
+    apiGet("getUserMultiAddresses", { mobile })
   ])
-    .then(([userRes, multiRes]) => {
+  .then(([userRes, multiRes]) => {
 
       const primary = userRes?.address
         ? {
@@ -4532,7 +4532,7 @@ function onChangeAddressClick() {
           }))
         : [];
 
-      // 2️⃣ If both empty → show new form
+      // 2️⃣ If nothing saved → show new form
       if (!primary && multiList.length === 0) {
         newFormBox.classList.remove("hidden");
         autofillNewAddressMobile();
@@ -4540,52 +4540,63 @@ function onChangeAddressClick() {
         return;
       }
 
-      // 3️⃣ Show dropdown
+      // 3️⃣ Show dropdown box
       dropdownBox.classList.remove("hidden");
 
-      // --- Primary first ---
+      let count = 1;
+
+      // --- Add Primary ---
       if (primary) {
-  const opt = document.createElement("option");
-  opt.value = JSON.stringify(primary);
-  opt.textContent =
-    `1) ${primary.address} | ${primary.pincode} | ${primary.city} | ${primary.state}`;
-  ddl.appendChild(opt);
-}
+        const opt = document.createElement("option");
+        opt.value = JSON.stringify(primary);
+        opt.textContent =
+          `${count}) ${primary.address} | ${primary.pincode} | ${primary.city} | ${primary.state}`;
+        ddl.appendChild(opt);
+        count++;
+      }
 
-      // --- Then multi_add ---
-      multiList.forEach((a, index) => {
-  const opt = document.createElement("option");
-  opt.value = JSON.stringify(a);
-  opt.textContent =
-    `${index + 2}) ${a.address} | ${a.pincode} | ${a.city} | ${a.state}`;
-  ddl.appendChild(opt);
-});
+      // --- Add multi_add addresses ---
+      multiList.forEach(a => {
+        const opt = document.createElement("option");
+        opt.value = JSON.stringify(a);
+        opt.textContent =
+          `${count}) ${a.address} | ${a.pincode} | ${a.city} | ${a.state}`;
+        ddl.appendChild(opt);
+        count++;
+      });
 
-
-      // --- Add new button is below dropdown (no change)
-
-      // 4️⃣ Auto select first option + fill main form
+      // 4️⃣ Auto-select first address
       const first = ddl.options[0];
       if (first) {
         ddl.value = first.value;
         const obj = JSON.parse(first.value);
-
         document.getElementById("address").value  = obj.address;
         document.getElementById("pincode").value = obj.pincode;
         document.getElementById("city").value    = obj.city;
         document.getElementById("state").value   = obj.state;
       }
-//  HIDE OVERLAY ONLY AFTER DROPDOWN OPTIONS LOADED
-const waitForDropdown = setInterval(() => {
-  if (ddl.options.length > 0) {
-    clearInterval(waitForDropdown);
-    if (overlay) overlay.style.display = "none";
-  }
-}, 550);
 
-      // 5️⃣ Change handler for dropdown
+      // ⭐ SUPER SAFE OVERLAY HIDE → when dropdown truly visible
+      const waitRender = setInterval(() => {
+
+        const optionsReady = ddl.options.length > 0;
+        const visible = !dropdownBox.classList.contains("hidden");
+
+        if (optionsReady && visible) {
+          clearInterval(waitRender);
+
+          // ensure browser paints dropdown before hiding overlay
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              if (overlay) overlay.style.display = "none";
+            });
+          });
+        }
+
+      }, 50);
+
+      // 5️⃣ Dropdown change handler
       ddl.onchange = () => {
-        if (ddl.value === "__ADD_NEW__") return;
         try {
           const obj = JSON.parse(ddl.value);
           document.getElementById("address").value  = obj.address;
@@ -4595,13 +4606,14 @@ const waitForDropdown = setInterval(() => {
         } catch (e) {}
       };
 
-    })
-    .catch(err => {
+  })
+  .catch(err => {
       console.error("Address load error:", err);
       alert("Unable to load saved addresses.");
       if (overlay) overlay.style.display = "none";
-    });
+  });
 }
+
 
 
   function onChangeAddressAddNew() {
@@ -4687,6 +4699,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
