@@ -1777,88 +1777,73 @@ function loadPrimaryAddress() {
 async function loadSavedAddresses() {
   const mobile = localStorage.getItem("userMobile");
 
-  // Return structure same rakhta hu (compatibility)
-  const result = {
-    primaryAddress: "",
-    multiAddresses: [],
-    hasMulti: false
-  };
+  if (!mobile) {
+    return {
+      primaryObj: null,
+      multiObjList: [],
+      hasMulti: false
+    };
+  }
 
-  if (!mobile) return result;
-
-  // SHOW overlay while loading
   const overlay = document.getElementById("loadingOverlay");
-  if (overlay) overlay.style.display = "flex";
 
   try {
+    if (overlay) overlay.style.display = "flex";
+
     // -------------------------------
     // 1️⃣ GET PRIMARY (user sheet)
     // -------------------------------
-    const primaryRes = await fetch(
+    const userRes = await fetch(
       `https://script.google.com/macros/s/AKfycbz8B-nwXivGHzKgcWT8zTvS4sAWG6dKfsDh8rsn29CGXCeIxxeNJ9NaPcL03cQBGHEf/exec?action=getUserByMobile&mobile=${mobile}`
     );
-    const primaryData = await primaryRes.json();
+    const user = await userRes.json();
 
     let primaryObj = null;
 
-    if (primaryData?.address) {
+    if (user?.address) {
       primaryObj = {
-        address: primaryData.address || "",
-        pincode: primaryData.pincode || "",
-        city: primaryData.city || "",
-        state: primaryData.state || "",
+        address: user.address,
+        pincode: user.pincode || "",
+        city: user.city || "",
+        state: user.state || "",
         type: "primary"
       };
-
-      // old return format compatibility
-      result.primaryAddress = primaryObj.address;
     }
 
     // -------------------------------
-    // 2️⃣ GET MULTI_ADD (multi sheet)
+    // 2️⃣ GET MULTI_ADD (OBJECT FORMAT)
     // -------------------------------
     const multiRes = await fetch(
       `https://script.google.com/macros/s/AKfycbz8B-nwXivGHzKgcWT8zTvS4sAWG6dKfsDh8rsn29CGXCeIxxeNJ9NaPcL03cQBGHEf/exec?action=getMultiAddress&mobile=${mobile}`
     );
-    const multiData = await multiRes.json();
+    const multi = await multiRes.json();
 
-    const multiArr = Array.isArray(multiData?.addresses) ? multiData.addresses : [];
+    // multi.addresses is ALREADY object array
+    const multiObjList = Array.isArray(multi?.addresses)
+      ? multi.addresses.map(a => ({
+          address: a.address || "",
+          pincode: a.pincode || "",
+          city: a.city || "",
+          state: a.state || "",
+          type: "multi"
+        }))
+      : [];
 
-    // Convert OLD "string address" → NEW "object with 4 columns"
-    const multiObjList = multiArr.map(str => {
-      // expected “address,pin,city,state” or “Address”
-      const parts = str.split(",").map(s => s.trim());
-      return {
-        address: parts[0] || str,
-        pincode: parts[1] || "",
-        city: parts[2] || "",
-        state: parts[3] || "",
-        type: "multi"
-      };
-    });
-
-    // For compatibility still return array of strings
-    result.multiAddresses = multiArr;
-    result.hasMulti = multiArr.length > 0;
-
-    // -------------------------------
-    // 3️⃣ RETURN NEW MERGED FORMAT
-    // -------------------------------
     return {
-      ...result,
       primaryObj,
-      multiObjList
+      multiObjList,
+      hasMulti: multiObjList.length > 0
     };
-
-  } catch (err) {
+  }
+  catch (err) {
     console.error("Address Load Error:", err);
-    return result;
-
-  } finally {
-    if (overlay) overlay.style.display = "none";
+    return {
+      primaryObj: null,
+      multiObjList: [],
+      hasMulti: false
+    };
   }
 }
-
 
     
 document.getElementById("changeAddressBtn").addEventListener("click", async () => {
@@ -4638,6 +4623,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
