@@ -1863,57 +1863,76 @@ async function loadSavedAddresses() {
     
 document.getElementById("changeAddressBtn").addEventListener("click", async () => {
 
-  // Load all saved addresses
-  const data = await loadSavedAddresses();
-
+  const overlay = document.getElementById("loadingOverlay");
   const dropdown = document.getElementById("savedAddressDropdown");
-  const ddlBox   = document.getElementById("addressSelectContainer");
-  const formBox  = document.getElementById("newAddressForm");
+  const ddlBox = document.getElementById("addressSelectContainer");
+  const formBox = document.getElementById("newAddressForm");
 
-  // Reset UI
+  // STEP 1 — Start overlay
+  if (overlay) overlay.style.display = "flex";
+
+  // STEP 2 — Reset UI
   dropdown.innerHTML = "";
   ddlBox.classList.add("hidden");
   formBox.classList.add("hidden");
 
-  // CASE 2 — No multi_add addresses
-  if (!data.hasMulti) {
+  // STEP 3 — Fetch new format addresses
+  const data = await loadSavedAddresses();
 
-    // Open Add New Address form directly
+  // ---------------------------
+  // 🔶 CASE 2 — No multi_add addresses
+  // ---------------------------
+  if (!data.hasMulti && !data.primaryObj) {
+
+    // Show new address form directly (same as old code)
     formBox.classList.remove("hidden");
 
-    // Autofill mobile inside form
     document.getElementById("newAddressMobile").value =
       localStorage.getItem("userMobile") || "";
 
+    if (overlay) overlay.style.display = "none";
     return;
   }
 
-  // CASE 1 — User HAS saved addresses → populate dropdown
+  // ---------------------------
+  // 🔶 CASE 1 — We have saved addresses
+  // ---------------------------
   ddlBox.classList.remove("hidden");
 
-  // --- 1️⃣ Primary Address ---
-  if (data.primaryAddress && data.primaryAddress.trim() !== "") {
+  // --- Primary address (new object format)
+  if (data.primaryObj) {
+    const p = data.primaryObj;
     const opt1 = document.createElement("option");
-    opt1.value = "__PRIMARY__";
-    opt1.textContent = "Primary Address";
+    opt1.value = JSON.stringify(p);   // NEW FORMAT
+    opt1.textContent = `Primary: ${p.address}, ${p.pincode}, ${p.city}, ${p.state}`;
     dropdown.appendChild(opt1);
   }
 
-  // --- 2️⃣ Multi-address list ---
-  data.multiAddresses.forEach((addr, index) => {
+  // --- MultiAdd Addresses (new object format)
+  data.multiObjList.forEach((a, index) => {
     const opt = document.createElement("option");
-    opt.value = "__MULTI__" + index;
-    opt.textContent = addr;
+    opt.value = JSON.stringify(a);   // NEW FORMAT
+    opt.textContent = `${a.address}, ${a.pincode}, ${a.city}, ${a.state}`;
     dropdown.appendChild(opt);
   });
 
-  // --- 3️⃣ Add New Address (last option) ---
+  // --- Add New Address (same as old)
   const addNew = document.createElement("option");
   addNew.value = "__ADD_NEW__";
   addNew.textContent = "➕ Add New Address";
   dropdown.appendChild(addNew);
 
+  // STEP 4 — Smooth fade animation
+  ddlBox.style.opacity = "0";
+  setTimeout(() => {
+    ddlBox.style.transition = "opacity 0.25s ease";
+    ddlBox.style.opacity = "1";
+  }, 10);
+
+  // STEP 5 — Hide overlay
+  if (overlay) overlay.style.display = "none";
 });
+
 
 document.getElementById("savedAddressDropdown").addEventListener("change", async function () {
   const selected = this.value;
@@ -4594,6 +4613,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
