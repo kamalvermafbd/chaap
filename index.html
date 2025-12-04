@@ -4587,7 +4587,9 @@ function onChangeAddressClick() {
           document.getElementById("state").value   = obj.state;
         } catch (e) {}
       };
-
+setTimeout(() => {
+  if (overlay) overlay.style.display = "none";
+}, 150);
       if (overlay) overlay.style.display = "none";
     })
     .catch(err => {
@@ -4681,6 +4683,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
