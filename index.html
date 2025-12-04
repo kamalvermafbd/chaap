@@ -478,6 +478,9 @@ body::before {
       #savedAddressDropdown {
     font-family: monospace;
   }
+    .added-flash {
+  @apply scale-105 transition duration-150 ease-out;
+}
   </style>
 </head>
 <body>
@@ -4026,7 +4029,8 @@ document.addEventListener('click', function (e) {
     }
 
   addToCart(info.name, info.unit, info.rate, info.discPercent, info.itemId, info.variantId);
-
+btn.classList.add("added-flash");
+setTimeout(() => btn.classList.remove("added-flash"), 250);
 
 // 1a — RESET VARIANT RADIOS
 const parentCard = btn.closest(".menu-item");
@@ -4035,10 +4039,7 @@ if (parentCard) {
 }
 
 // 1b — DISABLE ADD BUTTON (only appearance)
-btn.classList.add("disabled-btn");
-btn.style.background = "#ccc";
-btn.style.opacity = "0.6";
-btn.blur();
+
 
 // 1d — FULL DATA RESET (correct place)
 btn.dataset.price = "";
@@ -4059,7 +4060,9 @@ btn.dataset.disc = "";
   }
 
   addToCart(name, unit, price, discPercent, btn.dataset.itemId, "");
-
+// INSERT Z2 HERE
+btn.classList.add("added-flash");
+setTimeout(() => btn.classList.remove("added-flash"), 250);
 
 
 });
@@ -4689,6 +4692,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
