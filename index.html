@@ -481,6 +481,17 @@ body::before {
     .added-flash {
   @apply scale-105 transition duration-150 ease-out;
 }
+
+    .cart-badge-pop {
+  animation: cartPop 0.25s ease-out;
+}
+
+@keyframes cartPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
   </style>
 </head>
 <body>
@@ -4759,6 +4770,10 @@ function updateCartBadge() {
     badge.innerText = "";
     badge.style.display = "none";
   }
+  //  Z5a — Cart badge POP animation (Zomato style)
+  badge.classList.remove("cart-badge-pop");
+  void badge.offsetWidth;   // reflow to restart animation
+  badge.classList.add("cart-badge-pop");
 }
 
 async function openCheckout() {
@@ -4783,6 +4798,7 @@ document.addEventListener("DOMContentLoaded", updateCartBadge);
 </script>
 </body>
 </html>
+
 
 
 
