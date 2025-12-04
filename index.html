@@ -475,6 +475,9 @@ body::before {
   background: #ccc !important;
   pointer-events: auto !important; /* click allowed for alert */
 }  
+      #savedAddressDropdown {
+    font-family: monospace;
+  }
   </style>
 </head>
 <body>
@@ -4542,21 +4545,22 @@ function onChangeAddressClick() {
 
       // --- Primary first ---
       if (primary) {
-        const opt = document.createElement("option");
-        opt.value = JSON.stringify(primary);
-        opt.textContent =
-          `Primary: ${primary.address} | ${primary.pincode} | ${primary.city} | ${primary.state}`;
-        ddl.appendChild(opt);
-      }
+  const opt = document.createElement("option");
+  opt.value = JSON.stringify(primary);
+  opt.textContent =
+    `1) ${primary.address} | ${primary.pincode} | ${primary.city} | ${primary.state}`;
+  ddl.appendChild(opt);
+}
 
       // --- Then multi_add ---
       multiList.forEach((a, index) => {
-        const opt = document.createElement("option");
-        opt.value = JSON.stringify(a);
-        opt.textContent =
-          `${index + 1}) ${a.address} | ${a.pincode} | ${a.city} | ${a.state}`;
-        ddl.appendChild(opt);
-      });
+  const opt = document.createElement("option");
+  opt.value = JSON.stringify(a);
+  opt.textContent =
+    `${index + 2}) ${a.address} | ${a.pincode} | ${a.city} | ${a.state}`;
+  ddl.appendChild(opt);
+});
+
 
       // --- Add new button is below dropdown (no change)
 
@@ -4677,5 +4681,6 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
