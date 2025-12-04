@@ -4579,13 +4579,9 @@ function onChangeAddressClick() {
 const waitForDropdown = setInterval(() => {
   if (ddl.options.length > 0) {
     clearInterval(waitForDropdown);
-
-    // extra safety delay so UI fully ready
-    setTimeout(() => {
-      if (overlay) overlay.style.display = "none";
-    }, 300); // 300–400 ms is ideal
+    if (overlay) overlay.style.display = "none";
   }
-}, 50);
+}, 550);
 
       // 5️⃣ Change handler for dropdown
       ddl.onchange = () => {
@@ -4691,6 +4687,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
