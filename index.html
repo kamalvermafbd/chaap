@@ -577,6 +577,7 @@ style="
     <p>Delicious meals delivered fast!</p>
     
   </header>
+<span id="cartCount" class="ml-2 text-white font-semibold"></span>
 
 <!-- LEFT NAVIGATION PANEL -->
 <!-- LEFT NAVIGATION PANEL -->
@@ -1476,6 +1477,41 @@ if (!isLoggedIn()) {
   alert(`${name} (${unit}) added to cart`);
 }
 
+async function openCartPanel() {
+
+  showCartOverlay();  // small loading
+
+  try {
+
+    // ⭐ Logged-in user → fetch fresh backend cart
+    if (isLoggedIn()) {
+
+      const mobile = localStorage.getItem("userMobile");
+      if (mobile) {
+        const backendCart = await apiGet("getCart", { mobile });
+
+        if (Array.isArray(backendCart)) {
+          cart = backendCart;
+          localStorage.setItem("cart", JSON.stringify(cart));
+        }
+      }
+
+    } else {
+      // ⭐ Guest user → use guestCart
+      const guest = localStorage.getItem("guestCart");
+      cart = guest ? JSON.parse(guest) : [];
+    }
+
+    // ⭐ Always re-render after loading
+    renderCart();
+    updateCartBadge();
+
+  } catch (err) {
+    console.error("openCartPanel Error:", err);
+  }
+
+  hideCartOverlay();  // close loader
+}
 
 
 
@@ -1665,6 +1701,8 @@ cartItemsContainer.appendChild(card);
 
   const taxSummaryEl = document.getElementById("taxSummary");
   if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
+
+  updateCartBadge();
 }
 
 
@@ -1693,6 +1731,8 @@ async function updateQty(index, newQty) {
   renderCart();
 
   // 5 — Backend save (queued, safe, no double-event)
+  updateCartBadge();
+
   await saveCartToBackend();
 }
 
@@ -2176,6 +2216,7 @@ function removeItem(index) {
   }
 
   }, 150); // small debounce for delete
+updateCartBadge();
 
 }
 
@@ -4029,6 +4070,8 @@ document.addEventListener('click', function (e) {
     }
 
   addToCart(info.name, info.unit, info.rate, info.discPercent, info.itemId, info.variantId);
+    updateCartBadge();
+
 btn.classList.add("added-flash");
 setTimeout(() => btn.classList.remove("added-flash"), 250);
 
@@ -4060,7 +4103,9 @@ btn.dataset.disc = "";
   }
 
   addToCart(name, unit, price, discPercent, btn.dataset.itemId, "");
-// INSERT Z2 HERE
+updateCartBadge();
+
+  // INSERT Z2 HERE
 btn.classList.add("added-flash");
 setTimeout(() => btn.classList.remove("added-flash"), 250);
 
@@ -4688,10 +4733,35 @@ function autofillNewAddressMobile() {
   }
 }
 
+function updateCartBadge() {
+  const count = cart.reduce((sum, item) => sum + Number(item.qty), 0);
+  const badge = document.getElementById("cartCount");
+  if (badge) badge.innerText = count > 0 ? count : "";
+}  
+
+async function openCheckout() {
+
+  await openCartPanel();   // ⭐ Z4a must be here
+
+  autofillMobileForLoggedIn();
+  resetCheckoutFieldsDefault();
+  setupAddressUIVisibility();
+  loadPrimaryAddress();
+
+  if (cart.length === 0) {
+    alert("Your cart is empty!");
+    return;
+  }
+
+  document.getElementById("checkoutModal").style.display = "flex";
+}
+
+
   
 </script>
 </body>
 </html>
+
 
 
 
