@@ -4492,11 +4492,80 @@ function autofillNewAddressMobile() {
     field.value = mobile;
   }
 }
+// ----------------------------
+// FIX: Missing Change Address Handler
+// ----------------------------
+async function onChangeAddressClick() {
+
+  const overlay = document.getElementById("loadingOverlay");
+  const dropdown = document.getElementById("savedAddressDropdown");
+  const ddlBox = document.getElementById("addressSelectContainer");
+  const formBox = document.getElementById("newAddressForm");
+
+  if (overlay) overlay.style.display = "flex";
+
+  // Reset UI
+  dropdown.innerHTML = "";
+  ddlBox.classList.add("hidden");
+  formBox.classList.add("hidden");
+
+  // Load addresses
+  const data = await loadSavedAddresses();
+
+  // CASE A — No address found → show New Address Form
+  if (!data.primaryObj && data.multiObjList.length === 0) {
+    formBox.classList.remove("hidden");
+    document.getElementById("newAddressMobile").value =
+      localStorage.getItem("userMobile") || "";
+
+    if (overlay) overlay.style.display = "none";
+    return;
+  }
+
+  // CASE B — Saved addresses found → show dropdown
+  ddlBox.classList.remove("hidden");
+
+  // Primary
+  if (data.primaryObj) {
+    const opt1 = document.createElement("option");
+    opt1.value = JSON.stringify(data.primaryObj);
+    opt1.textContent =
+      `Primary: ${data.primaryObj.address}, ${data.primaryObj.pincode}, ${data.primaryObj.city}, ${data.primaryObj.state}`;
+    dropdown.appendChild(opt1);
+  }
+
+  // Multi
+  data.multiObjList.forEach(a => {
+    const opt = document.createElement("option");
+    opt.value = JSON.stringify(a);
+    opt.textContent = `${a.address}, ${a.pincode}, ${a.city}, ${a.state}`;
+    dropdown.appendChild(opt);
+  });
+
+  // Add New option
+  const addNew = document.createElement("option");
+  addNew.value = "__ADD_NEW__";
+  addNew.textContent = "➕ Add New Address";
+  dropdown.appendChild(addNew);
+
+  // Auto select primary or first
+  let selected = data.primaryObj || data.multiObjList[0];
+  dropdown.value = JSON.stringify(selected);
+
+  // Autofill main 4 fields
+  document.getElementById("address").value = selected.address || "";
+  document.getElementById("pincode").value = selected.pincode || "";
+  document.getElementById("city").value = selected.city || "";
+  document.getElementById("state").value = selected.state || "";
+
+  if (overlay) overlay.style.display = "none";
+}
 
   
 </script>
 </body>
 </html>
+
 
 
 
