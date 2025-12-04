@@ -552,6 +552,41 @@ body::before {
   transition: right 0.35s ease-out;
   position: fixed;
 }
+#cartDrawer {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 88%;
+  max-width: 380px;
+  height: 100vh;
+  background: #ffffff;
+  box-shadow: -6px 0 18px rgba(0,0,0,0.18);
+  
+  border-top-left-radius: 18px;
+  border-bottom-left-radius: 18px;
+
+  z-index: 99999;
+  padding: 20px;
+  overflow-y: auto;
+
+  transition: right 0.30s cubic-bezier(0.25, 0.8, 0.25, 1); /* premium smooth */
+}
+#cartBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  display: none;
+  z-index: 99998;
+  transition: opacity 0.25s ease;
+  opacity: 0;
+}
+
+#cartBackdrop.active {
+  display: block;
+  opacity: 1;
+}
 
   </style>
 </head>
@@ -4928,6 +4963,7 @@ document.addEventListener("keydown", function(e) {
 </script>
 </body>
 </html>
+
 
 
 
