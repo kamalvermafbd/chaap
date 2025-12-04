@@ -1776,48 +1776,91 @@ function loadPrimaryAddress() {
 
 async function loadSavedAddresses() {
   const mobile = localStorage.getItem("userMobile");
-  if (!mobile) {
-    return {
-      primaryAddress: "",
-      multiAddresses: [],
-      hasMulti: false
-    };
-  }
+
+  // Return structure same rakhta hu (compatibility)
+  const result = {
+    primaryAddress: "",
+    multiAddresses: [],
+    hasMulti: false
+  };
+
+  if (!mobile) return result;
+
+  // SHOW overlay while loading
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) overlay.style.display = "flex";
 
   try {
-    // 1️⃣ Fetch PRIMARY address (user sheet)
+    // -------------------------------
+    // 1️⃣ GET PRIMARY (user sheet)
+    // -------------------------------
     const primaryRes = await fetch(
       `https://script.google.com/macros/s/AKfycbz8B-nwXivGHzKgcWT8zTvS4sAWG6dKfsDh8rsn29CGXCeIxxeNJ9NaPcL03cQBGHEf/exec?action=getUserByMobile&mobile=${mobile}`
     );
     const primaryData = await primaryRes.json();
 
-    const primaryAddress = primaryData?.address || "";
+    let primaryObj = null;
 
-    // 2️⃣ Fetch MULTI addresses (multi_add sheet)
+    if (primaryData?.address) {
+      primaryObj = {
+        address: primaryData.address || "",
+        pincode: primaryData.pincode || "",
+        city: primaryData.city || "",
+        state: primaryData.state || "",
+        type: "primary"
+      };
+
+      // old return format compatibility
+      result.primaryAddress = primaryObj.address;
+    }
+
+    // -------------------------------
+    // 2️⃣ GET MULTI_ADD (multi sheet)
+    // -------------------------------
     const multiRes = await fetch(
       `https://script.google.com/macros/s/AKfycbz8B-nwXivGHzKgcWT8zTvS4sAWG6dKfsDh8rsn29CGXCeIxxeNJ9NaPcL03cQBGHEf/exec?action=getMultiAddress&mobile=${mobile}`
     );
     const multiData = await multiRes.json();
 
-    const multiAddresses =
-      Array.isArray(multiData?.addresses) ? multiData.addresses : [];
+    const multiArr = Array.isArray(multiData?.addresses) ? multiData.addresses : [];
 
+    // Convert OLD "string address" → NEW "object with 4 columns"
+    const multiObjList = multiArr.map(str => {
+      // expected “address,pin,city,state” or “Address”
+      const parts = str.split(",").map(s => s.trim());
+      return {
+        address: parts[0] || str,
+        pincode: parts[1] || "",
+        city: parts[2] || "",
+        state: parts[3] || "",
+        type: "multi"
+      };
+    });
+
+    // For compatibility still return array of strings
+    result.multiAddresses = multiArr;
+    result.hasMulti = multiArr.length > 0;
+
+    // -------------------------------
+    // 3️⃣ RETURN NEW MERGED FORMAT
+    // -------------------------------
     return {
-      primaryAddress,
-      multiAddresses,
-      hasMulti: multiAddresses.length > 0
+      ...result,
+      primaryObj,
+      multiObjList
     };
 
   } catch (err) {
     console.error("Address Load Error:", err);
+    return result;
 
-    return {
-      primaryAddress: "",
-      multiAddresses: [],
-      hasMulti: false
-    };
+  } finally {
+    if (overlay) overlay.style.display = "none";
   }
 }
+
+
+    
 document.getElementById("changeAddressBtn").addEventListener("click", async () => {
 
   // Load all saved addresses
@@ -1876,33 +1919,57 @@ document.getElementById("savedAddressDropdown").addEventListener("change", async
   const selected = this.value;
 
   const formBox = document.getElementById("newAddressForm");
-  const dropdownBox = document.getElementById("addressSelectContainer");
   const addressField = document.getElementById("address");
+  const pinField = document.getElementById("pincode");
+  const cityField = document.getElementById("city");
+  const stateField = document.getElementById("state");
 
-  // Reset forms
+  // Always hide new-form by default
   formBox.classList.add("hidden");
 
-  // If Add New Address selected → open new form
+  // 1️⃣ ADD NEW ADDRESS (same as old flow)
   if (selected === "__ADD_NEW__") {
     formBox.classList.remove("hidden");
 
-    // Autofill mobile into new form
     document.getElementById("newAddressMobile").value =
       localStorage.getItem("userMobile") || "";
 
     return;
   }
 
-  // LOAD ALL ADDRESSES AGAIN (to access values properly)
+  // ----------------------------------------
+  // 2️⃣ NEW FORMAT: selected is JSON object
+  // ----------------------------------------
+  let parsed = null;
+
+  try {
+    parsed = JSON.parse(selected);   // Works for both Primary & Multi (new format)
+  } catch (e) {
+    console.error("Invalid JSON address:", selected);
+  }
+
+  // If parsed object exists → auto-fill 4 fields
+  if (parsed && typeof parsed === "object") {
+    addressField.value = parsed.address || "";
+    pinField.value = parsed.pincode || "";
+    cityField.value = parsed.city || "";
+    stateField.value = parsed.state || "";
+    return;
+  }
+
+  // ---------------------------------------------------
+  // 3️⃣ BACKWARD-COMPATIBLE MODE (if old format selected)
+  // ---------------------------------------------------
+
   const data = await loadSavedAddresses();
 
-  // 1️⃣ Primary Address Selected
+  // OLD Primary
   if (selected === "__PRIMARY__") {
     addressField.value = data.primaryAddress || "";
     return;
   }
 
-  // 2️⃣ Multi Addresses
+  // OLD Multi
   if (selected.startsWith("__MULTI__")) {
     const index = parseInt(selected.replace("__MULTI__", ""));
     const selectedAddress = data.multiAddresses[index] || "";
@@ -1910,6 +1977,7 @@ document.getElementById("savedAddressDropdown").addEventListener("change", async
     return;
   }
 });
+
 document.getElementById("saveNewAddressBtn").addEventListener("click", async () => {
 
   const mobile = localStorage.getItem("userMobile");
@@ -4465,6 +4533,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
