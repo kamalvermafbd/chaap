@@ -1785,10 +1785,7 @@ async function loadSavedAddresses() {
     };
   }
 
-  const overlay = document.getElementById("loadingOverlay");
-
   try {
-    if (overlay) overlay.style.display = "flex";
 
     // -------------------------------
     // 1️⃣ GET PRIMARY (user sheet)
@@ -1811,14 +1808,13 @@ async function loadSavedAddresses() {
     }
 
     // -------------------------------
-    // 2️⃣ GET MULTI_ADD (OBJECT FORMAT)
+    // 2️⃣ GET MULTI_ADD (object format)
     // -------------------------------
     const multiRes = await fetch(
       `https://script.google.com/macros/s/AKfycbz8B-nwXivGHzKgcWT8zTvS4sAWG6dKfsDh8rsn29CGXCeIxxeNJ9NaPcL03cQBGHEf/exec?action=getMultiAddress&mobile=${mobile}`
     );
     const multi = await multiRes.json();
 
-    // multi.addresses is ALREADY object array
     const multiObjList = Array.isArray(multi?.addresses)
       ? multi.addresses.map(a => ({
           address: a.address || "",
@@ -1832,7 +1828,7 @@ async function loadSavedAddresses() {
     return {
       primaryObj,
       multiObjList,
-      hasMulti: multiObjList.length > 0
+      hasMulti: (primaryObj !== null) || (multiObjList.length > 0)
     };
   }
   catch (err) {
@@ -4484,130 +4480,6 @@ function autofillMobileForLoggedIn() {
 
 // Run when checkout modal shows up
 
-function onChangeAddressClick() {
-  const mobile = localStorage.getItem("mobile") || localStorage.getItem("userMobile");
-
-  if (!mobile) return; // guest safety
-
-  const dropdownBox = document.getElementById("addressSelectContainer");
-
-
-  const newFormBox = document.getElementById("newAddressForm");
-
-  // Always hide both first
-  dropdownBox.classList.add("hidden");
-  newFormBox.classList.add("hidden");
-
-  // 🔵 Fetch multi address list for this user
-  apiGet("getUserMultiAddresses", { mobile })
-    .then(res => {
-      const list = res.addresses || [];
-
-      if (list.length === 0) {
-        // 🔴 CASE 2 — no saved addresses → directly show add new
-        newFormBox.classList.remove("hidden");
-        autofillNewAddressMobile();
-
-        return;
-      }
-
-      // 🟢 CASE 1 — saved addresses exist → show dropdown
-      dropdownBox.classList.remove("hidden");
-
-      // Step 4 me dropdown fill karenge
-   
-const ddl = document.getElementById("savedAddressDropdown");
-ddl.classList.remove("hidden");
-      
-ddl.innerHTML = ""; // reset
-
-list.forEach((addr, index) => {
-  const opt = document.createElement("option");
-  opt.value = addr.address;
-  opt.textContent = `${index + 1}) ${addr.address}`;
-  ddl.appendChild(opt);
-});
-
-// When user selects from dropdown → update main address
-ddl.onchange = () => {
-  const selected = ddl.value;
-  document.getElementById("address").value = selected;
-};
-    })
-    .catch(err => {
-      console.error("Address load error:", err);
-      alert("Unable to load saved addresses.");
-    });
-}
-
-  function onChangeAddressAddNew() {
- const mobile = localStorage.getItem("mobile") || localStorage.getItem("userMobile");
-
-  if (!mobile) return;
-
-  const dropdownBox = document.getElementById("addressSelectContainer");
-  const newFormBox = document.getElementById("newAddressForm");
-
-  dropdownBox.classList.add("hidden");
-  newFormBox.classList.remove("hidden");
-
-  // Autofill mobile inside new-address form
-  document.getElementById("newAddressMobile").value = mobile;
-}
-
-function saveNewAddress() {
-  const mobile = localStorage.getItem("userMobile");
-  if (!mobile) return alert("Login required.");
-
-  const addr = document.getElementById("newAddressField").value.trim();
-  const pin  = document.getElementById("newPincode").value.trim();
-  const city = document.getElementById("newCity").value.trim();
-  const state = document.getElementById("newState").value.trim();
-
-  if (!addr) return alert("Please enter address.");
-  if (pin.length !== 6) return alert("Please enter valid 6-digit pincode.");
-  if (!city) return alert("Enter city.");
-  if (!state) return alert("Enter state.");
-
-  apiPost("saveUserNewAddress", { mobile, address: addr, pincode: pin, city, state })
-    .then(res => {
-      if (res.success) {
-        alert("Address saved successfully!");
-
-        // Hide form
-        const form = document.getElementById("newAddressForm");
-        form.classList.add("hidden");
-
-        // Clear new form inputs
-        document.getElementById("newAddressField").value = "";
-        document.getElementById("newPincode").value = "";
-        document.getElementById("newCity").value = "";
-        document.getElementById("newState").value = "";
-
-        // Show dropdown
-        document.getElementById("addressSelectContainer").classList.remove("hidden");
-
-        // Reload dropdown list
-        onChangeAddressClick();
-
-        // Auto-select new address
-        setTimeout(() => {
-          const ddl = document.getElementById("savedAddressDropdown");
-          if (ddl) {
-            ddl.value = addr;  // Pre-select newly added address
-          }
-          document.getElementById("address").value = addr; // Update main textarea
-        }, 400);
-
-      } else {
-        alert(res.message || "Failed to save address.");
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Error saving address.");
-    });
-}
 
 
 // STEP 8 — Autofill New Address Form with logged-in mobile
@@ -4623,6 +4495,7 @@ function autofillNewAddressMobile() {
 </script>
 </body>
 </html>
+
 
 
 
