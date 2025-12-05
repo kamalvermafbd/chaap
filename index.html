@@ -5462,11 +5462,28 @@ if (isLoggedIn()) {
   // Update badge
   updateCartBadge();
 }
+function refreshCartDrawer() {
+  // Drawer active है तो ही refresh करो
+  const drawer = document.getElementById("cartDrawer");
+  if (!drawer || !drawer.classList.contains("active")) return;
+
+  // Latest cart array load करो
+  let cartArr = isLoggedIn()
+    ? JSON.parse(localStorage.getItem("cart") || "[]")
+    : JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+  // Drawer UI को rebuild करो
+  openCartPanel(cartArr);
+
+  // Badge update
+  updateCartBadge();
+}
 
   
 </script>
 </body>
 </html>
+
 
 
 
