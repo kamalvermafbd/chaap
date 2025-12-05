@@ -4204,6 +4204,40 @@ function activateVariantSelector(item, idx) {
 
       // STEP 5 — Default qty = 1 on variant change
       document.getElementById(`qtyText-${item.itemId}_${variantId}`).innerText = 1;
+// ⭐ B4-A — Add to cart for multi variant
+let cartArr = isLoggedIn()
+  ? JSON.parse(localStorage.getItem("cart") || "[]")
+  : JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+// Check if variant already exists in cart
+let existing = cartArr.find(
+  c => c.itemId === item.itemId && c.variantId === variantId
+);
+
+if (!existing) {
+  const cartObj = {
+    itemId: item.itemId,
+    variantId: variantId,
+    name: item.name,
+    unit: r.dataset.unit,
+    price: Number(r.dataset.mrp),
+    disc: Number(r.dataset.disc),
+    qty: 1
+  };
+  cartArr.push(cartObj);
+} else {
+  existing.qty = 1; // when reselecting variant
+}
+
+// Save back (logged-in / guest)
+if (isLoggedIn()) {
+  localStorage.setItem("cart", JSON.stringify(cartArr));
+  saveCartToBackend(cartArr);
+} else {
+  localStorage.setItem("guestCart", JSON.stringify(cartArr));
+}
+
+updateCartBadge();
 
     });
   });
@@ -5084,17 +5118,98 @@ function addFromMenu(itemId) {
   updateCartBadge();
 }
 
-function menuPlus(id) {
-  let q = Number(document.getElementById("qtyText-" + id).innerText);
+function menuPlus(itemId) {
+
+  // 1️⃣ UI Qty increment
+  const qtyText = document.getElementById("qtyText-" + itemId);
+  let q = Number(qtyText.innerText);
   q++;
-  document.getElementById("qtyText-" + id).innerText = q;
+  qtyText.innerText = q;
+
+  // 2️⃣ Load existing cart
+  let cartArr = isLoggedIn()
+    ? JSON.parse(localStorage.getItem("cart") || "[]")
+    : JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+  // 3️⃣ Find item in cart (single → no variantId)
+  const item = cartArr.find(c => c.itemId === itemId && !c.variantId);
+  if (!item) return; // safety
+
+  // 4️⃣ Update qty
+  item.qty = q;
+
+  // 5️⃣ Save back
+  if (isLoggedIn()) {
+    localStorage.setItem("cart", JSON.stringify(cartArr));
+    saveCartToBackend(cartArr); // async
+  } else {
+    localStorage.setItem("guestCart", JSON.stringify(cartArr));
+  }
+
+  // 6️⃣ Update badge
+  updateCartBadge();
 }
 
-function menuMinus(id) {
-  let q = Number(document.getElementById("qtyText-" + id).innerText);
-  if (q > 1) q--;
-  document.getElementById("qtyText-" + id).innerText = q;
+
+function menuMinus(itemId) {
+
+  // 1️⃣ Read current qty from UI
+  const qtyText = document.getElementById("qtyText-" + itemId);
+  let q = Number(qtyText.innerText);
+
+  if (q <= 1) {
+    // Qty will become 0 → Remove from cart
+    qtyText.innerText = 0;
+
+    // 2️⃣ Load cart
+    let cartArr = isLoggedIn()
+      ? JSON.parse(localStorage.getItem("cart") || "[]")
+      : JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+    // 3️⃣ Remove from cart
+    cartArr = cartArr.filter(c => !(c.itemId === itemId && !c.variantId));
+
+    // 4️⃣ Save back
+    if (isLoggedIn()) {
+      localStorage.setItem("cart", JSON.stringify(cartArr));
+      saveCartToBackend(cartArr); // async
+    } else {
+      localStorage.setItem("guestCart", JSON.stringify(cartArr));
+    }
+
+    // 5️⃣ UI Reset — QtyBox hide, ADD show
+    document.getElementById("qtyBox-" + itemId).classList.add("hidden");
+    document.getElementById("addBtn-" + itemId).classList.remove("hidden");
+
+    // 6️⃣ Update badge
+    updateCartBadge();
+    return;
+  }
+
+  // Otherwise qty > 1 → normal decrement
+  q--;
+  qtyText.innerText = q;
+
+  // 7️⃣ Update cart object qty
+  let cartArr = isLoggedIn()
+    ? JSON.parse(localStorage.getItem("cart") || "[]")
+    : JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+  const item = cartArr.find(c => c.itemId === itemId && !c.variantId);
+  if (item) item.qty = q;
+
+  // 8️⃣ Save back
+  if (isLoggedIn()) {
+    localStorage.setItem("cart", JSON.stringify(cartArr));
+    saveCartToBackend(cartArr);
+  } else {
+    localStorage.setItem("guestCart", JSON.stringify(cartArr));
+  }
+
+  // 9️⃣ Update badge
+  updateCartBadge();
 }
+
   
 function restoreMenuQuantities() {
 
@@ -5177,6 +5292,7 @@ function restoreMenuQuantities() {
 </script>
 </body>
 </html>
+
 
 
 
