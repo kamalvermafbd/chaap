@@ -5731,7 +5731,8 @@ function updateCart(itemId, variantId, action, meta = {}) {
     let cart = getActiveCart();           // always returns an array
     if (!Array.isArray(cart)) cart = [];
 
-    const isMulti = meta.itemType === "multi";
+  const isMulti = meta.type === "multi";
+
 
     // 3) Multi item → variant required
     if (isMulti && !variantId && action !== "selectVariant") {
@@ -5777,8 +5778,10 @@ function updateCart(itemId, variantId, action, meta = {}) {
     updateMenuQtyFromCart && updateMenuQtyFromCart(itemId, variantId, cart);
     renderCartDrawer && renderCartDrawer(cart);
     updateCartBadge && updateCartBadge(cart);
-    //  AUTO REFRESH DRAWER 
-if (typeof openCartPanel === "function") openCartPanel(cart);
+    // Update Multi Variant menu qty
+const mvEl = document.getElementById(`qtyText-${itemId}_${variantId}`);
+if (mvEl) mvEl.innerText = existing ? existing.qty : 0;
+
 
     // 10) Checkout page open ho to usko bhi refresh karo
     if (isCheckoutOpen && isCheckoutOpen()) {
@@ -5957,6 +5960,7 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
 </script>
 </body>
 </html>
+
 
 
 
