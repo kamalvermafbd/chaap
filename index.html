@@ -5178,7 +5178,7 @@ function menuPlus(itemId) {
   q++;
   qtyText.innerText = q;
 animateQty("qtyText-" + itemId);
-
+  
   updateDrawerItemQty(itemId, null, q);
 
 
@@ -5193,7 +5193,7 @@ animateQty("qtyText-" + itemId);
 
   // 4️⃣ Update qty
   item.qty = q;
-
+cart = cartArr; 
   // 5️⃣ Save back
   if (isLoggedIn()) {
     localStorage.setItem("cart", JSON.stringify(cartArr));
@@ -5261,6 +5261,7 @@ updateDrawerItemQty(itemId, null, q);
 
   const item = cartArr.find(c => c.itemId === itemId && !c.variantId);
   if (item) item.qty = q;
+  cart = cartArr; 
 
   // 8️⃣ Save back
   if (isLoggedIn()) {
@@ -5302,7 +5303,7 @@ updateDrawerItemQty(itemId, variantId, q);
       c => c.itemId === itemId && c.variantId === variantId
     );
     if (item) item.qty = q;
-
+cart = cartArr; 
     // Save back
     if (isLoggedIn()) {
       localStorage.setItem("cart", JSON.stringify(cartArr));
@@ -5487,7 +5488,7 @@ function menuPlus_multi(id) {
 
   // 4️⃣ Update qty in cart
   item.qty = q;
-
+cart = cartArr;
   // 5️⃣ Save back
   if (isLoggedIn()) {
     localStorage.setItem("cart", JSON.stringify(cartArr));
@@ -5498,6 +5499,7 @@ function menuPlus_multi(id) {
 
   // 6️⃣ Cart badge update
   updateCartBadge();
+  refreshCartDrawer(); 
   updateDrawerTotals();
 
 }
@@ -5539,11 +5541,12 @@ if (isLoggedIn()) {
 }
 
   // Restore UI qty buttons
-  restoreMenuQuantities();
+ setTimeout(restoreMenuQuantities, 120);
 
   // Update badge
   updateCartBadge();
 }
+  
 function refreshCartDrawer() {
   // Drawer active है तो ही refresh करो
   const drawer = document.getElementById("cartDrawer");
@@ -5665,6 +5668,7 @@ function updateDrawerTotals() {
 </script>
 </body>
 </html>
+
 
 
 
