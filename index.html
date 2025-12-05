@@ -1619,42 +1619,69 @@ if (!isLoggedIn()) {
   alert(`${name} (${unit}) added to cart`);
 }
 
-async function openCartPanel() {
+function openCartPanel(cartArr = null) {
 
-  showCartOverlay();  // small loading
+  const drawer = document.getElementById("cartDrawer");
+  const container = document.getElementById("cartDrawerContent");
 
-  try {
+  if (!container) return;
 
-    // ⭐ Logged-in user → fetch fresh backend cart
-    if (isLoggedIn()) {
+  // Load latest cart
+  const cart = cartArr || (
+    isLoggedIn()
+      ? JSON.parse(localStorage.getItem("cart") || "[]")
+      : JSON.parse(localStorage.getItem("guestCart") || "[]")
+  );
 
-      const mobile = localStorage.getItem("userMobile");
-      if (mobile) {
-        const backendCart = await apiGet("getCart", { mobile });
+  let html = "";
 
-        if (Array.isArray(backendCart)) {
-          cart = backendCart;
-          localStorage.setItem("cart", JSON.stringify(cart));
-        }
-      }
+  cart.forEach(ci => {
+    const itemId = ci.itemId;
+    const variantId = ci.variantId || null;
+    const qty = ci.qty;
+    const mrp = Number(ci.price);
+    const disc = Number(ci.disc || 0);
 
-    } else {
-      // ⭐ Guest user → use guestCart
-      const guest = localStorage.getItem("guestCart");
-      cart = guest ? JSON.parse(guest) : [];
-    }
+    const priceAfterDisc = mrp - (mrp * disc / 100);
+    const total = (priceAfterDisc * qty).toFixed(2);
 
-    // ⭐ Always re-render after loading
-    renderCart();
-    updateCartBadge();
+    // ⭐ Correct ROW ID format (C4-F FIX)
+    const rowId = variantId
+      ? `drawerRow-${itemId}_${variantId}`
+      : `drawerRow-${itemId}`;
 
-  } catch (err) {
-    console.error("openCartPanel Error:", err);
-  }
+    html += `
+      <div id="${rowId}"
+           class="drawer-row flex justify-between items-center py-2 border-b"
+           data-price="${mrp}"
+           data-disc="${disc}">
 
-  hideCartOverlay();  // close loader
+        <div class="flex flex-col">
+          <span class="font-semibold">${ci.name}</span>
+          ${variantId ? `<span class="text-sm text-gray-600">${ci.unit}</span>` : ""}
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button class="px-2 bg-gray-300 rounded text-lg"
+                  onclick="menuMinus('${itemId}${variantId ? "_" + variantId : ""}')">−</button>
+
+          <span class="drawer-qty font-semibold">${qty}</span>
+
+          <button class="px-2 bg-gray-300 rounded text-lg"
+                  onclick="${variantId
+                    ? `menuPlus_multi('${itemId}_${variantId}')`
+                    : `menuPlus('${itemId}')`
+                  }">+</button>
+        </div>
+
+        <div class="drawer-total font-semibold">₹${total}</div>
+
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
 }
-
 
 
 function renderCart() {
@@ -5021,12 +5048,16 @@ async function openCheckout() {
 
   document.getElementById("checkoutModal").style.display = "flex";
 }
-function openCartDrawer() {
+async function openCartDrawer() {
   updateCartBadge();
-  openCartPanel();          // Always load latest cart
+
+  await loadCartBeforeDrawer();   // ✔ correct position
+
+  openCartPanel();                // Always load latest cart
+
   document.getElementById("cartBackdrop").classList.add("active");
   document.getElementById("cartDrawer").classList.add("active");
-    document.body.style.overflow = "hidden";
+  document.body.style.overflow = "hidden";
 }
 
 function closeCartDrawer() {
@@ -5563,11 +5594,21 @@ function removeItemFromDrawer(itemId, variantId = null) {
     row.remove();
   }, 180);
 }
+async function loadCartBeforeDrawer() {
+  if (isLoggedIn()) {
+    const mobile = localStorage.getItem("userMobile");
+    const res = await apiGet("getCart", { mobile });
+    if (Array.isArray(res)) {
+      localStorage.setItem("cart", JSON.stringify(res));
+    }
+  }
+}
 
   
 </script>
 </body>
 </html>
+
 
 
 
