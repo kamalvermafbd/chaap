@@ -5719,51 +5719,34 @@ async function loadCartBeforeDrawer() {
   }
 }
 function updateDrawerTotals() {
-  try {
-    // Yahi cart humesha latest hoga
-    const items = cart || [];
 
-    let subTotal = 0;
-    let taxAmount = 0;
-    let grandTotal = 0;
+  // Drawer active nahi ho → skip (flicker aur wrong total fix)
+  const drawer = document.getElementById("cartDrawer");
+  if (!drawer || !drawer.classList.contains("active")) return;
 
-    // 1) Subtotal calculate
-    items.forEach(it => {
-      const qty = Number(it.qty) || 0;
-      const price = Number(it.netRate || it.rate || 0);
-      subTotal += qty * price;
-    });
+  const totalSpan = document.getElementById("cartTotal");
+  if (!totalSpan) return;
 
-    // 2) Tax fetch (already loaded from backend)
-    const tax = window.restaurantTaxSettings || {
-      taxType: "On Bill",
-      servicePercent: 0,
-      cgstPercent: 0,
-      sgstPercent: 0,
-      igstPercent: 0
-    };
+  let grandTotal = 0;
 
-    if (tax.taxType === "On Bill") {
-      const service = (subTotal * tax.servicePercent) / 100;
-      const cgst = (subTotal * tax.cgstPercent) / 100;
-      const sgst = (subTotal * tax.sgstPercent) / 100;
-      const igst = (subTotal * tax.igstPercent) / 100;
+  // Drawer rows read karo
+  const rows = drawer.querySelectorAll(".drawer-row");
 
-      taxAmount = service + cgst + sgst + igst;
-    }
+  rows.forEach(row => {
 
-    // 3) Grand total
-    grandTotal = subTotal + taxAmount;
+    const qtyEl = row.querySelector(".drawer-qty");
+    const price = Number(row.dataset.price || 0);
+    const disc  = Number(row.dataset.disc || 0);
 
-    // 4) Update UI
-    document.getElementById("drawerSubTotal").innerText = subTotal.toFixed(2);
-    document.getElementById("drawerTax").innerText = taxAmount.toFixed(2);
-    document.getElementById("drawerGrandTotal").innerText = grandTotal.toFixed(2);
+    const qty = qtyEl ? Number(qtyEl.innerText || 0) : 0;
 
-  } catch (e) {
-    console.error("updateDrawerTotals ERROR", e);
-  }
+    const priceAfterDisc = price - (price * disc / 100);
+    grandTotal += priceAfterDisc * qty;
+  });
+
+  totalSpan.innerText = grandTotal.toFixed(2);
 }
+
 function showCartOverlay(msg = "Loading…") {
   const o = document.getElementById("cartOverlay");
   if (!o) return;
@@ -5781,6 +5764,7 @@ function hideCartOverlay() {
 </script>
 </body>
 </html>
+
 
 
 
