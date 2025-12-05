@@ -1127,7 +1127,9 @@ style="
 
 
   <script>
-function animateQty(id) {
+window.cartReady = false;
+
+    function animateQty(id) {
   const el = document.getElementById(id);
   if (!el) return;
 
@@ -1622,6 +1624,7 @@ if (!isLoggedIn()) {
 }
 
 function openCartPanel(cartArr = null) {
+ if (!window.cartReady) return;
 
   const drawer = document.getElementById("cartDrawer");
   const container = document.getElementById("cartDrawerContent");
@@ -5004,6 +5007,7 @@ function autofillNewAddressMobile() {
   }
 }
 function updateCartBadge() {
+   if (!window.cartReady) return;
   let count = 0;
 
   // Logged-in → count from backend/local cart
@@ -5572,10 +5576,12 @@ if (isLoggedIn()) {
  setTimeout(restoreMenuQuantities, 120);
 
   // Update badge
+  window.cartReady = true;
   updateCartBadge();
 }
   
 function refreshCartDrawer() {
+    if (!window.cartReady) return;
   const drawer = document.getElementById("cartDrawer");
 
   // ❗ Hard safety: drawer MUST be open and visible
@@ -5711,6 +5717,7 @@ function hideCartOverlay() {
 </script>
 </body>
 </html>
+
 
 
 
