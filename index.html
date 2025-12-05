@@ -3981,8 +3981,15 @@ function isLoggedIn() {
 
   
 function buildMenuCardHTML(item, idx) {
-item.itemId = item.itemId || item.ItemId || item.id || item.ID;
-
+// A2A — Ensure stable itemId (Single + Multi)
+item.itemId = String(
+  item.itemId ||
+  item.ItemId ||
+  item.id ||
+  item.ID ||
+  slugify(item.name)
+);
+  
   let priceSection = "";
   let cartSection = "";
 
@@ -4028,14 +4035,14 @@ item.itemId = item.itemId || item.ItemId || item.id || item.ID;
     `;
 
     cartSection = `
-      <button class="add-btn"
-        data-name="${item.name}"
-        data-unit="${item.unit}"
-        data-price="${mrp}"
-        data-disc="${disc}"
-        data-item-id="${item.itemId}">
-        Add to Cart
-      </button>
+  <button class="add-btn hidden"
+    data-name="${item.name}"
+    data-unit="${item.unit}"
+    data-price="${mrp}"
+    data-disc="${disc}"
+    data-item-id="${item.itemId}">
+    Add
+  </button>
     `;
   }
 
@@ -4094,13 +4101,15 @@ item.itemId = item.itemId || item.ItemId || item.id || item.ID;
     });
 
     priceSection = `<div class="variant-box">${variantsHTML}</div>`;
-
+     // A2B — Hide old Add button for Multi also
     cartSection = `
-      <button class="add-btn disabled-btn"
-            id="btn-${idSafe}"
-            data-name="${item.name}">
-        Add to Cart
-      </button>
+ 
+<button class="add-btn disabled-btn hidden"
+        id="btn-${idSafe}"
+        data-name="${item.name}">
+  Add
+</button>
+
     `;
   }
 
@@ -4113,7 +4122,30 @@ item.itemId = item.itemId || item.ItemId || item.id || item.ID;
     <p>${item.description || ""}</p>
     ${priceSection}
     ${cartSection}
+
+    <!-- ADD BUTTON -->
+<button id="addBtn-${item.itemId}"
+        class="addBtn bg-[#ff6f00] text-white px-3 py-1 rounded font-semibold mt-2"
+        onclick="addFromMenu('${item.itemId}')">
+  ADD
+</button>
+
+<!-- QTY BOX -->
+<div id="qtyBox-${item.itemId}" 
+     class="qtyBox hidden flex items-center justify-center gap-3 mt-2">
+
+  <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+          onclick="menuMinus('${item.itemId}')">−</button>
+
+  <span id="qtyText-${item.itemId}" class="font-semibold">1</span>
+
+  <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+          onclick="menuPlus('${item.itemId}')">+</button>
+
+</div>
+
   `;
+  
 }
 
 function activateVariantSelector(item, idx) {
@@ -4957,12 +4989,30 @@ document.addEventListener("keydown", function(e) {
   }
 });
 
+function addFromMenu(id) {
+  document.getElementById("addBtn-" + id).classList.add("hidden");
+  document.getElementById("qtyBox-" + id).classList.remove("hidden");
+  document.getElementById("qtyText-" + id).innerText = 1;
+}
+
+function menuPlus(id) {
+  let q = Number(document.getElementById("qtyText-" + id).innerText);
+  q++;
+  document.getElementById("qtyText-" + id).innerText = q;
+}
+
+function menuMinus(id) {
+  let q = Number(document.getElementById("qtyText-" + id).innerText);
+  if (q > 1) q--;
+  document.getElementById("qtyText-" + id).innerText = q;
+}
   
 
   
 </script>
 </body>
 </html>
+
 
 
 
