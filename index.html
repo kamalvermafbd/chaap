@@ -4158,13 +4158,8 @@ item.itemId = String(
 
     priceSection = `<div class="variant-box">${variantsHTML}</div>`;
      // A2B — Hide old Add button for Multi also
-    cartSection = `
- 
-<button class="add-btn disabled-btn hidden"
-        id="btn-${idSafe}"
-        data-name="${item.name}">
-  Add
-</button>
+   cartSection = "";
+
 
     `;
   }
@@ -4219,7 +4214,8 @@ function activateVariantSelector(item, idx) {
 
   if (item.cat2 !== "Multi") return;
 
-  const idSafe = slugify(item.name) + "-" + idx;
+  const idSafe = slugify(item.name) + "-" + item.itemId;
+
   const radios = document.querySelectorAll(`input[name="var-${idSafe}"]`);
 
   // HIDE ALL VARIANT QTY BOXES (whenever switching)
@@ -5954,6 +5950,7 @@ function onDecVariant(itemId, variantId, meta) {
 </script>
 </body>
 </html>
+
 
 
 
