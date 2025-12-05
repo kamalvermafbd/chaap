@@ -1658,14 +1658,18 @@ function openCartPanel(cartArr = null) {
   cart.forEach(ci => {
     const itemId = ci.itemId;
     const variantId = ci.variantId || null;
-    const qty = ci.qty;
-    const mrp = Number(ci.price);
-    const disc = Number(ci.disc || 0);
+    const qty = Number(ci.qty);
 
-    const priceAfterDisc = mrp - (mrp * disc / 100);
-    const total = (priceAfterDisc * qty).toFixed(2);
+    // ⭐ FIX 1 — correct keys
+    const rate = Number(ci.rate || 0);
+    const discPercent = Number(ci.discPercent || 0);
 
-    // ⭐ Correct ROW ID format (C4-F FIX)
+    // ⭐ FIX 2 — correct total calculation
+    const discAmt = (rate * discPercent) / 100;
+    const netRate = rate - discAmt;
+    const total = (discPercent > 0 ? netRate : rate) * qty;
+
+    // ⭐ ID fix
     const rowId = variantId
       ? `drawerRow-${itemId}_${variantId}`
       : `drawerRow-${itemId}`;
@@ -1673,8 +1677,8 @@ function openCartPanel(cartArr = null) {
     html += `
       <div id="${rowId}"
            class="drawer-row flex justify-between items-center py-2 border-b"
-           data-price="${mrp}"
-           data-disc="${disc}">
+           data-rate="${rate}"
+           data-disc="${discPercent}">
 
         <div class="flex flex-col">
           <span class="font-semibold">${ci.name}</span>
@@ -1694,7 +1698,7 @@ function openCartPanel(cartArr = null) {
                   }">+</button>
         </div>
 
-        <div class="drawer-total font-semibold">₹${total}</div>
+        <div class="drawer-total font-semibold">₹${total.toFixed(2)}</div>
 
       </div>
     `;
@@ -5688,6 +5692,7 @@ function updateDrawerTotals() {
 </script>
 </body>
 </html>
+
 
 
 
