@@ -4211,44 +4211,6 @@ item.itemId = String(
 }
 
 
-function activateVariantSelector(item, idx) {
-
-  if (item.cat2 !== "Multi") return;
-
-  // UNIQUE ID per card
-  const idSafe = slugify(item.name) + "-" + idx;
-
-  const radios = document.querySelectorAll(`input[name="var-${idSafe}"]`);
-
-  radios.forEach(r => {
-    r.addEventListener("change", () => {
-
-      const variantId = r.dataset.variantId;
-      const price = Number(r.dataset.mrp);
-      const disc = Number(r.dataset.disc);
-      const unit = r.dataset.unit;
-
-      // STEP 1 — Remove any old qty/add box for this card
-      const old = document.querySelector(`.box-${idSafe}`);
-      if (old) old.remove();
-
-      // STEP 2 — Build ADD button (Zomato style)
-      const boxHTML = `
-        <div class="mt-2 box-${idSafe}" id="box-${item.itemId}_${variantId}">
-          <button class="px-3 py-1 bg-[#ff6f00] text-white rounded"
-            onclick="addMultiVariant('${item.itemId}', '${variantId}', '${unit}', ${price}, ${disc})">
-            ADD
-          </button>
-        </div>
-      `;
-
-      // STEP 3 — Place box under selected variant row
-      const parentRow = r.closest(".variant-row");
-      parentRow.insertAdjacentHTML("afterend", boxHTML);
-
-    });
-  });
-}
 
 function addVariantToCart(name) {
   const safe = slugify(name);
@@ -5960,6 +5922,7 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
 </script>
 </body>
 </html>
+
 
 
 
