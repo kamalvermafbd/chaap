@@ -5920,11 +5920,34 @@ function renderCartDrawer(cart) {
     renderCart(cart);
   }
 }
+function onAddClick(itemId, meta) {
+  updateCart(itemId, "", "add", meta);
+}
+
+  function onIncClick(itemId, meta) {
+  updateCart(itemId, "", "inc", meta);
+}
+function onDecClick(itemId, meta) {
+  updateCart(itemId, "", "dec", meta);
+}
+function onVariantSelect(itemId, variantId, meta) {
+  updateCart(itemId, variantId, "selectVariant", meta);
+}
+function onAddVariant(itemId, variantId, meta) {
+  updateCart(itemId, variantId, "add", meta);
+}
+function onIncVariant(itemId, variantId, meta) {
+  updateCart(itemId, variantId, "inc", meta);
+}
+function onDecVariant(itemId, variantId, meta) {
+  updateCart(itemId, variantId, "dec", meta);
+}
 
   
 </script>
 </body>
 </html>
+
 
 
 
