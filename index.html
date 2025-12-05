@@ -1435,8 +1435,10 @@ let renderIndex = 0;
         menuDiv.appendChild(div);
         activateVariantSelector(item, renderIndex - 1);
       });
-    }
+       }
   });
+     restoreMenuQuantities();
+
 }
 
 
@@ -5021,10 +5023,65 @@ document.addEventListener("keydown", function(e) {
   }
 });
 
-function addFromMenu(id) {
-  document.getElementById("addBtn-" + id).classList.add("hidden");
-  document.getElementById("qtyBox-" + id).classList.remove("hidden");
-  document.getElementById("qtyText-" + id).innerText = 1;
+function addFromMenu(itemId) {
+
+  // 1️⃣ UI Update
+  const addBtn = document.getElementById("addBtn-" + itemId);
+  const qtyBox = document.getElementById("qtyBox-" + itemId);
+  const qtyText = document.getElementById("qtyText-" + itemId);
+
+  addBtn.classList.add("hidden");
+  qtyBox.classList.remove("hidden");
+  qtyText.innerText = 1;
+
+  // 2️⃣ Build cart item object (Single item, no variant)
+  const item = menuItems.find(i => 
+    String(i.itemId || i.ItemId || i.id || i.ID) === String(itemId)
+  );
+
+  if (!item) return;
+
+  const mrp = Number(item.price);
+  const disc = Number(item.discPercent || 0);
+
+  const cartObj = {
+    itemId: itemId,
+    name: item.name || "",
+    unit: item.unit || "",
+    price: mrp,
+    disc: disc,
+    qty: 1
+  };
+
+  // 3️⃣ ADD to actual cart array
+  let cartArr = [];
+
+  if (isLoggedIn()) {
+    cartArr = JSON.parse(localStorage.getItem("cart") || "[]");
+  } else {
+    cartArr = JSON.parse(localStorage.getItem("guestCart") || "[]");
+  }
+
+  // Check if already exists (should not happen for single ADD)
+  const existing = cartArr.find(c => c.itemId === itemId && !c.variantId);
+
+  if (existing) {
+    existing.qty = 1;
+  } else {
+    cartArr.push(cartObj);
+  }
+
+  // 4️⃣ Save back
+  if (isLoggedIn()) {
+    localStorage.setItem("cart", JSON.stringify(cartArr));
+    // Async backend push (non-blocking)
+    saveCartToBackend(cartArr);
+  } else {
+    localStorage.setItem("guestCart", JSON.stringify(cartArr));
+  }
+
+  // 5️⃣ Update cart badge
+  updateCartBadge();
 }
 
 function menuPlus(id) {
@@ -5039,11 +5096,88 @@ function menuMinus(id) {
   document.getElementById("qtyText-" + id).innerText = q;
 }
   
+function restoreMenuQuantities() {
+
+  let savedCart = [];
+
+  // Logged-in cart OR guest cart
+  if (isLoggedIn()) {
+    savedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+  } else {
+    savedCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+  }
+
+  savedCart.forEach(ci => {
+
+    const { itemId, variantId, qty } = ci;
+
+    // ------------------------------
+    // SINGLE ITEM RESTORE
+    // ------------------------------
+    if (!variantId) {
+
+      const addBtn = document.getElementById(`addBtn-${itemId}`);
+      const box = document.getElementById(`qtyBox-${itemId}`);
+      const qtyText = document.getElementById(`qtyText-${itemId}`);
+
+      if (addBtn && box && qtyText) {
+        addBtn.classList.add("hidden");
+        box.classList.remove("hidden");
+        qtyText.innerText = qty;
+      }
+    }
+
+    // ------------------------------
+    // MULTI ITEM RESTORE
+    // ------------------------------
+    if (variantId) {
+
+      // Multi qtyBox id = itemId_variantId
+      let box = document.getElementById(`qtyBox-${itemId}_${variantId}`);
+      let qtyText = document.getElementById(`qtyText-${itemId}_${variantId}`);
+
+      // If qtyBox not exist yet → create it dynamically (same as variant selector)
+      if (!box) {
+        const radio = document.querySelector(`input[data-variant-id="${variantId}"]`);
+        if (radio) {
+          const parentRow = radio.closest(".variant-row");
+          const qtyHTML = `
+            <div id="qtyBox-${itemId}_${variantId}"
+                 class="qtyBox flex items-center gap-3 mt-2">
+
+              <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+                      onclick="menuMinus('${itemId}_${variantId}')">−</button>
+
+              <span id="qtyText-${itemId}_${variantId}" class="font-semibold">${qty}</span>
+
+              <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+                      onclick="menuPlus('${itemId}_${variantId}')">+</button>
+
+            </div>
+          `;
+          parentRow.insertAdjacentHTML("afterend", qtyHTML);
+        }
+      } else {
+        qtyText.innerText = qty;
+      }
+
+      // Hide add button for multi (unnecessary but safe)
+      const addBtnMulti = document.getElementById(`addBtn-${itemId}`);
+      if (addBtnMulti) addBtnMulti.classList.add("hidden");
+
+      // Finally show qtyBox
+      box = document.getElementById(`qtyBox-${itemId}_${variantId}`);
+      if (box) box.classList.remove("hidden");
+    }
+
+  });
+}
 
   
 </script>
 </body>
 </html>
+
 
 
 
