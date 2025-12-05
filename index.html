@@ -657,7 +657,9 @@ style="
 <div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold"> <span>Total:</span> <span>₹<span id="cartTotal">0</span></span> </div> 
 <button onclick="openCheckout()" class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg"> Checkout </button> </div> 
 
-<button onclick="openCartDrawer()" style="position:absolute; right:160px; top:60px; background:#ff6347; color:white; padding:8px 12px; border-radius:6px; border:none;"> View Cart (<span id="cartCount">0</span>) </button>
+<button onclick="openCartDrawer()" 
+  style="position:absolute; right:160px; top:60px; background:#ff6347; color:white;
+  padding:8px 12px; border-radius:6px; border:none;"> View Cart (<span id="cartCount">0</span>) </button>
   
 
  <!-- HAMBURGER BUTTON (appears only after login) -->
@@ -708,7 +710,7 @@ style="
     <p>Delicious meals delivered fast!</p>
     
   </header>
-<span id="cartCount" class="ml-2 text-white font-semibold"></span>
+
 
 <!-- LEFT NAVIGATION PANEL -->
 <!-- LEFT NAVIGATION PANEL -->
@@ -5049,12 +5051,23 @@ async function openCheckout() {
   document.getElementById("checkoutModal").style.display = "flex";
 }
 async function openCartDrawer() {
+
+  // ⭐ 1) Overlay ON
+  showCartOverlay("Loading your cart…");
+
+  // ⭐ 2) Safe badge update
   updateCartBadge();
 
-  await loadCartBeforeDrawer();   // ✔ correct position
+  // ⭐ 3) Load latest cart (backend/guest)
+  await loadCartBeforeDrawer();
 
-  openCartPanel();                // Always load latest cart
+  // ⭐ 4) Drawer UI build karo
+  openCartPanel();
 
+  // ⭐ 5) Overlay OFF — after UI ready
+  hideCartOverlay();
+
+  // ⭐ 6) Drawer open
   document.getElementById("cartBackdrop").classList.add("active");
   document.getElementById("cartDrawer").classList.add("active");
   document.body.style.overflow = "hidden";
@@ -5548,21 +5561,24 @@ if (isLoggedIn()) {
 }
   
 function refreshCartDrawer() {
-  // Drawer active है तो ही refresh करो
   const drawer = document.getElementById("cartDrawer");
+
+  // ❗ Hard safety: drawer MUST be open and visible
   if (!drawer || !drawer.classList.contains("active")) return;
 
-  // Latest cart array load करो
-  let cartArr = isLoggedIn()
+  // Always reload fresh cart every refresh
+  const cartArr = isLoggedIn()
     ? JSON.parse(localStorage.getItem("cart") || "[]")
     : JSON.parse(localStorage.getItem("guestCart") || "[]");
 
-  // Drawer UI को rebuild करो
+  // Build UI safely
   openCartPanel(cartArr);
 
-  // Badge update
+  // Update totals + badge
+  updateDrawerTotals();
   updateCartBadge();
 }
+
   function updateDrawerItemQty(itemId, variantId = null, newQty) {
 
   // Drawer active nahi → skip
@@ -5663,11 +5679,24 @@ function updateDrawerTotals() {
     console.error("updateDrawerTotals ERROR", e);
   }
 }
+function showCartOverlay(msg = "Loading…") {
+  const o = document.getElementById("cartOverlay");
+  if (!o) return;
+  o.innerText = msg;
+  o.classList.remove("hidden");
+}
+
+function hideCartOverlay() {
+  const o = document.getElementById("cartOverlay");
+  if (!o) return;
+  o.classList.add("hidden");
+}
 
   
 </script>
 </body>
 </html>
+
 
 
 
