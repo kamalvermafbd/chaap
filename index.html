@@ -5771,10 +5771,81 @@ function hideCartOverlay() {
   o.classList.add("hidden");
 }
 
-  
+ /**
+ * MASTER CART ENGINE
+ * Single + Multi, Guest + Login, Menu + Drawer + Checkout
+ */
+function updateCart(itemId, variantId, action, meta = {}) {
+  try {
+    // 1) Safe inputs
+    if (!itemId) return;
+    action = action || "add";
+
+    // 2) Decide cart source (guest vs logged-in)  ➜ helper (Step-3)
+    let cart = getActiveCart();           // always returns an array
+    if (!Array.isArray(cart)) cart = [];
+
+    const isMulti = meta.itemType === "multi";
+
+    // 3) Multi item → variant required
+    if (isMulti && !variantId && action !== "selectVariant") {
+      showToast && showToast("Please select a variant first.");
+      return;
+    }
+
+    // 4) Find existing line in cart  ➜ helper (Step-3)
+    const idx = findCartItemIndex(cart, itemId, variantId);
+    let existing = idx > -1 ? cart[idx] : null;
+
+    // 5) Only change UI on variant select, no cart change
+    if (action === "selectVariant") {
+      updateVariantUI && updateVariantUI(itemId, variantId, meta);
+      return;
+    }
+
+    // 6) Handle actions: add / inc / dec / remove
+    if (action === "add") {
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        const line = buildCartItemPayload(itemId, variantId, meta); // helper
+        line.qty = 1;
+        cart.push(line);
+      }
+    } else if (action === "inc" && existing) {
+      existing.qty += 1;
+    } else if (action === "dec" && existing) {
+      existing.qty -= 1;
+      if (existing.qty <= 0) cart.splice(idx, 1);
+    } else if (action === "remove" && existing) {
+      cart.splice(idx, 1);
+    }
+
+    // 7) Clean zero-qty items (extra safety)
+    cart = cart.filter(it => it && it.qty > 0);
+
+    // 8) Save cart (guest vs login) ➜ helper (Step-3)
+    saveActiveCart(cart);
+
+    // 9) Instant UI sync (no wait)
+    updateMenuQtyFromCart && updateMenuQtyFromCart(itemId, variantId, cart);
+    renderCartDrawer && renderCartDrawer(cart);
+    updateCartBadge && updateCartBadge(cart);
+
+    // 10) Checkout page open ho to usko bhi refresh karo
+    if (isCheckoutOpen && isCheckoutOpen()) {
+      refreshCheckout && refreshCheckout(cart);
+    }
+  } catch (err) {
+    console.error("updateCart engine error:", err);
+    showToast && showToast("Something went wrong, please try again.");
+  }
+}
+ 
 </script>
 </body>
 </html>
+
 
 
 
