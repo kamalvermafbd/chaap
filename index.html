@@ -5841,10 +5841,91 @@ function updateCart(itemId, variantId, action, meta = {}) {
     showToast && showToast("Something went wrong, please try again.");
   }
 }
- 
+function getActiveCart() {
+  const isUser = isLoggedIn && isLoggedIn();
+
+  if (isUser) {
+    try {
+      const b = JSON.parse(localStorage.getItem("backendCart") || "[]");
+      return Array.isArray(b) ? b : [];
+    } catch (e) {
+      return [];
+    }
+  } else {
+    try {
+      const g = JSON.parse(localStorage.getItem("guestCart") || "[]");
+      return Array.isArray(g) ? g : [];
+    } catch (e) {
+      return [];
+    }
+  }
+}
+function saveActiveCart(cart) {
+  const isUser = isLoggedIn && isLoggedIn();
+
+  if (!Array.isArray(cart)) cart = [];
+
+  if (isUser) {
+    // backend save (non-blocking)
+    saveCartToBackend && saveCartToBackend(cart);
+    localStorage.setItem("backendCart", JSON.stringify(cart));
+  } else {
+    localStorage.setItem("guestCart", JSON.stringify(cart));
+  }
+}
+function findCartItemIndex(cart, itemId, variantId) {
+  return cart.findIndex(
+    it =>
+      String(it.itemId) === String(itemId) &&
+      String(it.variantId || "") === String(variantId || "")
+  );
+}
+function buildCartItemPayload(itemId, variantId, meta = {}) {
+  return {
+    itemId,
+    variantId: variantId || "",
+    qty: 0,
+    name: meta.name || "",
+    unit: meta.unit || "",
+    price: meta.price || 0,
+    discount: meta.discount || 0,
+    type: meta.type || "",
+    img: meta.img || ""
+  };
+}
+function updateMenuQtyFromCart(itemId, variantId, cart) {
+  const item = cart.find(
+    x =>
+      String(x.itemId) === String(itemId) &&
+      String(x.variantId || "") === String(variantId || "")
+  );
+
+  const qty = item ? item.qty : 0;
+
+  // Tumhare existing HTML structure ke hisab se:
+  const el = document.querySelector(
+    `[data-itemid="${itemId}"][data-variantid="${variantId}"] .menu-qty`
+  );
+  if (!el) return;
+
+  el.textContent = qty > 0 ? qty : "Add";
+}
+function updateCartBadge(cart) {
+  const count = cart.reduce((s, x) => s + (x.qty || 0), 0);
+  const badge = document.getElementById("cartBadge");
+  if (badge) badge.textContent = count;
+}
+function renderCartDrawer(cart) {
+  if (window.renderCart) {
+    renderCart(cart);
+  }
+}
+
+  
 </script>
 </body>
 </html>
+
 
 
 
