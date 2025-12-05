@@ -5187,111 +5187,143 @@ function addFromMenu(itemId) {
   // 5️⃣ Update cart badge
   updateCartBadge();
   refreshCartDrawer(); 
+  window.cart = cartArr;     // global sync
+  cart = cartArr;            // ensure main array updated
+  if (typeof renderCart === "function") renderCart();   // bottom cart UI
+  if (typeof updateDrawerTotals === "function") updateDrawerTotals(); // totals
 }
 
 function menuPlus(itemId) {
 
   // 1️⃣ UI Qty increment
   const qtyText = document.getElementById("qtyText-" + itemId);
+  if (!qtyText) return; // safety
+
   let q = Number(qtyText.innerText);
   q++;
   qtyText.innerText = q;
-animateQty("qtyText-" + itemId);
-  
+  animateQty("qtyText-" + itemId);
+
+  // ⭐ Drawer row live sync
   updateDrawerItemQty(String(itemId), null, q);
 
-
-
-  // 2️⃣ Load existing cart
+  // 2️⃣ Load correct cart (guest / logged-in)
   let cartArr = isLoggedIn()
     ? JSON.parse(localStorage.getItem("cart") || "[]")
     : JSON.parse(localStorage.getItem("guestCart") || "[]");
 
-  // 3️⃣ Find item in cart (single → no variantId)
+  // 3️⃣ Find item (single → no variant)
   const item = cartArr.find(c => c.itemId === itemId && !c.variantId);
-  if (!item) return; // safety
+  if (!item) return;
 
   // 4️⃣ Update qty
   item.qty = q;
-cart = cartArr; 
+
+  // ⭐ CRITICAL FIX — global cart sync
+  window.cart = cartArr;
+  cart = cartArr;
+
   // 5️⃣ Save back
   if (isLoggedIn()) {
     localStorage.setItem("cart", JSON.stringify(cartArr));
-    saveCartToBackend(cartArr); // async
+    saveCartToBackend(cartArr);   // async, safe
   } else {
     localStorage.setItem("guestCart", JSON.stringify(cartArr));
   }
 
-  // 6️⃣ Update badge
+  // 6️⃣ Badge update
   updateCartBadge();
-  if (document.getElementById("cartDrawer").classList.contains("active")) {
+
+  // ⭐ Refresh drawer ONLY if open
+  const drawer = document.getElementById("cartDrawer");
+  if (drawer && drawer.classList.contains("active")) {
     refreshCartDrawer();
+    updateDrawerTotals();
+  }
 }
 
-  updateDrawerTotals();
-
-}
 
 
 function menuMinus(itemId) {
 
   // 1️⃣ Read current qty from UI
   const qtyText = document.getElementById("qtyText-" + itemId);
+  if (!qtyText) return;
+
   let q = Number(qtyText.innerText);
 
+  // -----------------------------------------------------
+  // CASE-A → Qty becomes 0 → REMOVE ITEM COMPLETELY
+  // -----------------------------------------------------
   if (q <= 1) {
-    // Qty will become 0 → Remove from cart
+
     qtyText.innerText = 0;
 
-    // 2️⃣ Load cart
+    // 2️⃣ Load correct cart
     let cartArr = isLoggedIn()
       ? JSON.parse(localStorage.getItem("cart") || "[]")
       : JSON.parse(localStorage.getItem("guestCart") || "[]");
 
-    // 3️⃣ Remove from cart
+    // 3️⃣ Remove this item (single → no variantId)
     cartArr = cartArr.filter(c => !(c.itemId === itemId && !c.variantId));
+
+    // Drawer live remove
     removeItemFromDrawer(String(itemId));
 
-
-
-    // 4️⃣ Save back
+    // 4️⃣ Save updated cart back
     if (isLoggedIn()) {
       localStorage.setItem("cart", JSON.stringify(cartArr));
-      saveCartToBackend(cartArr); // async
+      saveCartToBackend(cartArr);  // async
     } else {
       localStorage.setItem("guestCart", JSON.stringify(cartArr));
     }
 
-    // 5️⃣ UI Reset — QtyBox hide, ADD show
-    document.getElementById("qtyBox-" + itemId).classList.add("hidden");
-    document.getElementById("addBtn-" + itemId).classList.remove("hidden");
+    // Global sync
+    cart = cartArr;
+    window.cart = cartArr;
 
-    // 6️⃣ Update badge
+    // 5️⃣ Reset UI
+    const box = document.getElementById("qtyBox-" + itemId);
+    const addBtn = document.getElementById("addBtn-" + itemId);
+
+    if (box) box.classList.add("hidden");
+    if (addBtn) addBtn.classList.remove("hidden");
+
+    // 6️⃣ Update badge + drawer
     updateCartBadge();
-    if (document.getElementById("cartDrawer").classList.contains("active")) {
-    refreshCartDrawer();
-}
 
-    updateDrawerTotals(); 
+    if (document.getElementById("cartDrawer").classList.contains("active")) {
+      refreshCartDrawer();
+      updateDrawerTotals();
+    }
+
     return;
   }
 
-  // Otherwise qty > 1 → normal decrement
+  // -----------------------------------------------------
+  // CASE-B → Qty > 1 → normal decrement
+  // -----------------------------------------------------
   q--;
   qtyText.innerText = q;
-updateDrawerItemQty(String(itemId), null, q);
+  animateQty("qtyText-" + itemId);
 
+  // Drawer live update
+  updateDrawerItemQty(String(itemId), null, q);
 
-  // 7️⃣ Update cart object qty
+  // 7️⃣ Load correct cart
   let cartArr = isLoggedIn()
     ? JSON.parse(localStorage.getItem("cart") || "[]")
     : JSON.parse(localStorage.getItem("guestCart") || "[]");
 
+  // 8️⃣ Update qty in cart
   const item = cartArr.find(c => c.itemId === itemId && !c.variantId);
   if (item) item.qty = q;
-  cart = cartArr; 
 
-  // 8️⃣ Save back
+  // Global sync
+  cart = cartArr;
+  window.cart = cartArr;
+
+  // 9️⃣ Save back
   if (isLoggedIn()) {
     localStorage.setItem("cart", JSON.stringify(cartArr));
     saveCartToBackend(cartArr);
@@ -5299,15 +5331,15 @@ updateDrawerItemQty(String(itemId), null, q);
     localStorage.setItem("guestCart", JSON.stringify(cartArr));
   }
 
-  // 9️⃣ Update badge
+  // 🔟 Update UI + drawer totals
   updateCartBadge();
+
   if (document.getElementById("cartDrawer").classList.contains("active")) {
     refreshCartDrawer();
+    updateDrawerTotals();
+  }
 }
 
-  updateDrawerTotals();
-
-}
 
 function menuMinus_multi(id) {
 
@@ -5717,6 +5749,7 @@ function hideCartOverlay() {
 </script>
 </body>
 </html>
+
 
 
 
