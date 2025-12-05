@@ -4171,37 +4171,48 @@ item.itemId = String(
   // ==========================
   //       RETURN CARD
   // ==========================
+
+  // 👉 NEW: Menu-level controls only for Single items
+  let menuControls = "";
+
+  if (item.cat2 === "Single") {
+    menuControls = `
+      <!-- ADD BUTTON (Single only) -->
+      <button id="addBtn-${item.itemId}"
+              class="addBtn bg-[#ff6f00] text-white px-3 py-1 rounded font-semibold mt-2"
+              onclick="addFromMenu('${item.itemId}')">
+        ADD
+      </button>
+
+      <!-- QTY BOX (Single only) -->
+      <div id="qtyBox-${item.itemId}" 
+           class="qtyBox hidden flex items-center justify-center gap-3 mt-2">
+
+        <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+                onclick="menuMinus('${item.itemId}')">−</button>
+
+        <span id="qtyText-${item.itemId}" class="font-semibold">1</span>
+
+        <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+                onclick="menuPlus('${item.itemId}')">+</button>
+
+      </div>
+    `;
+  } else {
+    // Multi item → NO global ADD, only variant-wise qty using activateVariantSelector
+    menuControls = "";
+  }
+
   return `
     <img src="${item.image}" alt="${item.name}">
     <h4>${item.name}</h4>
     <p>${item.description || ""}</p>
     ${priceSection}
     ${cartSection}
-
-    <!-- ADD BUTTON -->
-<button id="addBtn-${item.itemId}"
-        class="addBtn bg-[#ff6f00] text-white px-3 py-1 rounded font-semibold mt-2"
-        onclick="addFromMenu('${item.itemId}')">
-  ADD
-</button>
-
-<!-- QTY BOX -->
-<div id="qtyBox-${item.itemId}" 
-     class="qtyBox hidden flex items-center justify-center gap-3 mt-2">
-
-  <button class="px-2 py-1 bg-gray-300 rounded text-lg"
-          onclick="menuMinus('${item.itemId}')">−</button>
-
-  <span id="qtyText-${item.itemId}" class="font-semibold">1</span>
-
-  <button class="px-2 py-1 bg-gray-300 rounded text-lg"
-          onclick="menuPlus('${item.itemId}')">+</button>
-
-</div>
-
+    ${menuControls}
   `;
-  
 }
+
 
 function activateVariantSelector(item, idx) {
 
@@ -5764,6 +5775,7 @@ function hideCartOverlay() {
 </script>
 </body>
 </html>
+
 
 
 
