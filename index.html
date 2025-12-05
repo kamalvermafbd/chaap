@@ -5343,22 +5343,21 @@ function menuMinus(itemId) {
 
 function menuMinus_multi(id) {
 
-  // id format: "itemId_variantId"
   const [itemId, variantId] = id.split("_");
-
   const qtyText = document.getElementById("qtyText-" + id);
   let q = Number(qtyText.innerText);
 
-  // 1️⃣ If qty > 1 → normal decrement
+  // ------------------------------------------------
+  // CASE A → NORMAL DECREMENT (qty > 1)
+  // ------------------------------------------------
   if (q > 1) {
+
     q--;
     qtyText.innerText = q;
     animateQty("qtyText-" + id);
 
-updateDrawerItemQty(String(itemId), String(variantId), q);
+    updateDrawerItemQty(String(itemId), String(variantId), q);
 
-
-    // Update cart
     let cartArr = isLoggedIn()
       ? JSON.parse(localStorage.getItem("cart") || "[]")
       : JSON.parse(localStorage.getItem("guestCart") || "[]");
@@ -5367,8 +5366,10 @@ updateDrawerItemQty(String(itemId), String(variantId), q);
       c => c.itemId === itemId && c.variantId === variantId
     );
     if (item) item.qty = q;
-cart = cartArr; 
-    // Save back
+
+    cart = cartArr;
+    window.cart = cartArr;
+
     if (isLoggedIn()) {
       localStorage.setItem("cart", JSON.stringify(cartArr));
       saveCartToBackend(cartArr);
@@ -5378,25 +5379,28 @@ cart = cartArr;
 
     updateCartBadge();
     refreshCartDrawer();
-      updateDrawerTotals();
-
+    updateDrawerTotals();
     return;
   }
 
-  // 2️⃣ Qty = 1 → REMOVE ITEM
+  // ------------------------------------------------
+  // CASE B → REMOVE ITEM (qty = 1)
+  // ------------------------------------------------
   if (q === 1) {
 
-    // Remove from cart
     let cartArr = isLoggedIn()
       ? JSON.parse(localStorage.getItem("cart") || "[]")
       : JSON.parse(localStorage.getItem("guestCart") || "[]");
 
+    // Remove exact variant
     cartArr = cartArr.filter(
       c => !(c.itemId === itemId && c.variantId === variantId)
     );
-removeItemFromDrawer(String(itemId), String(variantId));
 
-    // Save back
+    // Drawer remove — FIXED ID format
+    removeItemFromDrawer(`${itemId}_${variantId}`);
+
+    // Save in storage
     if (isLoggedIn()) {
       localStorage.setItem("cart", JSON.stringify(cartArr));
       saveCartToBackend(cartArr);
@@ -5404,18 +5408,20 @@ removeItemFromDrawer(String(itemId), String(variantId));
       localStorage.setItem("guestCart", JSON.stringify(cartArr));
     }
 
-    // Hide qtyBox
+    cart = cartArr;
+    window.cart = cartArr;
+
+    // Hide qty box
     const box = document.getElementById("qtyBox-" + id);
     if (box) box.classList.add("hidden");
 
-    // Reset radios so user can select variant again
+    // Reset radio
     const radio = document.querySelector(`input[data-variant-id="${variantId}"]`);
     if (radio) radio.checked = false;
 
     updateCartBadge();
     refreshCartDrawer();
     updateDrawerTotals();
-
   }
 }
 
@@ -5525,33 +5531,38 @@ function cleanCartConsistency(cartArr) {
 
 
 function menuPlus_multi(id) {
-
-  // id format: "itemId_variantId"
+  // id = "itemId_variantId"
   const [itemId, variantId] = id.split("_");
 
-  // 1️⃣ UI qty increment
+  // 1️⃣ UI increment
   const qtyText = document.getElementById("qtyText-" + id);
   let q = Number(qtyText.innerText);
   q++;
   qtyText.innerText = q;
   animateQty("qtyText-" + id);
 
+  // Drawer qty update
+  updateDrawerItemQty(String(itemId), String(variantId), q);
 
   // 2️⃣ Load cart
   let cartArr = isLoggedIn()
     ? JSON.parse(localStorage.getItem("cart") || "[]")
     : JSON.parse(localStorage.getItem("guestCart") || "[]");
 
-  // 3️⃣ Find variant in cart
+  // 3️⃣ Find exact multi variant
   const item = cartArr.find(
     c => c.itemId === itemId && c.variantId === variantId
   );
   if (!item) return;
 
-  // 4️⃣ Update qty in cart
+  // 4️⃣ Update qty
   item.qty = q;
-cart = cartArr;
-  // 5️⃣ Save back
+
+  // Save in global state
+  cart = cartArr;
+  window.cart = cartArr;
+
+  // 5️⃣ Save to correct storage
   if (isLoggedIn()) {
     localStorage.setItem("cart", JSON.stringify(cartArr));
     saveCartToBackend(cartArr);
@@ -5559,14 +5570,14 @@ cart = cartArr;
     localStorage.setItem("guestCart", JSON.stringify(cartArr));
   }
 
-  // 6️⃣ Cart badge update
+  // 6️⃣ UI update
   updateCartBadge();
   if (document.getElementById("cartDrawer").classList.contains("active")) {
     refreshCartDrawer();
+    updateDrawerTotals();
+  }
 }
-  updateDrawerTotals();
 
-}
 async function loadCartOnStart() {
 
   let cartArr = [];
@@ -5749,6 +5760,7 @@ function hideCartOverlay() {
 </script>
 </body>
 </html>
+
 
 
 
