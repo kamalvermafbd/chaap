@@ -5078,8 +5078,12 @@ async function openCartDrawer() {
   // ⭐ 3) Load latest cart (backend/guest)
   await loadCartBeforeDrawer();
 
-  // ⭐ 4) Drawer UI build karo
-  openCartPanel();
+  // ⭐ 4) Drawer UI build karo — ALWAYS fresh cart
+  const freshCart = isLoggedIn()
+    ? JSON.parse(localStorage.getItem("cart") || "[]")
+    : JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+  openCartPanel(freshCart);
 
   // ⭐ 5) Overlay OFF — after UI ready
   hideCartOverlay();
@@ -5947,6 +5951,7 @@ function onDecVariant(itemId, variantId, meta) {
 </script>
 </body>
 </html>
+
 
 
 
