@@ -4153,28 +4153,60 @@ function activateVariantSelector(item, idx) {
   if (item.cat2 !== "Multi") return;
 
   const idSafe = slugify(item.name) + "-" + idx;
+  const radios = document.querySelectorAll(`input[name="var-${idSafe}"]`);
 
-const radios = document.querySelectorAll(`input[name="var-${idSafe}"]`);
-const btn = document.getElementById(`btn-${idSafe}`);
+  // HIDE ALL VARIANT QTY BOXES (whenever switching)
+  function hideAllVariantQty() {
+    radios.forEach(r => {
+      const vid = r.dataset.variantId;
+      const box = document.getElementById(`qtyBox-${item.itemId}_${vid}`);
+      if (box) box.classList.add("hidden");
+    });
+  }
 
   radios.forEach(r => {
-   r.addEventListener("change", () => {
-  // enable visually: remove the disabled visual class
-  btn.classList.remove("disabled-btn");
+    r.addEventListener("change", () => {
 
-  // store selected variant data on button (used by delegated click handler)
-  btn.dataset.price = r.dataset.mrp;
-  btn.dataset.unit  = r.dataset.unit;
-     btn.dataset.variantId = r.dataset.variantId;
+      const variantId = r.dataset.variantId;
 
+      // STEP 1 — Hide previous qty boxes
+      hideAllVariantQty();
 
-  // restore normal appearance
-  btn.style.background = "#ff6347";
-  btn.style.opacity = "1";
-});
+      // STEP 2 — Check if qtyBox exists for this variant
+      let box = document.getElementById(`qtyBox-${item.itemId}_${variantId}`);
 
+      // STEP 3 — If not exist, create dynamically under selected variant row
+      if (!box) {
+        const parentRow = r.closest(".variant-row");
+        const qtyHTML = `
+          <div id="qtyBox-${item.itemId}_${variantId}"
+               class="qtyBox flex items-center gap-3 mt-2">
+
+            <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+                    onclick="menuMinus('${item.itemId}_${variantId}')">−</button>
+
+            <span id="qtyText-${item.itemId}_${variantId}"
+                  class="font-semibold">1</span>
+
+            <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+                    onclick="menuPlus('${item.itemId}_${variantId}')">+</button>
+
+          </div>
+        `;
+        parentRow.insertAdjacentHTML("afterend", qtyHTML);
+      }
+
+      // STEP 4 — Show qtyBox for selected variant
+      box = document.getElementById(`qtyBox-${item.itemId}_${variantId}`);
+      box.classList.remove("hidden");
+
+      // STEP 5 — Default qty = 1 on variant change
+      document.getElementById(`qtyText-${item.itemId}_${variantId}`).innerText = 1;
+
+    });
   });
 }
+
 
 function addVariantToCart(name) {
   const safe = slugify(name);
@@ -5012,6 +5044,7 @@ function menuMinus(id) {
 </script>
 </body>
 </html>
+
 
 
 
