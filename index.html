@@ -5428,26 +5428,34 @@ function menuMinus_multi(id) {
   
 function restoreMenuQuantities() {
 
+  // 0️⃣ Source of truth = GLOBAL cart (अगर भरा है तो)
   let savedCart = [];
 
-  // Logged-in cart OR guest cart
-  if (isLoggedIn()) {
-    savedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+  if (Array.isArray(cart) && cart.length > 0) {
+    savedCart = cart;
   } else {
-    savedCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+    // Fallback → localStorage (login / guest के हिसाब से)
+    if (isLoggedIn()) {
+      savedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+    } else {
+      savedCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+    }
   }
 
+  // Safety filter
   savedCart.forEach(ci => {
+    const itemId    = String(ci.itemId || "").trim();
+    const variantId = ci.variantId ? String(ci.variantId).trim() : "";
+    const qty       = Number(ci.qty || 0);
 
-    const { itemId, variantId, qty } = ci;
+    if (!itemId || qty <= 0) return;
 
-    // ------------------------------
-    // SINGLE ITEM RESTORE
-    // ------------------------------
+    // --------------------------------
+    // 🟢 SINGLE ITEM RESTORE (no variant)
+    // --------------------------------
     if (!variantId) {
-
-      const addBtn = document.getElementById(`addBtn-${itemId}`);
-      const box = document.getElementById(`qtyBox-${itemId}`);
+      const addBtn  = document.getElementById(`addBtn-${itemId}`);
+      const box     = document.getElementById(`qtyBox-${itemId}`);
       const qtyText = document.getElementById(`qtyText-${itemId}`);
 
       if (addBtn && box && qtyText) {
@@ -5455,57 +5463,67 @@ function restoreMenuQuantities() {
         box.classList.remove("hidden");
         qtyText.innerText = qty;
       }
+      return;
     }
 
-    // ------------------------------
-    // MULTI ITEM RESTORE
-    // ------------------------------
-    if (variantId) {
+    // --------------------------------
+    // 🟣 MULTI VARIANT RESTORE
+    // --------------------------------
+    // qtyBox id → qtyBox-itemId_variantId
+    let box     = document.getElementById(`qtyBox-${itemId}_${variantId}`);
+    let qtyText = document.getElementById(`qtyText-${itemId}_${variantId}`);
 
-      // Multi qtyBox id = itemId_variantId
-      let box = document.getElementById(`qtyBox-${itemId}_${variantId}`);
-      let qtyText = document.getElementById(`qtyText-${itemId}_${variantId}`);
+    // अगर qtyBox अभी तक बना ही नहीं → बनाओ (same pattern as variant select)
+    if (!box) {
+      const radio = document.querySelector(
+        `input[type="radio"][data-variant-id="${variantId}"]`
+      );
 
-      // If qtyBox not exist yet → create it dynamically (same as variant selector)
-      if (!box) {
-        const radio = document.querySelector(`input[data-variant-id="${variantId}"]`);
-        if (radio) {
-          const parentRow = radio.closest(".variant-row");
-          const qtyHTML = `
-            <div id="qtyBox-${itemId}_${variantId}"
-                 class="qtyBox flex items-center gap-3 mt-2">
+      if (radio) {
+        const parentRow = radio.closest(".variant-row");
+        const qtyHTML = `
+          <div id="qtyBox-${itemId}_${variantId}"
+               class="qtyBox flex items-center gap-3 mt-2">
 
-              <button class="px-2 py-1 bg-gray-300 rounded text-lg"
-                      onclick="menuMinus_multi('${itemId}_${variantId}')">−</button>
+            <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+                    onclick="menuMinus_multi('${itemId}_${variantId}')">−</button>
 
-              <span id="qtyText-${itemId}_${variantId}"
-                    class="font-semibold">${qty}</span>
+            <span id="qtyText-${itemId}_${variantId}"
+                  class="font-semibold">${qty}</span>
 
-              <button class="px-2 py-1 bg-gray-300 rounded text-lg"
-                      onclick="menuPlus_multi('${itemId}_${variantId}')">+</button>
+            <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+                    onclick="menuPlus_multi('${itemId}_${variantId}')">+</button>
 
-            </div>
-          `;
-          parentRow.insertAdjacentHTML("afterend", qtyHTML);
-        }
-      } else {
-        qtyText.innerText = qty;
+          </div>
+        `;
+        parentRow.insertAdjacentHTML("afterend", qtyHTML);
       }
 
-      // Hide add button for multi
-      const addBtnMulti = document.getElementById(`addBtn-${itemId}`);
-      if (addBtnMulti) addBtnMulti.classList.add("hidden");
-
-      // Show qtyBox
-      box = document.getElementById(`qtyBox-${itemId}_${variantId}`);
-      if (box) box.classList.remove("hidden");
-      const radioToSelect = document.querySelector(`input[data-variant-id="${variantId}"]`);
-if (radioToSelect) {
-  radioToSelect.checked = true;
-}
+      // fresh reference
+      box     = document.getElementById(`qtyBox-${itemId}_${variantId}`);
+      qtyText = document.getElementById(`qtyText-${itemId}_${variantId}`);
+    } else {
+      // पहले से है → सिर्फ qty सेट करो
+      qtyText.innerText = qty;
     }
 
+    // Multi item → ADD button हमेशा hide
+    const addBtnMulti = document.getElementById(`addBtn-${itemId}`);
+    if (addBtnMulti) addBtnMulti.classList.add("hidden");
+
+    // qtyBox show करो
+    if (box) box.classList.remove("hidden");
+
+    // Radio भी select कर दो (taaki user ko pata चले कौन सा variant चुना है)
+    const radioToSelect = document.querySelector(
+      `input[type="radio"][data-variant-id="${variantId}"]`
+    );
+    if (radioToSelect) {
+      radioToSelect.checked = true;
+    }
   });
+}
+
 }
 function cleanCartConsistency(cartArr) {
 
@@ -5760,6 +5778,7 @@ function hideCartOverlay() {
 </script>
 </body>
 </html>
+
 
 
 
