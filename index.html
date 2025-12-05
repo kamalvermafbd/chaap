@@ -5205,6 +5205,8 @@ animateQty("qtyText-" + itemId);
   // 6️⃣ Update badge
   updateCartBadge();
   refreshCartDrawer();
+  updateDrawerTotals();
+
 }
 
 
@@ -5243,6 +5245,7 @@ function menuMinus(itemId) {
     // 6️⃣ Update badge
     updateCartBadge();
     refreshCartDrawer();
+    updateDrawerTotals(); 
     return;
   }
 
@@ -5270,6 +5273,8 @@ updateDrawerItemQty(itemId, null, q);
   // 9️⃣ Update badge
   updateCartBadge();
   refreshCartDrawer();
+  updateDrawerTotals();
+
 }
 
 function menuMinus_multi(id) {
@@ -5308,6 +5313,8 @@ updateDrawerItemQty(itemId, variantId, q);
 
     updateCartBadge();
     refreshCartDrawer();
+      updateDrawerTotals();
+
     return;
   }
 
@@ -5344,6 +5351,8 @@ updateDrawerItemQty(itemId, variantId, q);
 
     updateCartBadge();
     refreshCartDrawer();
+    updateDrawerTotals();
+
   }
 }
 
@@ -5489,6 +5498,8 @@ function menuPlus_multi(id) {
 
   // 6️⃣ Cart badge update
   updateCartBadge();
+  updateDrawerTotals();
+
 }
 async function loadCartOnStart() {
 
@@ -5603,22 +5614,57 @@ async function loadCartBeforeDrawer() {
     }
   }
 }
+function updateDrawerTotals() {
+  try {
+    // Yahi cart humesha latest hoga
+    const items = cart || [];
+
+    let subTotal = 0;
+    let taxAmount = 0;
+    let grandTotal = 0;
+
+    // 1) Subtotal calculate
+    items.forEach(it => {
+      const qty = Number(it.qty) || 0;
+      const price = Number(it.netRate || it.rate || 0);
+      subTotal += qty * price;
+    });
+
+    // 2) Tax fetch (already loaded from backend)
+    const tax = window.restaurantTaxSettings || {
+      taxType: "On Bill",
+      servicePercent: 0,
+      cgstPercent: 0,
+      sgstPercent: 0,
+      igstPercent: 0
+    };
+
+    if (tax.taxType === "On Bill") {
+      const service = (subTotal * tax.servicePercent) / 100;
+      const cgst = (subTotal * tax.cgstPercent) / 100;
+      const sgst = (subTotal * tax.sgstPercent) / 100;
+      const igst = (subTotal * tax.igstPercent) / 100;
+
+      taxAmount = service + cgst + sgst + igst;
+    }
+
+    // 3) Grand total
+    grandTotal = subTotal + taxAmount;
+
+    // 4) Update UI
+    document.getElementById("drawerSubTotal").innerText = subTotal.toFixed(2);
+    document.getElementById("drawerTax").innerText = taxAmount.toFixed(2);
+    document.getElementById("drawerGrandTotal").innerText = grandTotal.toFixed(2);
+
+  } catch (e) {
+    console.error("updateDrawerTotals ERROR", e);
+  }
+}
 
   
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
 
 
 
