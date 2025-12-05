@@ -5947,10 +5947,73 @@ function onDecVariant(itemId, variantId, meta) {
   updateCart(itemId, variantId, "dec", meta);
 }
 */ //master cart enginer end
-  
+
+  function activateVariantSelector(item, idx) {
+  if (item.cat2 !== "Multi") return;
+
+  const idSafe = slugify(item.name) + "-" + idx;
+  const radios = document.querySelectorAll(`input[name="var-${idSafe}"]`);
+
+  radios.forEach(r => {
+    r.addEventListener("change", () => {
+      const variantId = r.dataset.variantId;
+      const price = Number(r.dataset.mrp);
+      const disc = Number(r.dataset.disc);
+      const unit = r.dataset.unit;
+
+      // STEP 1 — remove old qty/add box (if exists)
+      const oldBox = document.getElementById(`qtyBox-${item.itemId}_${variantId}`);
+      if (oldBox) oldBox.remove();
+
+      const parentRow = r.closest(".variant-row");
+
+      // STEP 2 — create ADD button (Zomato style)
+      const boxHTML = `
+        <div id="qtyBox-${item.itemId}_${variantId}" class="mt-2">
+          <button class="px-3 py-1 bg-[#ff6f00] text-white rounded"
+            onclick="addMultiVariant('${item.itemId}', '${variantId}', '${unit}', ${price}, ${disc})">
+            ADD
+          </button>
+        </div>
+      `;
+
+      parentRow.insertAdjacentHTML("afterend", boxHTML);
+    });
+  });
+}
+function addMultiVariant(itemId, variantId, unit, price, disc) {
+  const meta = {
+    name: "",
+    unit: unit,
+    price: price,
+    discount: disc,
+    type: "multi"
+  };
+
+  // Master Cart Engine call
+  updateCart(itemId, variantId, "add", meta);
+
+  // Now replace ADD → qty box
+  const box = document.getElementById(`qtyBox-${itemId}_${variantId}`);
+  if (!box) return;
+
+  box.innerHTML = `
+    <div class="flex items-center gap-3">
+      <button class="px-2 bg-gray-300 rounded text-lg"
+        onclick="updateCart('${itemId}', '${variantId}', 'dec')">−</button>
+
+      <span class="font-semibold" id="qtyText-${itemId}_${variantId}">1</span>
+
+      <button class="px-2 bg-gray-300 rounded text-lg"
+        onclick="updateCart('${itemId}', '${variantId}', 'inc')">+</button>
+    </div>
+  `;
+}
+
 </script>
 </body>
 </html>
+
 
 
 
