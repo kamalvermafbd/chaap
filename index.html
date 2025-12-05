@@ -646,18 +646,36 @@ style="
   </span>
 </div>
 
-  <div id="cartBackdrop" onclick="closeCartDrawer()"></div> 
+<div id="cartBackdrop" onclick="closeCartDrawer()"></div>
+
 <div id="cartDrawer"> 
-   <button onclick="closeCartDrawer()" 
+
+  <button onclick="closeCartDrawer()" 
     class="absolute right-3 top-3 text-gray-500 hover:text-gray-800 text-2xl font-bold">
     &times;
   </button>
-<h2 class="text-xl font-semibold mb-3">Your Cart</h2> 
-<div id="cartItems"></div> 
-<div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold"> <span>Total:</span> <span>₹<span id="cartTotal">0</span></span> </div> 
-<button onclick="openCheckout()" class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg"> Checkout </button> </div> 
 
-<button onclick="openCartDrawer()" style="position:absolute; right:160px; top:60px; background:#ff6347; color:white; padding:8px 12px; border-radius:6px; border:none;"> View Cart (<span id="cartCount">0</span>) </button>
+  <h2 class="text-xl font-semibold mb-3">Your Cart</h2>
+
+  <!-- ⭐ Corrected ID for drawer content -->
+  <div id="cartDrawerContent"></div>
+
+  <div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold">
+    <span>Total:</span>
+    <span>₹<span id="cartTotal">0</span></span>
+  </div>
+
+  <button onclick="openCheckout()" 
+    class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg">
+    Checkout
+  </button>
+
+</div>
+
+<button onclick="openCartDrawer()" 
+  style="position:absolute; right:160px; top:60px; background:#ff6347; 
+  color:white; padding:8px 12px; border-radius:6px; border:none;">
+  View Cart (<span id="cartCount">0</span>) </button>
   
 
  <!-- HAMBURGER BUTTON (appears only after login) -->
@@ -808,6 +826,8 @@ style="
 
              <div class="cart">
     <h3 class="text-xl font-semibold mb-3 text-gray-800">Your Cart</h3>
+
+               
         <!-- CART -->
         <div id="cartWrapper" class="p-4 bg-white shadow rounded-md">
 <div id="cartItems" class="space-y-3"></div>
@@ -5668,6 +5688,7 @@ function updateDrawerTotals() {
 </script>
 </body>
 </html>
+
 
 
 
