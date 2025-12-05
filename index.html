@@ -5679,16 +5679,19 @@ function refreshCartDrawer() {
   const qtySpan = row.querySelector(".drawer-qty");
   if (qtySpan) qtySpan.innerText = newQty;
 
-  // Update item total
-  const pricePerUnit = Number(row.dataset.price);
-  const discPercent = Number(row.dataset.disc || 0);
+  // ==========================
+  //  SAFE RATE CALCULATION
+  // ==========================
+  const pricePerUnit = Number(row.dataset.price || 0);
+  const discPercent  = Number(row.dataset.disc  || 0);
 
-  const priceAfterDisc = pricePerUnit - (pricePerUnit * discPercent / 100);
+  const priceAfterDisc = pricePerUnit - ((pricePerUnit * discPercent) / 100);
   const total = (priceAfterDisc * newQty).toFixed(2);
 
   const totalSpan = row.querySelector(".drawer-total");
   if (totalSpan) totalSpan.innerText = "₹" + total;
 }
+
 
 function removeItemFromDrawer(itemId, variantId = null) {
   const rowId = variantId 
@@ -5778,6 +5781,7 @@ function hideCartOverlay() {
 </script>
 </body>
 </html>
+
 
 
 
