@@ -5027,6 +5027,7 @@ function toggleCartDrawer() {
 }
 
   document.addEventListener("DOMContentLoaded", updateCartBadge);
+document.addEventListener("DOMContentLoaded", loadCartOnStart);
   
 // ===== SWIPE TO CLOSE Drawer (Zomato style) =====
 let touchStartX = 0;
@@ -5351,6 +5352,10 @@ function restoreMenuQuantities() {
       // Show qtyBox
       box = document.getElementById(`qtyBox-${itemId}_${variantId}`);
       if (box) box.classList.remove("hidden");
+      const radioToSelect = document.querySelector(`input[data-variant-id="${variantId}"]`);
+if (radioToSelect) {
+  radioToSelect.checked = true;
+}
     }
 
   });
@@ -5393,11 +5398,48 @@ function menuPlus_multi(id) {
   // 6️⃣ Cart badge update
   updateCartBadge();
 }
+async function loadCartOnStart() {
+
+  let cartArr = [];
+
+  // Logged-in user → load backend
+  if (isLoggedIn()) {
+    try {
+      const res = await apiGet("getCart", {
+        mobile: localStorage.getItem("userMobile")
+      });
+
+      cartArr = Array.isArray(res) ? res : [];
+
+      // Sync locally
+      localStorage.setItem("cart", JSON.stringify(cartArr));
+
+    } catch (e) {
+      console.error("Cart load failed:", e);
+      cartArr = JSON.parse(localStorage.getItem("cart") || "[]");
+    }
+  }
+
+  // Guest user → load local guest cart
+  else {
+    cartArr = JSON.parse(localStorage.getItem("guestCart") || "[]");
+  }
+
+  // VERY IMPORTANT: Set global cart[] for system
+  cart = cartArr;
+
+  // Restore UI qty buttons
+  restoreMenuQuantities();
+
+  // Update badge
+  updateCartBadge();
+}
 
   
 </script>
 </body>
 </html>
+
 
 
 
