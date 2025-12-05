@@ -4105,7 +4105,7 @@ item.itemId = String(
   //       MULTI ITEM
   // ==========================
   if (item.cat2 === "Multi") {
-    const idSafe = slugify(item.name) + "-" + idx;
+   const idSafe = slugify(item.name) + "-" + item.itemId;
 
 
     let variantsHTML = "";
@@ -5954,6 +5954,7 @@ function onDecVariant(itemId, variantId, meta) {
 </script>
 </body>
 </html>
+
 
 
 
