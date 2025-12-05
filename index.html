@@ -5771,10 +5771,10 @@ function hideCartOverlay() {
   o.classList.add("hidden");
 }
 
- /**
+ /*
  * MASTER CART ENGINE
  * Single + Multi, Guest + Login, Menu + Drawer + Checkout
- */
+
 function updateCart(itemId, variantId, action, meta = {}) {
   try {
     // 1) Safe inputs
@@ -5942,11 +5942,12 @@ function onIncVariant(itemId, variantId, meta) {
 function onDecVariant(itemId, variantId, meta) {
   updateCart(itemId, variantId, "dec", meta);
 }
-
+*/ //master cart enginer end
   
 </script>
 </body>
 </html>
+
 
 
 
