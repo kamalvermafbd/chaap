@@ -587,7 +587,17 @@ body::before {
   display: block;
   opacity: 1;
 }
+.qty-pop {
+  animation: qtyPop 0.25s ease-out;
+}
 
+@keyframes qtyPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+    
   </style>
 </head>
 <body>
@@ -1115,6 +1125,15 @@ style="
 
 
   <script>
+function animateQty(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  el.classList.remove("qty-pop");
+  void el.offsetWidth; // reflow reset
+  el.classList.add("qty-pop");
+}
+
     let restaurantTax = {
   taxType: "",
   servicePercent: 0,
@@ -5127,6 +5146,8 @@ function menuPlus(itemId) {
   let q = Number(qtyText.innerText);
   q++;
   qtyText.innerText = q;
+animateQty("qtyText-" + itemId);
+
   updateDrawerItemQty(itemId, null, q);
 
 
@@ -5232,6 +5253,8 @@ function menuMinus_multi(id) {
   if (q > 1) {
     q--;
     qtyText.innerText = q;
+    animateQty("qtyText-" + id);
+
 updateDrawerItemQty(itemId, variantId, q);
 
     // Update cart
@@ -5408,6 +5431,8 @@ function menuPlus_multi(id) {
   let q = Number(qtyText.innerText);
   q++;
   qtyText.innerText = q;
+  animateQty("qtyText-" + id);
+
 
   // 2️⃣ Load cart
   let cartArr = isLoggedIn()
@@ -5524,8 +5549,8 @@ function refreshCartDrawer() {
 
 function removeItemFromDrawer(itemId, variantId = null) {
   const rowId = variantId 
-    ? `drawer-row-${itemId}_${variantId}`
-    : `drawer-row-${itemId}`;
+    ? `drawerRow-${itemId}_${variantId}`   // 🔥 FIXED
+    : `drawerRow-${itemId}`;               // 🔥 FIXED
 
   const row = document.getElementById(rowId);
   if (!row) return;
@@ -5543,6 +5568,7 @@ function removeItemFromDrawer(itemId, variantId = null) {
 </script>
 </body>
 </html>
+
 
 
 
