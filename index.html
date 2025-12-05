@@ -1422,9 +1422,9 @@ let renderIndex = 0;
       div.className = "menu-item fadeIn";
 
        div.innerHTML = buildMenuCardHTML(item, renderIndex);
-  renderIndex++;
-      menuDiv.appendChild(div);
-      activateVariantSelector(item, renderIndex - 1);
+menuDiv.appendChild(div);
+activateVariantSelector(item, renderIndex);
+renderIndex++;
 
     });
   }
@@ -1456,10 +1456,10 @@ let renderIndex = 0;
         div.className = 'menu-item fadeIn';
 
          div.innerHTML = buildMenuCardHTML(item, renderIndex);
-  renderIndex++;
-        
-        menuDiv.appendChild(div);
-        activateVariantSelector(item, renderIndex - 1);
+menuDiv.appendChild(div);
+activateVariantSelector(item, renderIndex);
+renderIndex++;
+
       });
        }
   });
@@ -5960,6 +5960,7 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
 </script>
 </body>
 </html>
+
 
 
 
