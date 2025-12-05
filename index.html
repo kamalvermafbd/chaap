@@ -1,25 +1,5678 @@
-<div id="cartBackdrop" onclick="closeCartDrawer()"></div>
+  
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Chaap Express</title>
+<script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Real Manifest File -->
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="icon" sizes="192x192" href="/icons/icon-192.png">
+  <link rel="icon" sizes="512x512" href="/icons/icon-512.png">
+
+  <meta name="theme-color" content="#ff6f00" />
+  <style>
+    /* Fade-in effect for menu items */
+.fadeIn {
+  animation: fadeIn 0.6s ease forwards;
+  opacity: 0;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Slide-in animation for category titles */
+.slideIn {
+  animation: slideIn 0.7s ease forwards;
+  opacity: 0;
+}
+@keyframes slideIn {
+  from { transform: translateX(-30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Ripple animation for buttons */
+button {
+  position: relative;
+  overflow: hidden;
+}
+button::after {
+  content: "";
+  position: absolute;
+  background: rgba(255,255,255,0.4);
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+}
+button:active::after {
+  width: 200px;
+  height: 200px;
+  top: 50%;
+  left: 50%;
+  opacity: 1;
+  transition: 0.4s ease;
+}
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: #fffdf7;
+      color: #333;
+    }
+    header {
+      text-align: center;
+      background: #ff6347;
+      color: white;
+      padding: 20px;
+    }
+    .menu-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      padding: 20px;
+    }
+    .menu-item {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 10px;
+    }
+      .menu-item h4, 
+      .menu-item p,
+      .menu-item img {
+     text-align: left !important;
+    }
+    /* FIX SINGLE ITEM PRICE ALIGNMENT */
+.menu-item .variant-row {
+  text-align: left !important;
+}
+
+.menu-item .variant-row .unit,
+.menu-item .variant-row .price {
+  text-align: left !important;
+}
+
+    /* Keep button fixed at bottom */
+.menu-item {
+  display: flex;
+  flex-direction: column;
+  min-height: 350px;   /* adjust as needed */
+}
+
+.menu-item button {
+  margin-top: auto;
+  display: inline-block;   /* full width nahi lega */
+  width: auto;             /* text ke hisaab se size */
+  padding: 6px 14px;       /* perfect compact size */
+  font-size: 14px;
+  align-self: center;      /* center me aayega */
+}
+
+.variant-box {
+  margin-bottom: 10px;
+}
+
+/* FIX: Ensure price never gets cut */
+.variant-row {
+  overflow: visible !important;
+}
+
+/* FIX: Give space on right side so ₹ price doesn't clip */
+.variant-box {
+  padding-right: 14px !important;
+}
+
+/* FIX: prevent label flex from shrinking price */
+.price {
+  flex-shrink: 0 !important;
+  margin-left: auto !important;
+}
+/* Move price slightly inward */
+.price {
+  margin-right: 8px !important;
+}
+
+/* Keep Multi-variant in single line ALWAYS */
+.variant-row {
+  white-space: nowrap !important;
+}
+
+/* Left side ko shrink hone se rokna */
+.left-side {
+  flex-shrink: 0 !important;
+}
+
+/* Unit text 1st column me rahe, wrap na ho */
+.unit {
+  white-space: nowrap !important;
+}
+
+/* Price right me fix ho jaye, wrap na ho */
+.price {
+  white-space: nowrap !important;
+}
+
+    .menu-item img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .cart {
+      padding: 20px;
+      background: #fff8f0;
+      border-top: 2px solid #ff6347;
+    }
+    cart-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      margin: 2px 0;
+      border-bottom: 1px solid #eee;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border-bottom: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th:nth-child(2), td:nth-child(2) {
+      width: 60px;
+    }
+    button.default-btn {
+  background: #ff6347;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+    button:hover { background: #e7533d; }
+    checkout-btn {
+      width: auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    #checkoutForm button[type="button"] {
+      margin-top: 25px;
+    }
+    
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+    }
+    input, textarea, select {
+      width: 100%;
+      margin: 6px 0;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    
+#menu p {
+  color: #000;
+  font-weight: 600;
+}
+body {
+  background: linear-gradient(135deg, #fff9f2, #ffe6d5);
+  background-attachment: fixed;
+}
+    
+.variant-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  width: 100%;  
+  
+}
+    
+.left-side {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.left-side {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.price {
+  font-weight: 600;
+}
+
+
+.variant-row .left-side {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.variant-row input[type="radio"] {
+  transform: scale(1.3);
+}
+
+.variant-box {
+  border: 1px solid #ddd;
+  padding: 8px;
+  border-radius: 8px;
+  margin-top: 10px;
+  background: #fafafa;
+  width: 100%;
+  box-sizing: border-box;
+  box-sizing: border-box;    /* ← JO MOST IMPORTANT FIX HAI */
+  overflow: hidden;          /* ← extra expansion stop */
+}
+
+/* Center only the title and description */
+.menu-item h4,
+.menu-item p {
+  text-align: center !important;
+}
+.variant-row { white-space: normal; }
+
+@media (min-width:520px) {
+  .variant-row { white-space: nowrap; }
+}
+/* Visual-only "disabled" look so clicks still work */
+.disabled-btn {
+  background: #ccc !important;
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: auto !important; /* ensure clicks are still delivered */
+}
+    .final-price {
+  font-size: 16px;
+  font-weight: 700;
+}
+.mrp {
+  text-decoration: line-through;
+  color: #777;
+  margin-left: 6px;
+  font-size: 13px;
+}
+
+
+/* Profile Page Input Styling */
+#profilePage input {
+  width: 280px !important;       /* Fixed compact width */
+  max-width: 90% !important;     /* Responsive */
+  font-size: 14px !important;    /* Smaller text */
+  height: 32px !important;       /* Compact height */
+  padding: 4px 10px !important;  /* Balanced padding */
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+#profilePage input[readonly] {
+  background: #f5f5f5;
+  color: #555;
+}
+#pageWrapper {
+  position: relative;
+}
+
+
+#editBtn, #saveBtn, #cancelBtn {
+  font-size: 14px !important;
+  padding: 6px 12px !important;
+}
+
+/* PREMIUM LEFT SIDEBAR */
+#leftNav {
+  position: fixed;
+  left: 0;
+  width: 220px;
+  top: 180px;    /* header ?? ???? */
+  bottom: 0;
+  background: #2A0A4A;  /* elegant royal blue */
+  color: white;
+  padding: 20px 15px;
+  border-right: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 2px 0 12px rgba(0,0,0,0.12);
+  border-top-right-radius: 12px;
+   transform: translateX(-100%);
+  transition: transform 0.3s ease;
+
+}
+
+/* Menu UL */
+#leftNav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Items */
+#leftNav li {
+  padding: 12px 10px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  color: white;
+  font-size: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: 0.2s;  
+}
+
+/* Hover effect */
+#leftNav li:hover {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(4px);
+}
+
+/* Active menu */
+#leftNav li.active {
+  background: white;
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+/* Premium badge for numbers */
+.nav-badge {
+  background: white;
+  color: #1e3a8a;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+/* Premium Navigation Icons */
+.nav-icon {
+  font-size: 22px;       /* Bigger size */
+  color: #ffd166;        /* Soft gold/yellow – looks premium on blue */
+  font-weight: bold;
+}
+#profileOverlay { 
+   display: none; 
+   position: fixed; 
+   inset: 0;
+   background: rgba(0,0,0,0.45);
+   z-index: 9999;
+   color: white;
+   font-size: 22px;
+   align-items: center;
+   justify-content: center;
+}
+#profileOverlay.active {
+   display: flex;
+}
+
+/* soft noise overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+  opacity: 0.15;
+  pointer-events: none;
+}
+/* Sidebar hidden by default (slide-left) */
+
+/* When sidebar is active */
+#leftNav.active {
+  transform: translateX(0);
+}
+
+  button:focus,
+  button:active,
+  button:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  *:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+.nohighlight {
+  -webkit-tap-highlight-color: transparent !important;
+  background: transparent !important;
+}
+.nohighlight:active,
+.nohighlight:focus {
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.animate-fadeIn {
+  animation: fadeIn .25s ease-out;
+}
+  .disabled-btn {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background: #ccc !important;
+  pointer-events: auto !important; /* click allowed for alert */
+}  
+      #savedAddressDropdown {
+    font-family: monospace;
+  }
+    .added-flash {
+  @apply scale-105 transition duration-150 ease-out;
+}
+
+    .cart-badge-pop {
+  animation: cartPop 0.25s ease-out;
+}
+
+@keyframes cartPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+#cartDrawer {
+  position: fixed;
+  top: 0;
+  right: -100%;           /* hidden by default */
+  width: 90%;
+  max-width: 380px;
+  height: 100vh;
+  background: #ffffff;
+  box-shadow: -4px 0 12px rgba(0,0,0,0.12);
+  z-index: 99999;
+  padding: 20px;
+  overflow-y: auto;
+  transition: right 0.35s ease-out;   /* smooth slide */
+}
+
+/* Drawer Visible */
+#cartDrawer.active {
+  right: 0;
+}
+
+/* Dim Background */
+#cartBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: none;
+  z-index: 99998;
+}
+
+/* Active State */
+#cartBackdrop.active {
+  display: block;
+}
+/* Z10 — Responsive Zomato-style drawer spacing */
+#cartDrawer {
+  padding-top: 50px !important;
+}
+
+#cartDrawer h2 {
+  margin-top: 10px;
+  margin-bottom: 18px;
+}
+
+#cartItems .cart-card {
+  padding: 12px !important;
+}
+#cartDrawer {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 90%;
+  max-width: 380px;
+  height: 100vh;
+  background: #ffffff;
+  box-shadow: -4px 0 12px rgba(0,0,0,0.12);
+  z-index: 99999;
+  padding: 20px;
+  overflow-y: auto;
+  transition: right 0.35s ease-out;
+  position: fixed;
+}
+#cartDrawer {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 88%;
+  max-width: 380px;
+  height: 100vh;
+  background: #ffffff;
+  box-shadow: -6px 0 18px rgba(0,0,0,0.18);
+  
+  border-top-left-radius: 18px;
+  border-bottom-left-radius: 18px;
+
+  z-index: 99999;
+  padding: 20px;
+  overflow-y: auto;
+
+  transition: right 0.30s cubic-bezier(0.25, 0.8, 0.25, 1); /* premium smooth */
+}
+#cartBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  display: none;
+  z-index: 99998;
+  transition: opacity 0.25s ease;
+  opacity: 0;
+}
+
+#cartBackdrop.active {
+  display: block;
+  opacity: 1;
+}
+.qty-pop {
+  animation: qtyPop 0.25s ease-out;
+}
+
+@keyframes qtyPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+    
+  </style>
+</head>
+<body>
+<div id="cartOverlay" class="fixed inset-0 bg-black bg-opacity-45 z-50 text-white text-xl font-medium flex items-center justify-center hidden">
+  Updating your cart…
+</div>
+
+
+  <button onclick="openLogin()" 
+        style="position:absolute; right:100px; top:60px; z-index:9999;
+               background:#444;color:white;padding:8px 14px;border:none;
+               border-radius:6px;cursor:pointer;">
+  Login
+</button>
+<button id="logoutBtn"
+        onclick="logoutUser()" 
+        style="position:absolute; right:58px; top:60px; z-index:9999;
+               background:#444;color:white;padding:8px 14px;border:none;
+               border-radius:6px;cursor:pointer; display:none;">
+  Logout
+</button>
+
+<button onclick="openSignup()" 
+        style="position:absolute; right:12px; top:60px; z-index:9999;
+               background:#444;color:white;padding:8px 14px;border:none;
+               border-radius:6px;cursor:pointer;">
+  Signup
+</button>
+<div  id="signupLabelBox" 
+style="
+  position:absolute;
+  right:12px;
+  top:100px;
+  width:180px;
+  text-align:right;
+  font-size:13px;
+  color:#FFFFFF; 
+  font-weight:500;
+  font-family:Poppins, sans-serif;
+  line-height:16px;
+">
+  
+  <span style="color:#FFFFFF; font-weight:600; text-decoration:none; cursor:pointer;"
+        onclick="openSignup()">
+  Are you not registered? <br> Just Sign Up
+  </span>
+</div>
+
+  <div id="cartBackdrop" onclick="closeCartDrawer()"></div> 
 <div id="cartDrawer"> 
-
-  <button onclick="closeCartDrawer()" 
+   <button onclick="closeCartDrawer()" 
     class="absolute right-3 top-3 text-gray-500 hover:text-gray-800 text-2xl font-bold">
     &times;
   </button>
+<h2 class="text-xl font-semibold mb-3">Your Cart</h2> 
+<div id="cartItems"></div> 
+<div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold"> <span>Total:</span> <span>₹<span id="cartTotal">0</span></span> </div> 
+<button onclick="openCheckout()" class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg"> Checkout </button> </div> 
 
-  <h2 class="text-xl font-semibold mb-3">Your Cart</h2>
+<button onclick="openCartDrawer()" style="position:absolute; right:160px; top:60px; background:#ff6347; color:white; padding:8px 12px; border-radius:6px; border:none;"> View Cart (<span id="cartCount">0</span>) </button>
+  
 
-  <!-- ⭐ Corrected ID for drawer content -->
-  <div id="cartDrawerContent"></div>
+ <!-- HAMBURGER BUTTON (appears only after login) -->
+<button id="hamburgerBtn"
+        onclick="toggleSidebar()"
+        style="position:fixed; top:15px; left:15px; font-size:26px;
+               background:#7A0010; color:#FFD166; border:none;
+               padding:8px 12px; border-radius:8px; cursor:pointer;
+               box-shadow:0 2px 6px rgba(0,0,0,0.2); z-index:9999; display:none;">
+  <svg id="hamburgerIcon" viewBox="0 0 24 24" width="24" height="24" fill="#FFD166">
+    <rect y="4" width="24" height="3"></rect>
+    <rect y="10" width="24" height="3"></rect>
+    <rect y="16" width="24" height="3"></rect>
+  </svg>
+</button>
 
-  <div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold">
-    <span>Total:</span>
-    <span>₹<span id="cartTotal">0</span></span>
+<button id="installBtn" 
+        style="
+          display:none;
+          position:fixed;
+          bottom:20px;
+          right:20px;
+          background:#ff6347;
+          color:white;
+          padding:10px 16px;
+          border-radius:8px;
+          font-size:16px;
+          border:none;
+          box-shadow:0 4px 10px rgba(0,0,0,0.2);
+          z-index:99999;
+        ">
+  Install App
+</button>
+
+  <header>
+    <div id="userInfoBox" 
+     style="background:#ff6347; color:white; padding:6px 12px;
+            border-radius:6px; display:none; font-size:14px;
+            margin-top:10px; display:inline-block;">
+
+  Logged in: <span id="loggedEmail"></span><br>
+ 
+</div>
+    <div id="restaurantInfo">
+      <h1 id="restaurantName">Loading...</h1>
+      <p id="restaurantAddress"></p>
+    </div>
+    <p>Delicious meals delivered fast!</p>
+    
+  </header>
+<span id="cartCount" class="ml-2 text-white font-semibold"></span>
+
+<!-- LEFT NAVIGATION PANEL -->
+<!-- LEFT NAVIGATION PANEL -->
+<div id="leftNav"
+     style="
+       position:fixed;
+       left:0;
+       top:90px;
+       bottom:0;
+       width:180px;
+       background:#1976d2;
+       color:white;
+       border-right:1px solid #e6e6e6;
+       box-shadow: 2px 0 4px rgba(0,0,0,0.06); /* soft professional shadow */
+       padding:20px;
+       z-index:999;
+       overflow-y:auto;
+       display:block; /* default hidden */
+       
+     ">
+  <ul id="premiumMenu">
+  <li onclick="openMenuPageProperly(this)">
+
+  <span class="nav-icon">
+  <svg viewBox="0 0 24 24" width="32" height="32">
+    <path d="M6 7V6a6 6 0 0 1 12 0v1h2a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h2Zm2 0h8V6a4 4 0 0 0-8 0v1Z" 
+          fill="#FFD166"></path>
+  </svg>
+</span>
+
+  Continue Shopping
+</li>
+
+      <li onclick="activateMenu(this); showPage('profilePage'); loadUserProfile();">
+    <span class="nav-badge">1</span>
+    My Profile
+  </li>
+
+  <li onclick="activateMenu(this); showPage('ordersPage'); loadUserOrders();">
+
+    <span class="nav-badge">2</span>
+    My Orders
+  </li>
+
+ <li onclick="activateMenu(this); showPage('offersPage'); loadOffers();">
+    <span class="nav-badge">3</span>
+    Offers
+  </li>
+
+</ul>
+
+</div>
+
+<!-- RIGHT SIDE MAIN CONTENT -->
+<!-- MAIN CONTENT AREA -->
+<div id="mainContent" 
+     style="margin-left:0px; padding:20px; transition:0.2s ease;">
+
+    <!--  MENU WRAPPER (default visible) -->
+    <div id="menuWrapper">
+
+        <!-- FILTER AREA -->
+        <div id="filterWrapper" style="text-align:center; margin-bottom:15px;">
+ <!-- Category Filter -->
+        <select id="categoryFilter" onchange="filterMenu()"
+            style="width:45%;max-width:200px;padding:10px;font-size:16px;
+                   border-radius:6px;border:1px solid #ccc;background:white;">
+            <option value="">All Categories</option>
+        </select>
+
+        <!-- Search -->
+        <input type="text" id="menuSearch"
+               placeholder="Search food item..."
+               oninput="filterMenu()"
+               style="width:45%;max-width:200px;padding:10px;font-size:16px;
+                      border-radius:6px;border:1px solid #ccc;margin-left:10px;">
+
+        <!-- Clear -->
+        <button onclick="clearFilters()"
+            style="padding:10px 15px;margin-left:10px;background:#777;color:white;
+                   border:none;border-radius:6px;cursor:pointer;">
+            Clear
+        </button>
+
+
+
+            <!-- Your existing category filter + search + clear button will be here -->
+        </div>
+
+        <!-- OTHER PAGES WRAPPER (default hidden) -->
+
+
+        <!-- MENU LIST -->
+        <div id="menu" class="menu-container">
+            <p>Loading menu...</p>
+        </div>
+
+             <div class="cart">
+    <h3 class="text-xl font-semibold mb-3 text-gray-800">Your Cart</h3>
+        <!-- CART -->
+        <div id="cartWrapper" class="p-4 bg-white shadow rounded-md">
+<div id="cartItems" class="space-y-3"></div>
+
+            <!-- Your current cart HTML goes here -->
+
+
+    <table id="cartTable" class="hidden">
+
+  <thead>
+    <tr class="bg-gray-100 border-b">
+      <th class="px-4 py-2 text-left">Item</th>
+      <th class="px-4 py-2 text-left">Qty</th>
+      <th class="px-4 py-2 text-left">Rate (MRP)</th>
+      <th class="px-4 py-2 text-left">Disc %</th>
+      <th class="px-4 py-2 text-left">Disc Amt</th>
+      <th class="px-4 py-2 text-left">Net Amt</th>
+      <th class="px-4 py-2 text-left">Total</th>
+      <th class="px-4 py-2 text-left">Action</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+  
+<p id="cartBaseTotal" class="text-right font-semibold mt-2 mb-4">
+  Total: ₹<span id="cartTotal">0.00</span>
+</p>
+
+<!-- Tax Summary Comes Here -->
+<div id="taxSummary" class="text-right font-semibold mt-2"></div>
+
+<button onclick="openCheckout()" class="w-full bg-orange-500 text-white py-3 rounded-lg mt-4 hover:bg-orange-600">
+  Checkout
+</button>
+
   </div>
+        </div>
+    </div>
 
-  <button onclick="openCheckout()" 
-    class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg">
-    Checkout
+  <div id="pageWrapper" style="display:none; padding:10px;">
+
+    <!-- PROFILE PAGE -->
+    <div id="profilePage" style="display:none;">
+        <h2>My Profile</h2>
+        
+        <div id="profileLoading" style="display:none; color:red;">Loading...</div>
+        <input id="pName" placeholder="Full Name" readonly><br>
+        <input id="pMobile" placeholder="Mobile" disabled><br>
+        <input id="pEmail" placeholder="Email" readonly><br>
+        <input id="pAddress" placeholder="Address" readonly><br>
+        <input id="ppin" placeholder="Pincode" readonly><br>
+        <input id="pCity" placeholder="City" readonly><br>
+        <input id="pState" placeholder="State" readonly><br>
+
+        <button id="editBtn" onclick="enableProfileEdit()">Edit</button>
+        <button id="saveBtn" onclick="saveProfile()" style="display:none;">Save Changes</button>
+        <button id="cancelBtn" onclick="cancelProfileEdit()" style="display:none;">Cancel</button>
+
+        <div id="profileOverlay"
+             style="
+               position:fixed;
+               inset:0;
+               background:rgba(0,0,0,0.45);
+               z-index:9999;
+               color:white;
+               font-size:22px;
+               align-items:center;
+               justify-content:center;
+             ">
+          Saving your profile…
+        </div>
+    </div>
+
+    <!-- ORDERS PAGE -->
+    <div id="ordersPage" style="display:none;">
+        <h2>My Orders</h2>
+        <p>No order history available.</p>
+    </div>
+
+    <!-- OFFERS PAGE -->
+    <div id="offersPage" style="display:none;">
+        <h2>Offers</h2>
+        <p>No offers available currently.</p>
+    </div>
+
+</div>
+
+
+<!-- CHECKOUT MODAL (Tailwind Updated — with ALL your original fields) -->
+
+<div id="checkoutModal"
+     class="fixed inset-0 bg-black bg-opacity-40 hidden z-[9999] flex items-center justify-center p-2">
+
+  <div class="bg-white w-[92%] max-w-[360px] rounded-xl shadow-lg p-4 relative animate-fadeIn 
+              max-h-[82vh] overflow-y-auto">
+
+    <!-- Close Button -->
+    <button onclick="closeCheckout()"
+            class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-xl font-semibold">
+      ✕
+    </button>
+
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+      Checkout
+    </h2>
+
+    <form id="checkoutForm" class="space-y-3">
+
+      <!-- Mobile -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Mobile</label>
+        <input id="mobile"
+               type="tel"
+               pattern="^[0-9]{10}$"
+               placeholder="Enter 10-digit Mobile"
+               required
+               oninput="checkCustomerByMobile()"
+               class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
+                      focus:outline-none focus:ring-2 focus:ring-orange-500" />
+        <p id="infoMsg" class="text-green-600 text-sm mt-1 hidden"></p>
+      </div>
+
+      <!-- Order Type -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Order Type</label>
+        <select id="orderType" required onchange="toggleAddressField()"
+                class="w-full border border-gray-300 rounded-lg p-2.5 bg-white
+                       focus:outline-none focus:ring-2 focus:ring-orange-500">
+          <option value="">Select Order Type</option>
+          <option value="Dine In">Dine In</option>
+          <option value="Take Away">Take Away</option>
+          <option value="Home Delivery">Home Delivery</option>
+        </select>
+      </div>
+
+      <!-- Name -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+        <input id="customerName"
+               type="text"
+               placeholder="Your Name"
+               required
+               class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
+                      focus:outline-none focus:ring-2 focus:ring-orange-500">
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+        <input id="email"
+               type="email"
+               placeholder="Email"
+               required
+               class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
+                      focus:outline-none focus:ring-2 focus:ring-orange-500">
+      </div>
+
+      <!-- Address -->
+<div id="addressWrapper">
+  <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+  <textarea id="address"
+            placeholder="Address"
+            class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
+                   focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+</div>
+
+<!-- PINCODE -->
+<div id="pincodeWrapper" style="display:none; margin-top:10px;">
+  <label class="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
+  <input id="pincode"
+         readonly
+         class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
+                bg-gray-100 cursor-not-allowed">
+</div>
+
+<!-- CITY -->
+<div id="cityWrapper" style="display:none; margin-top:10px;">
+  <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+  <input id="city"
+         readonly
+         class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
+                bg-gray-100 cursor-not-allowed">
+</div>
+
+<!-- STATE -->
+<div id="stateWrapper" style="display:none; margin-top:10px;">
+  <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
+  <input id="state"
+         readonly
+         class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
+                bg-gray-100 cursor-not-allowed">
+</div>
+
+
+<!-- CHANGE ADDRESS BUTTON (shown only for logged-in users via JS) -->
+<div class="space-y-3">
+   <button id="changeAddressBtn"
+  onclick="onChangeAddressClick()"
+  class="mt-2 px-3 py-1 bg-blue-600 text-white rounded text-sm hidden">
+  Change Address
+</button>
+
+
+
+<!-- SAVED ADDRESS DROPDOWN -->
+<div id="addressSelectContainer" class="mt-3 hidden">
+  <label class="block text-sm font-medium mb-1">Select Saved Address</label>
+  <select id="savedAddressDropdown"
+          class="w-full border rounded px-2 py-2 text-sm">
+    <!-- Options added dynamically -->
+  </select>
+  <!-- STEP 3D BUTTON BELOW DROPDOWN -->
+  <button onclick="onChangeAddressAddNew()"
+          class="mt-2 px-3 py-1 bg-gray-600 text-white rounded text-sm">
+    + Add New Address
+  </button>
+</div>
+
+
+<!-- ADD NEW ADDRESS FORM -->
+<div id="newAddressForm" class="mt-4 hidden border p-3 rounded bg-gray-50">
+
+  <label class="text-sm font-medium">Mobile</label>
+  <input id="newAddressMobile"
+         class="w-full border px-2 py-2 rounded bg-gray-200 text-gray-700"
+         readonly />
+
+  <label class="text-sm font-medium mt-3">Address</label>
+  <textarea id="newAddressField"
+            class="w-full border px-2 py-2 rounded"
+            placeholder="Enter full address"></textarea>
+
+  <label class="text-sm font-medium mt-3">Pincode</label>
+  <input id="newPincode"
+         class="w-full border px-2 py-2 rounded"
+         maxlength="6"
+         placeholder="Enter pincode" />
+
+  <label class="text-sm font-medium mt-3">City</label>
+  <input id="newCity"
+         class="w-full border px-2 py-2 rounded"
+         placeholder="Enter city" />
+
+  <label class="text-sm font-medium mt-3">State</label>
+  <input id="newState"
+         class="w-full border px-2 py-2 rounded"
+         placeholder="Enter state" />
+
+  <button id="saveNewAddressBtn"
+        onclick="saveNewAddress()"
+        class="mt-4 w-full bg-green-600 text-white py-2 rounded">
+  Save Address
+</button>
+
+</div>
+</div>
+
+      
+      <!-- Payment -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+        <select id="paymentMethod" required
+                class="w-full border border-gray-300 rounded-lg p-2.5 bg-white
+                       focus:outline-none focus:ring-2 focus:ring-orange-500">
+          <option value="">Select Payment</option>
+          <option value="Cash on Delivery">Cash on Delivery</option>
+          <option value="Online">Online</option>
+        </select>
+      </div>
+<!-- BUTTONS -->
+<div class="mt-3 grid grid-cols-2 gap-3">
+
+  <!-- Place Order (LEFT) -->
+  <button type="submit"
+    class="w-full py-2.5 rounded-xl text-sm font-semibold
+           bg-orange-600 hover:bg-orange-700 text-white">
+    Place Order
+  </button>
+
+  <!-- Cancel (RIGHT - matching size & theme) -->
+  <button type="button" onclick="closeCheckout()"
+    class="w-full py-2.5 rounded-xl text-sm font-semibold
+           bg-orange-100 text-orange-700 border border-orange-300
+           hover:bg-orange-200">
+    Cancel
   </button>
 
 </div>
+
+
+
+
+    </form>
+
+  </div>
+</div>
+
+
+
+<div id="loadingOverlay" style="
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 24px;
+  ">
+    Processing your order...
+  </div>
+
+
+  <script>
+function animateQty(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  el.classList.remove("qty-pop");
+  void el.offsetWidth; // reflow reset
+  el.classList.add("qty-pop");
+}
+
+    let restaurantTax = {
+  taxType: "",
+  servicePercent: 0,
+  cgstPercent: 0,
+  sgstPercent: 0,
+  igstPercent: 0
+};
+let cart = [];   // start empty
+
+ // --- CART SAVE LOCK SYSTEM (Fix race condition) ---
+let cartSaveLock = false;
+let cartSaveQueued = false;
+// ---- ADD-TO-CART CLICK LOCK ----
+let addClickLock = false;
+// --- Debounce variables (qty/update/delete) ---
+let qtyDebounce = null;
+let deleteDebounce = null;
+let blockRender = false;
+
+    function levenshtein(a, b) {
+  a = a || ""; b = b || "";
+  const m = a.length, n = b.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
+  const dp = Array.from({length: m+1}, () => new Array(n+1).fill(0));
+  for (let i=0;i<=m;i++) dp[i][0] = i;
+  for (let j=0;j<=n;j++) dp[0][j] = j;
+  for (let i=1;i<=m;i++) {
+    for (let j=1;j<=n;j++) {
+      const cost = a[i-1] === b[j-1] ? 0 : 1;
+      dp[i][j] = Math.min(dp[i-1][j] + 1, dp[i][j-1] + 1, dp[i-1][j-1] + cost);
+    }
+  }
+  return dp[m][n];
+}
+
+// Normalize text for comparison
+function normalizeText(s) {
+  return String(s || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, "")   // remove punctuation
+    .replace(/\s+/g, " ")         // collapse spaces
+    .trim();
+}
+
+// Map several synonyms / common variants to canonical form
+const CANONICAL_MAP = {
+  "starter": "Starters",
+  "starters": "Starters",
+  "startrer": "Starters",
+  "snack": "Snacks",
+  "snacks": "Snacks",
+  "drink": "Drink",
+  "drinks": "Drinks",
+  "mocktail": "Mocktail",
+  "mocktails": "Mocktails",
+  "cocktail": "Cocktail",
+  "cocktails": "Cocktails",
+  "main course": "Main Course",
+  "main": "Main Course",
+  "maincourse": "Main Course",
+  "sweets": "Sweets",
+  "sweet": "Sweet",
+  "dessert": "Dessert",
+  "desserts": "Desserts"
+};
+
+// Return canonical name for a category string using map + fuzzy fallback
+function canonicalCategory(raw, priorityListLower) {
+  const norm = normalizeText(raw);
+  if (!norm) return ""; // blank
+
+  // direct map
+  if (CANONICAL_MAP[norm]) return CANONICAL_MAP[norm];
+
+  // singular/plural quick fix: strip trailing 's'
+  if (norm.endsWith("s") && CANONICAL_MAP[norm.slice(0,-1)]) {
+    return CANONICAL_MAP[norm.slice(0,-1)];
+  }
+
+  // fuzzy match against priority list and canonical map keys
+  let best = {score: Infinity, key: null, target: null};
+
+  // check known canonical keys (map keys)
+  for (const key of Object.keys(CANONICAL_MAP)) {
+    const d = levenshtein(norm, key);
+    if (d < best.score) { best = {score: d, key, target: CANONICAL_MAP[key]}; }
+  }
+
+  // check priority list labels (lowercase versions)
+  for (const label of priorityListLower) {
+    const d = levenshtein(norm, label);
+    if (d < best.score) { best = {score: d, key: label, target: label.split(" ").map(w=>w[0].toUpperCase()+w.slice(1)).join(" ")}; }
+  }
+
+  // if very close (threshold), accept fuzzy match
+  if (best.score <= Math.max(1, Math.floor(Math.min(norm.length, (best.key||"").length) * 0.35))) {
+    // return capitalized target (if target from priorityListLower, it might be lowercase)
+    const t = best.target || best.key;
+    // ensure Title Case
+    return String(t).split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  }
+
+  // fallback: title-case the original normalized string
+  return norm.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+}
+
+// NEW populateCategoryDropdown — shows canonical categories (no duplicates from typos)
+
+function populateCategoryDropdown(items) {
+  const dropdown = document.getElementById("categoryFilter");
+  dropdown.innerHTML = `<option value="">All Categories</option>`;
+
+  // priority list (same as renderMenu)
+  const categoryPriority = [
+    "starters","snacks","drinks","mocktails","cocktails","main course","sweets","desserts"
+  ];
+  const priorityLower = categoryPriority.slice();
+
+  // Build set of canonical categories
+  const canonicalSet = new Set();
+  items.forEach(i => {
+    const can = canonicalCategory(i.category, priorityLower);
+    if (can) canonicalSet.add(can);
+  });
+
+  // Sort canonical list using priority (known ones first in defined order, others alphabetic)
+  const list = Array.from(canonicalSet);
+  list.sort((a,b) => {
+    const A = a.toLowerCase(), B = b.toLowerCase();
+    const ai = priorityLower.indexOf(A);
+    const bi = priorityLower.indexOf(B);
+    if (ai !== -1 && bi !== -1) return ai - bi;
+    if (ai !== -1) return -1;
+    if (bi !== -1) return 1;
+    return A.localeCompare(B);
+  });
+
+  list.forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    dropdown.appendChild(opt);
+  });
+}
+
+    
+
+    let menuItems = [];
+ 
+const API_BASE = "https://script.google.com/macros/s/AKfycbwlYAAVie3VWdJl6QtfxW1dNcVKz_YGHUWvtH5FKuXrukop5m5n5O5dP-uewI7W7v4dMA/exec";
+
+function apiGet(api, params = {}) {
+  const url = new URL(API_BASE);
+  url.searchParams.set("api", api);
+
+  Object.keys(params).forEach(k => 
+    url.searchParams.set(k, params[k])
+  );
+
+  return fetch(url.toString(), {
+    method: "GET",
+    headers: { "Accept": "application/json" }
+  }).then(res => res.json());
+}
+apiGet("getMenu")
+  .then(res => {
+    // ⭐ Add image field to each menu item
+    res.menu = (res.menu || []).map(row => ({
+      ...row,
+      image: row["Image Url"] || row.image || row.Image || row.img || ""
+   // auto-detect column
+    }));
+   window.menuItems = res.menu;
+    renderMenu(res.menu);
+  })
+  .catch(err => console.error("Menu load error:", err));
+
+// LOAD cat_allocation sheet
+apiGet("getCatAllocations")
+  .then(res => {
+    window.cat_allocations = res.cat_allocations || [];
+    console.log("Cat Allocations Loaded:", window.cat_allocations);
+  })
+  .catch(err => console.error("cat allocation load error:", err));
+
+    apiGet("getRestaurantInfo")
+  .then(res => {
+    document.getElementById("restaurantName").innerHTML = "&#127860; " + res.name;
+    document.getElementById("restaurantAddress").innerText = res.address;
+ // NEW (store tax settings globally)
+    restaurantTax.taxType        = res.taxType || "";
+    restaurantTax.servicePercent = (res.servicePercent && res.servicePercent !== "NIL") ? Number(res.servicePercent) : 0;
+
+    restaurantTax.cgstPercent    = Number(res.cgstPercent) || 0;
+    restaurantTax.sgstPercent    = Number(res.sgstPercent) || 0;
+    restaurantTax.igstPercent    = Number(res.igstPercent) || 0;
+
+    console.log("Restaurant Tax Settings Loaded:", restaurantTax);
+  
+    })
+  .catch(err => {
+    console.error("Restaurant info load error:", err);
+  });
+function slugify(s) {
+  return String(s || "")
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9\-_]/g, "");
+}
+
+
+function renderMenu(items) {
+  menuItems = items;
+
+  // Auto-fill category dropdown (canonical)
+  populateCategoryDropdown(items);
+
+  const menuDiv = document.getElementById('menu');
+  menuDiv.innerHTML = '';
+let renderIndex = 0;
+  // priority brain
+  const categoryPriority = [
+    "starters",
+    "snacks",
+    "drinks",
+    "mocktails",
+    "cocktails",
+    "main course",
+    "sweets",
+    "desserts"
+  ];
+
+  // Build map: original raw category -> canonical
+  const rawToCanonical = {};
+  items.forEach(it => {
+    const raw = (it.category || "").toString();
+    rawToCanonical[raw] = canonicalCategory(raw, categoryPriority);
+  });
+
+  // Extract unique canonical categories (preserve order)
+  let categoryOrder = [...new Set(
+    Object.values(rawToCanonical).filter(c => c && c !== "")
+  )];
+
+  // Sort categoryOrder using priority (canonical lowercases)
+  categoryOrder.sort((a,b) => {
+    const A = a.toLowerCase(), B = b.toLowerCase();
+    const ai = categoryPriority.indexOf(A);
+    const bi = categoryPriority.indexOf(B);
+    if (ai !== -1 && bi !== -1) return ai - bi;
+    if (ai !== -1) return -1;
+    if (bi !== -1) return 1;
+    return A.localeCompare(B);
+  });
+
+  // ====== CHEF SPECIAL SECTION ======
+  const chefSpecialItems = items.filter(i => {
+    const val = (i.hotselling || i.Hotselling || "").toString().trim().toUpperCase();
+    return val === "TRUE";
+  });
+
+  if (chefSpecialItems.length > 0) {
+    const heading = document.createElement("h2");
+    heading.classList.add("slideIn");
+    heading.innerHTML = "Chef Special";
+    heading.style.margin = "10px 0 5px";
+    heading.style.padding = "10px";
+    heading.style.background = "#ff6347";
+    heading.style.color = "white";
+    heading.style.borderRadius = "6px";
+    heading.style.gridColumn = "1 / -1";
+    menuDiv.appendChild(heading);
+
+    chefSpecialItems.forEach(item => {
+      item.itemId = item.itemId || item.ItemId || item.id || item.ID;
+
+      const div = document.createElement("div");
+      div.className = "menu-item fadeIn";
+
+       div.innerHTML = buildMenuCardHTML(item, renderIndex);
+  renderIndex++;
+      menuDiv.appendChild(div);
+      activateVariantSelector(item, renderIndex - 1);
+
+    });
+  }
+
+  // ====== CATEGORY GROUPING ======
+  categoryOrder.forEach(cat => {
+    const group = items.filter(i => {
+      const can = rawToCanonical[(i.category || "").toString()];
+      return (can || "").toLowerCase() === cat.toLowerCase();
+    });
+
+    if (group.length > 0) {
+      const heading = document.createElement("h2");
+      heading.classList.add("slideIn");
+
+      heading.innerHTML = cat;
+      heading.style.margin = "10px 0 5px";
+      heading.style.padding = "10px";
+      heading.style.background = "#ff6347";
+      heading.style.color = "white";
+      heading.style.borderRadius = "6px";
+      heading.style.gridColumn = "1 / -1";
+      menuDiv.appendChild(heading);
+
+      group.forEach(item => {
+        item.itemId = item.itemId || item.ItemId || item.id || item.ID;
+
+        const div = document.createElement('div');
+        div.className = 'menu-item fadeIn';
+
+         div.innerHTML = buildMenuCardHTML(item, renderIndex);
+  renderIndex++;
+        
+        menuDiv.appendChild(div);
+        activateVariantSelector(item, renderIndex - 1);
+      });
+       }
+  });
+     restoreMenuQuantities();
+
+}
+
+
+function clearFilters() {
+  document.getElementById("menuSearch").value = "";
+  document.getElementById("categoryFilter").value = "";
+
+  // Reset menu to original grouped view
+  renderMenu(menuItems);
+}
+function rebuildCart() {
+
+  // Read correct cart based on login state
+  if (!isLoggedIn()) {
+    cart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+  } else {
+    cart = JSON.parse(localStorage.getItem("cart") || "[]");
+  }
+
+  cart = cart.map(item => {
+    // quantity fix
+    item.qty = Number(item.qty || item.quantity || 1);
+
+    // rate fix
+    item.rate = Number(item.rate || item.price || 0);
+
+    // total recalc
+    item.total = item.rate * item.qty;
+
+    // discount recalc
+    if (item.discPercent > 0) {
+      item.discAmt = item.total * (item.discPercent / 100);
+      item.netAmt = item.total - item.discAmt;
+    } else {
+      delete item.discAmt;
+      delete item.netAmt;
+    }
+
+    return item;
+  });
+
+  // store updated clean cart (guest vs logged-in)
+  if (!isLoggedIn()) {
+    localStorage.setItem("guestCart", JSON.stringify(cart));
+  } else {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }
+
+  // rerender
+  renderCart();
+}
+
+function addToCart(name, unit, rate, discPercent = 0, itemIdFromBtn = "", variantIdFromBtn = "") {
+// --- Prevent spam clicking ---
+if (addClickLock) return;
+addClickLock = true;
+
+setTimeout(() => addClickLock = false, 150);
+  showCartOverlay("Adding item…");
+
+  // STEP 1C – Normalize
+  const cleanUnit = String(unit || "").trim().toLowerCase();
+  const cleanName = String(name || "").trim().toLowerCase();
+// Read correct cart based on login state
+let stored;
+if (!isLoggedIn()) {
+  stored = JSON.parse(localStorage.getItem("guestCart") || "[]");
+} else {
+  stored = JSON.parse(localStorage.getItem("cart") || "[]");
+}
+
+  let itemId = "";
+  let variantId = "";
+
+  // STEP 1B — If button already passed correct IDs, use them
+  if (itemIdFromBtn) {
+    itemId = itemIdFromBtn;
+    variantId = variantIdFromBtn || "";
+} else {
+    console.warn("FATAL: addToCart called WITHOUT itemIdFromBtn. Button must send correct IDs.");
+    hideCartOverlay();
+    return;
+}
+
+
+  // --------------------------------------------
+  // Perfect merge logic using itemId + variantId
+  const existing = stored.find(i => i.itemId == itemId && i.variantId == variantId);
+
+  if (existing) {
+    existing.qty = Number(existing.qty || 0) + 1;
+    existing.total = parseFloat((existing.qty * existing.rate).toFixed(2));
+
+    if (existing.discPercent > 0) {
+      const discAmt = (existing.rate * existing.discPercent) / 100;
+      existing.discAmt = parseFloat(discAmt.toFixed(2));
+      existing.netAmt = parseFloat(((existing.rate - discAmt) * existing.qty).toFixed(2));
+    } else {
+      delete existing.discAmt;
+      delete existing.netAmt;
+    }
+  }
+
+  // NEW ITEM
+  else {
+      // Find exact menu item using itemId (best method)
+    const menuItemFull = (window.menuItems || []).find(
+  m => m.itemId == itemId
+);
+
+    const qty = 1;
+
+    const total = rate * qty;
+    const discAmt = (rate * discPercent) / 100;
+    const netRate = rate - discAmt;
+
+   
+    let newItem = {
+      name,
+      unit,
+      qty,
+      rate: Number(rate),
+      total: parseFloat(total.toFixed(2)),
+      itemId,
+      variantId,
+      discPercent: Number(discPercent),
+       image: menuItemFull?.image || ""
+    };
+
+    if (discPercent > 0) {
+      newItem.discAmt = parseFloat(discAmt.toFixed(2));
+      newItem.netAmt = parseFloat((netRate * qty).toFixed(2));
+    }
+
+    stored.push(newItem);
+  }
+
+  // SAVE to localStorage only
+  // ⭐ Guest users MUST save here
+if (!isLoggedIn()) {
+    localStorage.setItem("guestCart", JSON.stringify(stored));
+} else {
+    localStorage.setItem("cart", JSON.stringify(stored));
+}
+
+  cart = stored;
+  window.cart = stored;
+
+  renderCart();
+
+  // --------------------------------------------
+ if (isLoggedIn()) {
+  saveCartToBackend().finally(() => hideCartOverlay());
+} else {
+  hideCartOverlay();
+}
+
+
+  alert(`${name} (${unit}) added to cart`);
+}
+
+function openCartPanel(cartArr = null) {
+
+  const drawer = document.getElementById("cartDrawer");
+  const container = document.getElementById("cartDrawerContent");
+
+  if (!container) return;
+
+  // Load latest cart
+  const cart = cartArr || (
+    isLoggedIn()
+      ? JSON.parse(localStorage.getItem("cart") || "[]")
+      : JSON.parse(localStorage.getItem("guestCart") || "[]")
+  );
+
+  let html = "";
+
+  cart.forEach(ci => {
+    const itemId = ci.itemId;
+    const variantId = ci.variantId || null;
+    const qty = ci.qty;
+    const mrp = Number(ci.price);
+    const disc = Number(ci.disc || 0);
+
+    const priceAfterDisc = mrp - (mrp * disc / 100);
+    const total = (priceAfterDisc * qty).toFixed(2);
+
+    // ⭐ Correct ROW ID format (C4-F FIX)
+    const rowId = variantId
+      ? `drawerRow-${itemId}_${variantId}`
+      : `drawerRow-${itemId}`;
+
+    html += `
+      <div id="${rowId}"
+           class="drawer-row flex justify-between items-center py-2 border-b"
+           data-price="${mrp}"
+           data-disc="${disc}">
+
+        <div class="flex flex-col">
+          <span class="font-semibold">${ci.name}</span>
+          ${variantId ? `<span class="text-sm text-gray-600">${ci.unit}</span>` : ""}
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button class="px-2 bg-gray-300 rounded text-lg"
+                  onclick="menuMinus('${itemId}${variantId ? "_" + variantId : ""}')">−</button>
+
+          <span class="drawer-qty font-semibold">${qty}</span>
+
+          <button class="px-2 bg-gray-300 rounded text-lg"
+                  onclick="${variantId
+                    ? `menuPlus_multi('${itemId}_${variantId}')`
+                    : `menuPlus('${itemId}')`
+                  }">+</button>
+        </div>
+
+        <div class="drawer-total font-semibold">₹${total}</div>
+
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+
+function renderCart() {
+if (blockRender) return;
+  console.log("Rendering Cart...");
+   console.log(cart);
+
+  const cartItemsContainer = document.querySelector('#cartItems');
+cartItemsContainer.innerHTML = '';
+  const thead = document.querySelector('#cartTable thead tr');
+  
+// ---- SUPER SANITIZER (Prevents render bugs) ----
+cart = cart.map(item => {
+   // ADD THIS FIX 
+  const menuMatch = window.menuItems?.find(m => m.itemId == item.itemId);
+  if (menuMatch) item.image = menuMatch.image;
+  const menuItem = (window.menuItems || []).find(m => m.itemId == item.itemId);
+
+  // 1) NAME FIX
+  if (!item.name && menuItem?.name) item.name = menuItem.name;
+
+  // 2) UNIT FIX (for Multi items)
+  if (!item.unit) {
+    const variant = (window.cat_allocations || []).find(v => v.variantId == item.variantId);
+    if (variant) item.unit = variant.unit;
+  }
+
+  // 3) IMAGE FIX
+  if (!item.image && menuItem?.image) item.image = menuItem.image;
+
+  // 4) TYPE FIX (force correct numeric)
+  item.qty = Number(item.qty || 1);
+  item.rate = Number(item.rate || 0);
+  item.discPercent = Number(item.discPercent || 0);
+
+  // 5) TOTAL RECALC
+  const discAmt = (item.rate * item.discPercent) / 100;
+  item.discAmt = Number(discAmt.toFixed(2));
+
+  const netRate = item.rate - item.discAmt;
+
+  item.total = item.discPercent > 0 
+    ? Number((netRate * item.qty).toFixed(2))
+    : Number((item.rate * item.qty).toFixed(2));
+
+  return item;
+});
+
+ // ⭐ SAVE sanitized image back to storage
+if (!isLoggedIn()) {
+  localStorage.setItem("guestCart", JSON.stringify(cart));
+} else {
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+
+  // ===== Check discount usage =====
+  const anyDiscount = cart.some(i => Number(i.discPercent) > 0);
+
+  // ===== Build header =====
+  // ===== PERMANENT FULL HEADER (no flicker) =====
+thead.innerHTML = `
+  <th>Item</th>
+  <th>Qty</th>
+  <th>Rate (MRP)</th>
+  <th class="col-disc">Disc %</th>
+  <th class="col-disc">Disc Amt</th>
+  <th class="col-disc">Net Amt</th>
+  <th>Total</th>
+  <th>Action</th>
+`;
+// ===== Hide / Show discount columns =====
+const showDisc = cart.some(i => Number(i.discPercent) > 0);
+
+  let grandTotal = 0;
+
+  // ================================================
+  //               BUILD CART TABLE ROWS
+  // ================================================
+  cart.forEach((item, idx) => {
+
+    const rate = Number(item.rate);
+    const qty  = Number(item.qty);
+    const disc = Number(item.discPercent || 0);
+
+    // fresh safe calculations
+    const discAmt = parseFloat(((rate * disc) / 100).toFixed(2));
+    const netRate = rate - discAmt;
+
+    // FIX: for no discount → use MRP * qty
+    const total = disc > 0 
+      ? parseFloat((netRate * qty).toFixed(2))
+      : parseFloat((rate * qty).toFixed(2));
+
+    grandTotal += total;
+
+    
+
+const card = document.createElement("div");
+card.className = "cart-card mb-3 p-4 bg-white rounded-lg shadow flex items-center justify-between gap-4"; // Added gap-4 and padding increased
+
+card.innerHTML = `
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 w-full">
+ <img 
+      src="${item.image || 'https://via.placeholder.com/60'}" 
+      class="w-20 h-20 object-cover rounded-md"
+    />
+
+<div class="flex-1">
+  <div class="font-semibold text-gray-800 leading-tight">${item.name} (${item.unit})</div>
+   <div class="text-gray-500 text-sm">Rate: ₹${rate.toFixed(2)}</div>
+   </div>
+ ${disc > 0 ? `
+   <div class="text-right text-sm text-gray-600 leading-tight">
+    <div class="text-sm text-gray-500">Disc %: <span class="font-semibold">${disc}%</span></div>
+    <div class="text-sm text-gray-500">Disc Amt: <span class="font-semibold">₹${discAmt.toFixed(2)}</span></div>
+    <div class="text-sm text-gray-500">Net Rate: <span class="font-semibold">₹${netRate.toFixed(2)}</span></div>
+  </div>
+` : ""}
+<div class="flex items-center gap-2">
+    <div class="flex items-center gap-2">
+  <button 
+    onclick="updateQty(${idx}, ${qty - 1})" 
+    class="w-8 h-8 flex items-center justify-center border rounded-full"
+  >−</button>
+
+  <div class="w-10 text-center font-semibold">${qty}</div>
+
+  <button 
+    onclick="updateQty(${idx}, ${qty + 1})" 
+    class="w-8 h-8 flex items-center justify-center border border-gray-400 rounded-full text-xl"
+  >+</button>
+</div>
+
+  </div>
+
+ 
+
+
+ <div class="font-semibold text-lg text-gray-800">
+  ₹${total.toFixed(2)}
+</div>
+
+ 
+  <button class="text-red-500" onclick="removeItem(${idx})">Delete</button>
+`;
+cartItemsContainer.appendChild(card);
+
+
+  });
+
+  // ===== FINAL TOTAL SET =====
+  let baseTotal = parseFloat(grandTotal.toFixed(2));
+  document.getElementById("cartTotal").innerText = baseTotal.toFixed(2);
+
+  // TAX BLOCK unchanged
+  let taxHtml = "";
+
+  if (restaurantTax.taxType === "On Bill") {
+
+    const serviceAmt = parseFloat(((baseTotal * restaurantTax.servicePercent) / 100).toFixed(2));
+    const taxableAmount = parseFloat((baseTotal + serviceAmt).toFixed(2));
+
+    const cgstAmt = parseFloat(((taxableAmount * restaurantTax.cgstPercent) / 100).toFixed(2));
+    const sgstAmt = parseFloat(((taxableAmount * restaurantTax.sgstPercent) / 100).toFixed(2));
+    const igstAmt = parseFloat(((taxableAmount * restaurantTax.igstPercent) / 100).toFixed(2));
+
+    const grandTotalCalc = parseFloat((taxableAmount + cgstAmt + sgstAmt + igstAmt).toFixed(2));
+
+    taxHtml = `
+      ${restaurantTax.servicePercent > 0 
+        ? `<p style="margin:2px 0;">Service Charges (${restaurantTax.servicePercent}%): ₹${serviceAmt.toFixed(2)}</p>`
+        : ""
+      }
+
+      <p style="margin:2px 0;">CGST (${restaurantTax.cgstPercent}%): ₹${cgstAmt.toFixed(2)}</p>
+      <p style="margin:2px 0;">SGST (${restaurantTax.sgstPercent}%): ₹${sgstAmt.toFixed(2)}</p>
+      ${restaurantTax.igstPercent > 0 ? `<p style="margin:2px 0;">IGST (${restaurantTax.igstPercent}%): ₹${igstAmt.toFixed(2)}</p>` : ""}
+      <div class="flex justify-between items-center mt-4">
+  <div class="font-semibold text-lg text-gray-800">Grand Total</div>
+  <div class="font-semibold text-lg text-red-500">₹${grandTotalCalc.toFixed(2)}</div>
+</div>
+
+    `;
+  }
+
+  const taxSummaryEl = document.getElementById("taxSummary");
+  if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
+
+  updateCartBadge();
+}
+
+
+
+// Ultra-stable qty update handler (no debounce, no rollback)
+async function updateQty(index, newQty) {
+
+  // If backend save is running → skip UI update
+  if (blockRender) return;
+
+  // 1 — Validate qty
+  newQty = Number(newQty);
+  if (isNaN(newQty) || newQty < 1) newQty = 1;
+
+  // 2 — Update cart safely
+  cart[index].qty = newQty;
+
+  // 3 — Save immediately to local storage
+  if (!isLoggedIn()) {
+    localStorage.setItem("guestCart", JSON.stringify(cart));
+  } else {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }
+
+  // 4 — Re-render cart instantly (no delay, no flicker)
+  renderCart();
+
+  // 5 — Backend save (queued, safe, no double-event)
+  updateCartBadge();
+
+  await saveCartToBackend();
+}
+
+
+function openCheckout() {
+  autofillMobileForLoggedIn();
+  
+  resetCheckoutFieldsDefault();   // FIRST reset UI
+
+  setupAddressUIVisibility();      // THEN show/hide Change Address
+
+  // MOVE THIS LINE ↓ HERE (after login autofill + reset)
+  loadPrimaryAddress();  
+ setTimeout(() => toggleAddressField(), 50);
+  if (cart.length === 0) {
+    alert("Your cart is empty!");
+    return;
+  }
+
+  document.getElementById("cartOverlay").style.display = "none";
+
+  // Reset Saved-Address UI
+  document.getElementById("changeAddressBtn").classList.add("hidden");
+  document.getElementById("addressSelectContainer").classList.add("hidden");
+  document.getElementById("newAddressForm").classList.add("hidden");
+  document.getElementById("savedAddressDropdown").innerHTML = "";
+
+  if (!isLoggedIn()) {
+    document.getElementById("mobile").value = "";
+    document.getElementById("customerName").value = "";
+    document.getElementById("email").value = "";
+    document.getElementById("address").value = "";
+  }
+
+  document.getElementById('checkoutModal').style.display = 'flex';
+}
+
+    
+function loadPrimaryAddress() {
+  // Logged-in users only
+  if (!isLoggedIn()) return;
+
+  const mobile = localStorage.getItem("mobile");
+  if (!mobile) return;
+
+  const orderType = document.getElementById("orderType")?.value;
+
+  // Only apply primary address for Home Delivery
+  if (orderType !== "Home Delivery") return;
+
+  const addressField = document.getElementById("address");
+  const addressWrapper = document.getElementById("addressWrapper");
+  if (!addressField || !addressWrapper) return;
+
+  // Show wrapper
+  addressWrapper.style.display = "block";
+
+  // Fetch user profile
+  apiGet("getUserProfile", { mobile })
+    .then(res => {
+      if (res.success && res.address) {
+        addressField.value = res.address.trim();
+      }
+    })
+    .catch(err => console.error("loadPrimaryAddress error:", err));
+}
+
+async function loadSavedAddresses() {
+  const mobile = localStorage.getItem("userMobile");
+
+  if (!mobile) {
+    return {
+      primaryObj: null,
+      multiObjList: [],
+      hasMulti: false
+    };
+  }
+
+  const overlay = document.getElementById("loadingOverlay");
+
+  try {
+    if (overlay) overlay.style.display = "flex";
+
+    // -------------------------------
+    // 1️⃣ GET PRIMARY (user sheet)
+    // -------------------------------
+    const userRes = await fetch(
+      `https://script.google.com/macros/s/AKfycbz8B-nwXivGHzKgcWT8zTvS4sAWG6dKfsDh8rsn29CGXCeIxxeNJ9NaPcL03cQBGHEf/exec?action=getUserByMobile&mobile=${mobile}`
+    );
+    const user = await userRes.json();
+
+    let primaryObj = null;
+
+    if (user?.address) {
+      primaryObj = {
+        address: user.address,
+        pincode: user.pincode || "",
+        city: user.city || "",
+        state: user.state || "",
+        type: "primary"
+      };
+    }
+
+    // -------------------------------
+    // 2️⃣ GET MULTI_ADD (OBJECT FORMAT)
+    // -------------------------------
+    const multiRes = await fetch(
+      `https://script.google.com/macros/s/AKfycbz8B-nwXivGHzKgcWT8zTvS4sAWG6dKfsDh8rsn29CGXCeIxxeNJ9NaPcL03cQBGHEf/exec?action=getMultiAddress&mobile=${mobile}`
+    );
+    const multi = await multiRes.json();
+
+    // multi.addresses is ALREADY object array
+    const multiObjList = Array.isArray(multi?.addresses)
+      ? multi.addresses.map(a => ({
+          address: a.address || "",
+          pincode: a.pincode || "",
+          city: a.city || "",
+          state: a.state || "",
+          type: "multi"
+        }))
+      : [];
+
+    return {
+      primaryObj,
+      multiObjList,
+      hasMulti: multiObjList.length > 0
+    };
+  }
+  catch (err) {
+    console.error("Address Load Error:", err);
+    return {
+      primaryObj: null,
+      multiObjList: [],
+      hasMulti: false
+    };
+  }
+}
+
+    
+document.getElementById("changeAddressBtn").addEventListener("click", async () => {
+
+  const overlay = document.getElementById("loadingOverlay");
+  const dropdown = document.getElementById("savedAddressDropdown");
+  const ddlBox = document.getElementById("addressSelectContainer");
+  const formBox = document.getElementById("newAddressForm");
+
+  // STEP 1 — Start overlay
+  if (overlay) overlay.style.display = "flex";
+
+  // STEP 2 — Reset UI
+  dropdown.innerHTML = "";
+  ddlBox.classList.add("hidden");
+  formBox.classList.add("hidden");
+
+  // STEP 3 — Fetch new format addresses
+  const data = await loadSavedAddresses();
+
+  // ---------------------------
+  // 🔶 CASE 2 — No multi_add addresses
+  // ---------------------------
+  if (!data.hasMulti && !data.primaryObj) {
+
+    // Show new address form directly (same as old code)
+    formBox.classList.remove("hidden");
+
+    document.getElementById("newAddressMobile").value =
+      localStorage.getItem("userMobile") || "";
+
+    if (overlay) overlay.style.display = "none";
+    return;
+  }
+
+  // ---------------------------
+  // 🔶 CASE 1 — We have saved addresses
+  // ---------------------------
+  ddlBox.classList.remove("hidden");
+
+  // --- Primary address (new object format)
+  if (data.primaryObj) {
+    const p = data.primaryObj;
+    const opt1 = document.createElement("option");
+    opt1.value = JSON.stringify(p);   // NEW FORMAT
+    opt1.textContent = `Primary: ${p.address}, ${p.pincode}, ${p.city}, ${p.state}`;
+    dropdown.appendChild(opt1);
+  }
+
+  // --- MultiAdd Addresses (new object format)
+  data.multiObjList.forEach((a, index) => {
+    const opt = document.createElement("option");
+    opt.value = JSON.stringify(a);   // NEW FORMAT
+    opt.textContent = `${a.address}, ${a.pincode}, ${a.city}, ${a.state}`;
+    dropdown.appendChild(opt);
+  });
+
+  // --- Add New Address (same as old)
+  const addNew = document.createElement("option");
+  addNew.value = "__ADD_NEW__";
+  addNew.textContent = "➕ Add New Address";
+  dropdown.appendChild(addNew);
+// ---------------------------
+// STEP-5: Auto Default Selection
+// ---------------------------
+
+let defaultAddressObj = null;
+
+// 1️⃣ If primary exists → select primary automatically
+if (data.primaryObj) {
+  defaultAddressObj = data.primaryObj;
+  dropdown.value = JSON.stringify(data.primaryObj);
+}
+
+// 2️⃣ Else if multiAdd available → auto-select first address
+else if (data.multiObjList.length > 0) {
+  defaultAddressObj = data.multiObjList[0];
+  dropdown.value = JSON.stringify(data.multiObjList[0]);
+}
+
+// 3️⃣ If default address found → autofill fields
+if (defaultAddressObj) {
+  document.getElementById("address").value  = defaultAddressObj.address || "";
+  document.getElementById("pincode").value = defaultAddressObj.pincode || "";
+  document.getElementById("city").value    = defaultAddressObj.city || "";
+  document.getElementById("state").value   = defaultAddressObj.state || "";
+}
+
+  // STEP 4 — Smooth fade animation
+  ddlBox.style.opacity = "0";
+  setTimeout(() => {
+    ddlBox.style.transition = "opacity 0.25s ease";
+    ddlBox.style.opacity = "1";
+  }, 10);
+
+  // STEP 5 — Hide overlay
+  if (overlay) overlay.style.display = "none";
+});
+
+
+document.getElementById("savedAddressDropdown").addEventListener("change", async function () {
+  const selected = this.value;
+
+  const formBox = document.getElementById("newAddressForm");
+  const addressField = document.getElementById("address");
+  const pinField = document.getElementById("pincode");
+  const cityField = document.getElementById("city");
+  const stateField = document.getElementById("state");
+
+  // Always hide new-form by default
+  formBox.classList.add("hidden");
+
+  // 1️⃣ ADD NEW ADDRESS (same as old flow)
+  if (selected === "__ADD_NEW__") {
+    formBox.classList.remove("hidden");
+
+    document.getElementById("newAddressMobile").value =
+      localStorage.getItem("userMobile") || "";
+
+    return;
+  }
+
+  // ----------------------------------------
+  // 2️⃣ NEW FORMAT: selected is JSON object
+  // ----------------------------------------
+  let parsed = null;
+
+  try {
+    parsed = JSON.parse(selected);   // Works for both Primary & Multi (new format)
+  } catch (e) {
+    console.error("Invalid JSON address:", selected);
+  }
+
+  // If parsed object exists → auto-fill 4 fields
+  if (parsed && typeof parsed === "object") {
+    addressField.value = parsed.address || "";
+    pinField.value = parsed.pincode || "";
+    cityField.value = parsed.city || "";
+    stateField.value = parsed.state || "";
+    return;
+  }
+
+  // ---------------------------------------------------
+  // 3️⃣ BACKWARD-COMPATIBLE MODE (if old format selected)
+  // ---------------------------------------------------
+
+  const data = await loadSavedAddresses();
+
+  // OLD Primary
+  if (selected === "__PRIMARY__") {
+    addressField.value = data.primaryAddress || "";
+    return;
+  }
+
+  // OLD Multi
+  if (selected.startsWith("__MULTI__")) {
+    const index = parseInt(selected.replace("__MULTI__", ""));
+    const selectedAddress = data.multiAddresses[index] || "";
+    addressField.value = selectedAddress;
+    return;
+  }
+});
+
+document.getElementById("saveNewAddressBtn").addEventListener("click", async () => {
+
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) return alert("You must be logged in to save address.");
+
+  // Read fields
+  const addr  = document.getElementById("newAddressField").value.trim();
+  const pin   = document.getElementById("newPincode").value.trim();
+  const city  = document.getElementById("newCity").value.trim();
+  const state = document.getElementById("newState").value.trim();
+
+  // Validations
+  if (!addr) return alert("Please enter address.");
+  if (!pin || pin.length !== 6) return alert("Enter valid 6-digit pincode.");
+  if (!city) return alert("City is missing.");
+  if (!state) return alert("State is missing.");
+
+  // Disable button
+  const btn = document.getElementById("saveNewAddressBtn");
+  btn.innerText = "Saving...";
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(
+      "https://script.google.com/macros/s/AKfycbz8B-nwXivGHzKgcWT8zTvS4sAWG6dKfsDh8rsn29CGXCeIxxeNJ9NaPcL03cQBGHEf/exec",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          action: "addMultiAddress",
+          mobile,
+          address: addr,
+          pincode: pin,
+          city,
+          state
+        })
+      }
+    ).then(r => r.json());
+
+    if (!res.success) {
+      alert(res.message || "Failed to save address.");
+      btn.innerText = "Save Address";
+      btn.disabled = false;
+      return;
+    }
+
+    alert("Address saved successfully!");
+
+    // -----------------------------
+    //  STEP-1: fill main checkout fields
+    // -----------------------------
+    document.getElementById("address").value = addr;
+    document.getElementById("pincode").value = pin;
+    document.getElementById("city").value = city;
+    document.getElementById("state").value = state;
+
+    // -----------------------------
+    //  STEP-2: hide new address form
+    // -----------------------------
+    document.getElementById("newAddressForm").classList.add("hidden");
+
+    // -----------------------------
+    //  STEP-3: reload dropdown
+    // -----------------------------
+    const dropdown = document.getElementById("savedAddressDropdown");
+    const box = document.getElementById("addressSelectContainer");
+
+    const data = await loadSavedAddresses();
+
+    dropdown.innerHTML = "";
+
+    // Primary
+    if (data.primaryObj) {
+      const p = data.primaryObj;
+      const opt = document.createElement("option");
+      opt.value = JSON.stringify(p);
+      opt.textContent = `Primary: ${p.address}, ${p.pincode}, ${p.city}, ${p.state}`;
+      dropdown.appendChild(opt);
+    }
+
+    // Multi
+    data.multiObjList.forEach(a => {
+      const opt = document.createElement("option");
+      opt.value = JSON.stringify(a);
+      opt.textContent = `${a.address}, ${a.pincode}, ${a.city}, ${a.state}`;
+      dropdown.appendChild(opt);
+    });
+
+    // Add New
+    const addNew = document.createElement("option");
+    addNew.value = "__ADD_NEW__";
+    addNew.textContent = "➕ Add New Address";
+    dropdown.appendChild(addNew);
+
+    // -----------------------------
+    //  STEP-4: auto-select the new saved address
+    // -----------------------------
+    const newObj = {
+      address: addr,
+      pincode: pin,
+      city,
+      state,
+      type: "multi"
+    };
+
+    dropdown.value = JSON.stringify(newObj);
+
+    // -----------------------------
+    //  STEP-5: show dropdown container
+    // -----------------------------
+    box.classList.remove("hidden");
+
+    // -----------------------------
+    //  STEP-6: clear new-form fields
+    // -----------------------------
+    document.getElementById("newAddressField").value = "";
+    document.getElementById("newPincode").value = "";
+    document.getElementById("newCity").value = "";
+    document.getElementById("newState").value = "";
+
+  } catch (err) {
+    alert("Error saving address: " + err.message);
+  }
+
+  btn.innerText = "Save Address";
+  btn.disabled = false;
+});
+
+
+
+    function closeCheckout() {
+      document.getElementById('checkoutModal').style.display = 'none';
+    }
+function deleteCart() {
+  showCartOverlay("Clearing cart…");
+
+  cart = [];
+
+  if (!isLoggedIn()) {
+    localStorage.removeItem("guestCart");
+    renderCart();
+    hideCartOverlay();
+    return;
+  }
+
+  // Logged-in: clear only LOCAL mirror (NEVER delete backend)
+  localStorage.setItem("cart", "[]");
+  renderCart();
+
+  hideCartOverlay();
+}
+
+function removeItem(index) {
+ showCartOverlay();
+
+  const item = cart[index];
+  if (!item) {
+    hideCartOverlay();
+    return;
+  }
+
+  clearTimeout(deleteDebounce);
+
+  deleteDebounce = setTimeout(() => {
+
+    cart.splice(index, 1);
+
+    // SAVE LOCALLY
+    if (!isLoggedIn()) {
+      localStorage.setItem("guestCart", JSON.stringify(cart));
+    } else {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
+
+    renderCart();
+
+    // BACKEND SYNC
+    if (isLoggedIn()) {
+    saveCartToBackend().finally(() => hideCartOverlay());
+  } else {
+    hideCartOverlay();
+  }
+
+  }, 150); // small debounce for delete
+updateCartBadge();
+
+}
+
+
+function checkCustomerByMobile() {
+  if (isLoggedIn()) {
+  document.getElementById('mobile').readOnly = true;
+  return; // stop guest mobile logic
+}
+  const mobile = document.getElementById('mobile').value.trim();
+  
+
+  // If mobile incomplete -> reset and hide complete row (label + input)
+  if (mobile.length !== 10) {
+
+    // Reset Order Type row
+    document.getElementById('orderType').parentElement.style.display = "none";
+
+    // Hide full rows (label + input)
+    document.getElementById('customerName').parentElement.style.display = "none";
+    document.getElementById('email').parentElement.style.display = "none";
+    document.getElementById('addressWrapper').style.display = "none";
+
+    // Hide optional info text
+    document.getElementById('infoMsg').style.display = "none";
+
+    return;
+  }
+
+  // Valid mobile → show orderType row
+  document.getElementById('orderType').parentElement.style.display = "block";
+}
+
+
+
+    
+ document.getElementById("orderType").addEventListener("change", () => {
+  toggleAddressField();
+  setupAddressUIVisibility();   // ✅ STEP 1B correct location
+});
+
+    
+document.getElementById("mobile").addEventListener("input", function () {
+  const mobile = document.getElementById('mobile').value.trim();
+  if (/^[0-9]{10}$/.test(mobile)) {
+    // Only run when Order Type already selected
+    if (document.getElementById('orderType').value) {
+      toggleAddressField();
+    }
+  }
+});
+
+let lastLookupMobile = "";
+let lastLookupOrderType = "";
+    function toggleAddressField() {
+
+  const mobile = document.getElementById("mobile").value.trim();
+  const orderType = document.getElementById("orderType").value;
+
+  if (!orderType) return;
+
+  // --- 1) Validate mobile ---
+  if (!/^[0-9]{10}$/.test(mobile)) {
+    alert("Enter a valid 10-digit mobile number.");
+    return;
+  }
+
+  // --- 2) Base references ---
+  const nameField = document.getElementById("customerName");
+  const emailField = document.getElementById("email");
+  const addressField = document.getElementById("address");
+
+  const addressWrapper = document.getElementById("addressWrapper");
+  const paymentField = document.getElementById("paymentMethod");
+  const overlay = document.getElementById("loadingOverlay");
+  const orderSelect = document.getElementById("orderType");
+  const changeBtn = document.getElementById("changeAddressBtn");
+
+  // NEW FIELDS
+  const pincodeField = document.getElementById("pincode");
+  const cityField    = document.getElementById("city");
+  const stateField   = document.getElementById("state");
+
+  const pincodeWrapper = document.getElementById("pincodeWrapper");
+  const cityWrapper    = document.getElementById("cityWrapper");
+  const stateWrapper   = document.getElementById("stateWrapper");
+
+  if (!nameField || !emailField || !addressField) return;
+
+  // --- 3) Make name + email always visible ---
+  nameField.closest("div").style.display = "block";
+  emailField.closest("div").style.display = "block";
+  paymentField.style.display = "block";
+
+  // --- 4) Always show overlay (both cases) ---
+  overlay.style.display = "flex";
+  orderSelect.disabled = true;
+
+  // ==========================================================
+  //                LOGGED-IN USER LOGIC
+  // ==========================================================
+  if (isLoggedIn()) {
+
+    nameField.readOnly = true;
+    emailField.readOnly = true;
+    addressField.readOnly = true;
+
+    // Fetch everything from USER SHEET
+    apiGet("getUserProfile", { mobile })
+      .then(res => {
+        if (res.success) {
+
+          // Fill all fields FROM USER SHEET
+          nameField.value = res.name || "";
+          emailField.value = res.email || "";
+          addressField.value = res.address || "";
+
+          pincodeField.value = res.pincode || "";
+          cityField.value    = res.city || "";
+          stateField.value   = res.state || "";
+        }
+      })
+      .finally(() => {
+
+        // UI rules based on order type
+        if (orderType === "Home Delivery") {
+
+          // Address + 3 other fields visible
+          addressWrapper.style.display = "block";
+          pincodeWrapper.style.display = "block";
+          cityWrapper.style.display    = "block";
+          stateWrapper.style.display   = "block";
+          changeBtn?.classList.remove("hidden");
+
+          addressField.required = true;
+
+        } else {
+          // Takeaway / Dine-In → hide address + pincode/city/state
+          addressWrapper.style.display = "none";
+          pincodeWrapper.style.display = "none";
+          cityWrapper.style.display    = "none";
+          stateWrapper.style.display   = "none";
+
+          changeBtn?.classList.add("hidden");
+
+          addressField.required = false;
+        }
+
+        overlay.style.display = "none";
+        orderSelect.disabled = false;
+
+      });
+
+    return; // STOP HERE — DO NOT TOUCH GUEST LOGIC
+  }
+
+  // ==========================================================
+  //                GUEST USER LOGIC (UNTOUCHED)
+  // ==========================================================
+
+  nameField.readOnly = false;
+  emailField.readOnly = false;
+  addressField.readOnly = false;
+
+  // Hide pincode/city/state for guest always
+  pincodeWrapper.style.display = "none";
+  cityWrapper.style.display    = "none";
+  stateWrapper.style.display   = "none";
+
+  apiGet("getCustomerDetailsByMobile", { mobile })
+    .then(rows => {
+
+      let orders = Array.isArray(rows) ? rows : [];
+
+      if (orders.length === 0) {
+        nameField.value = "";
+        emailField.value = "";
+        addressField.value = "";
+
+        if (orderType !== "Home Delivery") {
+          addressWrapper.style.display = "none";
+        }
+        return;
+      }
+
+      // ----- Pick latest row -----
+      let latest = orders.reduce((max, row) =>
+        row.rowNumber > max.rowNumber ? row : max
+      );
+
+      // Fill name/email
+      nameField.value = latest.name || "";
+      emailField.value = latest.email || "";
+
+      // ----- Latest HD Address -----
+      let latestHD = "";
+      for (let i = orders.length - 1; i >= 0; i--) {
+        const row = orders[i];
+        const hd =
+          row.Address?.trim() ||
+          row.address?.trim() ||
+          row.Address1?.trim() ||
+          row.Address2?.trim() ||
+          "";
+
+        if (row.orderType === "Home Delivery" && hd !== "") {
+          latestHD = hd;
+          break;
+        }
+      }
+
+      // ----- Show/hide based on order type -----
+      if (orderType === "Home Delivery") {
+        addressWrapper.style.display = "block";
+        addressField.required = true;
+        addressField.readOnly = false;
+        addressField.value = latestHD || "";
+
+      } else {
+        addressWrapper.style.display = "none";
+        addressField.value = "";
+        addressField.required = false;
+      }
+
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error loading customer details.");
+    })
+    .finally(() => {
+      overlay.style.display = "none";
+      orderSelect.disabled = false;
+    });
+
+}
+
+
+
+
+  
+function placeOrder() {
+  if (window._orderLock) return;
+window._orderLock = true;
+
+  const customerName = document.getElementById('customerName').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const mobile = document.getElementById('mobile').value.trim();
+  const orderType = document.getElementById('orderType').value;
+  const address = document.getElementById('address').value.trim();
+  const paymentMethod = document.getElementById('paymentMethod').value;
+
+  if (!/^[0-9]{10}$/.test(mobile)) {
+    alert("Enter a valid 10-digit mobile number");
+    return;
+  }
+  if (orderType === "Home Delivery" && !address) {
+    alert("Please enter delivery address");
+    return;
+  }
+
+  // BASE TOTAL (without tax)
+let baseTotal = parseFloat(document.getElementById('cartTotal').innerText);
+
+// Defaults for "On Item"
+let serviceAmt = 0;
+let taxableAmount = baseTotal;
+let cgstAmt = 0;
+let sgstAmt = 0;
+let igstAmt = 0;
+let grandTotalFinal = baseTotal;
+
+// If Tax_Type = "On Bill", then apply tax logic
+if (restaurantTax.taxType === "On Bill") {
+
+  // Service Charge
+ serviceAmt =
+  restaurantTax.servicePercent > 0
+    ? parseFloat(((baseTotal * restaurantTax.servicePercent) / 100).toFixed(2))
+    : 0;
+
+
+  // Taxable amount = base + service charge
+  taxableAmount = parseFloat((baseTotal + serviceAmt).toFixed(2));
+
+  // CGST
+  cgstAmt = parseFloat(((taxableAmount * restaurantTax.cgstPercent) / 100).toFixed(2));
+
+  // SGST
+  sgstAmt = parseFloat(((taxableAmount * restaurantTax.sgstPercent) / 100).toFixed(2));
+
+  // IGST
+  igstAmt = parseFloat(((taxableAmount * restaurantTax.igstPercent) / 100).toFixed(2));
+
+  // FINAL GRAND TOTAL
+  grandTotalFinal = parseFloat((taxableAmount + cgstAmt + sgstAmt + igstAmt).toFixed(2));
+}
+
+// FINAL AMOUNT TO SAVE / SEND TO SHEET
+const totalAmount = grandTotalFinal;
+
+
+  const orderData = {
+  customerName,
+  email,
+  mobile,
+  orderType,
+  address,
+  cartItems: cart,
+
+  // BASE totals
+  baseTotal,
+  serviceAmt,
+  taxableAmount,
+  cgstAmt,
+  sgstAmt,
+  igstAmt,
+  grandTotal: grandTotalFinal,
+
+  paymentMethod
+};
+
+
+  // ?? Show overlay & lock UI
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.innerText = "updating address... Please wait...";
+  if (!isLoggedIn()) {
+  nameField.value = nameField.value;
+  emailField.value = emailField.value;
+  addressField.value = addressField.value;
+}
+  overlay.style.display = "flex";
+
+  document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
+    .forEach(el => el.disabled = true);
+
+  // ?? REPLACEMENT (fetch API instead of google.script.run)
+  apiPost("placeOrder", orderData)
+    .then(res => {
+      if (res.success) {
+        alert(
+          `Order placed successfully!\nYour Order Number: ${res.orderNumber}\n\n${res.message}`
+        );
+        cart = [];
+         localStorage.removeItem("cart");
+        renderCart();
+        
+        closeCheckout();
+      } else {
+        alert(res.message || "Order failed.");
+      }
+
+      // Unlock UI
+      overlay.style.display = "none";
+      document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
+        .forEach(el => el.disabled = false);
+    })
+    .catch(err => {
+      console.error("Order error:", err);
+      alert("Error placing order. Please try again.");
+
+      overlay.style.display = "none";
+      document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
+        .forEach(el => el.disabled = false);
+    });
+  window._orderLock = false;
+
+}
+
+function filterMenu() {
+  const text = document.getElementById("menuSearch").value.toLowerCase();
+  const selected = document.getElementById("categoryFilter").value; // note: keep original case (Title Case)
+
+  // priority list - same as renderMenu/populateCategoryDropdown
+  const categoryPriority = [
+    "starters",
+    "snacks",
+    "drinks",
+    "mocktails",
+    "cocktails",
+    "main course",
+    "sweets",
+    "desserts"
+  ];
+
+  // Step 1: canonical category detect (PASS priority list)
+  let filtered = menuItems.map(i => ({
+    ...i,
+    canonical: canonicalCategory(i.category, categoryPriority).toLowerCase()
+  }));
+
+  // Step 2: Apply category filter (if selected not empty)
+  if (selected && selected.trim() !== "") {
+    const selLower = selected.toLowerCase();
+    filtered = filtered.filter(i => i.canonical === selLower);
+  }
+
+  // Step 3: Apply text filter
+  if (text.trim() !== "") {
+    const q = text.trim();
+    filtered = filtered.filter(i =>
+      (String(i.name || "").toLowerCase().includes(q)) ||
+      (i.description && String(i.description).toLowerCase().includes(q))
+    );
+  }
+
+  // If no filter ? show full grouped menu (reuse renderMenu)
+  if ((!selected || selected === "") && text.trim() === "") {
+    renderMenu(menuItems);
+    return;
+  }
+
+  const menuDiv = document.getElementById("menu");
+  menuDiv.innerHTML = "";
+
+  if (filtered.length === 0) {
+    menuDiv.innerHTML = "<p style='padding:10px;'>No items found.</p>";
+    return;
+  }
+
+  // Step 4: Group filtered results by canonical category (preserve ordering by priority)
+  const groups = {};
+  filtered.forEach(item => {
+    const cat = item.canonical || "Other";
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push(item);
+  });
+
+  // Build order: priority first, then alphabetic
+  const groupKeys = Object.keys(groups);
+  groupKeys.sort((a,b) => {
+    const ai = categoryPriority.indexOf(a);
+    const bi = categoryPriority.indexOf(b);
+    if (ai !== -1 && bi !== -1) return ai - bi;
+    if (ai !== -1) return -1;
+    if (bi !== -1) return 1;
+    return a.localeCompare(b);
+  });
+
+  // Step 5: Render groups using buildMenuCardHTML + activateVariantSelector
+  groupKeys.forEach(cat => {
+    const heading = document.createElement("h2");
+    heading.classList.add("slideIn");
+    // Title case heading
+    heading.innerHTML = cat.replace(/\b\w/g, c => c.toUpperCase());
+    heading.style.margin = "10px 0 5px";
+    heading.style.padding = "10px";
+    heading.style.background = "#ff6347";
+    heading.style.color = "white";
+    heading.style.borderRadius = "6px";
+    heading.style.gridColumn = "1 / -1";
+    menuDiv.appendChild(heading);
+
+    groups[cat].forEach(item => {
+      const div = document.createElement("div");
+      div.className = "menu-item fadeIn";
+
+      // Use the same card builder as the main view (handles Single / Multi)
+      div.innerHTML = buildMenuCardHTML(item);
+      menuDiv.appendChild(div);
+
+      // Activate variant selector if item is multi (so radio -> button enabling works)
+      try {
+        activateVariantSelector(item);
+      } catch (e) {
+        // fail-safe: don't break UI on JS errors
+        console.error("activateVariantSelector error:", e);
+      }
+    });
+  });
+}
+
+
+  </script>
+<div id="loginProgressOverlay"
+     class="fixed inset-0 bg-black bg-opacity-40 z-[10000] hidden 
+            flex items-center justify-center text-white text-xl font-semibold">
+  Login in progress…
+</div>
+
+
+  
+
+
+
+<!-- LOGIN OVERLAY (NEW TAILWIND VERSION) -->
+<div id="loginModal"
+  class="fixed inset-0 bg-black bg-opacity-50 z-[9999] hidden flex items-center justify-center">
+
+    <div class="bg-white w-11/12 max-w-sm rounded-xl p-6 shadow-xl relative 
+              flex flex-col gap-4">
+
+
+    <!-- Close -->
+    <button onclick="closeLogin()"
+      class="absolute top-3 right-3 text-gray-600 text-2xl font-semibold">
+      &times;
+    </button>
+
+    <h2 class="text-xl font-semibold text-gray-800 text-center mb-6">
+      Login to Continue
+    </h2>
+
+    <!-- Mobile -->
+    <input id="loginMobile" type="tel" maxlength="10"
+      placeholder="Enter Mobile Number"
+      class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base 
+       focus:ring-2 focus:ring-orange-400 outline-none"
+      />
+
+    <!-- Password -->
+    <input id="loginPassword" type="password"
+      placeholder="Enter Password"
+      class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base 
+       focus:ring-2 focus:ring-orange-400 outline-none"
+ 
+      />
+
+    <!-- Login Button -->
+    <button onclick="loginUser()"
+      class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold 
+       shadow-md hover:bg-orange-600 transition"
+
+      >
+      Login
+    </button>
+
+<!-- Forgot Password -->
+<button onclick="openForgotPassword()"
+  class="text-orange-600 text-sm font-medium mt-3 nohighlight"
+  style="background:none; border:none; padding:0;">
+  Forgot Password?
+</button>
+
+
+
+
+
+
+<!-- Signup Link -->
+<div class="text-center text-sm text-gray-600 mt-2">
+  Not registered?
+  <span onclick="openSignup()" class="text-orange-600 font-semibold cursor-pointer">
+    Sign Up
+  </span>
+</div>
+
+      
+  </div>
+</div>
+
+
+
+<!-- FORGOT PASSWORD MODAL -->
+<div id="forgotPasswordModal"
+     class="fixed inset-0 bg-black bg-opacity-50 z-[9999] hidden flex items-center justify-center">
+
+  <div class="bg-white w-11/12 max-w-sm rounded-xl p-6 shadow-lg text-center relative">
+
+    <h2 class="text-[18px] text-gray-800 mb-2">Reset Your Password</h2>
+
+    <!-- Mobile -->
+    <input id="fpMobile" type="tel" maxlength="10"
+      placeholder="Enter Mobile Number"
+      class="w-full border border-gray-300 rounded-lg px-4 py-3 mt-2" />
+
+    <!-- Send OTP -->
+    <button onclick="sendResetOTP()"
+      class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold mt-3">
+      Send OTP
+    </button>
+
+    <!-- OTP -->
+    <input id="fpOTP" type="text" style="display:none"
+      placeholder="Enter OTP"
+      class="w-full border border-gray-300 rounded-lg px-4 py-3 mt-3" />
+
+    <!-- New Password -->
+    <input id="fpNewPass" type="password" style="display:none"
+      placeholder="Enter New Password"
+      class="w-full border border-gray-300 rounded-lg px-4 py-3 mt-3" />
+
+    <!-- Update Button -->
+    <button id="resetBtn" onclick="resetPassword()" style="display:none"
+      class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold mt-3">
+      Update Password
+    </button>
+
+    <!-- Close -->
+    <button onclick="closeForgotPassword()"
+      class="w-full bg-gray-200 text-gray-800 py-3 rounded-lg mt-3">
+      Close
+    </button>
+
+    <!-- 🟢 OVERLAY INSIDE CARD -->
+    <div id="fpOverlay"
+      class="absolute inset-0 bg-black bg-opacity-40 text-white font-semibold text-lg
+             flex items-center justify-center rounded-xl hidden">
+      Sending OTP...
+    </div>
+
+  </div>
+</div>
+
+
+<!-- SIGNUP MODAL (COMPACT + CLEAN) -->
+<div id="signupModal"
+     class="fixed inset-0 bg-black bg-opacity-50 z-[9999] hidden flex items-center justify-center">
+  <div class="modal-content bg-white w-11/12 max-w-sm rounded-xl p-5 shadow-lg space-y-3 overflow-y-auto"
+
+       style="max-height: 90vh;">
+
+    <h2 class="text-lg font-semibold text-gray-800 text-center">Welcome User</h2>
+
+    <p class="text-sm text-gray-600 text-center -mt-1">
+      This is a test signup window. No backend code is triggered.
+    </p>
+
+    <!-- Mobile -->
+    <input type="text" id="suMobile" placeholder="Mobile Number"
+      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm 
+             focus:ring-2 focus:ring-orange-400 outline-none"/>
+
+    <!-- Password -->
+    <input type="password" id="suPassword" placeholder="Password"
+      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm 
+             focus:ring-2 focus:ring-orange-400 outline-none"/>
+
+    <!-- Name -->
+    <input type="text" id="suName" placeholder="Full Name"
+      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm 
+             focus:ring-2 focus:ring-orange-400 outline-none"/>
+
+    <!-- Email -->
+    <input type="email" id="suEmail" placeholder="Email Address"
+      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm 
+             focus:ring-2 focus:ring-orange-400 outline-none"/>
+
+    <!-- Send OTP -->
+    <button type="button" onclick="sendEmailOTP()"
+      class="w-full bg-blue-500 text-white py-2 rounded-lg text-sm font-semibold 
+             shadow hover:bg-blue-600 transition">
+      Send OTP
+    </button>
+
+    <!-- Email OTP -->
+    <input type="text" id="suEmailOTP" placeholder="Enter Email OTP" 
+  style="display:none"
+  class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm 
+         focus:ring-2 focus:ring-orange-400 outline-none"/>
+
+
+    <!-- Address -->
+    <textarea id="suAddress" placeholder="Address"
+      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm 
+             focus:ring-2 focus:ring-orange-400 outline-none resize-none h-20"></textarea>
+
+    <!-- NEW PINCODE FIELD -->
+    <select id="suPincode" onchange="onPincodeSelect()"
+      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm 
+             focus:ring-2 focus:ring-orange-400 outline-none">
+      <option value="">Select Pincode</option>
+    </select>
+
+    <!-- City -->
+    <input type="text" id="suCity" placeholder="City" readonly
+      class="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-sm 
+             text-gray-600 outline-none"/>
+
+    <!-- State -->
+    <input type="text" id="suState" placeholder="State" readonly
+      class="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-sm 
+             text-gray-600 outline-none"/>
+
+    <!-- Submit -->
+    <button onclick="verifyAndSignup()"
+      class="w-full bg-green-600 text-white py-2 rounded-lg text-sm font-semibold 
+             shadow hover:bg-green-700 transition">
+      Submit
+    </button>
+
+    <!-- Close -->
+    <button onclick="closeSignup()"
+      class="w-full bg-gray-200 text-gray-800 py-2 rounded-lg text-sm font-medium 
+             shadow hover:bg-gray-300 transition">
+      Close
+    </button>
+
+  </div>
+</div>
+
+<script>
+
+//open login
+function openLogin() {
+  const modal = document.getElementById("loginModal");
+  modal.style.display = "flex";
+modal.classList.remove("hidden");
+  document.getElementById("signupLabelBox").style.display = "none";
+
+}
+
+function closeLogin() {
+  const modal = document.getElementById("loginModal");
+
+  // FULL HARD CLOSE
+  modal.style.display = "none";
+  modal.classList.add("hidden");
+
+  // REMOVE ANY POSSIBLE OVERLAY FREEZE
+  unlockLoginForm();
+
+  // Force hide all overlays inside login
+  const overlay = document.getElementById("loginProgressOverlay");
+  if (overlay) overlay.classList.add("hidden");
+
+  // Clear fields (safety)
+  document.getElementById("loginMobile").value = "";
+  document.getElementById("loginPassword").value = "";
+
+  // ⭐ IMPORTANT FIX: Show signup label again
+  const label = document.getElementById("signupLabelBox");
+  if (label) label.style.display = "block";
+}
+
+
+
+function logoutUser() {
+  // UI resets
+  document.getElementById("userInfoBox").style.display = "none";
+  document.getElementById("loggedEmail").innerText = "";
+
+  document.querySelector("button[onclick='openLogin()']").style.display = "inline-block";
+  document.querySelector("button[onclick='openSignup()']").style.display = "inline-block";
+
+  document.getElementById("logoutBtn").style.display = "none";
+  document.getElementById("signupLabelBox").style.display = "block";
+  document.getElementById("hamburgerBtn").style.display = "none";
+
+  document.getElementById("leftNav").style.display = "none";
+document.getElementById("leftNav").classList.remove("active");
+document.getElementById("leftNav").style.display = "none";
+  
+  document.getElementById("menuWrapper").style.display = "block";
+  document.getElementById("pageWrapper").style.display = "none";
+
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("ordersPage").style.display = "none";
+  document.getElementById("offersPage").style.display = "none";
+
+  document.querySelectorAll("#premiumMenu li").forEach(li => li.classList.remove("active"));
+  document.getElementById("mainContent").style.marginLeft = "0";
+
+  // Remove login identifiers
+  localStorage.removeItem("userMobile");
+  localStorage.removeItem("userEmail");
+
+  // MOST IMPORTANT (Cart Behave Rule)
+  // ❗ Clear only local cart, NOT backend cart
+  localStorage.removeItem("cart");   // remove local mirror
+  cart = [];
+  window.cart = [];
+
+  // ❗ Clear sessionId (start fresh next login)
+  localStorage.removeItem("sessionId");
+
+  // Refresh cart UI
+  renderCart();
+document.getElementById("mobile").value = "";
+document.getElementById("customerName").value = "";
+document.getElementById("email").value = "";
+document.getElementById("address").value = "";
+  alert("Logged out successfully.");
+}
+
+
+</script>
+<script>
+let cityList = []; // map sheet data store
+
+function openSignup() {
+  document.getElementById("signupModal").style.display = "flex";
+
+  // Load city/pincode list only once
+  if (cityList.length === 0) {
+    apiGet("getCityList")
+      .then(res => fillPincodeDropdown(res.cities))
+      .catch(err => {
+        console.error("City list load error:", err);
+        alert("Failed to load city/pincode list.");
+      });
+  }
+}
+
+
+
+
+function closeSignup() {
+  document.getElementById("signupModal").style.display = "none";
+}
+
+function fillPincodeDropdown(list) {
+  cityList = list;
+
+  const ddl = document.getElementById("suPincode");
+  ddl.innerHTML = `<option value="">Select Pincode</option>`;
+
+  list.forEach(item => {
+    const opt = document.createElement("option");
+    opt.value = item.pin;
+    opt.textContent = item.pin;
+    ddl.appendChild(opt);
+  });
+}
+
+function onPincodeSelect() {
+  const pin = document.getElementById("suPincode").value;
+  const cityBox = document.getElementById("suCity");
+  const stateBox = document.getElementById("suState");
+
+  if (!pin) {
+    cityBox.value = "";
+    stateBox.value = "";
+    return;
+  }
+
+  const record = cityList.find(r => String(r.pin) === String(pin));
+
+  if (record) {
+    cityBox.value = record.city;
+    stateBox.value = record.state;
+  } else {
+    cityBox.value = "";
+    stateBox.value = "";
+    alert("Pincode not found.");
+  }
+}
+
+function finalSignup() {
+  const user = {
+    mobile: document.getElementById("suMobile").value.trim(),
+    password: document.getElementById("suPassword").value.trim(),
+    name: document.getElementById("suName").value.trim(),
+    email: document.getElementById("suEmail").value.trim(),
+    address: document.getElementById("suAddress").value.trim(),
+    pincode: document.getElementById("suPincode").value.trim(),
+    city: document.getElementById("suCity").value.trim(),
+    state: document.getElementById("suState").value.trim()
+  };
+
+  // BASIC VALIDATIONS
+  if (!/^[0-9]{10}$/.test(user.mobile)) {
+    alert("Enter valid 10-digit mobile.");
+    return;
+  }
+  if (!user.password) return alert("Enter password");
+  if (!user.name) return alert("Enter name");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email)) {
+    alert("Enter valid email.");
+    return;
+  }
+  if (user.pincode.length !== 6) {
+    alert("Enter valid 6-digit pincode.");
+    return;
+  }
+  if (!user.city || !user.state) {
+    alert("Invalid pincode area.");
+    return;
+  }
+
+  // FORM ALREADY LOCKED BY verifyAndSignup()
+  // ? DO NOT CALL lockSignupForm() AGAIN
+  updateSignupOverlayMessage("Creating account...");
+
+  // ? CORRECT POST REQUEST
+  fetch(API_BASE + "?api=registerUser", {
+    method: "POST",
+     body: JSON.stringify(user)
+  })
+    .then(r => {
+      // If server returned non-JSON ? avoid crash
+      if (!r.ok) throw new Error("Server error " + r.status);
+      return r.json();
+    })
+    .then(res => {
+      unlockSignupForm();
+
+      if (res.success) {
+        alert(res.message || "Signup successful!");
+        closeSignup();
+      } else {
+        alert(res.message || "Signup failed.");
+      }
+    })
+    .catch(err => {
+      unlockSignupForm();
+      alert("Signup failed: " + err.message);
+    });
+}
+
+
+function lockSignupForm() {
+  const modal = document.querySelector("#signupModal .modal-content");
+
+  // Disable all fields inside modal
+  [...modal.querySelectorAll("input, select, textarea, button")].forEach(el => {
+    el.disabled = true;
+  });
+
+  // Overlay
+  const overlay = document.createElement("div");
+  overlay.id = "signupProgressOverlay";
+  overlay.style.position = "fixed";
+  overlay.style.inset = "0";
+  overlay.style.background = "rgba(0,0,0,0.35)";
+  overlay.style.display = "flex";
+  overlay.style.alignItems = "center";
+  overlay.style.justifyContent = "center";
+  overlay.style.fontSize = "22px";
+  overlay.style.color = "#fff";
+  overlay.style.zIndex = "9999";
+  overlay.textContent = "Signup in progress…";
+  document.body.appendChild(overlay);
+}
+function unlockSignupForm() {
+  const modal = document.querySelector("#signupModal .modal-content");
+
+  // Enable everything
+  [...modal.querySelectorAll("input, select, textarea, button")].forEach(el => {
+    el.disabled = false;
+  });
+
+  // Remove overlay
+  const overlay = document.getElementById("signupProgressOverlay");
+  if (overlay) overlay.remove();
+}
+
+function sendEmailOTP() {
+  const email = document.getElementById("suEmail").value.trim();
+
+  if (!email) {
+    alert("Please enter email first.");
+    return;
+  }
+
+  // ?? lock UI while sending OTP
+  lockSignupForm();
+  updateSignupOverlayMessage("Sending OTP...");
+
+  // ? GAS ? Netlify API call conversion
+  apiGet("sendSignupEmailOTP", { email })
+    .then(res => {
+      unlockSignupForm();
+
+      if (res.success) {
+        alert("OTP sent to your email!");
+        document.getElementById("suEmailOTP").style.display = "block";
+      } else {
+        alert(res.message);
+      }
+    })
+    .catch(err => {
+      unlockSignupForm();
+      alert("Error sending OTP: " + err.message);
+    });
+}
+
+function verifyAndSignup() {
+  const email = document.getElementById("suEmail").value.trim();
+  const otp = document.getElementById("suEmailOTP").value.trim();
+
+  if (!otp) {
+    alert("Please enter OTP.");
+    return;
+  }
+
+  // ?? LOCK UI + show overlay "Verifying OTP..."
+  lockSignupForm();
+  updateSignupOverlayMessage("Verifying OTP...");
+
+  // ? Netlify API CALL (GAS ?????)
+  apiGet("verifyEmailOTP", { email, otp })
+    .then(res => {
+      if (!res.success) {
+        unlockSignupForm();
+        alert(res.message);
+        return;
+      }
+
+      // OTP verified ? show next message
+      updateSignupOverlayMessage("Creating Account...");
+
+      // Now create new user
+      finalSignup();
+    })
+    .catch(err => {
+      unlockSignupForm();
+      alert("OTP verification failed: " + err.message);
+    });
+}
+
+ 
+function updateSignupOverlayMessage(msg) {
+  const overlay = document.getElementById("signupProgressOverlay");
+  if (overlay) overlay.textContent = msg;
+}
+
+// === FINAL STABLE LOAD HANDLER ===
+window.addEventListener("load", () => {
+
+
+  // clear login fields
+  const loginMobile = document.getElementById("loginMobile");
+  const loginPassword = document.getElementById("loginPassword");
+  if (loginMobile) loginMobile.value = "";
+  if (loginPassword) loginPassword.value = "";
+
+  const mobile = localStorage.getItem("userMobile");
+  const email  = localStorage.getItem("userEmail");
+  //  LOAD USER CART FROM BACKEND IF LOGGED IN
+
+
+  // Always reset full UI first
+  document.getElementById("menuWrapper").style.display = "block";
+  document.getElementById("pageWrapper").style.display = "none";
+
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("ordersPage").style.display = "none";
+  document.getElementById("offersPage").style.display = "none";
+
+  document.getElementById("leftNav").classList.remove("active");
+  document.getElementById("leftNav").style.display = "none";
+  document.getElementById("mainContent").style.marginLeft = "0";
+
+  document.getElementById("hamburgerBtn").style.display = "none";
+  document.getElementById("logoutBtn").style.display = "none";
+  document.getElementById("userInfoBox").style.display = "none";
+
+  document.querySelector("button[onclick='openLogin()']").style.display = "inline-block";
+  document.querySelector("button[onclick='openSignup()']").style.display = "inline-block";
+  document.getElementById("signupLabelBox").style.display = "block";
+
+  // ----- if logged in -----
+  if (mobile) {
+
+    // Show user info
+    document.getElementById("loggedEmail").innerText = email || "";
+    document.getElementById("userInfoBox").style.display = "block";
+
+    // Hide login/signup
+    document.querySelector("button[onclick='openLogin()']").style.display = "none";
+    document.querySelector("button[onclick='openSignup()']").style.display = "none";
+    document.getElementById("signupLabelBox").style.display = "none";
+
+    // Show nav + hamburger
+    document.getElementById("leftNav").style.display = "block";
+    document.getElementById("hamburgerBtn").style.display = "block";
+    document.getElementById("logoutBtn").style.display = "inline-block";
+
+    // Always show menu page after refresh
+    showPage("menuPage");
+
+    // highlight first item
+    const firstMenu = document.querySelector("#premiumMenu li");
+    if (firstMenu) firstMenu.classList.add("active");
+  }
+   loadUserCartOnStart();
+  if (!isLoggedIn()) {
+  const guest = JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+  // Render only if actually a valid array
+  if (Array.isArray(guest) && guest.length > 0) {
+    cart = guest;
+    window.cart = guest;
+    renderCart();
+    openCart();  
+     document.getElementById("cartToggleBar")?.classList.add("active-cart");
+  }
+}
+});
+
+function validateLoginMobile() {
+  const input = document.getElementById("loginMobile");
+  const error = document.getElementById("mobileError");
+
+  const original = input.value;          // User typed value
+  const digitsOnly = original.replace(/\D/g, "");  // Remove letters
+
+  // Update field to digits only
+  input.value = digitsOnly;
+
+  //  If user typed any non-digit (abcd etc.)
+  if (original !== digitsOnly) {
+    error.style.display = "block";
+    error.innerText = "Please enter only mobile numbers. Letters are not allowed.";
+    return;
+  }
+
+  //  Less than 10 digits but typed correctly
+  if (digitsOnly.length > 0 && digitsOnly.length < 10) {
+    error.style.display = "block";
+    error.innerText = "Please enter a valid 10-digit mobile number.";
+    return;
+  }
+
+  //  Exactly 10 digits ? no warning
+  if (digitsOnly.length === 10) {
+    error.style.display = "none";
+    return;
+  }
+
+  //  Empty field ? hide error
+  error.style.display = "none";
+}
+
+function lockLoginForm() {
+  document.querySelectorAll("#loginModal input, #loginModal button")
+    .forEach(el => el.disabled = true);
+
+  document.getElementById("loginProgressOverlay").classList.remove("hidden");
+}
+
+
+function unlockLoginForm() {
+  document.querySelectorAll("#loginModal input, #loginModal button")
+    .forEach(el => el.disabled = false);
+
+  document.getElementById("loginProgressOverlay").classList.add("hidden");
+}
+
+
+
+function openForgotPassword() {
+
+  // CLOSE LOGIN MODAL
+  document.getElementById("loginModal").style.display = "none";
+
+  // OPEN FORGOT MODAL
+  document.getElementById("forgotPasswordModal").style.display = "flex";
+
+  // RESET FIELDS
+  document.getElementById("fpOTP").style.display = "none";
+  document.getElementById("fpNewPass").style.display = "none";
+  document.getElementById("resetBtn").style.display = "none";
+}
+
+
+
+function closeForgotPassword() {
+  document.getElementById("forgotPasswordModal").style.display = "none";
+
+  // Reset fields
+  document.getElementById("fpMobile").value = "";
+  document.getElementById("fpOTP").value = "";
+  document.getElementById("fpNewPass").value = "";
+
+  // Hide OTP and Password fields
+  document.getElementById("fpOTP").style.display = "none";
+  document.getElementById("fpNewPass").style.display = "none";
+  document.getElementById("resetBtn").style.display = "none";
+}
+
+// STEP 1: SEND OTP
+function sendResetOTP() {
+  const mobile = document.getElementById("fpMobile").value.trim();
+
+  if (!/^[0-9]{10}$/.test(mobile)) {
+    alert("Please enter valid 10-digit mobile.");
+    return;
+  }
+
+  // SHOW Overlay (inside modal only)
+  const overlay = document.getElementById("fpOverlay");
+  overlay.style.display = "flex";
+  overlay.textContent = "Sending OTP...";
+
+  // LOCK form
+  lockForgotForm();
+
+  // API CALL
+  apiGet("sendPasswordResetOTP", { mobile })
+    .then(res => {
+      overlay.style.display = "none";
+      unlockForgotForm();
+
+      if (res.success) {
+        alert("OTP sent successfully!");
+
+        // SHOW OTP fields
+        document.getElementById("fpOTP").style.display = "block";
+        document.getElementById("fpNewPass").style.display = "block";
+        document.getElementById("resetBtn").style.display = "block";
+      } else {
+        alert(res.message);
+      }
+    })
+    .catch(err => {
+      overlay.style.display = "none";
+      unlockForgotForm();
+      alert("Error: " + err.message);
+    });
+}
+
+
+// STEP 2: RESET PASSWORD
+function resetPassword() {
+  const mobile = document.getElementById("fpMobile").value.trim();
+  const otp = document.getElementById("fpOTP").value.trim();
+  const newPass = document.getElementById("fpNewPass").value.trim();
+
+  if (!otp) {
+    alert("Enter OTP.");
+    return;
+  }
+  if (!newPass) {
+    alert("Enter new password.");
+    return;
+  }
+
+  // SHOW OVERLAY + LOCK UI
+  document.getElementById("fpOverlay").style.display = "flex";
+  lockForgotForm();
+  updateForgotOverlay("Updating password...");
+
+  apiPost("resetPassword", { mobile, otp, newPass })
+    .then(res => {
+      document.getElementById("fpOverlay").style.display = "none";
+      unlockForgotForm();
+
+      if (res.success) {
+        alert("Password updated successfully!");
+
+        closeForgotPassword();
+
+        //  FIX 1 — ensure login form is unlocked
+        unlockLoginForm();
+
+        //  FIX 2 — open login modal again
+        document.getElementById("loginModal").style.display = "flex";
+      } else {
+        alert(res.message);
+      }
+    })
+    .catch(err => {
+      document.getElementById("fpOverlay").style.display = "none";
+      unlockForgotForm();
+      alert("Error: " + err.message);
+
+      //  Ensure login is not stuck locked
+      unlockLoginForm();
+    });
+}
+
+function lockForgotForm() {
+  const modal = document.querySelector("#forgotPasswordModal > div");
+  modal.querySelectorAll("input, button").forEach(el => el.disabled = true);
+}
+
+function unlockForgotForm() {
+  const modal = document.querySelector("#forgotPasswordModal > div");
+  modal.querySelectorAll("input, button").forEach(el => el.disabled = false);
+}
+
+
+function updateForgotOverlay(msg) {
+  document.getElementById("fpOverlay").textContent = msg;
+}
+function showPage(pageId) {
+  // Always hide both wrappers first
+  document.getElementById("menuWrapper").style.display = "none";
+  document.getElementById("pageWrapper").style.display = "none";
+
+  // Hide all inner pages
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("ordersPage").style.display = "none";
+  document.getElementById("offersPage").style.display = "none";
+
+  // Show requested
+  if (pageId === "menuPage") {
+    document.getElementById("menuWrapper").style.display = "block";
+  } else {
+    document.getElementById("pageWrapper").style.display = "block";
+    document.getElementById(pageId).style.display = "block";
+  }
+}
+
+
+
+function activateMenu(element) {
+  document.querySelectorAll("#premiumMenu li").forEach(li => li.classList.remove("active"));
+  element.classList.add("active");
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById("leftNav");
+  const menuBtn = document.getElementById("hamburgerBtn");
+  const main = document.getElementById("mainContent");
+
+  // Sidebar hidden ? open
+  if (!sidebar.classList.contains("active")) {
+    sidebar.classList.add("active");
+    main.style.marginLeft = "220px";
+    menuBtn.innerHTML = `
+<svg width="22" height="22">
+  <path d="M4 4 L20 20 M20 4 L4 20" stroke="#FFD166" stroke-width="3"/>
+</svg>`;
+
+  } 
+  else {
+    // close sidebar
+    sidebar.classList.remove("active");
+    main.style.marginLeft = "0";
+    menuBtn.innerHTML = `
+<svg width="24" height="24" fill="#FFD166">
+  <rect y="4" width="24" height="3"></rect>
+  <rect y="10" width="24" height="3"></rect>
+  <rect y="16" width="24" height="3"></rect>
+</svg>`;
+
+
+  }
+}
+function loadUserProfile() {
+  const mobile = localStorage.getItem("userMobile");
+
+  if (!mobile) {
+    alert("Session expired. Please login again.");
+    return;
+  }
+
+  // ? SHOW SIMPLE LOADING TEXT
+  document.getElementById("profileLoading").style.display = "block";
+
+  // ? Netlify API replacement
+  apiGet("getUserProfile", { mobile })
+    .then(res => {
+      document.getElementById("profileLoading").style.display = "none";
+
+      if (!res.success) {
+        alert("User not found");
+        return;
+      }
+
+      fillProfileForm(res);
+    })
+    .catch(err => {
+      document.getElementById("profileLoading").style.display = "none";
+      alert("Failed: " + err.message);
+    });
+}
+function loadUserOrders() {
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) {
+    alert("Session expired. Please login again.");
+    return;
+  }
+  // ? SHOW SIMPLE LOADING TEXT
+  document.getElementById("ordersLoading").style.display = "block";
+  // ? Netlify API replacement
+  apiGet("getUserOrders", { mobile })
+    .then(res => {
+      document.getElementById("ordersLoading").style.display = "none";
+      if (!res.success) {
+        alert("No orders found");
+        return;
+      }
+      fillOrdersList(res.orders);
+    })
+    .catch(err => {
+      document.getElementById("ordersLoading").style.display = "none";
+      alert("Failed: " + err.message);
+    });
+}
+function loadOffers() {
+  // ? SHOW SIMPLE LOADING TEXT
+  document.getElementById("offersLoading").style.display = "block";
+  // ? Netlify API replacement
+  apiGet("getOffers", {})
+    .then(res => {
+      document.getElementById("offersLoading").style.display = "none";
+      if (!res.success) {
+        alert("No offers available");
+        return;
+      }
+      fillOffersList(res.offers);
+    })
+    .catch(err => {
+      document.getElementById("offersLoading").style.display = "none";
+      alert("Failed: " + err.message);
+    });
+}
+
+function fillProfileForm(res) {
+  document.getElementById("profileLoading").style.display = "none";
+
+  if (!res.success) {
+    alert("User not found");
+    return;
+  }
+
+  // Autofill
+  document.getElementById("pName").value = res.name || "";
+  document.getElementById("pMobile").value = res.mobile || "";
+  document.getElementById("pEmail").value = res.email || "";
+  document.getElementById("pAddress").value = res.address || "";
+   document.getElementById("ppin").value = res.pincode || "";
+  document.getElementById("pCity").value = res.city || "";
+  document.getElementById("pState").value = res.state || "";
+  setProfileReadonly(true);
+}
+function showProfilePage() {
+  hideAllPages();
+  document.getElementById("profilePage").style.display = "block";
+  loadUserProfile();   // ? profile load karo
+}
+
+function setProfileReadonly(state) {
+  document.getElementById("pName").readOnly = state;
+  document.getElementById("pEmail").readOnly = state;
+  document.getElementById("pAddress").readOnly = state;
+  document.getElementById("ppin").readOnly = state;
+  document.getElementById("pCity").readOnly = state;
+  document.getElementById("pState").readOnly = state;
+
+  // Mobile never editable
+  document.getElementById("pMobile").disabled = true;
+}
+function enableProfileEdit() {
+  setProfileReadonly(false);
+
+  document.getElementById("editBtn").style.display = "none";
+  document.getElementById("saveBtn").style.display = "inline-block";
+  document.getElementById("cancelBtn").style.display = "inline-block";
+}
+function cancelProfileEdit() {
+  loadUserProfile();   // reload original values
+  document.getElementById("editBtn").style.display = "inline-block";
+  document.getElementById("saveBtn").style.display = "none";
+  document.getElementById("cancelBtn").style.display = "none";
+}
+
+function saveProfile() {
+  const data = {
+    mobile: document.getElementById("pMobile").value.trim(),
+    name: document.getElementById("pName").value.trim(),
+    email: document.getElementById("pEmail").value.trim(),
+    address: document.getElementById("pAddress").value.trim(),
+    pincode: document.getElementById("ppin").value.trim(),
+    city: document.getElementById("pCity").value.trim(),
+    state: document.getElementById("pState").value.trim()
+  };
+
+  if (!data.name) return alert("Name cannot be empty");
+  if (!data.email) return alert("Email cannot be empty");
+  if (data.pincode.length !== 6) return alert("Enter valid 6-digit pincode");
+
+  // ? Show overlay
+  document.getElementById("profileOverlay").classList.add("active");
+
+  // Disable buttons
+  document.getElementById("editBtn").disabled = true;
+  document.getElementById("saveBtn").disabled = true;
+  document.getElementById("cancelBtn").disabled = true;
+
+  // ? Netlify POST request
+  apiPost("updateUserProfile", data)
+    .then(res => {
+      document.getElementById("profileOverlay").classList.remove("active");
+
+      // Re-enable buttons
+      document.getElementById("editBtn").disabled = false;
+      document.getElementById("saveBtn").disabled = false;
+      document.getElementById("cancelBtn").disabled = false;
+
+      if (res.success) {
+        alert("Profile updated successfully!");
+        loadUserProfile();
+
+        document.getElementById("editBtn").style.display = "inline-block";
+        document.getElementById("saveBtn").style.display = "none";
+        document.getElementById("cancelBtn").style.display = "none";
+      } else {
+        alert(res.message);
+      }
+    })
+    .catch(err => {
+      document.getElementById("profileOverlay").classList.remove("active");
+      alert("Error: " + err.message);
+    });
+}
+
+
+</script>
+<script>
+let deferredPrompt;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // Show button
+  document.getElementById("installBtn").style.display = "block";
+});
+
+// When user clicks install button
+document.getElementById("installBtn").addEventListener("click", async () => {
+  if (!deferredPrompt) return;
+
+  deferredPrompt.prompt();
+
+  const result = await deferredPrompt.userChoice;
+
+  if (result.outcome === "accepted") {
+    alert("App installed successfully!");
+  }
+
+  deferredPrompt = null;
+
+  // Hide button after install
+  document.getElementById("installBtn").style.display = "none";
+});
+
+// Hide button if already installed
+window.addEventListener("appinstalled", () => {
+  document.getElementById("installBtn").style.display = "none";
+});
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js')
+
+    .then(reg => {
+      console.log('SW Registered on Netlify');
+
+      // SAME UPDATE CHECK SYSTEM
+      reg.addEventListener("updatefound", () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener("statechange", () => {
+          if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+            if (confirm("A new version of the app is available. Update now?")) {
+              window.location.reload();
+            }
+          }
+        });
+      });
+
+    })
+    .catch(err => {
+      console.error('SW Failed:', err);
+    });
+}
+</script>
+<script>
+async function loginUser() {
+  const mobile = document.getElementById("loginMobile").value.trim();
+  const password = document.getElementById("loginPassword").value.trim();
+
+  if (!/^[0-9]{10}$/.test(mobile)) {
+    alert("Enter valid 10-digit mobile.");
+    return;
+  }
+
+  lockLoginForm(); // overlay ON
+
+  apiPost("login", { mobile, password })
+    .then(async res => {   // <-- keep async
+
+      // ❌ remove overlay unlock from here (success case)
+      // unlockLoginForm();  <-- REMOVE THIS LINE ONLY
+
+      if (!res.success) {
+        unlockLoginForm();   // fail case → overlay off
+        alert(res.message || "Login failed.");
+        return;
+      }
+
+      // 1️⃣ Save identity FIRST (IMPORTANT)
+      localStorage.setItem("userMobile", mobile);
+      localStorage.setItem("userEmail", res.email || "");
+
+      // 2️⃣ Update UI email immediately
+      document.getElementById("loggedEmail").innerText = res.email || "";
+
+      // 3️⃣ NOW do cart merge (AFTER email saved)
+      await onUserLogin(mobile);
+
+      // 4️⃣ UI panel updates
+      document.getElementById("userInfoBox").style.display = "block";
+      document.querySelector("button[onclick='openLogin()']").style.display = "none";
+      document.querySelector("button[onclick='openSignup()']").style.display = "none";
+      document.getElementById("signupLabelBox").style.display = "none";
+      document.getElementById("logoutBtn").style.display = "inline-block";
+      document.getElementById("hamburgerBtn").style.display = "block";
+      document.getElementById("leftNav").style.display = "block";
+
+      // ✅ SUCCESS → overlay OFF now
+      
+
+      // close modal with slight delay
+ setTimeout(() => {
+  closeLogin();
+   unlockLoginForm();   
+}, 50);
+
+    })
+    .catch(err => {
+      unlockLoginForm();  // error → overlay off
+      alert("Login error: " + err.message);
+    });
+}
+
+
+  function openMenuPageProperly(el) {
+  activateMenu(el);
+  hideAllPages();
+  document.getElementById("menuWrapper").style.display = "block";
+}
+
+
+</script>
+<script>
+function hideAllPages() {
+  document.getElementById("menuWrapper").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("ordersPage").style.display = "none";
+  document.getElementById("offersPage").style.display = "none";
+}
+</script>
+<script>
+
+function apiPost(api, data = {}) {
+  return fetch(API_BASE + "?api=" + api, {
+    method: "POST",
+    body: JSON.stringify(data)  // ??? ?? header ?? ????
+  }).then(res => res.json());
+}
+
+function isLoggedIn() {
+  return Boolean(localStorage.getItem("userMobile"));
+}
+
+  
+function buildMenuCardHTML(item, idx) {
+// A2A — Ensure stable itemId (Single + Multi)
+item.itemId = String(
+  item.itemId ||
+  item.ItemId ||
+  item.id ||
+  item.ID ||
+  slugify(item.name)
+);
+  
+  let priceSection = "";
+  let cartSection = "";
+
+  // ==========================
+  //       SINGLE ITEM
+  // ==========================
+  if (item.cat2 === "Single") {
+
+    // FINAL PRICE CALCULATION (MENU SHEET)
+    const mrp  = Number(item.price);               // From menu sheet
+    const disc = Number(item.discPercent || 0);
+    const finalPrice = parseFloat((mrp - (mrp * disc / 100)).toFixed(2));
+
+    priceSection = `
+      <div class="variant-box">
+        <div class="variant-row">
+          <div class="left-side">
+            <span class="unit">${item.unit || ""}</span>
+
+            ${disc > 0 ? `
+              <span style="background:#ff3e3e;color:#fff;font-size:11px;
+                           padding:2px 4px;border-radius:3px;">
+                ${disc}% OFF
+              </span>
+            ` : ""}
+          </div>
+
+          <div style="text-align:right;">
+            <span class="final-price" style="font-weight:700;font-size:16px;">
+              ₹${finalPrice}
+            </span>
+
+            ${disc > 0 ? `
+              <span class="mrp" 
+                    style="text-decoration:line-through;color:#777;
+                           margin-left:6px;font-size:13px;">
+                ₹${mrp}
+              </span>
+            ` : ""}
+          </div>
+        </div>
+      </div>
+    `;
+
+    cartSection = `
+  <button class="add-btn hidden"
+    data-name="${item.name}"
+    data-unit="${item.unit}"
+    data-price="${mrp}"
+    data-disc="${disc}"
+    data-item-id="${item.itemId}">
+    Add
+  </button>
+    `;
+  }
+
+  // ==========================
+  //       MULTI ITEM
+  // ==========================
+  if (item.cat2 === "Multi") {
+    const idSafe = slugify(item.name) + "-" + idx;
+
+
+    let variantsHTML = "";
+
+    item.variants.forEach(v => {
+
+      // FINAL PRICE CALCULATION (CAT_ALLOCATION SHEET)
+      const mrp  = Number(v.price);                  // From cat_allocation sheet
+      const disc = Number(v.discPercent || 0);
+      const finalPrice = parseFloat((mrp - (mrp * disc / 100)).toFixed(2));
+
+      variantsHTML += `
+        <label class="variant-row">
+          <div class="left-side">
+            <input type="radio"
+                   name="var-${idSafe}"
+                   data-unit="${v.unit}"
+                   data-mrp="${mrp}"
+                   data-disc="${disc}"
+                   data-variant-id="${v.variantId}">
+
+            <span class="unit">${v.unit}</span>
+
+            ${disc > 0 ? `
+              <span style="background:#ff3e3e;color:#fff;
+                           font-size:11px;padding:2px 4px;
+                           border-radius:3px;">
+                ${disc}% OFF
+              </span>
+            ` : ""}
+          </div>
+
+          <div style="text-align:right;">
+            <span class="final-price" 
+                  style="font-weight:700;font-size:16px;">
+              ₹${finalPrice}
+            </span>
+
+            ${disc > 0 ? `
+              <span style="text-decoration:line-through;
+                           color:#777;margin-left:6px;font-size:13px;">
+                ₹${mrp}
+              </span>
+            ` : ""}
+          </div>
+        </label>
+      `;
+    });
+
+    priceSection = `<div class="variant-box">${variantsHTML}</div>`;
+     // A2B — Hide old Add button for Multi also
+    cartSection = `
+ 
+<button class="add-btn disabled-btn hidden"
+        id="btn-${idSafe}"
+        data-name="${item.name}">
+  Add
+</button>
+
+    `;
+  }
+
+  // ==========================
+  //       RETURN CARD
+  // ==========================
+  return `
+    <img src="${item.image}" alt="${item.name}">
+    <h4>${item.name}</h4>
+    <p>${item.description || ""}</p>
+    ${priceSection}
+    ${cartSection}
+
+    <!-- ADD BUTTON -->
+<button id="addBtn-${item.itemId}"
+        class="addBtn bg-[#ff6f00] text-white px-3 py-1 rounded font-semibold mt-2"
+        onclick="addFromMenu('${item.itemId}')">
+  ADD
+</button>
+
+<!-- QTY BOX -->
+<div id="qtyBox-${item.itemId}" 
+     class="qtyBox hidden flex items-center justify-center gap-3 mt-2">
+
+  <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+          onclick="menuMinus('${item.itemId}')">−</button>
+
+  <span id="qtyText-${item.itemId}" class="font-semibold">1</span>
+
+  <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+          onclick="menuPlus('${item.itemId}')">+</button>
+
+</div>
+
+  `;
+  
+}
+
+function activateVariantSelector(item, idx) {
+
+  if (item.cat2 !== "Multi") return;
+
+  const idSafe = slugify(item.name) + "-" + idx;
+  const radios = document.querySelectorAll(`input[name="var-${idSafe}"]`);
+
+  // HIDE ALL VARIANT QTY BOXES (whenever switching)
+  function hideAllVariantQty() {
+    radios.forEach(r => {
+      const vid = r.dataset.variantId;
+      const box = document.getElementById(`qtyBox-${item.itemId}_${vid}`);
+      if (box) box.classList.add("hidden");
+    });
+  }
+
+  radios.forEach(r => {
+    r.addEventListener("change", () => {
+
+      const variantId = r.dataset.variantId;
+
+      // STEP 1 — Hide previous qty boxes
+      hideAllVariantQty();
+
+      // STEP 2 — Check if qtyBox exists for this variant
+      let box = document.getElementById(`qtyBox-${item.itemId}_${variantId}`);
+
+      // STEP 3 — If not exist, create dynamically under selected variant row
+      if (!box) {
+        const parentRow = r.closest(".variant-row");
+        const qtyHTML = `
+          <div id="qtyBox-${item.itemId}_${variantId}"
+               class="qtyBox flex items-center gap-3 mt-2">
+
+            <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+                    onclick="menuMinus('${item.itemId}_${variantId}')">−</button>
+
+            <span id="qtyText-${item.itemId}_${variantId}"
+                  class="font-semibold">1</span>
+
+            <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+                    onclick="menuPlus_multi('${item.itemId}_${variantId}')">+</button>
+
+          </div>
+        `;
+        parentRow.insertAdjacentHTML("afterend", qtyHTML);
+      }
+
+      // STEP 4 — Show qtyBox for selected variant
+      box = document.getElementById(`qtyBox-${item.itemId}_${variantId}`);
+      box.classList.remove("hidden");
+
+      // STEP 5 — Default qty = 1 on variant change
+      document.getElementById(`qtyText-${item.itemId}_${variantId}`).innerText = 1;
+// ⭐ B4-A — Add to cart for multi variant
+let cartArr = isLoggedIn()
+  ? JSON.parse(localStorage.getItem("cart") || "[]")
+  : JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+// Check if variant already exists in cart
+let existing = cartArr.find(
+  c => c.itemId === item.itemId && c.variantId === variantId
+);
+
+if (!existing) {
+  const cartObj = {
+    itemId: item.itemId,
+    variantId: variantId,
+    name: item.name,
+    unit: r.dataset.unit,
+    price: Number(r.dataset.mrp),
+    disc: Number(r.dataset.disc),
+    qty: 1
+  };
+  cartArr.push(cartObj);
+} else {
+  existing.qty = 1; // when reselecting variant
+}
+
+// Save back (logged-in / guest)
+if (isLoggedIn()) {
+  localStorage.setItem("cart", JSON.stringify(cartArr));
+  saveCartToBackend(cartArr);
+} else {
+  localStorage.setItem("guestCart", JSON.stringify(cartArr));
+}
+
+updateCartBadge();
+
+    });
+  });
+}
+
+
+function addVariantToCart(name) {
+  const safe = slugify(name);
+  const selected = document.querySelector(`input[name^="var-${safe}-"]:checked`);
+  if (!selected) return null;
+
+  const mrp  = Number(selected.dataset.mrp || 0);
+  const disc = Number(selected.dataset.disc || 0);
+
+  return {
+    name: name,
+    unit: selected.dataset.unit,
+    rate: mrp,
+    discPercent: disc,
+    variantId: selected.dataset.variantId,
+    itemId: menuItems.find(m => m.name === name)?.itemId
+};
+
+}
+
+
+
+
+
+// Delegated click handler for all Add buttons (works for Single and Multi)
+// ADD-TO-CART HANDLER
+document.addEventListener('click', function (e) {
+  const btn = e.target.closest('.add-btn');
+  if (!btn) return;
+
+  const name = btn.dataset.name;
+
+  if (btn.classList.contains('disabled-btn')) {
+    alert("Please select an option before adding to cart.");
+    return;
+  }
+
+  // MULTI ITEM
+  if (btn.id && btn.id.startsWith("btn-")) {
+    const info = addVariantToCart(name);
+    if (!info) return alert("Please select an option before adding to cart.");
+
+    if (!info.rate || info.rate <= 0 || isNaN(info.rate)) {
+      alert("Price not found for this variant.");
+      return;
+    }
+
+  addToCart(info.name, info.unit, info.rate, info.discPercent, info.itemId, info.variantId);
+    updateCartBadge();
+
+btn.classList.add("added-flash");
+setTimeout(() => btn.classList.remove("added-flash"), 250);
+
+// 1a — RESET VARIANT RADIOS
+const parentCard = btn.closest(".menu-item");
+if (parentCard) {
+  parentCard.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+}
+
+// 1b — DISABLE ADD BUTTON (only appearance)
+
+
+// 1d — FULL DATA RESET (correct place)
+btn.dataset.price = "";
+btn.dataset.unit = "";
+btn.dataset.disc = "";
+
+    return;
+  }
+
+  // SINGLE ITEM
+  const unit = btn.dataset.unit || "";
+  const price = Number(btn.dataset.price || 0);
+  const discPercent = Number(btn.dataset.disc || 0);
+
+  if (!price || price <= 0 || isNaN(price)) {
+    alert("Price not found for this item.");
+    return;
+  }
+
+  addToCart(name, unit, price, discPercent, btn.dataset.itemId, "");
+updateCartBadge();
+
+  // INSERT Z2 HERE
+btn.classList.add("added-flash");
+setTimeout(() => btn.classList.remove("added-flash"), 250);
+
+
+});
+
+
+// DELETE HANDLER — MUST BE BELOW ADD HANDLER
+document.addEventListener("click", function (e) {
+  const del = e.target.closest(".delete-btn");
+  if (!del) return;
+
+  const index = Number(del.dataset.index);
+  removeItem(index);
+});
+  // QTY HANDLER (INCREASE / DECREASE) — Prevent double events
+document.addEventListener("click", async function (e) {
+
+  const inc = e.target.closest(".qty-inc");
+  const dec = e.target.closest(".qty-dec");
+
+  if (!inc && !dec) return;
+
+  const index = Number((inc || dec).dataset.index);
+  if (isNaN(index)) return;
+
+  // 1 — Modify qty safely
+  if (inc) cart[index].qty++;
+  if (dec) cart[index].qty = Math.max(1, cart[index].qty - 1);
+
+  // 2 — Update local cart immediately (NO flicker)
+  localStorage.setItem("cart", JSON.stringify(cart));
+
+  // 3 — Re-render cart smoothly
+  renderCart();
+
+  // 4 — Backend save (but only ONE at a time)
+  await saveCartToBackend();
+});
+
+
+async function saveCartToBackend(cartData = null) {
+  return new Promise(async (resolve) => {
+
+    // Only if logged in
+    if (!isLoggedIn()) return resolve();
+
+    const mobile = localStorage.getItem("userMobile");
+    if (!mobile) return resolve();
+
+    // ---- QUEUE SYSTEM (Race fix) ----
+    if (window.cartSaveLock) {
+      window.cartSaveQueued = true;
+      return resolve();
+    }
+    window.cartSaveLock = true;
+
+    // Ensure sessionId
+    let sessionId = localStorage.getItem("sessionId");
+    if (!sessionId) {
+      sessionId = "SESS-" + Date.now();
+      localStorage.setItem("sessionId", sessionId);
+    }
+
+    // Use passed data OR global cart
+    const cartToSend = (cartData && Array.isArray(cartData)) ? cartData : cart;
+
+    // Clean final payload
+    const cleanedCart = cartToSend.map(item => ({
+      name: item.name || "",
+      unit: item.unit || "",
+      qty: Number(item.qty || 1),
+      rate: Number(item.rate || 0),
+      discPercent: Number(item.discPercent || 0),
+      itemId: item.itemId || "",
+      variantId: item.variantId || "",
+      image: item.image || ""
+    }));
+
+    try {
+       blockRender = true;  
+      await apiPost("saveCart", {
+        mobile,
+        email: localStorage.getItem("userEmail") || "",
+        sessionId,
+        cartItems: cleanedCart
+      });
+
+    } catch (err) {
+      console.error("Cart Save Error:", err);
+
+    } finally {
+ blockRender = false;  
+      window.cartSaveLock = false;
+
+      if (window.cartSaveQueued) {
+        window.cartSaveQueued = false;
+        await saveCartToBackend();
+      }
+  // FINAL SAFE CHECK
+    if (isLoggedIn()) {
+        localStorage.setItem("cart", JSON.stringify(cart));
+    }
+      // === STEP 4C: DISABLED BACKEND VERIFY TO PREVENT QTY ROLLBACK ===
+      resolve();
+    }
+
+  });
+}
+
+
+
+ function loadUserCartOnStart() {
+
+  // Only load if user is actually logged in
+  if (!isLoggedIn()) return;
+
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) return;
+
+  apiPost("getCart", { mobile })
+    .then(res => {
+      const backendCart = res.cart || res.data || res.cartItems || [];
+
+      // Sanitize every item to avoid null/missing fields
+      const cleaned = backendCart.map(item => ({
+        ...item,
+        itemId: item.itemId || "",
+        variantId: item.variantId || "",
+        qty: Number(item.qty || 1),
+        rate: Number(item.rate || 0),
+        discPercent: Number(item.discPercent || 0)
+      }));
+
+      // Save merged/cleaned cart locally
+      localStorage.setItem("cart", JSON.stringify(cleaned));
+      cart = cleaned;
+      window.cart = cleaned;
+
+      renderCart();
+    })
+    .catch(err => console.error("Load cart on start error:", err));
+}
+
+function getBackendCart(mobile) {
+  return apiPost("getCart", { mobile })
+    .then(res => {
+      if (res.success && Array.isArray(res.data)) {
+        return res.data;   // ← backend cart array return
+      }
+      return [];
+    })
+    .catch(err => {
+      console.error("Fetch Backend Cart Error:", err);
+      return [];
+    });
+}
+
+function mergeCarts(localCart, backendCart) {
+  let finalCart = [];
+
+  const map = new Map();
+
+  // Step 1: Backend items safe
+  backendCart.forEach(item => {
+    const key = `${item.itemId}_${item.variantId}`;
+    map.set(key, { ...item });
+  });
+
+  // Step 2: Local cart merge
+ localCart.forEach(localItem => {
+
+  // ❗ skip if invalid IDs
+  if (!localItem.itemId) return;
+  if (localItem.variantId === undefined) return;
+
+  const key = `${localItem.itemId}_${localItem.variantId}`;
+
+    if (map.has(key)) {
+      let exist = map.get(key);
+      exist.qty = Number(exist.qty) + Number(localItem.qty);
+      exist.total = exist.qty * exist.rate;
+      map.set(key, exist);
+    } else {
+      map.set(key, {
+        ...localItem,
+        cartId: "",      
+        sessionId: "",
+        mobile: "",
+        timestamp: ""
+      });
+    }
+  });
+
+  map.forEach(item => finalCart.push(item));
+  return finalCart;
+}
+async function onUserLogin(mobile) {
+
+  // ALWAYS load email first (IMPORTANT)
+  const email = localStorage.getItem("userEmail") || "";
+  //  Ensure sessionId exists
+  let sessionId = localStorage.getItem("sessionId");
+  if (!sessionId) {
+    sessionId = "SESS-" + Date.now();
+    localStorage.setItem("sessionId", sessionId);
+  }
+
+  // -------------------------------
+  // 1) Fetch backend cart
+  // -------------------------------
+  const backendRes = await apiPost("getCart", { mobile });
+  const backendCartRaw = backendRes.cart || [];
+
+  const backendCart = backendCartRaw.map(i => ({
+    name: i.name || "",
+    unit: i.unit || "",
+    qty: Number(i.qty || 1),
+    rate: Number(i.rate || 0),
+    discPercent: Number(i.discPercent || 0),
+    itemId: i.itemId || "",
+    variantId: i.variantId || "",
+    image: i.image || ""
+  }));
+
+  // -------------------------------
+  // 2) Read local guest cart
+  // -------------------------------
+  const guestRaw = JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+  const guestCart = guestRaw.map(i => ({
+    name: i.name || "",
+    unit: i.unit || "",
+    qty: Number(i.qty || 1),
+    rate: Number(i.rate || 0),
+    discPercent: Number(i.discPercent || 0),
+    itemId: i.itemId || "",
+    variantId: i.variantId || "",
+    image: i.image || ""
+  }));
+
+  // -------------------------------
+  // 3A) Merge (guest + backend)
+  // -------------------------------
+  let merged = mergeCarts(guestCart, backendCart);  
+
+  // -------------------------------
+  // 3B) Add backend items NOT in merged
+  // -------------------------------
+  backendCart.forEach(b => {
+    const exists = merged.some(m =>
+      m.itemId == b.itemId && m.variantId == b.variantId
+    );
+    if (!exists) merged.push(b);
+  });
+
+  // -------------------------------
+  // 3D) Final Normalize
+  // -------------------------------
+  const finalMerged = merged.map(item => {
+    item.qty = Number(item.qty || 1);
+    item.rate = Number(item.rate || 0);
+    item.discPercent = Number(item.discPercent || 0);
+
+    const discAmt = (item.rate * item.discPercent) / 100;
+    const netRate = item.rate - discAmt;
+
+    item.discAmt = Number(discAmt.toFixed(2));
+    item.netAmt  = Number(netRate.toFixed(2));
+
+    item.total = item.discPercent > 0
+      ? Number((netRate * item.qty).toFixed(2))
+      : Number((item.rate * item.qty).toFixed(2));
+
+    return item;
+  });
+
+  // -------------------------------
+  // 4) Save to backend
+  // -------------------------------
+  cart = finalMerged;
+  window.cart = finalMerged;
+localStorage.setItem("userEmail", email);
+
+  await saveCartToBackend(finalMerged);
+
+  // Clear guest cart
+  localStorage.removeItem("guestCart");
+
+  // -------------------------------
+  // 5) Save local mirror
+  // -------------------------------
+  localStorage.setItem("cart", JSON.stringify(finalMerged));
+
+  // -------------------------------
+  // 6) Render UI
+  // -------------------------------
+  renderCart();
+  // STEP 5B — Force second render to fix stale UI
+setTimeout(() => renderCart(), 50);
+// === STEP 5C — Final backend verify after login ===
+setTimeout(async () => {
+  try {
+    const check = await apiPost("getCart", { mobile });
+    const latest = check.cart || check.data || [];
+
+    // Compare backend vs local
+    if (JSON.stringify(latest) !== JSON.stringify(cart)) {
+      console.warn("🔧 Login Sync: Backend mismatch → correcting");
+      localStorage.setItem("cart", JSON.stringify(latest));
+      cart = latest;
+      window.cart = latest;
+      renderCart();
+    }
+
+  } catch (err) {
+    console.error("Login final verify error:", err);
+  }
+}, 1000);
+
+}
+function showCartOverlay(msg = "Updating your cart…") {
+  const o = document.getElementById("cartOverlay");
+  if (o) {
+    o.textContent = msg;
+    o.style.display = "flex";
+  }
+}
+
+function hideCartOverlay() {
+  const o = document.getElementById("cartOverlay");
+  if (o) o.style.display = "none";
+}
+async function someCartAction() {
+  showCartOverlay("Working...");
+
+  try {
+      // 1) local storage update
+      // 2) cart rebuild
+      // 3) backend save (if logged in)
+      // 4) renderCart()
+      // 5) any recheck or merge
+  }
+  catch(err) {
+     console.error(err);
+  }
+  finally {
+     hideCartOverlay();   // <-- ALWAYS LAST
+  }
+}
+
+function resetCheckoutFieldsDefault() {
+
+  // SHOW only these 3 rows
+  document.getElementById("mobile").parentElement.style.display = "block";
+  document.getElementById("orderType").parentElement.style.display = "block";
+  document.getElementById("paymentMethod").parentElement.style.display = "block";
+
+  // HIDE Name + Email + Address (label + input together)
+  document.getElementById("customerName").parentElement.style.display = "none";
+  document.getElementById("email").parentElement.style.display = "none";
+  document.getElementById("addressWrapper").style.display = "none";
+
+  // Ensure fields remain editable when shown later
+  document.getElementById("customerName").readOnly = false;
+  document.getElementById("email").readOnly = false;
+  document.getElementById("address").readOnly = false;
+
+  // Payment MUST remain visible always
+  document.getElementById("paymentMethod").style.display = "block";
+}
+
+
+function setupAddressUIVisibility() {
+  const changeBtn = document.getElementById("changeAddressBtn");
+  const dropdownContainer = document.getElementById("addressSelectContainer");
+  const newAddressForm = document.getElementById("newAddressForm");
+
+  if (!changeBtn || !dropdownContainer || !newAddressForm) return;
+
+  if (isLoggedIn()) {
+    // ONLY logged-in users see the button
+    changeBtn.classList.remove("hidden");
+
+    // Dropdown & New address form remain hidden until user clicks
+    dropdownContainer.classList.add("hidden");
+    newAddressForm.classList.add("hidden");
+  } else {
+    // Guest User → everything OFF
+    changeBtn.classList.add("hidden");
+    dropdownContainer.classList.add("hidden");
+    newAddressForm.classList.add("hidden");
+  }
+}
+
+// run on page load
+document.addEventListener("DOMContentLoaded", setupAddressUIVisibility);
+
+function autofillMobileForLoggedIn() {
+  const mobileInput = document.getElementById("mobile");
+
+  if (!mobileInput) return;
+
+  // Only logged-in users
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) {
+    // Guest → allow typing
+    mobileInput.value = "";
+    mobileInput.readOnly = false;
+    return;
+  }
+
+  // Logged-in user → auto-fill and lock the field
+  mobileInput.value = mobile;
+  mobileInput.readOnly = true;
+}
+
+// Run when checkout modal shows up
+
+function onChangeAddressClick() {
+
+  const mobile = localStorage.getItem("mobile") || localStorage.getItem("userMobile");
+  if (!mobile) return;
+
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) overlay.style.display = "flex";
+
+  const dropdownBox = document.getElementById("addressSelectContainer");
+  const newFormBox = document.getElementById("newAddressForm");
+
+  dropdownBox.classList.add("hidden");
+  newFormBox.classList.add("hidden");
+
+  const ddl = document.getElementById("savedAddressDropdown");
+  ddl.innerHTML = "";
+  ddl.classList.remove("hidden");
+
+  // 1️⃣ Fetch Primary + MultiAdd together
+  Promise.all([
+    apiGet("getUserProfile", { mobile }),
+    apiGet("getUserMultiAddresses", { mobile })
+  ])
+  .then(([userRes, multiRes]) => {
+
+      const primary = userRes?.address
+        ? {
+            address: userRes.address,
+            pincode: userRes.pincode || "",
+            city: userRes.city || "",
+            state: userRes.state || "",
+            type: "primary"
+          }
+        : null;
+
+      const multiList = Array.isArray(multiRes?.addresses)
+        ? multiRes.addresses.map(a => ({
+            address: a.address || "",
+            pincode: a.pincode || "",
+            city: a.city || "",
+            state: a.state || "",
+            type: "multi"
+          }))
+        : [];
+
+      // 2️⃣ If nothing saved → show new form
+      if (!primary && multiList.length === 0) {
+        newFormBox.classList.remove("hidden");
+        autofillNewAddressMobile();
+        if (overlay) overlay.style.display = "none";
+        return;
+      }
+
+      // 3️⃣ Show dropdown box
+      dropdownBox.classList.remove("hidden");
+
+      let count = 1;
+
+      // --- Add Primary ---
+      if (primary) {
+        const opt = document.createElement("option");
+        opt.value = JSON.stringify(primary);
+        opt.textContent =
+          `${count}) ${primary.address} | ${primary.pincode} | ${primary.city} | ${primary.state}`;
+        ddl.appendChild(opt);
+        count++;
+      }
+
+      // --- Add multi_add addresses ---
+      multiList.forEach(a => {
+        const opt = document.createElement("option");
+        opt.value = JSON.stringify(a);
+        opt.textContent =
+          `${count}) ${a.address} | ${a.pincode} | ${a.city} | ${a.state}`;
+        ddl.appendChild(opt);
+        count++;
+      });
+
+      // 4️⃣ Auto-select first address
+      const first = ddl.options[0];
+      if (first) {
+        ddl.value = first.value;
+        const obj = JSON.parse(first.value);
+        document.getElementById("address").value  = obj.address;
+        document.getElementById("pincode").value = obj.pincode;
+        document.getElementById("city").value    = obj.city;
+        document.getElementById("state").value   = obj.state;
+      }
+
+      // ⭐ SUPER SAFE OVERLAY HIDE → when dropdown truly visible
+      const waitRender = setInterval(() => {
+
+        const optionsReady = ddl.options.length > 0;
+        const visible = !dropdownBox.classList.contains("hidden");
+
+        if (optionsReady && visible) {
+          clearInterval(waitRender);
+
+          // ensure browser paints dropdown before hiding overlay
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              if (overlay) overlay.style.display = "none";
+            });
+          });
+        }
+
+      }, 50);
+
+      // 5️⃣ Dropdown change handler
+      ddl.onchange = () => {
+        try {
+          const obj = JSON.parse(ddl.value);
+          document.getElementById("address").value  = obj.address;
+          document.getElementById("pincode").value = obj.pincode;
+          document.getElementById("city").value    = obj.city;
+          document.getElementById("state").value   = obj.state;
+        } catch (e) {}
+      };
+
+  })
+  .catch(err => {
+      console.error("Address load error:", err);
+      alert("Unable to load saved addresses.");
+      if (overlay) overlay.style.display = "none";
+  });
+}
+
+
+
+  function onChangeAddressAddNew() {
+ const mobile = localStorage.getItem("mobile") || localStorage.getItem("userMobile");
+
+  if (!mobile) return;
+
+  const dropdownBox = document.getElementById("addressSelectContainer");
+  const newFormBox = document.getElementById("newAddressForm");
+
+  dropdownBox.classList.add("hidden");
+  newFormBox.classList.remove("hidden");
+
+  // Autofill mobile inside new-address form
+  document.getElementById("newAddressMobile").value = mobile;
+}
+
+function saveNewAddress() {
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) return alert("Login required.");
+
+  const addr = document.getElementById("newAddressField").value.trim();
+  const pin  = document.getElementById("newPincode").value.trim();
+  const city = document.getElementById("newCity").value.trim();
+  const state = document.getElementById("newState").value.trim();
+
+  if (!addr) return alert("Please enter address.");
+  if (pin.length !== 6) return alert("Please enter valid 6-digit pincode.");
+  if (!city) return alert("Enter city.");
+  if (!state) return alert("Enter state.");
+
+  apiPost("saveUserNewAddress", { mobile, address: addr, pincode: pin, city, state })
+    .then(res => {
+      if (res.success) {
+        alert("Address saved successfully!");
+
+        // Hide form
+        const form = document.getElementById("newAddressForm");
+        form.classList.add("hidden");
+
+        // Clear new form inputs
+        document.getElementById("newAddressField").value = "";
+        document.getElementById("newPincode").value = "";
+        document.getElementById("newCity").value = "";
+        document.getElementById("newState").value = "";
+
+        // Show dropdown
+        document.getElementById("addressSelectContainer").classList.remove("hidden");
+
+        // Reload dropdown list
+        onChangeAddressClick();
+
+        // Auto-select new address
+        setTimeout(() => {
+          const ddl = document.getElementById("savedAddressDropdown");
+          if (ddl) {
+            ddl.value = addr;  // Pre-select newly added address
+          }
+          document.getElementById("address").value = addr; // Update main textarea
+        }, 400);
+
+      } else {
+        alert(res.message || "Failed to save address.");
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error saving address.");
+    });
+}
+
+const originalBodyOverflow = document.body.style.overflow || "";  
+// STEP 8 — Autofill New Address Form with logged-in mobile
+function autofillNewAddressMobile() {
+  const mobile = localStorage.getItem("userMobile") || "";
+  const field = document.getElementById("newAddressMobile");
+  if (field && mobile) {
+    field.value = mobile;
+  }
+}
+function updateCartBadge() {
+  let count = 0;
+
+  // Logged-in → count from backend/local cart
+  if (isLoggedIn()) {
+    const saved = localStorage.getItem("cart");
+    const arr = saved ? JSON.parse(saved) : [];
+    count = arr.reduce((a, b) => a + Number(b.qty || 1), 0);
+  }
+  // Guest
+  else {
+    const guest = localStorage.getItem("guestCart");
+    const arr = guest ? JSON.parse(guest) : [];
+    count = arr.reduce((a, b) => a + Number(b.qty || 1), 0);
+  }
+
+  const badge = document.getElementById("cartCount");
+  if (!badge) return;
+
+  // Show / hide logic
+  if (count > 0) {
+    badge.innerText = count;
+    badge.style.display = "inline-block";
+  } else {
+    badge.innerText = "";
+    badge.style.display = "none";
+  }
+  //  Z5a — Cart badge POP animation (Zomato style)
+  badge.classList.remove("cart-badge-pop");
+  void badge.offsetWidth;   // reflow to restart animation
+  badge.classList.add("cart-badge-pop");
+}
+
+async function openCheckout() {
+
+  await openCartPanel();   // ⭐ Z4a must be here
+
+  autofillMobileForLoggedIn();
+  resetCheckoutFieldsDefault();
+  setupAddressUIVisibility();
+  loadPrimaryAddress();
+
+  if (cart.length === 0) {
+    alert("Your cart is empty!");
+    return;
+  }
+
+  document.getElementById("checkoutModal").style.display = "flex";
+}
+async function openCartDrawer() {
+  updateCartBadge();
+
+  await loadCartBeforeDrawer();   // ✔ correct position
+
+  openCartPanel();                // Always load latest cart
+
+  document.getElementById("cartBackdrop").classList.add("active");
+  document.getElementById("cartDrawer").classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+
+function closeCartDrawer() {
+  document.getElementById("cartBackdrop").classList.remove("active");
+  document.getElementById("cartDrawer").classList.remove("active");
+document.body.style.overflow = originalBodyOverflow;
+}
+
+function toggleCartDrawer() {
+  const drawer = document.getElementById("cartDrawer");
+  if (drawer.classList.contains("active")) {
+    closeCartDrawer();
+  } else {
+    openCartDrawer();
+  }
+   
+}
+
+  document.addEventListener("DOMContentLoaded", updateCartBadge);
+document.addEventListener("DOMContentLoaded", loadCartOnStart);
+  
+// ===== SWIPE TO CLOSE Drawer (Zomato style) =====
+let touchStartX = 0;
+
+document.addEventListener("touchstart", function(e) {
+  const drawer = document.getElementById("cartDrawer");
+  if (!drawer.classList.contains("active")) return;
+
+  touchStartX = e.touches[0].clientX;
+});
+
+document.addEventListener("touchmove", function(e) {
+  const drawer = document.getElementById("cartDrawer");
+  if (!drawer.classList.contains("active")) return;
+
+  const currentX = e.touches[0].clientX;
+  const diff = currentX - touchStartX;
+
+  // Swipe right only
+  if (diff > 60) {
+    closeCartDrawer();
+  }
+});
+// ===== ESC Key Close =====
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape") {
+    closeCartDrawer();
+  }
+});
+
+function addFromMenu(itemId) {
+
+  // 1️⃣ UI Update
+  const addBtn = document.getElementById("addBtn-" + itemId);
+  const qtyBox = document.getElementById("qtyBox-" + itemId);
+  const qtyText = document.getElementById("qtyText-" + itemId);
+
+  addBtn.classList.add("hidden");
+  qtyBox.classList.remove("hidden");
+  qtyText.innerText = 1;
+
+  // 2️⃣ Build cart item object (Single item, no variant)
+  const item = menuItems.find(i => 
+    String(i.itemId || i.ItemId || i.id || i.ID) === String(itemId)
+  );
+
+  if (!item) return;
+
+  const mrp = Number(item.price);
+  const disc = Number(item.discPercent || 0);
+
+  const cartObj = {
+    itemId: itemId,
+    name: item.name || "",
+    unit: item.unit || "",
+    price: mrp,
+    disc: disc,
+    qty: 1
+  };
+
+  // 3️⃣ ADD to actual cart array
+  let cartArr = [];
+
+  if (isLoggedIn()) {
+    cartArr = JSON.parse(localStorage.getItem("cart") || "[]");
+  } else {
+    cartArr = JSON.parse(localStorage.getItem("guestCart") || "[]");
+  }
+
+  // Check if already exists (should not happen for single ADD)
+  const existing = cartArr.find(c => c.itemId === itemId && !c.variantId);
+
+  if (existing) {
+    existing.qty = 1;
+  } else {
+    cartArr.push(cartObj);
+  }
+
+  // 4️⃣ Save back
+  if (isLoggedIn()) {
+    localStorage.setItem("cart", JSON.stringify(cartArr));
+    // Async backend push (non-blocking)
+    saveCartToBackend(cartArr);
+  } else {
+    localStorage.setItem("guestCart", JSON.stringify(cartArr));
+  }
+
+  // 5️⃣ Update cart badge
+  updateCartBadge();
+  refreshCartDrawer(); 
+}
+
+function menuPlus(itemId) {
+
+  // 1️⃣ UI Qty increment
+  const qtyText = document.getElementById("qtyText-" + itemId);
+  let q = Number(qtyText.innerText);
+  q++;
+  qtyText.innerText = q;
+animateQty("qtyText-" + itemId);
+  
+  updateDrawerItemQty(itemId, null, q);
+
+
+  // 2️⃣ Load existing cart
+  let cartArr = isLoggedIn()
+    ? JSON.parse(localStorage.getItem("cart") || "[]")
+    : JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+  // 3️⃣ Find item in cart (single → no variantId)
+  const item = cartArr.find(c => c.itemId === itemId && !c.variantId);
+  if (!item) return; // safety
+
+  // 4️⃣ Update qty
+  item.qty = q;
+cart = cartArr; 
+  // 5️⃣ Save back
+  if (isLoggedIn()) {
+    localStorage.setItem("cart", JSON.stringify(cartArr));
+    saveCartToBackend(cartArr); // async
+  } else {
+    localStorage.setItem("guestCart", JSON.stringify(cartArr));
+  }
+
+  // 6️⃣ Update badge
+  updateCartBadge();
+  refreshCartDrawer();
+  updateDrawerTotals();
+
+}
+
+
+function menuMinus(itemId) {
+
+  // 1️⃣ Read current qty from UI
+  const qtyText = document.getElementById("qtyText-" + itemId);
+  let q = Number(qtyText.innerText);
+
+  if (q <= 1) {
+    // Qty will become 0 → Remove from cart
+    qtyText.innerText = 0;
+
+    // 2️⃣ Load cart
+    let cartArr = isLoggedIn()
+      ? JSON.parse(localStorage.getItem("cart") || "[]")
+      : JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+    // 3️⃣ Remove from cart
+    cartArr = cartArr.filter(c => !(c.itemId === itemId && !c.variantId));
+    removeItemFromDrawer(itemId);
+
+
+    // 4️⃣ Save back
+    if (isLoggedIn()) {
+      localStorage.setItem("cart", JSON.stringify(cartArr));
+      saveCartToBackend(cartArr); // async
+    } else {
+      localStorage.setItem("guestCart", JSON.stringify(cartArr));
+    }
+
+    // 5️⃣ UI Reset — QtyBox hide, ADD show
+    document.getElementById("qtyBox-" + itemId).classList.add("hidden");
+    document.getElementById("addBtn-" + itemId).classList.remove("hidden");
+
+    // 6️⃣ Update badge
+    updateCartBadge();
+    refreshCartDrawer();
+    updateDrawerTotals(); 
+    return;
+  }
+
+  // Otherwise qty > 1 → normal decrement
+  q--;
+  qtyText.innerText = q;
+updateDrawerItemQty(itemId, null, q);
+
+  // 7️⃣ Update cart object qty
+  let cartArr = isLoggedIn()
+    ? JSON.parse(localStorage.getItem("cart") || "[]")
+    : JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+  const item = cartArr.find(c => c.itemId === itemId && !c.variantId);
+  if (item) item.qty = q;
+  cart = cartArr; 
+
+  // 8️⃣ Save back
+  if (isLoggedIn()) {
+    localStorage.setItem("cart", JSON.stringify(cartArr));
+    saveCartToBackend(cartArr);
+  } else {
+    localStorage.setItem("guestCart", JSON.stringify(cartArr));
+  }
+
+  // 9️⃣ Update badge
+  updateCartBadge();
+  refreshCartDrawer();
+  updateDrawerTotals();
+
+}
+
+function menuMinus_multi(id) {
+
+  // id format: "itemId_variantId"
+  const [itemId, variantId] = id.split("_");
+
+  const qtyText = document.getElementById("qtyText-" + id);
+  let q = Number(qtyText.innerText);
+
+  // 1️⃣ If qty > 1 → normal decrement
+  if (q > 1) {
+    q--;
+    qtyText.innerText = q;
+    animateQty("qtyText-" + id);
+
+updateDrawerItemQty(itemId, variantId, q);
+
+    // Update cart
+    let cartArr = isLoggedIn()
+      ? JSON.parse(localStorage.getItem("cart") || "[]")
+      : JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+    const item = cartArr.find(
+      c => c.itemId === itemId && c.variantId === variantId
+    );
+    if (item) item.qty = q;
+cart = cartArr; 
+    // Save back
+    if (isLoggedIn()) {
+      localStorage.setItem("cart", JSON.stringify(cartArr));
+      saveCartToBackend(cartArr);
+    } else {
+      localStorage.setItem("guestCart", JSON.stringify(cartArr));
+    }
+
+    updateCartBadge();
+    refreshCartDrawer();
+      updateDrawerTotals();
+
+    return;
+  }
+
+  // 2️⃣ Qty = 1 → REMOVE ITEM
+  if (q === 1) {
+
+    // Remove from cart
+    let cartArr = isLoggedIn()
+      ? JSON.parse(localStorage.getItem("cart") || "[]")
+      : JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+    cartArr = cartArr.filter(
+      c => !(c.itemId === itemId && c.variantId === variantId)
+    );
+   removeItemFromDrawer(itemId, variantId);
+
+
+
+    // Save back
+    if (isLoggedIn()) {
+      localStorage.setItem("cart", JSON.stringify(cartArr));
+      saveCartToBackend(cartArr);
+    } else {
+      localStorage.setItem("guestCart", JSON.stringify(cartArr));
+    }
+
+    // Hide qtyBox
+    const box = document.getElementById("qtyBox-" + id);
+    if (box) box.classList.add("hidden");
+
+    // Reset radios so user can select variant again
+    const radio = document.querySelector(`input[data-variant-id="${variantId}"]`);
+    if (radio) radio.checked = false;
+
+    updateCartBadge();
+    refreshCartDrawer();
+    updateDrawerTotals();
+
+  }
+}
+
+  
+function restoreMenuQuantities() {
+
+  let savedCart = [];
+
+  // Logged-in cart OR guest cart
+  if (isLoggedIn()) {
+    savedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+  } else {
+    savedCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+  }
+
+  savedCart.forEach(ci => {
+
+    const { itemId, variantId, qty } = ci;
+
+    // ------------------------------
+    // SINGLE ITEM RESTORE
+    // ------------------------------
+    if (!variantId) {
+
+      const addBtn = document.getElementById(`addBtn-${itemId}`);
+      const box = document.getElementById(`qtyBox-${itemId}`);
+      const qtyText = document.getElementById(`qtyText-${itemId}`);
+
+      if (addBtn && box && qtyText) {
+        addBtn.classList.add("hidden");
+        box.classList.remove("hidden");
+        qtyText.innerText = qty;
+      }
+    }
+
+    // ------------------------------
+    // MULTI ITEM RESTORE
+    // ------------------------------
+    if (variantId) {
+
+      // Multi qtyBox id = itemId_variantId
+      let box = document.getElementById(`qtyBox-${itemId}_${variantId}`);
+      let qtyText = document.getElementById(`qtyText-${itemId}_${variantId}`);
+
+      // If qtyBox not exist yet → create it dynamically (same as variant selector)
+      if (!box) {
+        const radio = document.querySelector(`input[data-variant-id="${variantId}"]`);
+        if (radio) {
+          const parentRow = radio.closest(".variant-row");
+          const qtyHTML = `
+            <div id="qtyBox-${itemId}_${variantId}"
+                 class="qtyBox flex items-center gap-3 mt-2">
+
+              <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+                      onclick="menuMinus_multi('${itemId}_${variantId}')">−</button>
+
+              <span id="qtyText-${itemId}_${variantId}"
+                    class="font-semibold">${qty}</span>
+
+              <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+                      onclick="menuPlus_multi('${itemId}_${variantId}')">+</button>
+
+            </div>
+          `;
+          parentRow.insertAdjacentHTML("afterend", qtyHTML);
+        }
+      } else {
+        qtyText.innerText = qty;
+      }
+
+      // Hide add button for multi
+      const addBtnMulti = document.getElementById(`addBtn-${itemId}`);
+      if (addBtnMulti) addBtnMulti.classList.add("hidden");
+
+      // Show qtyBox
+      box = document.getElementById(`qtyBox-${itemId}_${variantId}`);
+      if (box) box.classList.remove("hidden");
+      const radioToSelect = document.querySelector(`input[data-variant-id="${variantId}"]`);
+if (radioToSelect) {
+  radioToSelect.checked = true;
+}
+    }
+
+  });
+}
+function cleanCartConsistency(cartArr) {
+
+  // Remove invalid items
+  cartArr = cartArr.filter(c =>
+    c && c.itemId && Number(c.qty) > 0
+  );
+
+  // Remove duplicates (same item + same variant)
+  const map = {};
+  const cleaned = [];
+
+  cartArr.forEach(c => {
+    const key = c.itemId + "_" + (c.variantId || "single");
+    if (!map[key]) {
+      map[key] = true;
+      cleaned.push(c);
+    }
+  });
+
+  return cleaned;
+}
+
+
+function menuPlus_multi(id) {
+
+  // id format: "itemId_variantId"
+  const [itemId, variantId] = id.split("_");
+
+  // 1️⃣ UI qty increment
+  const qtyText = document.getElementById("qtyText-" + id);
+  let q = Number(qtyText.innerText);
+  q++;
+  qtyText.innerText = q;
+  animateQty("qtyText-" + id);
+
+
+  // 2️⃣ Load cart
+  let cartArr = isLoggedIn()
+    ? JSON.parse(localStorage.getItem("cart") || "[]")
+    : JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+  // 3️⃣ Find variant in cart
+  const item = cartArr.find(
+    c => c.itemId === itemId && c.variantId === variantId
+  );
+  if (!item) return;
+
+  // 4️⃣ Update qty in cart
+  item.qty = q;
+cart = cartArr;
+  // 5️⃣ Save back
+  if (isLoggedIn()) {
+    localStorage.setItem("cart", JSON.stringify(cartArr));
+    saveCartToBackend(cartArr);
+  } else {
+    localStorage.setItem("guestCart", JSON.stringify(cartArr));
+  }
+
+  // 6️⃣ Cart badge update
+  updateCartBadge();
+  refreshCartDrawer(); 
+  updateDrawerTotals();
+
+}
+async function loadCartOnStart() {
+
+  let cartArr = [];
+
+  // Logged-in user → load backend
+  if (isLoggedIn()) {
+    try {
+      const res = await apiGet("getCart", {
+        mobile: localStorage.getItem("userMobile")
+      });
+
+      cartArr = Array.isArray(res) ? res : [];
+
+      // Sync locally
+      localStorage.setItem("cart", JSON.stringify(cartArr));
+
+    } catch (e) {
+      console.error("Cart load failed:", e);
+      cartArr = JSON.parse(localStorage.getItem("cart") || "[]");
+    }
+  }
+
+  // Guest user → load local guest cart
+  else {
+    cartArr = JSON.parse(localStorage.getItem("guestCart") || "[]");
+  }
+
+  // VERY IMPORTANT: Set global cart[] for system
+  cart = cartArr;
+cart = cleanCartConsistency(cart);
+//  C3-C — Save cleaned cart back
+if (isLoggedIn()) {
+  localStorage.setItem("cart", JSON.stringify(cart));
+} else {
+  localStorage.setItem("guestCart", JSON.stringify(cart));
+}
+
+  // Restore UI qty buttons
+ setTimeout(restoreMenuQuantities, 120);
+
+  // Update badge
+  updateCartBadge();
+}
+  
+function refreshCartDrawer() {
+  // Drawer active है तो ही refresh करो
+  const drawer = document.getElementById("cartDrawer");
+  if (!drawer || !drawer.classList.contains("active")) return;
+
+  // Latest cart array load करो
+  let cartArr = isLoggedIn()
+    ? JSON.parse(localStorage.getItem("cart") || "[]")
+    : JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+  // Drawer UI को rebuild करो
+  openCartPanel(cartArr);
+
+  // Badge update
+  updateCartBadge();
+}
+  function updateDrawerItemQty(itemId, variantId = null, newQty) {
+
+  // Drawer active nahi → skip
+  const drawer = document.getElementById("cartDrawer");
+  if (!drawer || !drawer.classList.contains("active")) return;
+
+  // Row identify logic
+  const rowId = variantId
+    ? `drawerRow-${itemId}_${variantId}`
+    : `drawerRow-${itemId}`;
+
+  const row = document.getElementById(rowId);
+  if (!row) return;
+
+  // Update qty text
+  const qtySpan = row.querySelector(".drawer-qty");
+  if (qtySpan) qtySpan.innerText = newQty;
+
+  // Update item total
+  const pricePerUnit = Number(row.dataset.price);
+  const discPercent = Number(row.dataset.disc || 0);
+
+  const priceAfterDisc = pricePerUnit - (pricePerUnit * discPercent / 100);
+  const total = (priceAfterDisc * newQty).toFixed(2);
+
+  const totalSpan = row.querySelector(".drawer-total");
+  if (totalSpan) totalSpan.innerText = "₹" + total;
+}
+
+function removeItemFromDrawer(itemId, variantId = null) {
+  const rowId = variantId 
+    ? `drawerRow-${itemId}_${variantId}`   // 🔥 FIXED
+    : `drawerRow-${itemId}`;               // 🔥 FIXED
+
+  const row = document.getElementById(rowId);
+  if (!row) return;
+
+  // Smooth fade-out animation
+  row.style.opacity = "0";
+  row.style.transform = "translateX(30px)";
+  
+  setTimeout(() => {
+    row.remove();
+  }, 180);
+}
+async function loadCartBeforeDrawer() {
+  if (isLoggedIn()) {
+    const mobile = localStorage.getItem("userMobile");
+    const res = await apiGet("getCart", { mobile });
+    if (Array.isArray(res)) {
+      localStorage.setItem("cart", JSON.stringify(res));
+    }
+  }
+}
+function updateDrawerTotals() {
+  try {
+    // Yahi cart humesha latest hoga
+    const items = cart || [];
+
+    let subTotal = 0;
+    let taxAmount = 0;
+    let grandTotal = 0;
+
+    // 1) Subtotal calculate
+    items.forEach(it => {
+      const qty = Number(it.qty) || 0;
+      const price = Number(it.netRate || it.rate || 0);
+      subTotal += qty * price;
+    });
+
+    // 2) Tax fetch (already loaded from backend)
+    const tax = window.restaurantTaxSettings || {
+      taxType: "On Bill",
+      servicePercent: 0,
+      cgstPercent: 0,
+      sgstPercent: 0,
+      igstPercent: 0
+    };
+
+    if (tax.taxType === "On Bill") {
+      const service = (subTotal * tax.servicePercent) / 100;
+      const cgst = (subTotal * tax.cgstPercent) / 100;
+      const sgst = (subTotal * tax.sgstPercent) / 100;
+      const igst = (subTotal * tax.igstPercent) / 100;
+
+      taxAmount = service + cgst + sgst + igst;
+    }
+
+    // 3) Grand total
+    grandTotal = subTotal + taxAmount;
+
+    // 4) Update UI
+    document.getElementById("drawerSubTotal").innerText = subTotal.toFixed(2);
+    document.getElementById("drawerTax").innerText = taxAmount.toFixed(2);
+    document.getElementById("drawerGrandTotal").innerText = grandTotal.toFixed(2);
+
+  } catch (e) {
+    console.error("updateDrawerTotals ERROR", e);
+  }
+}
+
+  
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
