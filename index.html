@@ -5360,6 +5360,27 @@ if (radioToSelect) {
 
   });
 }
+function cleanCartConsistency(cartArr) {
+
+  // Remove invalid items
+  cartArr = cartArr.filter(c =>
+    c && c.itemId && Number(c.qty) > 0
+  );
+
+  // Remove duplicates (same item + same variant)
+  const map = {};
+  const cleaned = [];
+
+  cartArr.forEach(c => {
+    const key = c.itemId + "_" + (c.variantId || "single");
+    if (!map[key]) {
+      map[key] = true;
+      cleaned.push(c);
+    }
+  });
+
+  return cleaned;
+}
 
 
 function menuPlus_multi(id) {
@@ -5427,6 +5448,13 @@ async function loadCartOnStart() {
 
   // VERY IMPORTANT: Set global cart[] for system
   cart = cartArr;
+cart = cleanCartConsistency(cart);
+//  C3-C — Save cleaned cart back
+if (isLoggedIn()) {
+  localStorage.setItem("cart", JSON.stringify(cart));
+} else {
+  localStorage.setItem("guestCart", JSON.stringify(cart));
+}
 
   // Restore UI qty buttons
   restoreMenuQuantities();
@@ -5439,6 +5467,7 @@ async function loadCartOnStart() {
 </script>
 </body>
 </html>
+
 
 
 
