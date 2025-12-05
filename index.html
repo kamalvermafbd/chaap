@@ -3149,6 +3149,8 @@ document.getElementById("leftNav").style.display = "none";
   localStorage.removeItem("cart");   // remove local mirror
   cart = [];
   window.cart = [];
+  localStorage.removeItem("guestCart");   // ⭐ This was missing
+
 
   // ❗ Clear sessionId (start fresh next login)
   localStorage.removeItem("sessionId");
@@ -5523,7 +5525,9 @@ cart = cartArr;
 
   // 6️⃣ Cart badge update
   updateCartBadge();
-  refreshCartDrawer(); 
+  if (document.getElementById("cartDrawer").classList.contains("active")) {
+    refreshCartDrawer();
+}
   updateDrawerTotals();
 
 }
@@ -5707,6 +5711,7 @@ function hideCartOverlay() {
 </script>
 </body>
 </html>
+
 
 
 
