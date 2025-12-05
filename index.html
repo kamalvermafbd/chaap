@@ -5127,6 +5127,8 @@ function menuPlus(itemId) {
   let q = Number(qtyText.innerText);
   q++;
   qtyText.innerText = q;
+  updateDrawerItemQty(itemId, null, q);
+
 
   // 2️⃣ Load existing cart
   let cartArr = isLoggedIn()
@@ -5195,6 +5197,7 @@ function menuMinus(itemId) {
   // Otherwise qty > 1 → normal decrement
   q--;
   qtyText.innerText = q;
+updateDrawerItemQty(itemId, null, q);
 
   // 7️⃣ Update cart object qty
   let cartArr = isLoggedIn()
@@ -5229,6 +5232,7 @@ function menuMinus_multi(id) {
   if (q > 1) {
     q--;
     qtyText.innerText = q;
+updateDrawerItemQty(itemId, variantId, q);
 
     // Update cart
     let cartArr = isLoggedIn()
@@ -5489,6 +5493,35 @@ function refreshCartDrawer() {
   // Badge update
   updateCartBadge();
 }
+  function updateDrawerItemQty(itemId, variantId = null, newQty) {
+
+  // Drawer active nahi → skip
+  const drawer = document.getElementById("cartDrawer");
+  if (!drawer || !drawer.classList.contains("active")) return;
+
+  // Row identify logic
+  const rowId = variantId
+    ? `drawerRow-${itemId}_${variantId}`
+    : `drawerRow-${itemId}`;
+
+  const row = document.getElementById(rowId);
+  if (!row) return;
+
+  // Update qty text
+  const qtySpan = row.querySelector(".drawer-qty");
+  if (qtySpan) qtySpan.innerText = newQty;
+
+  // Update item total
+  const pricePerUnit = Number(row.dataset.price);
+  const discPercent = Number(row.dataset.disc || 0);
+
+  const priceAfterDisc = pricePerUnit - (pricePerUnit * discPercent / 100);
+  const total = (priceAfterDisc * newQty).toFixed(2);
+
+  const totalSpan = row.querySelector(".drawer-total");
+  if (totalSpan) totalSpan.innerText = "₹" + total;
+}
+
 function removeItemFromDrawer(itemId, variantId = null) {
   const rowId = variantId 
     ? `drawer-row-${itemId}_${variantId}`
@@ -5510,6 +5543,7 @@ function removeItemFromDrawer(itemId, variantId = null) {
 </script>
 </body>
 </html>
+
 
 
 
