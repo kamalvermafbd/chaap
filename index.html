@@ -4191,7 +4191,7 @@ function activateVariantSelector(item, idx) {
                   class="font-semibold">1</span>
 
             <button class="px-2 py-1 bg-gray-300 rounded text-lg"
-                    onclick="menuPlus('${item.itemId}_${variantId}')">+</button>
+                    onclick="menuPlus_multi('${item.itemId}_${variantId}')">+</button>
 
           </div>
         `;
@@ -5210,6 +5210,73 @@ function menuMinus(itemId) {
   updateCartBadge();
 }
 
+function menuMinus_multi(id) {
+
+  // id format: "itemId_variantId"
+  const [itemId, variantId] = id.split("_");
+
+  const qtyText = document.getElementById("qtyText-" + id);
+  let q = Number(qtyText.innerText);
+
+  // 1️⃣ If qty > 1 → normal decrement
+  if (q > 1) {
+    q--;
+    qtyText.innerText = q;
+
+    // Update cart
+    let cartArr = isLoggedIn()
+      ? JSON.parse(localStorage.getItem("cart") || "[]")
+      : JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+    const item = cartArr.find(
+      c => c.itemId === itemId && c.variantId === variantId
+    );
+    if (item) item.qty = q;
+
+    // Save back
+    if (isLoggedIn()) {
+      localStorage.setItem("cart", JSON.stringify(cartArr));
+      saveCartToBackend(cartArr);
+    } else {
+      localStorage.setItem("guestCart", JSON.stringify(cartArr));
+    }
+
+    updateCartBadge();
+    return;
+  }
+
+  // 2️⃣ Qty = 1 → REMOVE ITEM
+  if (q === 1) {
+
+    // Remove from cart
+    let cartArr = isLoggedIn()
+      ? JSON.parse(localStorage.getItem("cart") || "[]")
+      : JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+    cartArr = cartArr.filter(
+      c => !(c.itemId === itemId && c.variantId === variantId)
+    );
+
+    // Save back
+    if (isLoggedIn()) {
+      localStorage.setItem("cart", JSON.stringify(cartArr));
+      saveCartToBackend(cartArr);
+    } else {
+      localStorage.setItem("guestCart", JSON.stringify(cartArr));
+    }
+
+    // Hide qtyBox
+    const box = document.getElementById("qtyBox-" + id);
+    if (box) box.classList.add("hidden");
+
+    // Reset radios so user can select variant again
+    const radio = document.querySelector(`input[data-variant-id="${variantId}"]`);
+    if (radio) radio.checked = false;
+
+    updateCartBadge();
+  }
+}
+
   
 function restoreMenuQuantities() {
 
@@ -5261,12 +5328,13 @@ function restoreMenuQuantities() {
                  class="qtyBox flex items-center gap-3 mt-2">
 
               <button class="px-2 py-1 bg-gray-300 rounded text-lg"
-                      onclick="menuMinus('${itemId}_${variantId}')">−</button>
+                      onclick="menuMinus_multi('${itemId}_${variantId}')">−</button>
 
-              <span id="qtyText-${itemId}_${variantId}" class="font-semibold">${qty}</span>
+              <span id="qtyText-${itemId}_${variantId}"
+                    class="font-semibold">${qty}</span>
 
               <button class="px-2 py-1 bg-gray-300 rounded text-lg"
-                      onclick="menuPlus('${itemId}_${variantId}')">+</button>
+                      onclick="menuPlus_multi('${itemId}_${variantId}')">+</button>
 
             </div>
           `;
@@ -5276,11 +5344,11 @@ function restoreMenuQuantities() {
         qtyText.innerText = qty;
       }
 
-      // Hide add button for multi (unnecessary but safe)
+      // Hide add button for multi
       const addBtnMulti = document.getElementById(`addBtn-${itemId}`);
       if (addBtnMulti) addBtnMulti.classList.add("hidden");
 
-      // Finally show qtyBox
+      // Show qtyBox
       box = document.getElementById(`qtyBox-${itemId}_${variantId}`);
       if (box) box.classList.remove("hidden");
     }
@@ -5288,10 +5356,49 @@ function restoreMenuQuantities() {
   });
 }
 
+
+function menuPlus_multi(id) {
+
+  // id format: "itemId_variantId"
+  const [itemId, variantId] = id.split("_");
+
+  // 1️⃣ UI qty increment
+  const qtyText = document.getElementById("qtyText-" + id);
+  let q = Number(qtyText.innerText);
+  q++;
+  qtyText.innerText = q;
+
+  // 2️⃣ Load cart
+  let cartArr = isLoggedIn()
+    ? JSON.parse(localStorage.getItem("cart") || "[]")
+    : JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+  // 3️⃣ Find variant in cart
+  const item = cartArr.find(
+    c => c.itemId === itemId && c.variantId === variantId
+  );
+  if (!item) return;
+
+  // 4️⃣ Update qty in cart
+  item.qty = q;
+
+  // 5️⃣ Save back
+  if (isLoggedIn()) {
+    localStorage.setItem("cart", JSON.stringify(cartArr));
+    saveCartToBackend(cartArr);
+  } else {
+    localStorage.setItem("guestCart", JSON.stringify(cartArr));
+  }
+
+  // 6️⃣ Cart badge update
+  updateCartBadge();
+}
+
   
 </script>
 </body>
 </html>
+
 
 
 
