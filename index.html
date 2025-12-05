@@ -1645,7 +1645,8 @@ function openCartPanel(cartArr = null) {
     const variantId = ci.variantId || null;
     const qty = ci.qty;
     const mrp = Number(ci.price);
-    const disc = Number(ci.disc || 0);
+   const disc = Number(ci.discPercent || ci.discount || 0);
+
 
     const priceAfterDisc = mrp - (mrp * disc / 100);
     const total = (priceAfterDisc * qty).toFixed(2);
@@ -1668,15 +1669,14 @@ function openCartPanel(cartArr = null) {
 
         <div class="flex items-center gap-3">
           <button class="px-2 bg-gray-300 rounded text-lg"
-                  onclick="menuMinus('${itemId}${variantId ? "_" + variantId : ""}')">−</button>
+                  onclick="updateCart('${itemId}', '${variantId}', 'dec')"
+>−</button>
 
           <span class="drawer-qty font-semibold">${qty}</span>
 
           <button class="px-2 bg-gray-300 rounded text-lg"
-                  onclick="${variantId
-                    ? `menuPlus_multi('${itemId}_${variantId}')`
-                    : `menuPlus('${itemId}')`
-                  }">+</button>
+                  onclick="updateCart('${itemId}', '${variantId}', 'inc')"
+>+</button>
         </div>
 
         <div class="drawer-total font-semibold">₹${total}</div>
@@ -5835,6 +5835,8 @@ function updateCart(itemId, variantId, action, meta = {}) {
     updateMenuQtyFromCart && updateMenuQtyFromCart(itemId, variantId, cart);
     renderCartDrawer && renderCartDrawer(cart);
     updateCartBadge && updateCartBadge(cart);
+    //  AUTO REFRESH DRAWER 
+if (typeof openCartPanel === "function") openCartPanel(cart);
 
     // 10) Checkout page open ho to usko bhi refresh karo
     if (isCheckoutOpen && isCheckoutOpen()) {
@@ -5951,4 +5953,5 @@ function onDecVariant(itemId, variantId, meta) {
 </script>
 </body>
 </html>
+
 
