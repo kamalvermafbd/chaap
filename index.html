@@ -5870,26 +5870,26 @@ function onDecVariant(itemId, variantId, meta) {
       const disc = Number(r.dataset.disc);
       const unit = r.dataset.unit;
 
-      // STEP 1 — remove old qty/add box (if exists)
-      const oldBox = document.getElementById(`qtyBox-${item.itemId}_${variantId}`);
-      if (oldBox) oldBox.remove();
+      // Remove old box (if any)
+      const old = document.querySelector(`.box-${idSafe}`);
+      if (old) old.remove();
 
-      const parentRow = r.closest(".variant-row");
-
-      // STEP 2 — create ADD button (Zomato style)
+      // NEW BOX (safe with backticks)
       const boxHTML = `
-        <div id="qtyBox-${item.itemId}_${variantId}" class="mt-2">
+        <div class="mt-2 box-${idSafe}" id="box-${item.itemId}_${variantId}">
           <button class="px-3 py-1 bg-[#ff6f00] text-white rounded"
-            onclick="addMultiVariant('${item.itemId}', '${variantId}', '${unit}', ${price}, ${disc})">
+            onclick="addMultiVariant('${item.itemId}', '${variantId}', \`${unit}\`, ${price}, ${disc})">
             ADD
           </button>
         </div>
       `;
 
+      const parentRow = r.closest(".variant-row");
       parentRow.insertAdjacentHTML("afterend", boxHTML);
     });
   });
 }
+
 function addMultiVariant(itemId, variantId, unit, price, disc) {
   const meta = {
     name: "",
@@ -5922,6 +5922,7 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
 </script>
 </body>
 </html>
+
 
 
 
