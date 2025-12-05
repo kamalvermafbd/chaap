@@ -5192,7 +5192,8 @@ function menuPlus(itemId) {
   qtyText.innerText = q;
 animateQty("qtyText-" + itemId);
   
-  updateDrawerItemQty(itemId, null, q);
+  updateDrawerItemQty(String(itemId), null, q);
+
 
 
   // 2️⃣ Load existing cart
@@ -5217,7 +5218,10 @@ cart = cartArr;
 
   // 6️⃣ Update badge
   updateCartBadge();
-  refreshCartDrawer();
+  if (document.getElementById("cartDrawer").classList.contains("active")) {
+    refreshCartDrawer();
+}
+
   updateDrawerTotals();
 
 }
@@ -5240,7 +5244,8 @@ function menuMinus(itemId) {
 
     // 3️⃣ Remove from cart
     cartArr = cartArr.filter(c => !(c.itemId === itemId && !c.variantId));
-    removeItemFromDrawer(itemId);
+    removeItemFromDrawer(String(itemId));
+
 
 
     // 4️⃣ Save back
@@ -5257,7 +5262,10 @@ function menuMinus(itemId) {
 
     // 6️⃣ Update badge
     updateCartBadge();
+    if (document.getElementById("cartDrawer").classList.contains("active")) {
     refreshCartDrawer();
+}
+
     updateDrawerTotals(); 
     return;
   }
@@ -5265,7 +5273,8 @@ function menuMinus(itemId) {
   // Otherwise qty > 1 → normal decrement
   q--;
   qtyText.innerText = q;
-updateDrawerItemQty(itemId, null, q);
+updateDrawerItemQty(String(itemId), null, q);
+
 
   // 7️⃣ Update cart object qty
   let cartArr = isLoggedIn()
@@ -5286,7 +5295,10 @@ updateDrawerItemQty(itemId, null, q);
 
   // 9️⃣ Update badge
   updateCartBadge();
-  refreshCartDrawer();
+  if (document.getElementById("cartDrawer").classList.contains("active")) {
+    refreshCartDrawer();
+}
+
   updateDrawerTotals();
 
 }
@@ -5305,7 +5317,8 @@ function menuMinus_multi(id) {
     qtyText.innerText = q;
     animateQty("qtyText-" + id);
 
-updateDrawerItemQty(itemId, variantId, q);
+updateDrawerItemQty(String(itemId), String(variantId), q);
+
 
     // Update cart
     let cartArr = isLoggedIn()
@@ -5343,9 +5356,7 @@ cart = cartArr;
     cartArr = cartArr.filter(
       c => !(c.itemId === itemId && c.variantId === variantId)
     );
-   removeItemFromDrawer(itemId, variantId);
-
-
+removeItemFromDrawer(String(itemId), String(variantId));
 
     // Save back
     if (isLoggedIn()) {
@@ -5696,6 +5707,7 @@ function hideCartOverlay() {
 </script>
 </body>
 </html>
+
 
 
 
