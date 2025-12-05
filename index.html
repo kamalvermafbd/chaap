@@ -1624,13 +1624,14 @@ if (!isLoggedIn()) {
 }
 
 function openCartPanel(cartArr = null) {
+ if (!window.cartReady) return;
 
-  if (!window.cartReady) return;
-
+  const drawer = document.getElementById("cartDrawer");
   const container = document.getElementById("cartDrawerContent");
+
   if (!container) return;
 
-  // Always load latest cart
+  // Load latest cart
   const cart = cartArr || (
     isLoggedIn()
       ? JSON.parse(localStorage.getItem("cart") || "[]")
@@ -1640,18 +1641,16 @@ function openCartPanel(cartArr = null) {
   let html = "";
 
   cart.forEach(ci => {
-
-    const itemId = String(ci.itemId);
-    const variantId = ci.variantId ? String(ci.variantId) : "";
-    const qty = Number(ci.qty);
-
-    // ⭐ CORRECT fields (your system uses rate + discPercent)
-    const mrp = Number(ci.rate || ci.price || 0);
-    const disc = Number(ci.discPercent || ci.disc || 0);
+    const itemId = ci.itemId;
+    const variantId = ci.variantId || null;
+    const qty = ci.qty;
+    const mrp = Number(ci.price);
+    const disc = Number(ci.disc || 0);
 
     const priceAfterDisc = mrp - (mrp * disc / 100);
     const total = (priceAfterDisc * qty).toFixed(2);
 
+    // ⭐ Correct ROW ID format (C4-F FIX)
     const rowId = variantId
       ? `drawerRow-${itemId}_${variantId}`
       : `drawerRow-${itemId}`;
@@ -1668,23 +1667,16 @@ function openCartPanel(cartArr = null) {
         </div>
 
         <div class="flex items-center gap-3">
-          ${
-            variantId
-              ? `<button class="px-2 bg-gray-300 rounded text-lg"
-                         onclick="menuMinus_multi('${itemId}_${variantId}')">−</button>`
-              : `<button class="px-2 bg-gray-300 rounded text-lg"
-                         onclick="menuMinus('${itemId}')">−</button>`
-          }
+          <button class="px-2 bg-gray-300 rounded text-lg"
+                  onclick="menuMinus('${itemId}${variantId ? "_" + variantId : ""}')">−</button>
 
           <span class="drawer-qty font-semibold">${qty}</span>
 
-          ${
-            variantId
-              ? `<button class="px-2 bg-gray-300 rounded text-lg"
-                         onclick="menuPlus_multi('${itemId}_${variantId}')">+</button>`
-              : `<button class="px-2 bg-gray-300 rounded text-lg"
-                         onclick="menuPlus('${itemId}')">+</button>`
-          }
+          <button class="px-2 bg-gray-300 rounded text-lg"
+                  onclick="${variantId
+                    ? `menuPlus_multi('${itemId}_${variantId}')`
+                    : `menuPlus('${itemId}')`
+                  }">+</button>
         </div>
 
         <div class="drawer-total font-semibold">₹${total}</div>
@@ -1695,6 +1687,7 @@ function openCartPanel(cartArr = null) {
 
   container.innerHTML = html;
 }
+
 
 function renderCart() {
 if (blockRender) return;
@@ -5958,28 +5951,3 @@ function onDecVariant(itemId, variantId, meta) {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
