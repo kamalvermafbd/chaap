@@ -5852,12 +5852,15 @@ function updateCart(itemId, variantId, action, meta = {}) {
   }
 
   // menu-level qty restore
-  restoreMenuVariations?.();
+  if (typeof restoreMenuQuantities === "function") {
+  restoreMenuQuantities();
+}
 }
   
 </script>
 </body>
 </html>
+
 
 
 
