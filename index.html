@@ -1464,6 +1464,7 @@ renderIndex++;
        }
   });
      restoreMenuQuantities();
+  removeAllOldMultiEvents();
 restoreMenuVariantQty();
 
 }
@@ -5761,11 +5762,18 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
     }
   });
 }
+function removeAllOldMultiEvents() {
+  document.querySelectorAll("input[data-variant-id]").forEach(el => {
+    const clean = el.cloneNode(true); 
+    el.replaceWith(clean);
+  });
+}
 
   
 </script>
 </body>
 </html>
+
 
 
 
