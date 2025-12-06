@@ -5726,7 +5726,8 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
   updateCart(itemId, variantId, "add", meta);
 
   // Now replace ADD → qty box
-  const box = document.getElementById(`qtyBox-${itemId}_${variantId}`);
+  const box = document.getElementById(`box-${itemId}_${variantId}`);
+
   if (!box) return;
 
   box.innerHTML = `
@@ -5745,6 +5746,7 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
 </script>
 </body>
 </html>
+
 
 
 
