@@ -5366,18 +5366,14 @@ function menuMinus_multi(id) {
     refreshCartDrawer();
     updateDrawerTotals();
   }
-}
+}function restoreMenuQuantities() {
 
-  
-function restoreMenuQuantities() {
-
-  // 0️⃣ Source of truth = GLOBAL cart (अगर भरा है तो)
+  // 0️⃣ Source of truth = GLOBAL cart
   let savedCart = [];
 
   if (Array.isArray(cart) && cart.length > 0) {
     savedCart = cart;
   } else {
-    // Fallback → localStorage (login / guest के हिसाब से)
     if (isLoggedIn()) {
       savedCart = JSON.parse(localStorage.getItem("cart") || "[]");
     } else {
@@ -5385,7 +5381,6 @@ function restoreMenuQuantities() {
     }
   }
 
-  // Safety filter
   savedCart.forEach(ci => {
     const itemId    = String(ci.itemId || "").trim();
     const variantId = ci.variantId ? String(ci.variantId).trim() : "";
@@ -5393,9 +5388,7 @@ function restoreMenuQuantities() {
 
     if (!itemId || qty <= 0) return;
 
-    // --------------------------------
-    // 🟢 SINGLE ITEM RESTORE (no variant)
-    // --------------------------------
+    // 🟢 SINGLE ITEM (no variantId)
     if (!variantId) {
       const addBtn  = document.getElementById(`addBtn-${itemId}`);
       const box     = document.getElementById(`qtyBox-${itemId}`);
@@ -5409,60 +5402,15 @@ function restoreMenuQuantities() {
       return;
     }
 
-    // --------------------------------
-    // 🟣 MULTI VARIANT RESTORE
-    // --------------------------------
-    // qtyBox id → qtyBox-itemId_variantId
-    let box     = document.getElementById(`qtyBox-${itemId}_${variantId}`);
-    let qtyText = document.getElementById(`qtyText-${itemId}_${variantId}`);
+    // 🟣 MULTI VARIANT
+    // 👉 IMPORTANT: sirf JO HTML pehle se hai usko use karo,
+    //    NAYA BOX JS se mat banao (double row ka issue yehi se aa raha tha)
+    const box     = document.getElementById(`box-${itemId}_${variantId}`);
+    const qtyText = document.getElementById(`qtyText-${itemId}_${variantId}`);
 
-    // अगर qtyBox अभी तक बना ही नहीं → बनाओ (same pattern as variant select)
-    if (!box) {
-      const radio = document.querySelector(
-        `input[type="radio"][data-variant-id="${variantId}"]`
-      );
-
-      if (radio) {
-        const parentRow = radio.closest(".variant-row");
-        const qtyHTML = `
-          <div id="qtyBox-${itemId}_${variantId}"
-               class="qtyBox flex items-center gap-3 mt-2">
-
-            <button class="px-2 py-1 bg-gray-300 rounded text-lg"
-                    onclick="menuMinus_multi('${itemId}_${variantId}')">−</button>
-
-            <span id="qtyText-${itemId}_${variantId}"
-                  class="font-semibold">${qty}</span>
-
-            <button class="px-2 py-1 bg-gray-300 rounded text-lg"
-                    onclick="menuPlus_multi('${itemId}_${variantId}')">+</button>
-
-          </div>
-        `;
-        parentRow.insertAdjacentHTML("afterend", qtyHTML);
-      }
-
-      // fresh reference
-      box     = document.getElementById(`qtyBox-${itemId}_${variantId}`);
-      qtyText = document.getElementById(`qtyText-${itemId}_${variantId}`);
-    } else {
-      // पहले से है → सिर्फ qty सेट करो
+    if (box && qtyText) {
+      box.classList.remove("hidden");
       qtyText.innerText = qty;
-    }
-
-    // Multi item → ADD button हमेशा hide
-    const addBtnMulti = document.getElementById(`addBtn-${itemId}`);
-    if (addBtnMulti) addBtnMulti.classList.add("hidden");
-
-    // qtyBox show करो
-    if (box) box.classList.remove("hidden");
-
-    // Radio भी select कर दो (taaki user ko pata चले कौन सा variant चुना है)
-    const radioToSelect = document.querySelector(
-      `input[type="radio"][data-variant-id="${variantId}"]`
-    );
-    if (radioToSelect) {
-      radioToSelect.checked = true;
     }
   });
 }
@@ -5887,6 +5835,7 @@ function updateCart(itemId, variantId, action, meta = {}) {
 </script>
 </body>
 </html>
+
 
 
 
