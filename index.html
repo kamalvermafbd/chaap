@@ -5390,7 +5390,7 @@ function restoreMenuQuantities() {
 
       if (addBtn && box && qtyText) {
         addBtn.classList.add("hidden");
-        box.classList.remove("hidden");
+        
         qtyText.textContent = qty;
       }
       return;
@@ -5403,7 +5403,7 @@ function restoreMenuQuantities() {
     const boxes = document.querySelectorAll(`[id^="box-${itemId}_${variantId}-"]`);
 
     boxes.forEach(box => {
-      box.classList.remove("hidden");
+      
 
       const qtyLabel = box.querySelector("span[id^='qtyText-']");
       if (qtyLabel) qtyLabel.textContent = qty;
@@ -5838,6 +5838,7 @@ function updateCart(itemId, variantId, action, meta = {}) {
 </script>
 </body>
 </html>
+
 
 
 
