@@ -5698,26 +5698,32 @@ function hideCartOverlay() {
 
 
   function activateVariantSelector(itemId, variantId, unit, price, disc) {
+  // 1) Hide all qty boxes for this item
   document.querySelectorAll(`[id^="box-${itemId}_"]`).forEach(box => {
     box.classList.add("hidden");
   });
 
+  // 2) Show only this selected variant box
   const target = document.getElementById(`box-${itemId}_${variantId}`);
   if (target) {
     target.classList.remove("hidden");
   }
 
+  // 3) Reset qty = 1
   const qtyText = document.getElementById(`qtyText-${itemId}_${variantId}`);
   if (qtyText) {
     qtyText.textContent = "1";
   }
 
+  // 4) Add to cart immediately (Zomato style)
   addMultiVariant(itemId, variantId, unit, price, disc);
 
+  // 5) Update UI / Drawer / Checkout badge
   updateCartBadge();
-  if (typeof refreshCheckout === "function") refreshCheckout();
+  if (typeof refreshCheckout === "function") {
+    refreshCheckout();
+  }
 }
-
 
 function addMultiVariant(itemId, variantId, unit, price, disc) {
   const meta = {
@@ -5773,6 +5779,7 @@ function removeAllOldMultiEvents() {
 </script>
 </body>
 </html>
+
 
 
 
