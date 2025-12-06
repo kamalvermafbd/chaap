@@ -1680,7 +1680,8 @@ function openCartPanel(cartArr = null) {
           <span class="drawer-qty font-semibold">${qty}</span>
 
           <button class="px-2 bg-gray-300 rounded text-lg"
-                  onclick="updateCart('${itemId}', '${variantId}', 'inc')"
+                  onclick="updateCart('${itemId}', '${variantId}', 'add')"
+
 >+</button>
         </div>
 
@@ -4112,6 +4113,11 @@ item.itemId = String(
   if (item.cat2 === "Multi") {
    const idSafe = slugify(item.name) + "-" + idx;
 
+    // AUTO-GENERATE variantId if missing
+    item.variants = item.variants.map((v, vidx) => ({
+      ...v,
+      variantId: v.variantId || slugify(v.unit) || `v${vidx + 1}`
+    }));
 
     let variantsHTML = "";
 
@@ -5761,6 +5767,7 @@ function removeAllOldMultiEvents() {
 </script>
 </body>
 </html>
+
 
 
 
