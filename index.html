@@ -5369,25 +5369,20 @@ function menuMinus_multi(id) {
 }
 function restoreMenuQuantities() {
 
-  let savedCart = [];
-
-  if (Array.isArray(cart) && cart.length > 0) {
-    savedCart = cart;
-  } else {
-    if (isLoggedIn()) {
-      savedCart = JSON.parse(localStorage.getItem("cart") || "[]");
-    } else {
-      savedCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-    }
-  }
+  let savedCart = Array.isArray(cart) && cart.length > 0 
+    ? cart 
+    : (isLoggedIn()
+        ? JSON.parse(localStorage.getItem("cart") || "[]")
+        : JSON.parse(localStorage.getItem("guestCart") || "[]"));
 
   savedCart.forEach(ci => {
-
-    const itemId    = String(ci.itemId || "");
+    const itemId = String(ci.itemId);
     const variantId = String(ci.variantId || "");
-    const qty       = Number(ci.qty || 1);
+    const qty = Number(ci.qty || 1);
 
+    // ----------------------------
     // SINGLE ITEM
+    // ----------------------------
     if (!variantId) {
       const addBtn  = document.getElementById(`addBtn-${itemId}`);
       const box     = document.getElementById(`qtyBox-${itemId}`);
@@ -5396,30 +5391,26 @@ function restoreMenuQuantities() {
       if (addBtn && box && qtyText) {
         addBtn.classList.add("hidden");
         box.classList.remove("hidden");
-        qtyText.innerText = qty;
+        qtyText.textContent = qty;
       }
       return;
     }
 
-    // MULTI VARIANT — find ALL matching cards (chef + starters)
+    // ----------------------------
+    // MULTI VARIANT → FOR ALL CARDS
+    // ----------------------------
+    // match ANY card-index version: box-1_1a-*
     const boxes = document.querySelectorAll(`[id^="box-${itemId}_${variantId}-"]`);
 
     boxes.forEach(box => {
       box.classList.remove("hidden");
 
-      const qtySpan = box.querySelector("span[id^='qtyText-']");
-      if (qtySpan) qtySpan.textContent = qty;
+      const qtyLabel = box.querySelector("span[id^='qtyText-']");
+      if (qtyLabel) qtyLabel.textContent = qty;
     });
-
-    // AUTO-select radio for every matching card
-    const radios = document.querySelectorAll(
-      `input[data-item-id="${itemId}"][data-variant-id="${variantId}"]`
-    );
-
-    radios.forEach(r => r.checked = true);
-
   });
 }
+
 
 
 function cleanCartConsistency(cartArr) {
@@ -5723,32 +5714,34 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
 }
 
   function restoreMenuVariantQty() {
-  if (!Array.isArray(cart) || cart.length === 0) return;
+
+  if (!window.cart || cart.length === 0) return;
 
   cart.forEach(ci => {
-
-    if (!ci.variantId) return;
 
     const itemId = String(ci.itemId);
     const variantId = String(ci.variantId);
     const qty = Number(ci.qty || 1);
 
-    // find ALL matching boxes
-    const boxes = document.querySelectorAll(`[id^="box-${itemId}_${variantId}-"]`);
+    if (!variantId) return;
 
-    boxes.forEach(box => {
-      box.classList.remove("hidden");
-
-      const qtySpan = box.querySelector("span[id^='qtyText-"]`);
-      if (qtySpan) qtySpan.textContent = qty;
-    });
-
-    // auto-check radio
+    // SELECT radio ONLY inside matching card
     const radios = document.querySelectorAll(
       `input[data-item-id="${itemId}"][data-variant-id="${variantId}"]`
     );
-    radios.forEach(r => r.checked = true);
 
+    radios.forEach(r => (r.checked = true));
+
+    // Restore qty in card-level boxes
+    const boxes = document.querySelectorAll(
+      `[id^="box-${itemId}_${variantId}-"]`
+    );
+
+    boxes.forEach(box => {
+      box.classList.remove("hidden");
+      const qtyLabel = box.querySelector("span[id^='qtyText-"]`);
+      if (qtyLabel) qtyLabel.textContent = qty;
+    });
   });
 }
 
@@ -5843,6 +5836,7 @@ function updateCart(itemId, variantId, action, meta = {}) {
 </script>
 </body>
 </html>
+
 
 
 
