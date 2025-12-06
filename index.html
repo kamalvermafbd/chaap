@@ -4107,11 +4107,11 @@ item.itemId = String(
     `;
   }
 
-  // ==========================
+   // ==========================
   //       MULTI ITEM
   // ==========================
   if (item.cat2 === "Multi") {
-   const idSafe = slugify(item.name) + "-" + idx;
+    const idSafe = slugify(item.name) + "-" + idx;
 
     // AUTO-GENERATE variantId if missing
     item.variants = item.variants.map((v, vidx) => ({
@@ -4122,26 +4122,28 @@ item.itemId = String(
     let variantsHTML = "";
 
     item.variants.forEach(v => {
-
       // FINAL PRICE CALCULATION (CAT_ALLOCATION SHEET)
       const mrp  = Number(v.price);                  // From cat_allocation sheet
       const disc = Number(v.discPercent || 0);
       const finalPrice = parseFloat((mrp - (mrp * disc / 100)).toFixed(2));
+
+      const boxId    = `box-${item.itemId}_${v.variantId}-${idx}`;
+      const qtyTextId = `qtyText-${item.itemId}_${v.variantId}-${idx}`;
 
       variantsHTML += `
         <label class="variant-row">
           <div class="left-side">
             <input type="radio"
                    name="var-${idSafe}"
-                   onclick="activateVariantSelector('${item.itemId}', '${v.variantId}', '${v.unit}', ${mrp}, ${disc})"
+                   onclick="activateVariantSelector('${item.itemId}', '${v.variantId}', '${v.unit}', ${mrp}, ${disc}, ${idx})"
                    data-unit="${v.unit}"
                    data-mrp="${mrp}"
                    data-disc="${disc}"
-                  data-variant-id="${v.variantId}"
-       data-item-id="${item.itemId}">
+                   data-variant-id="${v.variantId}"
+                   data-item-id="${item.itemId}">
 
             <span class="unit">${v.unit}</span>
-            
+
             ${disc > 0 ? `
               <span style="background:#ff3e3e;color:#fff;
                            font-size:11px;padding:2px 4px;
@@ -4165,28 +4167,27 @@ item.itemId = String(
             ` : ""}
           </div>
         </label>
-        <!-- HIDDEN QTY BOX FOR THIS VARIANT -->
-<div id="box-${item.itemId}_${v.variantId}"
-     class="hidden flex items-center gap-3 mt-2">
 
-  <button class="px-2 bg-gray-300 rounded text-lg"
-          onclick="updateCart('${item.itemId}', '${v.variantId}', 'dec')">−</button>
+        <!-- HIDDEN QTY BOX FOR THIS VARIANT (CARD-SPECIFIC) -->
+        <div id="${boxId}"
+             class="hidden flex items-center gap-3 mt-2">
 
-  <span class="font-semibold"
-        id="qtyText-${item.itemId}_${v.variantId}">1</span>
+          <button class="px-2 bg-gray-300 rounded text-lg"
+                  onclick="updateCart('${item.itemId}', '${v.variantId}', 'dec')">−</button>
 
-  <button class="px-2 bg-gray-300 rounded text-lg"
-          onclick="updateCart('${item.itemId}', '${v.variantId}', 'add')">+</button>
-</div>
+          <span class="font-semibold" id="${qtyTextId}">1</span>
 
+          <button class="px-2 bg-gray-300 rounded text-lg"
+                  onclick="updateCart('${item.itemId}', '${v.variantId}', 'add')">+</button>
+        </div>
       `;
     });
 
     priceSection = `<div class="variant-box">${variantsHTML}</div>`;
-     // A2B — Hide old Add button for Multi also
-   cartSection = "";
+    // Multi item → no global ADD button
+    cartSection = "";
+  }
 
-    }
 
   // ==========================
   //       RETURN CARD
@@ -5860,6 +5861,7 @@ function updateCart(itemId, variantId, action, meta = {}) {
 </script>
 </body>
 </html>
+
 
 
 
