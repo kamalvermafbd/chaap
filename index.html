@@ -5704,7 +5704,8 @@ function hideCartOverlay() {
 
 
   function activateVariantSelector(itemId, variantId, unit, price, disc) {
-     console.log("ACTIVATE →", itemId, variantId, unit, price, disc);
+  console.log("ACTIVATE →", itemId, variantId, unit, price, disc);
+
   // 1) Hide all qty boxes for this item
   document.querySelectorAll(`[id^="box-${itemId}_"]`).forEach(box => {
     box.classList.add("hidden");
@@ -5768,6 +5769,7 @@ function removeAllOldMultiEvents() {
 </script>
 </body>
 </html>
+
 
 
 
