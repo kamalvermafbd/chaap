@@ -1464,7 +1464,7 @@ renderIndex++;
        }
   });
      restoreMenuQuantities();
-  removeAllOldMultiEvents();
+  
 restoreMenuVariantQty();
 
 }
@@ -5714,36 +5714,38 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
 }
 
   function restoreMenuVariantQty() {
-
   if (!window.cart || cart.length === 0) return;
 
   cart.forEach(ci => {
-
-    const itemId = String(ci.itemId);
-    const variantId = String(ci.variantId);
-    const qty = Number(ci.qty || 1);
+    const itemId    = String(ci.itemId || "");
+    const variantId = String(ci.variantId || "");
+    const qty       = Number(ci.qty || 1);
 
     if (!variantId) return;
 
-    // SELECT radio ONLY inside matching card
-    const radios = document.querySelectorAll(
-      `input[data-item-id="${itemId}"][data-variant-id="${variantId}"]`
-    );
-
-    radios.forEach(r => (r.checked = true));
-
-    // Restore qty in card-level boxes
+    // Match ALL card-specific variant boxes
     const boxes = document.querySelectorAll(
       `[id^="box-${itemId}_${variantId}-"]`
     );
 
     boxes.forEach(box => {
       box.classList.remove("hidden");
-      const qtyLabel = box.querySelector("span[id^='qtyText-"]`);
+
+      const qtyLabel = box.querySelector(
+        `span[id^="qtyText-${itemId}_${variantId}-"]`
+      );
       if (qtyLabel) qtyLabel.textContent = qty;
     });
+
+    // Check correct radio inside each card
+    const radios = document.querySelectorAll(
+      `input[data-variant-id="${variantId}"][data-item-id="${itemId}"]`
+    );
+
+    radios.forEach(r => (r.checked = true));
   });
 }
+
 
 
 function removeAllOldMultiEvents() {
@@ -5836,6 +5838,7 @@ function updateCart(itemId, variantId, action, meta = {}) {
 </script>
 </body>
 </html>
+
 
 
 
