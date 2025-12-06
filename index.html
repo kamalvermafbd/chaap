@@ -5704,34 +5704,43 @@ function hideCartOverlay() {
 }
 
 
-  function activateVariantSelector(itemId, variantId, unit, price, disc) {
-  console.log("ACTIVATE →", itemId, variantId, unit, price, disc);
+  function activateVariantSelector(itemId, variantId, unit, price, disc, idx) {
 
-  // 1) Hide all qty boxes for this item
-  document.querySelectorAll(`[id^="box-${itemId}_"]`).forEach(box => {
-    box.classList.add("hidden");
-  });
+  console.log("ACTIVATE →", { itemId, variantId, unit, price, disc, idx });
+
+  // SAFE unique IDs
+  const boxId     = `box-${itemId}_${variantId}-${idx}`;
+  const qtyTextId = `qtyText-${itemId}_${variantId}-${idx}`;
+
+  // 1) Hide ALL variant boxes of THIS CARD only
+  document
+    .querySelectorAll(`[id^="box-${itemId}_"][id$="-${idx}"]`)
+    .forEach(b => b.classList.add("hidden"));
 
   // 2) Show only this selected variant box
-  const target = document.getElementById(`box-${itemId}_${variantId}`);
+  const target = document.getElementById(boxId);
   if (target) {
     target.classList.remove("hidden");
   }
 
-  // 3) Reset qty = 1
-  const qtyText = document.getElementById(`qtyText-${itemId}_${variantId}`);
-  if (qtyText) {
-    qtyText.textContent = "1";
+  // 3) Reset Qty = 1
+  const qtyLabel = document.getElementById(qtyTextId);
+  if (qtyLabel) {
+    qtyLabel.textContent = "1";
   }
 
-  // 4) Add to cart immediately (Zomato style)
-  addMultiVariant(itemId, variantId, unit, price, disc);
+  // 4) Add to CART using MASTER ENGINE
+  updateCart(itemId, variantId, "add", {
+    name: "",
+    unit,
+    price,
+    discount: disc
+  });
 
-  // 5) Update UI / Drawer / Checkout badge
+  // 5) UI Sync
   updateCartBadge();
-  if (typeof refreshCheckout === "function") {
-    refreshCheckout();
-  }
+  renderCart?.();
+  refreshCartDrawer?.();
 }
 
 function addMultiVariant(itemId, variantId, unit, price, disc) {
@@ -5861,6 +5870,7 @@ function updateCart(itemId, variantId, action, meta = {}) {
 </script>
 </body>
 </html>
+
 
 
 
