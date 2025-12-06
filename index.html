@@ -5734,6 +5734,8 @@ function hideCartOverlay() {
 }
 
 function addMultiVariant(itemId, variantId, unit, price, disc) {
+  console.log("ADD MULTI →", itemId, variantId, unit, price, disc);
+
   const meta = {
     name: "",
     unit: unit,
@@ -5769,6 +5771,7 @@ function removeAllOldMultiEvents() {
 </script>
 </body>
 </html>
+
 
 
 
