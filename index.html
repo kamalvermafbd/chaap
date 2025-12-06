@@ -5761,15 +5761,32 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
   if (!window.cart || cart.length === 0) return;
 
   cart.forEach(ci => {
-    const box = document.getElementById(`box-${ci.itemId}_${ci.variantId}`);
-    const qtyLabel = document.getElementById(`qtyText-${ci.itemId}_${ci.variantId}`);
+    const itemId    = String(ci.itemId || "");
+    const variantId = String(ci.variantId || "");
+    const qty       = Number(ci.qty || 1);
 
-    if (box && qtyLabel) {
-      box.classList.remove("hidden");          // show correct variant box
-      qtyLabel.textContent = ci.qty || 1;      // set correct qty
-    }
+    // Only multi variants
+    if (!variantId) return;
+
+    // Match boxes with correct card index ONLY
+    const boxes = document.querySelectorAll(`[id^="box-${itemId}_${variantId}-"]`);
+
+    boxes.forEach(box => {
+      box.classList.remove("hidden");
+
+      const qtyId = box.querySelector("span[id^='qtyText-']");
+      if (qtyId) qtyId.textContent = qty;
+    });
+
+    // Select correct radio button inside the SAME card
+    const radios = document.querySelectorAll(
+      `input[data-variant-id="${variantId}"][data-item-id="${itemId}"]`
+    );
+
+    radios.forEach(r => (r.checked = true));
   });
 }
+
 function removeAllOldMultiEvents() {
   document.querySelectorAll("input[data-variant-id]").forEach(el => {
     const clean = el.cloneNode(true); 
@@ -5870,6 +5887,7 @@ function updateCart(itemId, variantId, action, meta = {}) {
 </script>
 </body>
 </html>
+
 
 
 
