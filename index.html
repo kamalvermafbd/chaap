@@ -5767,10 +5767,98 @@ function removeAllOldMultiEvents() {
   });
 }
 
+function updateCart(itemId, variantId, action, meta = {}) {
+
+  // ------------------------
+  // 1) Load correct cart
+  // ------------------------
+  let cartArr = isLoggedIn()
+    ? JSON.parse(localStorage.getItem("cart") || "[]")
+    : JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+  const keyMatch = c =>
+    String(c.itemId) === String(itemId) &&
+    String(c.variantId || "") === String(variantId || "");
+
+  let existing = cartArr.find(keyMatch);
+
+  // ------------------------
+  // 2) ACTION = ADD
+  // ------------------------
+  if (action === "add") {
+
+    // NEW ITEM
+    if (!existing) {
+      existing = {
+        itemId,
+        variantId: variantId || "",
+        name: meta.name || "",
+        unit: meta.unit || "",
+        rate: Number(meta.price || 0),
+        discPercent: Number(meta.discount || 0),
+        qty: 1
+      };
+      cartArr.push(existing);
+    }
+
+    // EXISTING → QTY++
+    else {
+      existing.qty++;
+    }
+  }
+
+  // ------------------------
+  // 3) ACTION = DEC
+  // ------------------------
+  if (action === "dec") {
+    if (!existing) return;
+
+    if (existing.qty > 1) {
+      existing.qty--;
+    } else {
+      // remove item
+      cartArr = cartArr.filter(c => !keyMatch(c));
+    }
+  }
+
+  // ------------------------
+  // 4) SAVE cart (guest / login)
+  // ------------------------
+  if (isLoggedIn()) {
+    localStorage.setItem("cart", JSON.stringify(cartArr));
+    saveCartToBackend(cartArr);     // async safe
+  } else {
+    localStorage.setItem("guestCart", JSON.stringify(cartArr));
+  }
+
+  // ------------------------
+  // 5) GLOBAL SYNC
+  // ------------------------
+  cart = cartArr;
+  window.cart = cartArr;
+
+  // ------------------------
+  // 6) UI Updates
+  // ------------------------
+  updateCartBadge();
+
+  if (typeof refreshCartDrawer === "function") {
+    refreshCartDrawer();
+    updateDrawerTotals();
+  }
+
+  if (typeof renderCart === "function") {
+    renderCart();
+  }
+
+  // menu-level qty restore
+  restoreMenuVariations?.();
+}
   
 </script>
 </body>
 </html>
+
 
 
 
