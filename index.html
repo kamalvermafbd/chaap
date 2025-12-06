@@ -5734,25 +5734,7 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
     type: "multi"
   };
 
-  // Master Cart Engine call
   updateCart(itemId, variantId, "add", meta);
-
-  // Now replace ADD → qty box
-  const box = document.getElementById(`box-${itemId}_${variantId}`);
-
-  if (!box) return;
-
-  box.innerHTML = `
-    <div class="flex items-center gap-3">
-      <button class="px-2 bg-gray-300 rounded text-lg"
-        onclick="updateCart('${itemId}', '${variantId}', 'dec')">−</button>
-
-      <span class="font-semibold" id="qtyText-${itemId}_${variantId}">1</span>
-
-      <button class="px-2 bg-gray-300 rounded text-lg"
-        onclick="updateCart('${itemId}', '${variantId}', 'inc')">+</button>
-    </div>
-  `;
 }
 
   function restoreMenuVariantQty() {
@@ -5779,6 +5761,7 @@ function removeAllOldMultiEvents() {
 </script>
 </body>
 </html>
+
 
 
 
