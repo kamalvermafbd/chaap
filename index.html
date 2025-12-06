@@ -5366,9 +5366,9 @@ function menuMinus_multi(id) {
     refreshCartDrawer();
     updateDrawerTotals();
   }
-}function restoreMenuQuantities() {
+}
+function restoreMenuQuantities() {
 
-  // 0️⃣ Source of truth = GLOBAL cart
   let savedCart = [];
 
   if (Array.isArray(cart) && cart.length > 0) {
@@ -5382,13 +5382,12 @@ function menuMinus_multi(id) {
   }
 
   savedCart.forEach(ci => {
-    const itemId    = String(ci.itemId || "").trim();
-    const variantId = ci.variantId ? String(ci.variantId).trim() : "";
-    const qty       = Number(ci.qty || 0);
 
-    if (!itemId || qty <= 0) return;
+    const itemId    = String(ci.itemId || "");
+    const variantId = String(ci.variantId || "");
+    const qty       = Number(ci.qty || 1);
 
-    // 🟢 SINGLE ITEM (no variantId)
+    // SINGLE ITEM
     if (!variantId) {
       const addBtn  = document.getElementById(`addBtn-${itemId}`);
       const box     = document.getElementById(`qtyBox-${itemId}`);
@@ -5402,16 +5401,23 @@ function menuMinus_multi(id) {
       return;
     }
 
-    // 🟣 MULTI VARIANT
-    // 👉 IMPORTANT: sirf JO HTML pehle se hai usko use karo,
-    //    NAYA BOX JS se mat banao (double row ka issue yehi se aa raha tha)
-    const box     = document.getElementById(`box-${itemId}_${variantId}`);
-    const qtyText = document.getElementById(`qtyText-${itemId}_${variantId}`);
+    // MULTI VARIANT — find ALL matching cards (chef + starters)
+    const boxes = document.querySelectorAll(`[id^="box-${itemId}_${variantId}-"]`);
 
-    if (box && qtyText) {
+    boxes.forEach(box => {
       box.classList.remove("hidden");
-      qtyText.innerText = qty;
-    }
+
+      const qtySpan = box.querySelector("span[id^='qtyText-']");
+      if (qtySpan) qtySpan.textContent = qty;
+    });
+
+    // AUTO-select radio for every matching card
+    const radios = document.querySelectorAll(
+      `input[data-item-id="${itemId}"][data-variant-id="${variantId}"]`
+    );
+
+    radios.forEach(r => r.checked = true);
+
   });
 }
 
@@ -5706,34 +5712,35 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
 }
 
   function restoreMenuVariantQty() {
-  if (!window.cart || cart.length === 0) return;
+  if (!Array.isArray(cart) || cart.length === 0) return;
 
   cart.forEach(ci => {
-    const itemId    = String(ci.itemId || "");
-    const variantId = String(ci.variantId || "");
-    const qty       = Number(ci.qty || 1);
 
-    // Only multi variants
-    if (!variantId) return;
+    if (!ci.variantId) return;
 
-    // Match boxes with correct card index ONLY
+    const itemId = String(ci.itemId);
+    const variantId = String(ci.variantId);
+    const qty = Number(ci.qty || 1);
+
+    // find ALL matching boxes
     const boxes = document.querySelectorAll(`[id^="box-${itemId}_${variantId}-"]`);
 
     boxes.forEach(box => {
       box.classList.remove("hidden");
 
-      const qtyId = box.querySelector("span[id^='qtyText-']");
-      if (qtyId) qtyId.textContent = qty;
+      const qtySpan = box.querySelector("span[id^='qtyText-"]`);
+      if (qtySpan) qtySpan.textContent = qty;
     });
 
-    // Select correct radio button inside the SAME card
+    // auto-check radio
     const radios = document.querySelectorAll(
-      `input[data-variant-id="${variantId}"][data-item-id="${itemId}"]`
+      `input[data-item-id="${itemId}"][data-variant-id="${variantId}"]`
     );
+    radios.forEach(r => r.checked = true);
 
-    radios.forEach(r => (r.checked = true));
   });
 }
+
 
 function removeAllOldMultiEvents() {
   document.querySelectorAll("input[data-variant-id]").forEach(el => {
@@ -5835,6 +5842,7 @@ function updateCart(itemId, variantId, action, meta = {}) {
 </script>
 </body>
 </html>
+
 
 
 
