@@ -5662,28 +5662,35 @@ function hideCartOverlay() {
 
   console.log("ACTIVATE →", { itemId, variantId, unit, price, disc, idx });
 
-  // SAFE unique IDs
   const boxId     = `box-${itemId}_${variantId}-${idx}`;
   const qtyTextId = `qtyText-${itemId}_${variantId}-${idx}`;
 
-  // 1) Hide ALL variant boxes of THIS CARD only
+  // 1) Hide ALL variant qty boxes of THIS CARD
   document
     .querySelectorAll(`[id^="box-${itemId}_"][id$="-${idx}"]`)
     .forEach(b => b.classList.add("hidden"));
 
-  // 2) Show only this selected variant box
+  // 2) Show selected variant box
   const target = document.getElementById(boxId);
-  if (target) {
-    target.classList.remove("hidden");
+  if (target) target.classList.remove("hidden");
+
+  // 3) Check if this item+variant already exists in cart
+  const existing = cart.find(ci =>
+    String(ci.itemId) === String(itemId) &&
+    String(ci.variantId) === String(variantId)
+  );
+
+  // 4) If already in cart → just restore qty
+  if (existing) {
+    const qtyLabel = document.getElementById(qtyTextId);
+    if (qtyLabel) qtyLabel.textContent = existing.qty;
+    updateCartBadge();
+    renderCart?.();
+    refreshCartDrawer?.();
+    return;         // <-- IMPORTANT: don't auto-add again
   }
 
-  // 3) Reset Qty = 1
-  const qtyLabel = document.getElementById(qtyTextId);
-  if (qtyLabel) {
-    qtyLabel.textContent = "1";
-  }
-
-  // 4) Add to CART using MASTER ENGINE
+  // 5) Not in cart → Add as NEW item
   updateCart(itemId, variantId, "add", {
     name: "",
     unit,
@@ -5691,7 +5698,11 @@ function hideCartOverlay() {
     discount: disc
   });
 
-  // 5) UI Sync
+  // 6) Set visible qty = 1
+  const qtyLabel = document.getElementById(qtyTextId);
+  if (qtyLabel) qtyLabel.textContent = "1";
+
+  // 7) Sync UI
   updateCartBadge();
   renderCart?.();
   refreshCartDrawer?.();
@@ -5842,6 +5853,7 @@ function updateCart(itemId, variantId, action, meta = {}) {
 </script>
 </body>
 </html>
+
 
 
 
