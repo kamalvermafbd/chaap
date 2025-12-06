@@ -1423,7 +1423,7 @@ let renderIndex = 0;
 
        div.innerHTML = buildMenuCardHTML(item, renderIndex);
 menuDiv.appendChild(div);
-activateVariantSelector(item, renderIndex);
+
 renderIndex++;
 
     });
@@ -1457,13 +1457,14 @@ renderIndex++;
 
          div.innerHTML = buildMenuCardHTML(item, renderIndex);
 menuDiv.appendChild(div);
-activateVariantSelector(item, renderIndex);
+
 renderIndex++;
 
       });
        }
   });
      restoreMenuQuantities();
+restoreMenuVariantQty();
 
 }
 
@@ -4125,6 +4126,7 @@ item.itemId = String(
           <div class="left-side">
             <input type="radio"
                    name="var-${idSafe}"
+                   onclick="activateVariantSelector('${item.itemId}', '${v.variantId}', '${v.unit}', ${mrp}, ${disc})"
                    data-unit="${v.unit}"
                    data-mrp="${mrp}"
                    data-disc="${disc}"
@@ -4132,7 +4134,7 @@ item.itemId = String(
        data-item-id="${item.itemId}">
 
             <span class="unit">${v.unit}</span>
-
+            
             ${disc > 0 ? `
               <span style="background:#ff3e3e;color:#fff;
                            font-size:11px;padding:2px 4px;
@@ -4156,6 +4158,20 @@ item.itemId = String(
             ` : ""}
           </div>
         </label>
+        <!-- HIDDEN QTY BOX FOR THIS VARIANT -->
+<div id="box-${item.itemId}_${v.variantId}"
+     class="hidden flex items-center gap-3 mt-2">
+
+  <button class="px-2 bg-gray-300 rounded text-lg"
+          onclick="updateCart('${item.itemId}', '${v.variantId}', 'dec')">−</button>
+
+  <span class="font-semibold"
+        id="qtyText-${item.itemId}_${v.variantId}">1</span>
+
+  <button class="px-2 bg-gray-300 rounded text-lg"
+          onclick="updateCart('${item.itemId}', '${v.variantId}', 'add')">+</button>
+</div>
+
       `;
     });
 
@@ -5680,38 +5696,27 @@ function hideCartOverlay() {
 }
 
 
-  function activateVariantSelector(item, idx) {
-  if (item.cat2 !== "Multi") return;
-
-  const idSafe = slugify(item.name) + "-" + idx;
-  const radios = document.querySelectorAll(`input[name="var-${idSafe}"]`);
-
-  radios.forEach(r => {
-    r.addEventListener("change", () => {
-      const variantId = r.dataset.variantId;
-      const price = Number(r.dataset.mrp);
-      const disc = Number(r.dataset.disc);
-      const unit = r.dataset.unit;
-
-      // Remove old box (if any)
-      const old = document.querySelector(`.box-${idSafe}`);
-      if (old) old.remove();
-
-      // NEW BOX (safe with backticks)
-      const boxHTML = `
-        <div class="mt-2 box-${idSafe}" id="box-${item.itemId}_${variantId}">
-          <button class="px-3 py-1 bg-[#ff6f00] text-white rounded"
-            onclick="addMultiVariant('${item.itemId}', '${variantId}', \`${unit}\`, ${price}, ${disc})">
-            ADD
-          </button>
-        </div>
-      `;
-
-      const parentRow = r.closest(".variant-row");
-      parentRow.insertAdjacentHTML("afterend", boxHTML);
-    });
+  function activateVariantSelector(itemId, variantId, unit, price, disc) {
+  document.querySelectorAll(`[id^="box-${itemId}_"]`).forEach(box => {
+    box.classList.add("hidden");
   });
+
+  const target = document.getElementById(`box-${itemId}_${variantId}`);
+  if (target) {
+    target.classList.remove("hidden");
+  }
+
+  const qtyText = document.getElementById(`qtyText-${itemId}_${variantId}`);
+  if (qtyText) {
+    qtyText.textContent = "1";
+  }
+
+  addMultiVariant(itemId, variantId, unit, price, disc);
+
+  updateCartBadge();
+  if (typeof refreshCheckout === "function") refreshCheckout();
 }
+
 
 function addMultiVariant(itemId, variantId, unit, price, disc) {
   const meta = {
@@ -5743,9 +5748,25 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
   `;
 }
 
+  function restoreMenuVariantQty() {
+  if (!window.cart || cart.length === 0) return;
+
+  cart.forEach(ci => {
+    const box = document.getElementById(`box-${ci.itemId}_${ci.variantId}`);
+    const qtyLabel = document.getElementById(`qtyText-${ci.itemId}_${ci.variantId}`);
+
+    if (box && qtyLabel) {
+      box.classList.remove("hidden");          // show correct variant box
+      qtyLabel.textContent = ci.qty || 1;      // set correct qty
+    }
+  });
+}
+
+  
 </script>
 </body>
 </html>
+
 
 
 
