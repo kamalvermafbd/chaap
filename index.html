@@ -5649,39 +5649,41 @@ function hideCartOverlay() {
 }
 
 
-  function activateVariantSelector(itemId, variantId, unit, price, disc, idx) {
+function activateVariantSelector(itemId, variantId, unit, price, disc, idx) {
 
   console.log("ACTIVATE →", { itemId, variantId, unit, price, disc, idx });
 
-  const boxId     = `box-${itemId}_${variantId}-${idx}`;
-  const qtyTextId = `qtyText-${itemId}_${variantId}-${idx}`;
+  // FIXED ID SYSTEM — same IDs everywhere
+  const boxId     = `box-${itemId}_${variantId}`;
+  const qtyTextId = `qtyText-${itemId}_${variantId}`;
 
   // 1) Hide ALL variant qty boxes of THIS CARD
   document
-    .querySelectorAll(`[id^="box-${itemId}_"][id$="-${idx}"]`)
+    .querySelectorAll(`[id^="box-${itemId}_"]`)
     .forEach(b => b.classList.add("hidden"));
 
-  // 2) Show selected variant box
-  const target = document.getElementById(boxId);
-  if (target) target.classList.remove("hidden");
-
-  // 3) Check if this item+variant already exists in cart
+  // 2) Check if this item+variant already exists in cart
   const existing = cart.find(ci =>
     String(ci.itemId) === String(itemId) &&
     String(ci.variantId) === String(variantId)
   );
 
-  // 4) If already in cart → just restore qty
+  // 3) SHOW selected box ALWAYS (Zomato behavior)
+  const box = document.getElementById(boxId);
+  if (box) box.classList.remove("hidden");
+
+  const qtyLabel = document.getElementById(qtyTextId);
+
+  // 4) If already in cart → restore qty ONLY
   if (existing) {
-    const qtyLabel = document.getElementById(qtyTextId);
     if (qtyLabel) qtyLabel.textContent = existing.qty;
     updateCartBadge();
     renderCart?.();
     refreshCartDrawer?.();
-    return;         // <-- IMPORTANT: don't auto-add again
+    return; // IMPORTANT: no double add
   }
 
-  // 5) Not in cart → Add as NEW item
+  // 5) Not in cart → add as new with qty = 1
   updateCart(itemId, variantId, "add", {
     name: "",
     unit,
@@ -5689,8 +5691,7 @@ function hideCartOverlay() {
     discount: disc
   });
 
-  // 6) Set visible qty = 1
-  const qtyLabel = document.getElementById(qtyTextId);
+  // 6) Show qty=1 immediately
   if (qtyLabel) qtyLabel.textContent = "1";
 
   // 7) Sync UI
@@ -5698,6 +5699,7 @@ function hideCartOverlay() {
   renderCart?.();
   refreshCartDrawer?.();
 }
+
 
 function addMultiVariant(itemId, variantId, unit, price, disc) {
   console.log("ADD MULTI →", itemId, variantId, unit, price, disc);
@@ -5852,6 +5854,7 @@ function restoreMenuVariantQty() {
 </script>
 </body>
 </html>
+
 
 
 
