@@ -5721,64 +5721,44 @@ function buildCartObject(itemId, variantId, meta = {}) {
   // ---------------------
   // ACTION: ADD / INC
   // ---------------------
-  if (action === "add") {
+ // ADD FLOW (Master Engine)
+if (action === "add") {
 
-    if (existing) {
-      existing.qty = Number(existing.qty || 1) + 1;
-    } else {
-      const rate = Number(meta.price || 0);
-      const disc = Number(meta.discount || 0);
-
-      cartArr.push({
-        itemId,
-        variantId,
-        name: meta.name || "",
-        unit: meta.unit || "",
-        qty: 1,
-        rate,
-        discPercent: disc,
-        image: meta.image || ""
-      });
-    }
+  // If exists → increase qty
+  if (existing) {
+    existing.qty++;
+    return setCart(cartArr);
   }
+
+  // If not exists → build & push
+  const newObj = buildCartObject(itemId, variantId, meta);
+  cartArr.push(newObj);
+
+  return setCart(cartArr);
+}
 
   // ---------------------
   // ACTION: DEC
   // ---------------------
-  if (action === "dec") {
+ // DEC FLOW (Master Engine)
+if (action === "dec") {
 
-    if (!existing) return; // cannot decrease non-existing
+  if (!existing) return setCart(cartArr);
 
-    if (existing.qty <= 1) {
-      // delete
-      cartArr = cartArr.filter(c =>
-        !(String(c.itemId) === itemId &&
-          String(c.variantId || "") === variantId)
-      );
-    } else {
-      existing.qty--;
-    }
+  // If qty > 1 → decrement
+  if (existing.qty > 1) {
+    existing.qty--;
+    return setCart(cartArr);
   }
 
-  // ---------------------
-  // SAVE BACK
-  // ---------------------
-  if (isLoggedIn()) {
-    localStorage.setItem("cart", JSON.stringify(cartArr));
-    saveCartToBackend(cartArr);   // async safe
-  } else {
-    localStorage.setItem("guestCart", JSON.stringify(cartArr));
-  }
+  // If qty == 1 → delete item
+  cartArr = cartArr.filter(c =>
+    !(String(c.itemId) === itemId &&
+      String(c.variantId || "") === variantId)
+  );
 
-  cart = cartArr;
-  window.cart = cartArr;
-
-  // ---------------------
-  // UI Sync (all optional)
-  // ---------------------
-  try { updateCartBadge(); } catch(e){}
-  try { renderCart(); } catch(e){}
-  try { refreshCartDrawer(); } catch(e){}
+  return setCart(cartArr);
+}
 }
 function getCart() {
 
@@ -5794,6 +5774,7 @@ function getCart() {
   if (!Array.isArray(c)) c = [];
   return c;
 }
+  
 function setCart(updatedCart) {
 
   // Always ensure array
@@ -5818,9 +5799,20 @@ function setCart(updatedCart) {
   } catch (e) {
     console.warn("Backend save skipped:", e);
   }
-
+  refreshUI();
   return updatedCart;
+ 
 }
+function refreshUI() {
+  try { updateCartBadge(); } catch(e){}
+  try { refreshCartDrawer(); } catch(e){}
+  try { renderCart(); } catch(e){}
+  try { restoreMenuQuantities(); } catch(e){}
+  try { restoreMenuVariantQty(); } catch(e){}
+  try { updateDrawerTotals(); } catch(e){}
+}
+
+  
 function findCartItem(itemId, variantId) {
   itemId = String(itemId || "");
   variantId = String(variantId || "");
@@ -5835,6 +5827,7 @@ function findCartItem(itemId, variantId) {
 </script>
 </body>
 </html>
+
 
 
 
