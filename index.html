@@ -5539,53 +5539,54 @@ function hideCartOverlay() {
 
   function activateVariantSelector(itemId, variantId, unit, price, disc, idx) {
 
-  console.log("ACTIVATE →", { itemId, variantId, unit, price, disc, idx });
+  itemId = String(itemId);
+  variantId = String(variantId);
 
   const boxId     = `box-${itemId}_${variantId}-${idx}`;
   const qtyTextId = `qtyText-${itemId}_${variantId}-${idx}`;
 
-  // 1) Hide ALL variant qty boxes of THIS CARD
+  // 1) Hide ALL variant boxes for this card
   document
-    .querySelectorAll(`[id^="box-${itemId}_"][id$="-${idx}"]`)
+    .querySelectorAll(`div[id^="box-${itemId}_"][id$="-${idx}"]`)
     .forEach(b => b.classList.add("hidden"));
 
   // 2) Show selected variant box
   const target = document.getElementById(boxId);
   if (target) target.classList.remove("hidden");
 
-  // 3) Check if this item+variant already exists in cart
+  // 3) Check if this variant already exists in cart
   const existing = cart.find(ci =>
-    String(ci.itemId) === String(itemId) &&
-    String(ci.variantId) === String(variantId)
+    String(ci.itemId) === itemId &&
+    String(ci.variantId) === variantId
   );
 
-  // 4) If already in cart → just restore qty
   if (existing) {
+    // Restore qty immediately
     const qtyLabel = document.getElementById(qtyTextId);
     if (qtyLabel) qtyLabel.textContent = existing.qty;
-    updateCartBadge();
-    renderCart?.();
+
+    // Update drawer + badge instantly
+    updateCartBadge?.();
     refreshCartDrawer?.();
-    return;         // <-- IMPORTANT: don't auto-add again
+    return;
   }
 
-  // 5) Not in cart → Add as NEW item
+  // 4) Variant NOT in cart → ADD new
   updateCart(itemId, variantId, "add", {
-    name: "",
     unit,
     price,
     discount: disc
   });
 
-  // 6) Set visible qty = 1
+  // 5) Show qty = 1
   const qtyLabel = document.getElementById(qtyTextId);
   if (qtyLabel) qtyLabel.textContent = "1";
 
-  // 7) Sync UI
-  updateCartBadge();
-  renderCart?.();
+  // Sync UI
+  updateCartBadge?.();
   refreshCartDrawer?.();
 }
+
 
 function addMultiVariant(itemId, variantId, unit, price, disc) {
   console.log("ADD MULTI →", itemId, variantId, unit, price, disc);
@@ -5753,6 +5754,7 @@ qtyLabels.forEach(q => q.textContent = "");
 </script>
 </body>
 </html>
+
 
 
 
