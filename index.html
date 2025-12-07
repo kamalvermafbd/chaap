@@ -5782,11 +5782,31 @@ function findCartItem(itemId, variantId) {
     String(ci.variantId || "") === variantId
   ) || null;
 }
+  
+function variantPlus(itemId, variantId, idx) {
+
+  itemId = String(itemId);
+  variantId = String(variantId);
+
+  const qtyTextId = `qtyText-${itemId}_${variantId}-${idx}`;
+  const qtyEl = document.getElementById(qtyTextId);
+
+  if (!qtyEl) return;
+
+  let q = Number(qtyEl.innerText) + 1;
+  qtyEl.innerText = q;
+
+  try { animateQty(qtyTextId); } catch(e){}
+
+  // MASTER ENGINE
+  updateCart(itemId, variantId, "add");
+}
 
   
 </script>
 </body>
 </html>
+
 
 
 
