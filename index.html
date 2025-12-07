@@ -5100,51 +5100,27 @@ function addFromMenu(itemId) {
   
 function menuPlus(itemId) {
 
-  // 1️⃣ UI Qty increment
+  itemId = String(itemId);
+
+  // 1) UI qty increase
   const qtyText = document.getElementById("qtyText-" + itemId);
-  if (!qtyText) return; // safety
+  if (!qtyText) return;
 
-  let q = Number(qtyText.innerText);
-  q++;
+  let q = Number(qtyText.innerText) + 1;
   qtyText.innerText = q;
-  animateQty("qtyText-" + itemId);
 
-  // ⭐ Drawer row live sync
-  updateDrawerItemQty(String(itemId), null, q);
+  // Try animation (optional)
+  try { animateQty("qtyText-" + itemId); } catch(e){}
 
-  // 2️⃣ Load correct cart (guest / logged-in)
-  let cartArr = isLoggedIn()
-    ? JSON.parse(localStorage.getItem("cart") || "[]")
-    : JSON.parse(localStorage.getItem("guestCart") || "[]");
+  // 2) Master Engine call
+  updateCart(itemId, "", "add");
 
-  // 3️⃣ Find item (single → no variant)
-  const item = cartArr.find(c => c.itemId === itemId && !c.variantId);
-  if (!item) return;
+  // 3) Drawer live update (safe-ignore if closed)
+  updateDrawerItemQty?.(itemId, "", q);
 
-  // 4️⃣ Update qty
-  item.qty = q;
-
-  // ⭐ CRITICAL FIX — global cart sync
-  window.cart = cartArr;
-  cart = cartArr;
-
-  // 5️⃣ Save back
-  if (isLoggedIn()) {
-    localStorage.setItem("cart", JSON.stringify(cartArr));
-    saveCartToBackend(cartArr);   // async, safe
-  } else {
-    localStorage.setItem("guestCart", JSON.stringify(cartArr));
-  }
-
-  // 6️⃣ Badge update
-  updateCartBadge();
-
-  // ⭐ Refresh drawer ONLY if open
-  const drawer = document.getElementById("cartDrawer");
-  if (drawer && drawer.classList.contains("active")) {
-    refreshCartDrawer();
-    updateDrawerTotals();
-  }
+  // 4) Badge + drawer totals
+  updateCartBadge?.();
+  updateDrawerTotals?.();
 }
 
 
@@ -5824,6 +5800,7 @@ qtyLabels.forEach(q => q.textContent = "");
 </script>
 </body>
 </html>
+
 
 
 
