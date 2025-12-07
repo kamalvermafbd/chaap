@@ -5515,46 +5515,36 @@ function hideCartOverlay() {
   const boxId     = `box-${itemId}_${variantId}-${idx}`;
   const qtyTextId = `qtyText-${itemId}_${variantId}-${idx}`;
 
-  // 1) Hide ALL variant boxes for this card
-  document
-    .querySelectorAll(`div[id^="box-${itemId}_"][id$="-${idx}"]`)
+  // 1️⃣ Hide ALL variant boxes for this card
+  document.querySelectorAll(`div[id^="box-${itemId}_"][id$="-${idx}"]`)
     .forEach(b => b.classList.add("hidden"));
 
-  // 2) Show selected variant box
-  const target = document.getElementById(boxId);
-  if (target) target.classList.remove("hidden");
+  // 2️⃣ Show selected variant qty box
+  const targetBox = document.getElementById(boxId);
+  if (targetBox) targetBox.classList.remove("hidden");
 
-  // 3) Check if this variant already exists in cart
-  const existing = cart.find(ci =>
-    String(ci.itemId) === itemId &&
-    String(ci.variantId) === variantId
-  );
+  // 3️⃣ Check existing in cart
+  const ex = findCartItem(itemId, variantId);
 
-  if (existing) {
-    // Restore qty immediately
+  if (ex) {
+    // Restore qty
     const qtyLabel = document.getElementById(qtyTextId);
-    if (qtyLabel) qtyLabel.textContent = existing.qty;
+    if (qtyLabel) qtyLabel.textContent = ex.qty;
 
-    // Update drawer + badge instantly
-    updateCartBadge?.();
-    refreshCartDrawer?.();
+    // Nothing else — master engine will sync full UI
     return;
   }
 
-  // 4) Variant NOT in cart → ADD new
+  // 4️⃣ New variant → add via master engine
   updateCart(itemId, variantId, "add", {
     unit,
     price,
     discount: disc
   });
 
-  // 5) Show qty = 1
+  // 5️⃣ Initial qty = 1
   const qtyLabel = document.getElementById(qtyTextId);
   if (qtyLabel) qtyLabel.textContent = "1";
-
-  // Sync UI
-  updateCartBadge?.();
-  refreshCartDrawer?.();
 }
 
 
@@ -5797,6 +5787,7 @@ function findCartItem(itemId, variantId) {
 </script>
 </body>
 </html>
+
 
 
 
