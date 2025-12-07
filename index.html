@@ -5725,19 +5725,19 @@ function removeAllOldMultiEvents() {
 }
 function updateCart(itemId, variantId, action, meta = {}) {
 
-  // 1) SAFE → Load correct cart
+  // 1) Load proper cart
   let cartArr = isLoggedIn()
     ? JSON.parse(localStorage.getItem("cart") || "[]")
     : JSON.parse(localStorage.getItem("guestCart") || "[]");
 
-  // 2) Identify cart key
+  // 2) Identify entry
   const keyMatch = c =>
     String(c.itemId) === String(itemId) &&
     String(c.variantId || "") === String(variantId || "");
 
   let existing = cartArr.find(keyMatch);
 
-  // 3) MENU LOOKUP (VERY IMPORTANT)
+  // 3) Menu lookup
   const menuItem = menuItems.find(m => String(m.itemId) === String(itemId));
   let variant = null;
 
@@ -5745,7 +5745,7 @@ function updateCart(itemId, variantId, action, meta = {}) {
     variant = menuItem.variants.find(v => String(v.variantId) === String(variantId));
   }
 
-  // 4) FINAL SAFE META BUILD
+  // 4) Build meta
   const finalMeta = {
     name: menuItem?.name || meta.name || "",
     unit: variant?.unit || menuItem?.unit || meta.unit || "",
@@ -5753,7 +5753,7 @@ function updateCart(itemId, variantId, action, meta = {}) {
     discount: Number(variant?.discPercent || menuItem?.discPercent || meta.discount || 0)
   };
 
-  // 5) ACTION = ADD
+  // 5) ADD
   if (action === "add") {
     if (!existing) {
       existing = {
@@ -5769,33 +5769,39 @@ function updateCart(itemId, variantId, action, meta = {}) {
     } else {
       existing.qty++;
     }
+
+    // SHOW QTY BOX IMMEDIATELY (FIRST CLICK)
+    const box = document.getElementById(`box-${itemId}_${variantId}`);
+    const qtySpan = document.getElementById(`qtyText-${itemId}_${variantId}`);
+
+    if (box) box.classList.remove("hidden");
+    if (qtySpan) qtySpan.textContent = existing.qty;
   }
 
-  // 6) ACTION = DEC
+  // 6) DEC
   if (action === "dec") {
     if (!existing) return;
 
     if (existing.qty > 1) {
       existing.qty--;
+
+      // update UI live
+      const qtySpan = document.getElementById(`qtyText-${itemId}_${variantId}`);
+      if (qtySpan) qtySpan.textContent = existing.qty;
+
     } else {
+      // qty becomes 0 → hide ONLY this variant box
+      const box = document.getElementById(`box-${itemId}_${variantId}`);
+      const qtySpan = document.getElementById(`qtyText-${itemId}_${variantId}`);
 
-      // --- UI RESET FOR MULTI VARIANT WHEN REMOVED ---
-      if (variantId && existing.qty === 1) {
-        const box = document.getElementById(`box-${itemId}_${variantId}`);
-        const qtyText = document.getElementById(`qtyText-${itemId}_${variantId}`);
-        const radio = document.getElementById(`radio-${itemId}_${variantId}`);
+      if (box) box.classList.add("hidden");
+      if (qtySpan) qtySpan.textContent = "";
 
-        if (box) box.classList.add("hidden");
-        if (qtyText) qtyText.textContent = "";
-        if (radio) radio.checked = false;  // stop half plate auto highlight
-      }
-
-      // Remove from cart
       cartArr = cartArr.filter(c => !keyMatch(c));
     }
   }
 
-  // 7) SAVE (guest / logged-in)
+  // 7) Save cart
   if (isLoggedIn()) {
     localStorage.setItem("cart", JSON.stringify(cartArr));
     saveCartToBackend(cartArr);
@@ -5803,11 +5809,11 @@ function updateCart(itemId, variantId, action, meta = {}) {
     localStorage.setItem("guestCart", JSON.stringify(cartArr));
   }
 
-  // 8) GLOBAL SYNC
+  // 8) Global sync
   cart = cartArr;
   window.cart = cartArr;
 
-  // 9) UI SYNC
+  // 9) UI restore safe
   updateCartBadge();
   refreshCartDrawer?.();
   renderCart?.();
@@ -5815,28 +5821,27 @@ function updateCart(itemId, variantId, action, meta = {}) {
   restoreMenuVariantQty?.();
 }
 function restoreMenuVariantQty() {
+
   let savedCart = Array.isArray(cart) ? cart : [];
 
-  // Loop all variant boxes in DOM
   document.querySelectorAll("[id^='box-']").forEach(box => {
-    let id = box.id.replace("box-", "");  // item_variant
-    let [itemId, variantId] = id.split("_");
+    const id = box.id.replace("box-", "");
+    const [itemId, variantId] = id.split("_");
 
-    // Check cart
-    let inCart = savedCart.find(c =>
+    let entry = savedCart.find(c =>
       String(c.itemId) === String(itemId) &&
       String(c.variantId) === String(variantId)
     );
 
-    if (inCart) {
-      // qty > 0 → show box & qty
+    const qtySpan = document.getElementById(`qtyText-${itemId}_${variantId}`);
+
+    if (entry) {
+      // show
       box.classList.remove("hidden");
-      const qtySpan = document.getElementById(`qtyText-${itemId}_${variantId}`);
-      if (qtySpan) qtySpan.textContent = inCart.qty;
+      if (qtySpan) qtySpan.textContent = entry.qty;
     } else {
-      // qty removed → hide box properly
+      // hide
       box.classList.add("hidden");
-      const qtySpan = document.getElementById(`qtyText-${itemId}_${variantId}`);
       if (qtySpan) qtySpan.textContent = "";
     }
   });
@@ -5847,42 +5852,6 @@ function restoreMenuVariantQty() {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
