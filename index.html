@@ -5400,13 +5400,16 @@ function refreshCartDrawer() {
 }
 
 
-  function updateDrawerItemQty(itemId, variantId = null, newQty) {
+  function updateDrawerItemQty(itemId, variantId = "", newQty) {
 
-  // Drawer active nahi → skip
+  itemId = String(itemId);
+  variantId = String(variantId);
+
+  // Drawer closed → skip
   const drawer = document.getElementById("cartDrawer");
   if (!drawer || !drawer.classList.contains("active")) return;
 
-  // Row identify logic
+  // Row ID detect
   const rowId = variantId
     ? `drawerRow-${itemId}_${variantId}`
     : `drawerRow-${itemId}`;
@@ -5415,21 +5418,20 @@ function refreshCartDrawer() {
   if (!row) return;
 
   // Update qty text
-  const qtySpan = row.querySelector(".drawer-qty");
-  if (qtySpan) qtySpan.innerText = newQty;
+  const qtyEl = row.querySelector(".drawer-qty");
+  if (qtyEl) qtyEl.textContent = newQty;
 
-  // ==========================
-  //  SAFE RATE CALCULATION
-  // ==========================
-  const pricePerUnit = Number(row.dataset.price || 0);
-  const discPercent  = Number(row.dataset.disc  || 0);
+  // Recalculate total inside drawer
+  const mrp = Number(row.dataset.price || 0);
+  const disc = Number(row.dataset.disc || 0);
 
-  const priceAfterDisc = pricePerUnit - ((pricePerUnit * discPercent) / 100);
-  const total = (priceAfterDisc * newQty).toFixed(2);
+  const priceAfterDisc = mrp - (mrp * disc / 100);
+  const lineTotal = (priceAfterDisc * newQty).toFixed(2);
 
-  const totalSpan = row.querySelector(".drawer-total");
-  if (totalSpan) totalSpan.innerText = "₹" + total;
+  const totalEl = row.querySelector(".drawer-total");
+  if (totalEl) totalEl.textContent = "₹" + lineTotal;
 }
+
 
 
 function removeItemFromDrawer(itemId, variantId = null) {
@@ -5829,6 +5831,7 @@ function variantMinus(itemId, variantId, idx) {
 </script>
 </body>
 </html>
+
 
 
 
