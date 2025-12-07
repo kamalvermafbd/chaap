@@ -5072,58 +5072,37 @@ document.addEventListener("keydown", function(e) {
 
 function addFromMenu(itemId) {
 
-  // Always treat as string (safe compare)
   itemId = String(itemId);
 
-  // 1️⃣ UI UPDATE (same as before)
   const addBtn  = document.getElementById("addBtn-" + itemId);
   const qtyBox  = document.getElementById("qtyBox-" + itemId);
   const qtyText = document.getElementById("qtyText-" + itemId);
 
-  if (addBtn)  addBtn.classList.add("hidden");
-  if (qtyBox)  qtyBox.classList.remove("hidden");
+  if (addBtn) addBtn.classList.add("hidden");
+  if (qtyBox) qtyBox.classList.remove("hidden");
   if (qtyText) qtyText.innerText = "1";
 
-  // 2️⃣ PURE LOGIC → Master Cart Engine use karo
-  // Single item = variantId = ""
-  updateCart(itemId, "", "add");
+  try { animateQty("qtyText-" + itemId); } catch(e){}
 
-  // 3️⃣ Optional: thoda qty animation (agar animateQty hai)
-  try {
-    if (qtyText && typeof animateQty === "function") {
-      animateQty("qtyText-" + itemId);
-    }
-  } catch (e) {
-    console.warn("animateQty error (safe to ignore)", e);
-  }
+  // MASTER ENGINE
+  updateCart(itemId, "", "add");
 }
-  
+
 function menuPlus(itemId) {
 
   itemId = String(itemId);
 
-  // 1) UI qty increase
   const qtyText = document.getElementById("qtyText-" + itemId);
   if (!qtyText) return;
 
   let q = Number(qtyText.innerText) + 1;
   qtyText.innerText = q;
 
-  // Try animation (optional)
   try { animateQty("qtyText-" + itemId); } catch(e){}
 
-  // 2) Master Engine call
+  // MASTER ENGINE
   updateCart(itemId, "", "add");
-
-  // 3) Drawer live update (safe-ignore if closed)
-  updateDrawerItemQty?.(itemId, "", q);
-
-  // 4) Badge + drawer totals
-  updateCartBadge?.();
-  updateDrawerTotals?.();
 }
-
-
 
 function menuMinus(itemId) {
 
@@ -5137,20 +5116,16 @@ function menuMinus(itemId) {
 
   let q = Number(qtyText.innerText);
 
-  // If already at 1 → next is delete
+  // If qty is 1 → this press means remove
   if (q === 1) {
 
-    // UI change
     qtyText.innerText = "0";
-    qtyBox.classList.add("hidden");
-    addBtn.classList.remove("hidden");
 
-    // MASTER ENGINE delete
+    if (qtyBox) qtyBox.classList.add("hidden");
+    if (addBtn) addBtn.classList.remove("hidden");
+
+    // MASTER ENGINE remove
     updateCart(itemId, "", "dec");
-
-    updateCartBadge?.();
-    updateDrawerTotals?.();
-    refreshCartDrawer?.();
 
     return;
   }
@@ -5161,14 +5136,9 @@ function menuMinus(itemId) {
 
   try { animateQty("qtyText-" + itemId); } catch(e){}
 
-  // Master Engine decrement
+  // MASTER ENGINE
   updateCart(itemId, "", "dec");
-
-  updateDrawerItemQty?.(itemId, "", q);
-  updateCartBadge?.();
-  updateDrawerTotals?.();
 }
-
 
 
 function menuMinus_multi(id) {
@@ -5827,6 +5797,7 @@ function findCartItem(itemId, variantId) {
 </script>
 </body>
 </html>
+
 
 
 
