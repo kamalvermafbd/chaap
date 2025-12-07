@@ -5267,21 +5267,22 @@ function restoreMenuQuantities() {
     const variantId = String(ci.variantId || "");
     const qty = Number(ci.qty || 1);
 
-    // ----------------------------
-    // SINGLE ITEM
-    // ----------------------------
-    if (!variantId) {
-      const addBtn  = document.getElementById(`addBtn-${itemId}`);
-      const box     = document.getElementById(`qtyBox-${itemId}`);
-      const qtyText = document.getElementById(`qtyText-${itemId}`);
+  
+  // --- SINGLE ITEM RESTORE ---
+if (!variantId) {
 
-      if (addBtn && box && qtyText) {
-        addBtn.classList.add("hidden");
-        box.classList.remove("hidden");
-        qtyText.textContent = qty;
-      }
-      return;
-    }
+  const addBtn  = document.getElementById("addBtn-" + itemId);
+  const qtyBox  = document.getElementById("qtyBox-" + itemId);
+  const qtyText = document.getElementById("qtyText-" + itemId);
+
+  if (addBtn && qtyBox && qtyText) {
+    addBtn.classList.add("hidden");
+    qtyBox.classList.remove("hidden");
+    qtyText.textContent = qty;
+  }
+
+  return;  
+}
 
     // ----------------------------
     // MULTI VARIANT → FOR ALL CARDS
@@ -5749,6 +5750,7 @@ qtyLabels.forEach(q => q.textContent = "");
 </script>
 </body>
 </html>
+
 
 
 
