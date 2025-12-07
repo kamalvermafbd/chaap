@@ -5663,97 +5663,90 @@ function removeAllOldMultiEvents() {
   });
 }
 
-function updateCart(itemId, variantId, action, meta = {}) {
+function updateCart(itemId, variantId = "", action, meta = {}) {
 
-  // 1) SAFE → Load correct cart
+  itemId = String(itemId);
+  variantId = String(variantId);
+
+  // Read correct storage
   let cartArr = isLoggedIn()
     ? JSON.parse(localStorage.getItem("cart") || "[]")
     : JSON.parse(localStorage.getItem("guestCart") || "[]");
 
-  // 2) Identify cart key
-  const keyMatch = c =>
-    String(c.itemId) === String(itemId) &&
-    String(c.variantId || "") === String(variantId || "");
+  // Find match
+  let existing = cartArr.find(c =>
+    String(c.itemId) === itemId &&
+    String(c.variantId || "") === variantId
+  );
 
-  let existing = cartArr.find(keyMatch);
-
-  // 3) MENU LOOKUP (VERY IMPORTANT)
-  const menuItem = menuItems.find(m => String(m.itemId) === String(itemId));
-  let variant = null;
-
-  if (menuItem && menuItem.variants && variantId) {
-    variant = menuItem.variants.find(v => String(v.variantId) === String(variantId));
-  }
-
-  // 4) FINAL SAFE META BUILD
-  const finalMeta = {
-    name: menuItem?.name || meta.name || "",
-    unit: variant?.unit || menuItem?.unit || meta.unit || "",
-    price: Number(variant?.price || menuItem?.price || meta.price || 0),
-    discount: Number(variant?.discPercent || menuItem?.discPercent || meta.discount || 0)
-  };
-
-  // 5) ACTION = ADD
+  // ---------------------
+  // ACTION: ADD / INC
+  // ---------------------
   if (action === "add") {
-    if (!existing) {
-      existing = {
+
+    if (existing) {
+      existing.qty = Number(existing.qty || 1) + 1;
+    } else {
+      const rate = Number(meta.price || 0);
+      const disc = Number(meta.discount || 0);
+
+      cartArr.push({
         itemId,
-        variantId: variantId || "",
-        name: finalMeta.name,
-        unit: finalMeta.unit,
-        rate: finalMeta.price,
-        discPercent: finalMeta.discount,
-        qty: 1
-      };
-      cartArr.push(existing);
-    } else {
-      existing.qty++;
+        variantId,
+        name: meta.name || "",
+        unit: meta.unit || "",
+        qty: 1,
+        rate,
+        discPercent: disc,
+        image: meta.image || ""
+      });
     }
   }
 
-  // 6) ACTION = DEC
+  // ---------------------
+  // ACTION: DEC
+  // ---------------------
   if (action === "dec") {
-    if (!existing) return;
 
-    if (existing.qty > 1) {
-      existing.qty--;
+    if (!existing) return; // cannot decrease non-existing
+
+    if (existing.qty <= 1) {
+      // delete
+      cartArr = cartArr.filter(c =>
+        !(String(c.itemId) === itemId &&
+          String(c.variantId || "") === variantId)
+      );
     } else {
-
-      // HIDE MULTI VARIANT UI WHEN QTY BECOMES 0 (FINAL FIX)
-const boxes = document.querySelectorAll(`[id^="box-${itemId}_${variantId}"]`);
-boxes.forEach(b => b.classList.add("hidden"));
-
-const qtyLabels = document.querySelectorAll(`[id^="qtyText-${itemId}_${variantId}"]`);
-qtyLabels.forEach(q => q.textContent = "");
-
-      cartArr = cartArr.filter(c => !keyMatch(c));
+      existing.qty--;
     }
   }
 
-  // 7) SAVE (guest / logged-in)
+  // ---------------------
+  // SAVE BACK
+  // ---------------------
   if (isLoggedIn()) {
     localStorage.setItem("cart", JSON.stringify(cartArr));
-    saveCartToBackend(cartArr);
+    saveCartToBackend(cartArr);   // async safe
   } else {
     localStorage.setItem("guestCart", JSON.stringify(cartArr));
   }
 
-  // 8) GLOBAL SYNC
   cart = cartArr;
   window.cart = cartArr;
 
-  // 9) UI SYNC
-  updateCartBadge();
-  refreshCartDrawer?.();
-  renderCart?.();
-  restoreMenuQuantities?.();
-  restoreMenuVariantQty?.();
+  // ---------------------
+  // UI Sync (all optional)
+  // ---------------------
+  try { updateCartBadge(); } catch(e){}
+  try { renderCart(); } catch(e){}
+  try { refreshCartDrawer(); } catch(e){}
 }
 
   
 </script>
 </body>
 </html>
+
 
 
 
