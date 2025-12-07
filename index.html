@@ -5434,22 +5434,28 @@ function refreshCartDrawer() {
 
 
 
-function removeItemFromDrawer(itemId, variantId = null) {
-  const rowId = variantId 
-    ? `drawerRow-${itemId}_${variantId}`   // 🔥 FIXED
-    : `drawerRow-${itemId}`;               // 🔥 FIXED
+function removeItemFromDrawer(itemId, variantId = "") {
+
+  itemId = String(itemId);
+  variantId = String(variantId);
+
+  // Drawer closed → ignore
+  const drawer = document.getElementById("cartDrawer");
+  if (!drawer || !drawer.classList.contains("active")) return;
+
+  // Row ID
+  const rowId = variantId
+    ? `drawerRow-${itemId}_${variantId}`
+    : `drawerRow-${itemId}`;
 
   const row = document.getElementById(rowId);
-  if (!row) return;
+  if (row) row.remove();
 
-  // Smooth fade-out animation
-  row.style.opacity = "0";
-  row.style.transform = "translateX(30px)";
-  
-  setTimeout(() => {
-    row.remove();
-  }, 180);
+  // Update totals + badge
+  try { updateDrawerTotals(); } catch(e){}
+  try { updateCartBadge(); } catch(e){}
 }
+
 async function loadCartBeforeDrawer() {
   if (isLoggedIn()) {
     const mobile = localStorage.getItem("userMobile");
@@ -5831,6 +5837,7 @@ function variantMinus(itemId, variantId, idx) {
 </script>
 </body>
 </html>
+
 
 
 
