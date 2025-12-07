@@ -5224,6 +5224,7 @@ function menuMinus_multi(id) {
     updateDrawerTotals();
   }
 }
+
 function restoreMenuQuantities() {
 
   let savedCart = Array.isArray(cart) && cart.length > 0 
@@ -5237,35 +5238,29 @@ function restoreMenuQuantities() {
     const variantId = String(ci.variantId || "");
     const qty = Number(ci.qty || 1);
 
-  
-  // --- SINGLE ITEM RESTORE ---
-if (!variantId) {
+    // --- SINGLE ITEM ONLY ---
+    if (!variantId) {
 
-  const addBtn  = document.getElementById("addBtn-" + itemId);
-  const qtyBox  = document.getElementById("qtyBox-" + itemId);
-  const qtyText = document.getElementById("qtyText-" + itemId);
+      const addBtn  = document.getElementById("addBtn-" + itemId);
+      const qtyBox  = document.getElementById("qtyBox-" + itemId);
+      const qtyText = document.getElementById("qtyText-" + itemId);
 
-  if (addBtn && qtyBox && qtyText) {
-    addBtn.classList.add("hidden");
-    qtyBox.classList.remove("hidden");
-    qtyText.textContent = qty;
-  }
+      if (addBtn && qtyBox && qtyText) {
+        if (qty > 0) {
+          addBtn.classList.add("hidden");
+          qtyBox.classList.remove("hidden");
+          qtyText.textContent = qty;
+        } else {
+          qtyBox.classList.add("hidden");
+          addBtn.classList.remove("hidden");
+          qtyText.textContent = "0";
+        }
+      }
 
-  return;  
-}
+      return;
+    }
 
-    // ----------------------------
-    // MULTI VARIANT → FOR ALL CARDS
-    // ----------------------------
-    // match ANY card-index version: box-1_1a-*
-    const boxes = document.querySelectorAll(`[id^="box-${itemId}_${variantId}-"]`);
-
-    boxes.forEach(box => {
-      box.classList.remove("hidden");
-
-      const qtyLabel = box.querySelector("span[id^='qtyText-']");
-      if (qtyLabel) qtyLabel.textContent = qty;
-    });
+    // MULTI HANDLING REMOVED (now in restoreMenuVariantQty)
   });
 }
 
@@ -5564,55 +5559,41 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
 
   function restoreMenuVariantQty() {
 
-  if (!window.cart || cart.length === 0) return;
+  if (!Array.isArray(cart)) return;
 
-  // 1) Hide ALL multi variant qty boxes before restoring
-  document.querySelectorAll("div[id^='box-'][id*='_']").forEach(box => {
-    box.classList.add("hidden");
-  });
+  // 1️⃣ Hide ALL multi variant boxes & reset qty text
+  document.querySelectorAll("div[id^='box-']").forEach(b => b.classList.add("hidden"));
+  document.querySelectorAll("span[id^='qtyText-']").forEach(q => q.textContent = "");
+  document.querySelectorAll("input[data-variant-id][data-item-id]").forEach(r => r.checked = false);
 
-  document.querySelectorAll("span[id^='qtyText-'][id*='_']").forEach(q => {
-    q.textContent = "";
-  });
-
-  // UNCHECK all multi radios before restore
-  document.querySelectorAll("input[data-variant-id][data-item-id]").forEach(r => {
-    r.checked = false;
-  });
-
-  // 2) Restore each MULTI variant from cart
+  // 2️⃣ Restore items from cart
   cart.forEach(ci => {
 
-    const itemId    = String(ci.itemId);
-    const variantId = String(ci.variantId);
-    const qty       = Number(ci.qty || 1);
+    const itemId = String(ci.itemId);
+    const variantId = String(ci.variantId || "");
+    const qty = Number(ci.qty || 1);
 
-    // Only variants
+    // Skip singles (handled separately)
     if (!variantId) return;
 
-    // 3) Find ALL variant boxes across ALL cards
-    const boxes = document.querySelectorAll(
-      `div[id^="box-${itemId}_${variantId}-"]`
-    );
+    // 🔹 Show correct multi variant qty boxes
+    const boxes = document.querySelectorAll(`div[id^="box-${itemId}_${variantId}-"]`);
 
     boxes.forEach(box => {
       box.classList.remove("hidden");
 
-      // qty inside exact box
-      const qtyLabel = box.querySelector(
-        `span[id^="qtyText-${itemId}_${variantId}-"]`
-      );
-
+      const qtyLabel = box.querySelector(`span[id^="qtyText-${itemId}_${variantId}-"]`);
       if (qtyLabel) qtyLabel.textContent = qty;
     });
 
-    // 4) Tick ALL matching variant radios (Full & Half etc.)
+    // 🔹 Tick correct radio(s)
     const radios = document.querySelectorAll(
       `input[data-item-id="${itemId}"][data-variant-id="${variantId}"]`
     );
     radios.forEach(r => r.checked = true);
   });
 }
+
 
 
 
@@ -5850,6 +5831,7 @@ function variantMinus(itemId, variantId, idx) {
 </script>
 </body>
 </html>
+
 
 
 
