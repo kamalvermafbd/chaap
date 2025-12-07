@@ -5391,7 +5391,7 @@ function restoreMenuQuantities() {
       if (addBtn && box && qtyText) {
         addBtn.classList.add("hidden");
         box.classList.remove("hidden");
-         qtyText.textContent = qty;
+        qtyText.textContent = qty;
       }
       return;
     }
@@ -5649,41 +5649,39 @@ function hideCartOverlay() {
 }
 
 
-function activateVariantSelector(itemId, variantId, unit, price, disc, idx) {
+  function activateVariantSelector(itemId, variantId, unit, price, disc, idx) {
 
   console.log("ACTIVATE →", { itemId, variantId, unit, price, disc, idx });
 
-  // FIXED ID SYSTEM — same IDs everywhere
-  const boxId     = `box-${itemId}_${variantId}`;
-  const qtyTextId = `qtyText-${itemId}_${variantId}`;
+  const boxId     = `box-${itemId}_${variantId}-${idx}`;
+  const qtyTextId = `qtyText-${itemId}_${variantId}-${idx}`;
 
   // 1) Hide ALL variant qty boxes of THIS CARD
   document
-    .querySelectorAll(`[id^="box-${itemId}_"]`)
+    .querySelectorAll(`[id^="box-${itemId}_"][id$="-${idx}"]`)
     .forEach(b => b.classList.add("hidden"));
 
-  // 2) Check if this item+variant already exists in cart
+  // 2) Show selected variant box
+  const target = document.getElementById(boxId);
+  if (target) target.classList.remove("hidden");
+
+  // 3) Check if this item+variant already exists in cart
   const existing = cart.find(ci =>
     String(ci.itemId) === String(itemId) &&
     String(ci.variantId) === String(variantId)
   );
 
-  // 3) SHOW selected box ALWAYS (Zomato behavior)
-  const box = document.getElementById(boxId);
-  if (box) box.classList.remove("hidden");
-
-  const qtyLabel = document.getElementById(qtyTextId);
-
-  // 4) If already in cart → restore qty ONLY
+  // 4) If already in cart → just restore qty
   if (existing) {
+    const qtyLabel = document.getElementById(qtyTextId);
     if (qtyLabel) qtyLabel.textContent = existing.qty;
     updateCartBadge();
     renderCart?.();
     refreshCartDrawer?.();
-    return; // IMPORTANT: no double add
+    return;         // <-- IMPORTANT: don't auto-add again
   }
 
-  // 5) Not in cart → add as new with qty = 1
+  // 5) Not in cart → Add as NEW item
   updateCart(itemId, variantId, "add", {
     name: "",
     unit,
@@ -5691,7 +5689,8 @@ function activateVariantSelector(itemId, variantId, unit, price, disc, idx) {
     discount: disc
   });
 
-  // 6) Show qty=1 immediately
+  // 6) Set visible qty = 1
+  const qtyLabel = document.getElementById(qtyTextId);
   if (qtyLabel) qtyLabel.textContent = "1";
 
   // 7) Sync UI
@@ -5699,7 +5698,6 @@ function activateVariantSelector(itemId, variantId, unit, price, disc, idx) {
   renderCart?.();
   refreshCartDrawer?.();
 }
-
 
 function addMultiVariant(itemId, variantId, unit, price, disc) {
   console.log("ADD MULTI →", itemId, variantId, unit, price, disc);
@@ -5715,7 +5713,38 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
   updateCart(itemId, variantId, "add", meta);
 }
 
-  
+  function restoreMenuVariantQty() {
+  if (!window.cart || cart.length === 0) return;
+
+  cart.forEach(ci => {
+    const itemId    = String(ci.itemId || "");
+    const variantId = String(ci.variantId || "");
+    const qty       = Number(ci.qty || 1);
+
+    if (!variantId) return;
+
+    // Match ALL card-specific variant boxes
+    const boxes = document.querySelectorAll(
+      `[id^="box-${itemId}_${variantId}-"]`
+    );
+
+    boxes.forEach(box => {
+      box.classList.remove("hidden");
+
+      const qtyLabel = box.querySelector(
+        `span[id^="qtyText-${itemId}_${variantId}-"]`
+      );
+      if (qtyLabel) qtyLabel.textContent = qty;
+    });
+
+    // Check correct radio inside each card
+    const radios = document.querySelectorAll(
+      `input[data-variant-id="${variantId}"][data-item-id="${itemId}"]`
+    );
+
+    radios.forEach(r => (r.checked = true));
+  });
+}
 
 
 
@@ -5725,21 +5754,22 @@ function removeAllOldMultiEvents() {
     el.replaceWith(clean);
   });
 }
+
 function updateCart(itemId, variantId, action, meta = {}) {
 
-  // 1) Load proper cart
+  // 1) SAFE → Load correct cart
   let cartArr = isLoggedIn()
     ? JSON.parse(localStorage.getItem("cart") || "[]")
     : JSON.parse(localStorage.getItem("guestCart") || "[]");
 
-  // 2) Identify entry
+  // 2) Identify cart key
   const keyMatch = c =>
     String(c.itemId) === String(itemId) &&
     String(c.variantId || "") === String(variantId || "");
 
   let existing = cartArr.find(keyMatch);
 
-  // 3) Menu lookup
+  // 3) MENU LOOKUP (VERY IMPORTANT)
   const menuItem = menuItems.find(m => String(m.itemId) === String(itemId));
   let variant = null;
 
@@ -5747,7 +5777,7 @@ function updateCart(itemId, variantId, action, meta = {}) {
     variant = menuItem.variants.find(v => String(v.variantId) === String(variantId));
   }
 
-  // 4) Build meta
+  // 4) FINAL SAFE META BUILD
   const finalMeta = {
     name: menuItem?.name || meta.name || "",
     unit: variant?.unit || menuItem?.unit || meta.unit || "",
@@ -5755,7 +5785,7 @@ function updateCart(itemId, variantId, action, meta = {}) {
     discount: Number(variant?.discPercent || menuItem?.discPercent || meta.discount || 0)
   };
 
-  // 5) ADD
+  // 5) ACTION = ADD
   if (action === "add") {
     if (!existing) {
       existing = {
@@ -5771,39 +5801,20 @@ function updateCart(itemId, variantId, action, meta = {}) {
     } else {
       existing.qty++;
     }
-
-    // SHOW QTY BOX IMMEDIATELY (FIRST CLICK)
-    const box = document.getElementById(`box-${itemId}_${variantId}`);
-    const qtySpan = document.getElementById(`qtyText-${itemId}_${variantId}`);
-
-    if (box) box.classList.remove("hidden");
-    if (qtySpan) qtySpan.textContent = existing.qty;
   }
 
-  // 6) DEC
+  // 6) ACTION = DEC
   if (action === "dec") {
     if (!existing) return;
 
     if (existing.qty > 1) {
       existing.qty--;
-
-      // update UI live
-      const qtySpan = document.getElementById(`qtyText-${itemId}_${variantId}`);
-      if (qtySpan) qtySpan.textContent = existing.qty;
-
     } else {
-      // qty becomes 0 → hide ONLY this variant box
-      const box = document.getElementById(`box-${itemId}_${variantId}`);
-      const qtySpan = document.getElementById(`qtyText-${itemId}_${variantId}`);
-
-      if (box) box.classList.add("hidden");
-      if (qtySpan) qtySpan.textContent = "";
-
       cartArr = cartArr.filter(c => !keyMatch(c));
     }
   }
 
-  // 7) Save cart
+  // 7) SAVE (guest / logged-in)
   if (isLoggedIn()) {
     localStorage.setItem("cart", JSON.stringify(cartArr));
     saveCartToBackend(cartArr);
@@ -5811,51 +5822,20 @@ function updateCart(itemId, variantId, action, meta = {}) {
     localStorage.setItem("guestCart", JSON.stringify(cartArr));
   }
 
-  // 8) Global sync
+  // 8) GLOBAL SYNC
   cart = cartArr;
   window.cart = cartArr;
 
-  // 9) UI restore safe
+  // 9) UI SYNC
   updateCartBadge();
   refreshCartDrawer?.();
   renderCart?.();
   restoreMenuQuantities?.();
   restoreMenuVariantQty?.();
 }
-function restoreMenuVariantQty() {
-
-  let savedCart = Array.isArray(cart) ? cart : [];
-
-  document.querySelectorAll("[id^='box-']").forEach(box => {
-    const id = box.id.replace("box-", "");
-    const [itemId, variantId] = id.split("_");
-
-    let entry = savedCart.find(c =>
-      String(c.itemId) === String(itemId) &&
-      String(c.variantId) === String(variantId)
-    );
-
-    const qtySpan = document.getElementById(`qtyText-${itemId}_${variantId}`);
-
-    if (entry) {
-      // show
-      box.classList.remove("hidden");
-      if (qtySpan) qtySpan.textContent = entry.qty;
-    } else {
-      // hide
-      box.classList.add("hidden");
-      if (qtySpan) qtySpan.textContent = "";
-    }
-  });
-}
-
 
   
 </script>
 </body>
 </html>
-
-
-
-
 
