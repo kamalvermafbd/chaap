@@ -5662,8 +5662,47 @@ function removeAllOldMultiEvents() {
     el.replaceWith(clean);
   });
 }
+function buildCartObject(itemId, variantId, meta = {}) {
 
-function updateCart(itemId, variantId = "", action, meta = {}) {
+  itemId = String(itemId || "");
+  variantId = String(variantId || "");
+
+  // MENU lookups
+  const menuItem = window.menuItems?.find(m =>
+    String(m.itemId) === itemId
+  );
+
+  let variant = null;
+  if (menuItem?.variants && variantId) {
+    variant = menuItem.variants.find(v =>
+      String(v.variantId) === variantId
+    );
+  }
+
+  // FINAL SAFE META BUILD
+  const name = meta.name || menuItem?.name || "";
+  const unit = meta.unit || variant?.unit || menuItem?.unit || "";
+  const price = Number(meta.price || variant?.price || menuItem?.price || 0);
+  const discount = Number(meta.discount || variant?.discPercent || menuItem?.discPercent || 0);
+
+  return {
+    itemId,
+    variantId,
+    name,
+    unit,
+    price,
+    discPercent: discount,
+    qty: 1,
+    image: menuItem?.image || "",
+
+    // UI helpers — optional
+    rate: price,
+    total: price,
+  };
+}
+
+
+  function updateCart(itemId, variantId = "", action, meta = {}) {
 
   itemId = String(itemId);
   variantId = String(variantId);
@@ -5741,11 +5780,62 @@ function updateCart(itemId, variantId = "", action, meta = {}) {
   try { renderCart(); } catch(e){}
   try { refreshCartDrawer(); } catch(e){}
 }
+function getCart() {
+
+  // Guest user
+  if (!isLoggedIn()) {
+    let g = JSON.parse(localStorage.getItem("guestCart") || "[]");
+    if (!Array.isArray(g)) g = [];
+    return g;
+  }
+
+  // Logged-in user
+  let c = JSON.parse(localStorage.getItem("cart") || "[]");
+  if (!Array.isArray(c)) c = [];
+  return c;
+}
+function setCart(updatedCart) {
+
+  // Always ensure array
+  if (!Array.isArray(updatedCart)) updatedCart = [];
+
+  // Global sync
+  cart = updatedCart;
+  window.cart = updatedCart;
+
+  // Save to correct storage
+  if (!isLoggedIn()) {
+    localStorage.setItem("guestCart", JSON.stringify(updatedCart));
+  } else {
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  }
+
+  // Optional backend trigger (only after master engine complete)
+  try {
+    if (isLoggedIn() && typeof saveCartToBackend === "function") {
+      saveCartToBackend(updatedCart);
+    }
+  } catch (e) {
+    console.warn("Backend save skipped:", e);
+  }
+
+  return updatedCart;
+}
+function findCartItem(itemId, variantId) {
+  itemId = String(itemId || "");
+  variantId = String(variantId || "");
+
+  return cart.find(ci =>
+    String(ci.itemId) === itemId &&
+    String(ci.variantId || "") === variantId
+  ) || null;
+}
 
   
 </script>
 </body>
 </html>
+
 
 
 
