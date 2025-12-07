@@ -4946,38 +4946,28 @@ function autofillNewAddressMobile() {
     field.value = mobile;
   }
 }
+  
 function updateCartBadge() {
-   if (!window.cartReady) return;
-  let count = 0;
 
-  // Logged-in → count from backend/local cart
-  if (isLoggedIn()) {
-    const saved = localStorage.getItem("cart");
-    const arr = saved ? JSON.parse(saved) : [];
-    count = arr.reduce((a, b) => a + Number(b.qty || 1), 0);
-  }
-  // Guest
-  else {
-    const guest = localStorage.getItem("guestCart");
-    const arr = guest ? JSON.parse(guest) : [];
-    count = arr.reduce((a, b) => a + Number(b.qty || 1), 0);
-  }
+  // Always use master engine getter
+  const cartArr = getCart();
 
-  const badge = document.getElementById("cartCount");
+  let totalQty = 0;
+
+  cartArr.forEach(ci => {
+    totalQty += Number(ci.qty || 0);
+  });
+
+  const badge = document.getElementById("cartCountBadge");
   if (!badge) return;
 
-  // Show / hide logic
-  if (count > 0) {
-    badge.innerText = count;
-    badge.style.display = "inline-block";
+  if (totalQty > 0) {
+    badge.textContent = totalQty;
+    badge.classList.remove("hidden");
   } else {
-    badge.innerText = "";
-    badge.style.display = "none";
+    badge.textContent = "";
+    badge.classList.add("hidden");
   }
-  //  Z5a — Cart badge POP animation (Zomato style)
-  badge.classList.remove("cart-badge-pop");
-  void badge.offsetWidth;   // reflow to restart animation
-  badge.classList.add("cart-badge-pop");
 }
 
 async function openCheckout() {
@@ -5833,6 +5823,7 @@ function variantMinus(itemId, variantId, idx) {
 </script>
 </body>
 </html>
+
 
 
 
