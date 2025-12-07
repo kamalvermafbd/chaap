@@ -5072,70 +5072,32 @@ document.addEventListener("keydown", function(e) {
 
 function addFromMenu(itemId) {
 
-  // 1️⃣ UI Update
-  const addBtn = document.getElementById("addBtn-" + itemId);
-  const qtyBox = document.getElementById("qtyBox-" + itemId);
+  // Always treat as string (safe compare)
+  itemId = String(itemId);
+
+  // 1️⃣ UI UPDATE (same as before)
+  const addBtn  = document.getElementById("addBtn-" + itemId);
+  const qtyBox  = document.getElementById("qtyBox-" + itemId);
   const qtyText = document.getElementById("qtyText-" + itemId);
 
-  addBtn.classList.add("hidden");
-  qtyBox.classList.remove("hidden");
-  qtyText.innerText = 1;
+  if (addBtn)  addBtn.classList.add("hidden");
+  if (qtyBox)  qtyBox.classList.remove("hidden");
+  if (qtyText) qtyText.innerText = "1";
 
-  // 2️⃣ Build cart item object (Single item, no variant)
-  const item = menuItems.find(i => 
-    String(i.itemId || i.ItemId || i.id || i.ID) === String(itemId)
-  );
+  // 2️⃣ PURE LOGIC → Master Cart Engine use karo
+  // Single item = variantId = ""
+  updateCart(itemId, "", "add");
 
-  if (!item) return;
-
-  const mrp = Number(item.price);
-  const disc = Number(item.discPercent || 0);
-
-  const cartObj = {
-    itemId: itemId,
-    name: item.name || "",
-    unit: item.unit || "",
-    price: mrp,
-    disc: disc,
-    qty: 1
-  };
-
-  // 3️⃣ ADD to actual cart array
-  let cartArr = [];
-
-  if (isLoggedIn()) {
-    cartArr = JSON.parse(localStorage.getItem("cart") || "[]");
-  } else {
-    cartArr = JSON.parse(localStorage.getItem("guestCart") || "[]");
+  // 3️⃣ Optional: thoda qty animation (agar animateQty hai)
+  try {
+    if (qtyText && typeof animateQty === "function") {
+      animateQty("qtyText-" + itemId);
+    }
+  } catch (e) {
+    console.warn("animateQty error (safe to ignore)", e);
   }
-
-  // Check if already exists (should not happen for single ADD)
-  const existing = cartArr.find(c => c.itemId === itemId && !c.variantId);
-
-  if (existing) {
-    existing.qty = 1;
-  } else {
-    cartArr.push(cartObj);
-  }
-
-  // 4️⃣ Save back
-  if (isLoggedIn()) {
-    localStorage.setItem("cart", JSON.stringify(cartArr));
-    // Async backend push (non-blocking)
-    saveCartToBackend(cartArr);
-  } else {
-    localStorage.setItem("guestCart", JSON.stringify(cartArr));
-  }
-
-  // 5️⃣ Update cart badge
-  updateCartBadge();
-  refreshCartDrawer(); 
-  window.cart = cartArr;     // global sync
-  cart = cartArr;            // ensure main array updated
-  if (typeof renderCart === "function") renderCart();   // bottom cart UI
-  if (typeof updateDrawerTotals === "function") updateDrawerTotals(); // totals
 }
-
+  
 function menuPlus(itemId) {
 
   // 1️⃣ UI Qty increment
@@ -5862,6 +5824,7 @@ qtyLabels.forEach(q => q.textContent = "");
 </script>
 </body>
 </html>
+
 
 
 
