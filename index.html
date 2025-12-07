@@ -5715,13 +5715,16 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
 
   function restoreMenuVariantQty() {
   // 1) Reset ALL multi variant UI (hide everything)
-  document.querySelectorAll("div[id^='box-']").forEach(box => {
-    box.classList.add("hidden");
-  });
+  // Hide ONLY multi-variant qty boxes
+document.querySelectorAll("div[id^='box-'][id*='_']").forEach(box => {
+  box.classList.add("hidden");
+});
 
-  document.querySelectorAll("span[id^='qtyText-']").forEach(q => {
-    q.textContent = "";
-  });
+// Reset ONLY multi-variant qty text
+document.querySelectorAll("span[id^='qtyText-'][id*='_']").forEach(q => {
+  q.textContent = "";
+});
+
 
   document.querySelectorAll("input[data-variant-id][data-item-id]").forEach(r => {
     r.checked = false;
@@ -5859,6 +5862,7 @@ qtyLabels.forEach(q => q.textContent = "");
 </script>
 </body>
 </html>
+
 
 
 
