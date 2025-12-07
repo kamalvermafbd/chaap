@@ -5714,38 +5714,51 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
 }
 
   function restoreMenuVariantQty() {
-  if (!window.cart || cart.length === 0) return;
+  // 1) Reset ALL multi variant UI (hide everything)
+  document.querySelectorAll("div[id^='box-']").forEach(box => {
+    box.classList.add("hidden");
+  });
+
+  document.querySelectorAll("span[id^='qtyText-']").forEach(q => {
+    q.textContent = "";
+  });
+
+  document.querySelectorAll("input[data-variant-id][data-item-id]").forEach(r => {
+    r.checked = false;
+  });
+
+  // 2) Now restore ONLY what exists in cart
+  if (!window.cart || !Array.isArray(cart)) return;
 
   cart.forEach(ci => {
-    const itemId    = String(ci.itemId || "");
-    const variantId = String(ci.variantId || "");
+    const itemId    = String(ci.itemId);
+    const variantId = String(ci.variantId);
     const qty       = Number(ci.qty || 1);
 
-    if (!variantId) return;
+    // Multi variants ONLY
+    if (variantId !== "") {
 
-    // Match ALL card-specific variant boxes
-    const boxes = document.querySelectorAll(
-      `[id^="box-${itemId}_${variantId}-"]`
-    );
-
-    boxes.forEach(box => {
-      box.classList.remove("hidden");
-
-      const qtyLabel = box.querySelector(
-        `span[id^="qtyText-${itemId}_${variantId}-"]`
+      // find ALL boxes of this particular item+variant in ANY CARD
+      const boxes = document.querySelectorAll(
+        `div[id^="box-${itemId}_${variantId}-"]`
       );
-      if (qtyLabel) qtyLabel.textContent = qty;
-    });
 
-    // Check correct radio inside each card
-    const radios = document.querySelectorAll(
-      `input[data-variant-id="${variantId}"][data-item-id="${itemId}"]`
-    );
+      boxes.forEach(box => {
+        box.classList.remove("hidden");
 
-    radios.forEach(r => (r.checked = true));
+        // find qtyText inside same card (same idx)
+        const qtyLabel = box.querySelector(`span[id^="qtyText-${itemId}_${variantId}-"]`);
+        if (qtyLabel) qtyLabel.textContent = qty;
+      });
+
+      // tick radio for all cards of this variant
+      const radios = document.querySelectorAll(
+        `input[data-item-id="${itemId}"][data-variant-id="${variantId}"]`
+      );
+      radios.forEach(r => r.checked = true);
+    }
   });
 }
-
 
 
 function removeAllOldMultiEvents() {
@@ -5846,5 +5859,6 @@ qtyLabels.forEach(q => q.textContent = "");
 </script>
 </body>
 </html>
+
 
 
