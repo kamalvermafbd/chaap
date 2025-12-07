@@ -5713,38 +5713,7 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
   updateCart(itemId, variantId, "add", meta);
 }
 
-  function restoreMenuVariantQty() {
-  if (!window.cart || cart.length === 0) return;
-
-  cart.forEach(ci => {
-    const itemId    = String(ci.itemId || "");
-    const variantId = String(ci.variantId || "");
-    const qty       = Number(ci.qty || 1);
-
-    if (!variantId) return;
-
-    // Match ALL card-specific variant boxes
-    const boxes = document.querySelectorAll(
-      `[id^="box-${itemId}_${variantId}-"]`
-    );
-
-    boxes.forEach(box => {
-      box.classList.remove("hidden");
-
-      const qtyLabel = box.querySelector(
-        `span[id^="qtyText-${itemId}_${variantId}-"]`
-      );
-      if (qtyLabel) qtyLabel.textContent = qty;
-    });
-
-    // Check correct radio inside each card
-    const radios = document.querySelectorAll(
-      `input[data-variant-id="${variantId}"][data-item-id="${itemId}"]`
-    );
-
-    radios.forEach(r => (r.checked = true));
-  });
-}
+  
 
 
 
@@ -5754,7 +5723,6 @@ function removeAllOldMultiEvents() {
     el.replaceWith(clean);
   });
 }
-
 function updateCart(itemId, variantId, action, meta = {}) {
 
   // 1) SAFE → Load correct cart
@@ -5810,11 +5778,20 @@ function updateCart(itemId, variantId, action, meta = {}) {
     if (existing.qty > 1) {
       existing.qty--;
     } else {
-      cartArr = cartArr.filter(c => !keyMatch(c));
+
+      // --- UI RESET FOR MULTI VARIANT WHEN REMOVED ---
       if (variantId && existing.qty === 1) {
-  const box = document.getElementById(`box-${itemId}_${variantId}`);
-  if (box) box.classList.add("hidden");
-}
+        const box = document.getElementById(`box-${itemId}_${variantId}`);
+        const qtyText = document.getElementById(`qtyText-${itemId}_${variantId}`);
+        const radio = document.getElementById(`radio-${itemId}_${variantId}`);
+
+        if (box) box.classList.add("hidden");
+        if (qtyText) qtyText.textContent = "";
+        if (radio) radio.checked = false;  // stop half plate auto highlight
+      }
+
+      // Remove from cart
+      cartArr = cartArr.filter(c => !keyMatch(c));
     }
   }
 
@@ -5837,11 +5814,40 @@ function updateCart(itemId, variantId, action, meta = {}) {
   restoreMenuQuantities?.();
   restoreMenuVariantQty?.();
 }
+function restoreMenuVariantQty() {
+  let savedCart = Array.isArray(cart) ? cart : [];
+
+  // Loop all variant boxes in DOM
+  document.querySelectorAll("[id^='box-']").forEach(box => {
+    let id = box.id.replace("box-", "");  // item_variant
+    let [itemId, variantId] = id.split("_");
+
+    // Check cart
+    let inCart = savedCart.find(c =>
+      String(c.itemId) === String(itemId) &&
+      String(c.variantId) === String(variantId)
+    );
+
+    if (inCart) {
+      // qty > 0 → show box & qty
+      box.classList.remove("hidden");
+      const qtySpan = document.getElementById(`qtyText-${itemId}_${variantId}`);
+      if (qtySpan) qtySpan.textContent = inCart.qty;
+    } else {
+      // qty removed → hide box properly
+      box.classList.add("hidden");
+      const qtySpan = document.getElementById(`qtyText-${itemId}_${variantId}`);
+      if (qtySpan) qtySpan.textContent = "";
+    }
+  });
+}
+
 
   
 </script>
 </body>
 </html>
+
 
 
 
