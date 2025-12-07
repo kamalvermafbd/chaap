@@ -5801,11 +5801,56 @@ function variantPlus(itemId, variantId, idx) {
   // MASTER ENGINE
   updateCart(itemId, variantId, "add");
 }
+  
+function variantMinus(itemId, variantId, idx) {
+
+  itemId = String(itemId);
+  variantId = String(variantId);
+
+  const qtyTextId = `qtyText-${itemId}_${variantId}-${idx}`;
+  const boxId     = `box-${itemId}_${variantId}-${idx}`;
+
+  const qtyEl = document.getElementById(qtyTextId);
+  const boxEl = document.getElementById(boxId);
+
+  if (!qtyEl) return;
+
+  let q = Number(qtyEl.innerText);
+
+  // If qty is 1 → delete from UI
+  if (q === 1) {
+
+    qtyEl.innerText = "0";
+
+    if (boxEl) boxEl.classList.add("hidden");
+
+    // Untick radio button also
+    const radios = document.querySelectorAll(
+      `input[data-item-id="${itemId}"][data-variant-id="${variantId}"]`
+    );
+    radios.forEach(r => (r.checked = false));
+
+    // MASTER ENGINE remove
+    updateCart(itemId, variantId, "dec");
+
+    return;
+  }
+
+  // Normal decrement
+  q--;
+  qtyEl.innerText = q;
+
+  try { animateQty(qtyTextId); } catch(e){}
+
+  // MASTER ENGINE
+  updateCart(itemId, variantId, "dec");
+}
 
   
 </script>
 </body>
 </html>
+
 
 
 
