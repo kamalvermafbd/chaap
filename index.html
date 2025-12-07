@@ -5383,24 +5383,22 @@ if (isLoggedIn()) {
 }
   
 function refreshCartDrawer() {
-    if (!window.cartReady) return;
-  const drawer = document.getElementById("cartDrawer");
+  if (!window.cartReady) return;
 
-  // ❗ Hard safety: drawer MUST be open and visible
+  const drawer = document.getElementById("cartDrawer");
   if (!drawer || !drawer.classList.contains("active")) return;
 
-  // Always reload fresh cart every refresh
-  const cartArr = isLoggedIn()
-    ? JSON.parse(localStorage.getItem("cart") || "[]")
-    : JSON.parse(localStorage.getItem("guestCart") || "[]");
+  // Always use Master Engine getter
+  const cartArr = getCart();   // guest + login both safe
 
-  // Build UI safely
+  // Rebuild drawer UI from current cart
   openCartPanel(cartArr);
 
-  // Update totals + badge
-  updateDrawerTotals();
-  updateCartBadge();
+  // Totals + badge (safe optional)
+  try { updateDrawerTotals(); } catch(e){}
+  try { updateCartBadge(); } catch(e){}
 }
+
 
   function updateDrawerItemQty(itemId, variantId = null, newQty) {
 
@@ -5831,6 +5829,7 @@ function variantMinus(itemId, variantId, idx) {
 </script>
 </body>
 </html>
+
 
 
 
