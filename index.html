@@ -4717,7 +4717,8 @@ function setupAddressUIVisibility() {
 
 // run on page load
 document.addEventListener("DOMContentLoaded", setupAddressUIVisibility);
-
+document.addEventListener("DOMContentLoaded", restoreFullCartUI); 
+  
 function autofillMobileForLoggedIn() {
   const mobileInput = document.getElementById("mobile");
 
@@ -5888,3 +5889,4 @@ function variantMinus(itemId, variantId, idx) {
 </script>
 </body>
 </html>
+
