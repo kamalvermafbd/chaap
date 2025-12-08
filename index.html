@@ -1465,7 +1465,10 @@ renderIndex++;
        }
   });
      
-
+  // ⭐ CORRECT PLACE
+   setTimeout(() => {
+       restoreFullCartUI();
+   }, 50);
 }
 
 
@@ -3114,8 +3117,7 @@ function logoutUser() {
   document.getElementById("hamburgerBtn").style.display = "none";
 
   document.getElementById("leftNav").style.display = "none";
-document.getElementById("leftNav").classList.remove("active");
-document.getElementById("leftNav").style.display = "none";
+  document.getElementById("leftNav").classList.remove("active");
   
   document.getElementById("menuWrapper").style.display = "block";
   document.getElementById("pageWrapper").style.display = "none";
@@ -3127,29 +3129,35 @@ document.getElementById("leftNav").style.display = "none";
   document.querySelectorAll("#premiumMenu li").forEach(li => li.classList.remove("active"));
   document.getElementById("mainContent").style.marginLeft = "0";
 
-  // Remove login identifiers
+  // ==== LOGIN IDENTITY CLEAR ====
   localStorage.removeItem("userMobile");
   localStorage.removeItem("userEmail");
 
-  // MOST IMPORTANT (Cart Behave Rule)
-  // ❗ Clear only local cart, NOT backend cart
-  localStorage.removeItem("cart");   // remove local mirror
+  // ❗ Do NOT use localStorage.removeItem("mobile")
+  // Because system never sets "mobile" key anywhere.
+
+  // ==== CART LOGOUT RULE ====
+  // Clear only local mirrors — backend cart remains safe.
+  localStorage.removeItem("cart");
+  localStorage.removeItem("guestCart");
   cart = [];
   window.cart = [];
-  localStorage.removeItem("guestCart");   // ⭐ This was missing
 
-
-  // ❗ Clear sessionId (start fresh next login)
+  // Reset session
   localStorage.removeItem("sessionId");
 
-  // Refresh cart UI
+  // Reset checkout UI
+  document.getElementById("mobile").value = "";
+  document.getElementById("customerName").value = "";
+  document.getElementById("email").value = "";
+  document.getElementById("address").value = "";
+
+  // Re-render cart
   renderCart();
-document.getElementById("mobile").value = "";
-document.getElementById("customerName").value = "";
-document.getElementById("email").value = "";
-document.getElementById("address").value = "";
+
   alert("Logged out successfully.");
 }
+
 
 
 </script>
@@ -5682,6 +5690,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
