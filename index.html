@@ -1947,7 +1947,7 @@ function openCheckout() {
     document.getElementById("email").value = "";
     document.getElementById("address").value = "";
   }
-
+  refreshCheckoutCart();
   document.getElementById('checkoutModal').style.display = 'flex';
 }
 
@@ -5988,10 +5988,55 @@ function getCartForOrder() {
 
   return finalList;
 }
+
+function refreshCheckoutCart() {
+
+  const cartArr = getCart();   // master engine getter
+  const container = document.getElementById("checkoutCartContainer");
+
+  if (!container) return;
+
+  container.innerHTML = "";  // Reset checkout list
+
+  let html = "";
+
+  cartArr.forEach(ci => {
+
+    const itemId = String(ci.itemId);
+    const variantId = String(ci.variantId || "");
+    const unitLabel = ci.unit ? `(${ci.unit})` : "";
+
+    const qty = Number(ci.qty || 1);
+    const rate = Number(ci.rate || 0);
+    const disc = Number(ci.discPercent || 0);
+
+    const priceAfterDisc = rate - (rate * disc / 100);
+    const lineTotal = (priceAfterDisc * qty).toFixed(2);
+
+    html += `
+      <div class="checkout-row flex justify-between items-center py-2 border-b">
+        
+        <div class="flex flex-col">
+          <span class="font-semibold">${ci.name} ${unitLabel}</span>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span class="font-semibold">${qty}</span>
+        </div>
+
+        <div class="font-semibold">₹${lineTotal}</div>
+
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
   
 </script>
 </body>
 </html>
+
 
 
 
