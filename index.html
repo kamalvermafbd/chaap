@@ -4432,37 +4432,7 @@ async function saveCartToBackend(cartData = null) {
 
 
 
- function loadUserCartOnStart() {
-
-  // Only load if user is actually logged in
-  if (!isLoggedIn()) return;
-
-  const mobile = localStorage.getItem("userMobile");
-  if (!mobile) return;
-
-  apiPost("getCart", { mobile })
-    .then(res => {
-      const backendCart = res.cart || res.data || res.cartItems || [];
-
-      // Sanitize every item to avoid null/missing fields
-      const cleaned = backendCart.map(item => ({
-        ...item,
-        itemId: item.itemId || "",
-        variantId: item.variantId || "",
-        qty: Number(item.qty || 1),
-        rate: Number(item.rate || 0),
-        discPercent: Number(item.discPercent || 0)
-      }));
-
-      // Save merged/cleaned cart locally
-      localStorage.setItem("cart", JSON.stringify(cleaned));
-      cart = cleaned;
-      window.cart = cleaned;
-
-      renderCart();
-    })
-    .catch(err => console.error("Load cart on start error:", err));
-}
+ 
 
 function getBackendCart(mobile) {
   return apiPost("getCart", { mobile })
@@ -5000,7 +4970,7 @@ async function openCartDrawer() {
   window.cart = freshCart;
 
   // 4) Restore full UI before opening
-  restoreFullCartUI();
+
   updateCartBadge();
 
   // 5) Build drawer UI
@@ -5034,8 +5004,7 @@ function toggleCartDrawer() {
    
 }
 
-  document.addEventListener("DOMContentLoaded", () => {
-  loadCartOnStart();     
+  document.addEventListener("DOMContentLoaded", () => {   
   restoreFullCartUI();   
   updateCartBadge();    
 });
@@ -5765,8 +5734,6 @@ function refreshUI() {
   try { updateCartBadge(); } catch(e){}
   try { refreshCartDrawer(); } catch(e){}
   try { renderCart(); } catch(e){}
-  try { restoreMenuQuantities(); } catch(e){}
-  try { restoreMenuVariantQty(); } catch(e){}
   try { updateDrawerTotals(); } catch(e){}
 }
 
@@ -6036,6 +6003,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
