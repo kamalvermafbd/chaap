@@ -5000,10 +5000,7 @@ async function openCartDrawer() {
   await loadCartBeforeDrawer();
 
   // ⭐ 4) Drawer UI build karo — ALWAYS fresh cart
-  const freshCart = isLoggedIn()
-    ? JSON.parse(localStorage.getItem("cart") || "[]")
-    : JSON.parse(localStorage.getItem("guestCart") || "[]");
-
+ const freshCart = getCart();
   openCartPanel(freshCart);
 
   // ⭐ 5) Overlay OFF — after UI ready
@@ -5889,4 +5886,5 @@ function variantMinus(itemId, variantId, idx) {
 </script>
 </body>
 </html>
+
 
