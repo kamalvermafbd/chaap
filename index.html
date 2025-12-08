@@ -4898,20 +4898,31 @@ function updateCartBadge() {
 
 async function openCheckout() {
 
-  await openCartPanel();   // ⭐ Z4a must be here
+  // Always use master cart (NO backend calls)
+  const freshCart = getCart();
 
+  cart = freshCart;
+  window.cart = freshCart;
+
+  if (freshCart.length === 0) {
+    alert("Your cart is empty!");
+    return;
+  }
+
+  // Autofill + UI setup
   autofillMobileForLoggedIn();
   resetCheckoutFieldsDefault();
   setupAddressUIVisibility();
   loadPrimaryAddress();
 
-  if (cart.length === 0) {
-    alert("Your cart is empty!");
-    return;
-  }
+  // Build checkout items
+  refreshCheckout();
 
   document.getElementById("checkoutModal").style.display = "flex";
 }
+
+
+  
 async function openCartDrawer() {
 
   // 1) Always get latest cart (master engine)
@@ -5694,9 +5705,7 @@ function variantMinus(itemId, variantId, idx) {
   
 function refreshCheckout() {
 
-  // Always use master cart getter
   const cartArr = getCart();
-
   const container = document.getElementById("checkoutItemsContainer");
   if (!container) return;
 
@@ -5710,13 +5719,13 @@ function refreshCheckout() {
     const variantId = String(ci.variantId || "");
     const qty = Number(ci.qty || 1);
 
-    const mrp = Number(ci.rate || 0);
+    const rate = Number(ci.rate || 0);
     const disc = Number(ci.discPercent || 0);
 
-    const priceAfterDisc = mrp - (mrp * disc / 100);
-    const lineTotal = (priceAfterDisc * qty).toFixed(2);
+    const finalPrice = rate - (rate * disc / 100);
+    const lineTotal = (finalPrice * qty).toFixed(2);
 
-    subtotal += priceAfterDisc * qty;
+    subtotal += finalPrice * qty;
 
     const row = `
       <div class="checkout-row flex justify-between py-2 border-b">
@@ -5724,7 +5733,6 @@ function refreshCheckout() {
         <div>
           <div class="font-semibold">${ci.name}</div>
           ${ci.unit ? `<div class="text-sm text-gray-500">${ci.unit}</div>` : ""}
-          <div class="text-sm">₹${priceAfterDisc.toFixed(2)} x ${qty}</div>
         </div>
 
         <div class="flex items-center gap-3">
@@ -5738,17 +5746,19 @@ function refreshCheckout() {
             onclick="updateCart('${itemId}', '${variantId}', 'add'); refreshCheckout();">+</button>
         </div>
 
-        <div class="w-16 text-right font-semibold">₹${lineTotal}</div>
+        <div class="font-semibold">₹${lineTotal}</div>
+
       </div>
     `;
 
     container.insertAdjacentHTML("beforeend", row);
   });
 
-  // Subtotal section
+  // Subtotal
   const subtotalEl = document.getElementById("checkoutSubtotal");
   if (subtotalEl) subtotalEl.textContent = "₹" + subtotal.toFixed(2);
 }
+
 
 function getCartForOrder() {
 
@@ -5821,6 +5831,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
