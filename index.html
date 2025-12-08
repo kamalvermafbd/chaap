@@ -5226,22 +5226,21 @@ function loadCartOnStart() {
 
   
 function refreshCartDrawer() {
-  if (!window.cartReady) return;
 
+  // Drawer closed? → skip
   const drawer = document.getElementById("cartDrawer");
   if (!drawer || !drawer.classList.contains("active")) return;
 
-  // Always use Master Engine getter
-  const cartArr = getCart();   // guest + login both safe
+  // Always read latest cart
+  const cartArr = getCart();
 
-  // Rebuild drawer UI from current cart
+  // Rebuild drawer UI fresh
   openCartPanel(cartArr);
 
-  // Totals + badge (safe optional)
+  // Update totals + badge
   try { updateDrawerTotals(); } catch(e){}
   try { updateCartBadge(); } catch(e){}
 }
-
 
   function updateDrawerItemQty(itemId, variantId = "", newQty) {
 
@@ -5824,6 +5823,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
