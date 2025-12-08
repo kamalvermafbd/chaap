@@ -653,21 +653,50 @@ style="
 </div>
 
   <div id="cartBackdrop" onclick="closeCartDrawer()"></div> 
-<div id="cartDrawer"> 
+<<div id="cartDrawer"> 
+
    <button onclick="closeCartDrawer()" 
     class="absolute right-3 top-3 text-gray-500 hover:text-gray-800 text-2xl font-bold">
     &times;
   </button>
-<h2 class="text-xl font-semibold mb-3">Your Cart</h2> 
-<div id="drawerItemsList"></div> 
-<div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold"> 
-  <span>Total:</span> <span>₹<span id="drawerTotalAmount">0</span></span> </div> 
-<button onclick="openCheckout()" class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg"> Checkout </button> </div> 
 
-<button onclick="openCartDrawer()" 
-  style="position:absolute; right:160px; top:60px; background:#ff6347; color:white;
-  padding:8px 12px; border-radius:6px; border:none;"> View Cart (<span id="cartCount">0</span>) </button>
-  
+  <h2 class="text-xl font-semibold mb-3">Your Cart</h2> 
+
+  <div id="drawerItemsList"></div> 
+
+  <!-- OLD SUBTOTAL BLOCK (KEEP IT) -->
+  <div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold"> 
+    <span>Total:</span> 
+    <span>₹<span id="drawerTotalAmount">0</span></span> 
+  </div> 
+
+
+  <!-- ⭐⭐ MOVE THIS BLOCK INSIDE DRAWER ⭐⭐ -->
+  <div class="mt-4 border-t pt-3">
+
+    <p class="flex justify-between font-semibold text-lg">
+      <span>Base Total:</span>
+      <span>₹<span id="cartTotal">0.00</span></span>
+    </p>
+
+    <div id="taxSummary" class="text-right font-semibold mt-2"></div>
+
+    <div class="flex justify-between mt-4 text-xl font-bold">
+      <span>Grand Total:</span>
+      <span class="text-red-500">₹<span id="finalGrandTotal">0.00</span></span>
+    </div>
+
+    <button onclick="openCheckout()"
+            class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-lg">
+      Checkout
+    </button>
+
+  </div>
+  <!-- ⭐⭐ END BLOCK ⭐⭐ -->
+
+</div>   <!-- ✔ drawer ends HERE -->
+
+
 
  <!-- HAMBURGER BUTTON (appears only after login) -->
 <button id="hamburgerBtn"
@@ -5725,6 +5754,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
