@@ -5314,56 +5314,15 @@ function removeItemFromDrawer(itemId, variantId = "") {
 
 async function loadCartBeforeDrawer() {
 
-  // If not logged in → guest cart hi use hoga
-  if (!isLoggedIn()) {
-    cart = getCart();          // guestCart
-    window.cart = cart;
-    return cart;
-  }
+  // Master Engine se hamesha latest cart lo
+  const cartArr = getCart();   // guest => guestCart, login => cart (localStorage)
 
-  // 1) Logged in user → backend fetch
-  let backendCart = [];
-  try {
-    backendCart = await apiGet("getCart", {
-      mobile: localStorage.getItem("userMobile")
-    });
+  // Safe globals set
+  cart = Array.isArray(cartArr) ? cartArr : [];
+  window.cart = cart;
 
-    if (!Array.isArray(backendCart)) backendCart = [];
-  }
-  catch (e) {
-    console.error("Backend load failed", e);
-    backendCart = JSON.parse(localStorage.getItem("cart") || "[]");
-  }
-
-  // 2) Read guest cart (if any)
-  let guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-  if (!Array.isArray(guestCart)) guestCart = [];
-
-  // 3) Merge logic (perfect)
-  guestCart.forEach(g => {
-    const match = backendCart.find(b =>
-      String(b.itemId) === String(g.itemId) &&
-      String(b.variantId || "") === String(g.variantId || "")
-    );
-
-    if (match) {
-      match.qty += Number(g.qty || 0);
-    } else {
-      backendCart.push(g);
-    }
-  });
-
-  // 4) Save merged cart
-  localStorage.setItem("cart", JSON.stringify(backendCart));
-
-  // 5) Guest cart clear
-  localStorage.removeItem("guestCart");
-
-  // 6) Set master engine globals
-  cart = backendCart;
-  window.cart = backendCart;
-
-  return backendCart;
+  // Drawer / checkout isi ko use karega
+  return cart;
 }
 
 function updateDrawerTotals() {
@@ -5880,6 +5839,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
