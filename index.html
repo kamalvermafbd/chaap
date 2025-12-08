@@ -4736,7 +4736,7 @@ function updateCartBadge() {
     totalQty += Number(ci.qty || 0);
   });
 
-  const badge = document.getElementById("cartCountBadge");
+  const badge = document.getElementById("cartCount");
   if (!badge) return;
 
   if (totalQty > 0) {
@@ -5670,6 +5670,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
