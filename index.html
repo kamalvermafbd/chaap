@@ -3142,6 +3142,7 @@ function logoutUser() {
   localStorage.removeItem("guestCart");
   cart = [];
   window.cart = [];
+resetMenuUIForLogout();
 
   // Reset session
   localStorage.removeItem("sessionId");
@@ -5688,10 +5689,40 @@ function refreshCheckoutCart() {
 
   container.innerHTML = html;
 }
+
+  function resetMenuUIForLogout() {
+
+  // Hide all multi variant qty boxes
+  document.querySelectorAll("div[id^='box-']").forEach(b => {
+    b.classList.add("hidden");
+  });
+
+  // Show ADD buttons again
+  document.querySelectorAll("[id^='addBtn-']").forEach(btn => {
+    btn.classList.remove("hidden");
+  });
+
+  // Hide qtyBox for single items
+  document.querySelectorAll("[id^='qtyBox-']").forEach(box => {
+    box.classList.add("hidden");
+  });
+
+  // Reset all qtyText to 0 (not empty)
+  document.querySelectorAll("span[id^='qtyText-']").forEach(q => {
+    q.textContent = "0";
+  });
+
+  // Untick all multi variant radios
+  document
+    .querySelectorAll("input[data-variant-id][data-item-id]")
+    .forEach(r => (r.checked = false));
+}
+
   
 </script>
 </body>
 </html>
+
 
 
 
