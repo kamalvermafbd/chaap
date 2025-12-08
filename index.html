@@ -5366,38 +5366,32 @@ function hideCartOverlay() {
   const boxId     = `box-${itemId}_${variantId}-${idx}`;
   const qtyTextId = `qtyText-${itemId}_${variantId}-${idx}`;
 
-  // 1️⃣ Hide ALL variant boxes for this card
+  // 1️⃣ Hide all variant boxes for this card
   document.querySelectorAll(`div[id^="box-${itemId}_"][id$="-${idx}"]`)
     .forEach(b => b.classList.add("hidden"));
 
-  // 2️⃣ Show selected variant qty box
+  // 2️⃣ Show selected variant box
   const targetBox = document.getElementById(boxId);
   if (targetBox) targetBox.classList.remove("hidden");
 
-  // 3️⃣ Check existing in cart
+  // 3️⃣ Check if already in cart
   const ex = findCartItem(itemId, variantId);
 
   if (ex) {
     // Restore qty
     const qtyLabel = document.getElementById(qtyTextId);
     if (qtyLabel) qtyLabel.textContent = ex.qty;
-
-    // Nothing else — master engine will sync full UI
     return;
   }
 
-  // 4️⃣ New variant → add via master engine
-  updateCart(itemId, variantId, "add", {
-    unit,
-    price,
-    discount: disc
-  });
-
-  // 5️⃣ Initial qty = 1
+  // 4️⃣ New variant selected → DO NOT auto add
+  // → Just show qty = 1 in UI
   const qtyLabel = document.getElementById(qtyTextId);
   if (qtyLabel) qtyLabel.textContent = "1";
-}
 
+  // ❌ NO ADD-TO-CART HERE
+  // updateCart() must run only on + button click
+}
 
 function addMultiVariant(itemId, variantId, unit, price, disc) {
   console.log("ADD MULTI →", itemId, variantId, unit, price, disc);
@@ -5831,6 +5825,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
