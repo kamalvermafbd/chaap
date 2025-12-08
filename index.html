@@ -1463,9 +1463,7 @@ renderIndex++;
       });
        }
   });
-     restoreMenuQuantities();
-  
-restoreMenuVariantQty();
+     
 
 }
 
@@ -1512,7 +1510,7 @@ function rebuildCart() {
   if (!isLoggedIn()) {
     localStorage.setItem("guestCart", JSON.stringify(cart));
   } else {
-    localStorage.setItem("cart", JSON.stringify(cart));
+    
   }
 
   // rerender
@@ -1746,7 +1744,7 @@ cart = cart.map(item => {
 if (!isLoggedIn()) {
   localStorage.setItem("guestCart", JSON.stringify(cart));
 } else {
-  localStorage.setItem("cart", JSON.stringify(cart));
+  
 }
 
 
@@ -1905,7 +1903,7 @@ async function updateQty(index, newQty) {
   if (!isLoggedIn()) {
     localStorage.setItem("guestCart", JSON.stringify(cart));
   } else {
-    localStorage.setItem("cart", JSON.stringify(cart));
+    
   }
 
   // 4 — Re-render cart instantly (no delay, no flicker)
@@ -2352,7 +2350,7 @@ function removeItem(index) {
     if (!isLoggedIn()) {
       localStorage.setItem("guestCart", JSON.stringify(cart));
     } else {
-      localStorage.setItem("cart", JSON.stringify(cart));
+      
     }
 
     renderCart();
@@ -4319,7 +4317,7 @@ document.addEventListener("click", async function (e) {
   if (dec) cart[index].qty = Math.max(1, cart[index].qty - 1);
 
   // 2 — Update local cart immediately (NO flicker)
-  localStorage.setItem("cart", JSON.stringify(cart));
+  
 
   // 3 — Re-render cart smoothly
   renderCart();
@@ -4389,7 +4387,7 @@ async function saveCartToBackend(cartData = null) {
       }
   // FINAL SAFE CHECK
     if (isLoggedIn()) {
-        localStorage.setItem("cart", JSON.stringify(cart));
+        
     }
       // === STEP 4C: DISABLED BACKEND VERIFY TO PREVENT QTY ROLLBACK ===
       resolve();
@@ -5150,45 +5148,6 @@ function menuMinus_multi(id) {
   }
 }
 
-function restoreMenuQuantities() {
-
-  let savedCart = Array.isArray(cart) && cart.length > 0 
-    ? cart 
-    : (isLoggedIn()
-        ? JSON.parse(localStorage.getItem("cart") || "[]")
-        : JSON.parse(localStorage.getItem("guestCart") || "[]"));
-
-  savedCart.forEach(ci => {
-    const itemId = String(ci.itemId);
-    const variantId = String(ci.variantId || "");
-    const qty = Number(ci.qty || 1);
-
-    // --- SINGLE ITEM ONLY ---
-    if (!variantId) {
-
-      const addBtn  = document.getElementById("addBtn-" + itemId);
-      const qtyBox  = document.getElementById("qtyBox-" + itemId);
-      const qtyText = document.getElementById("qtyText-" + itemId);
-
-      if (addBtn && qtyBox && qtyText) {
-        if (qty > 0) {
-          addBtn.classList.add("hidden");
-          qtyBox.classList.remove("hidden");
-          qtyText.textContent = qty;
-        } else {
-          qtyBox.classList.add("hidden");
-          addBtn.classList.remove("hidden");
-          qtyText.textContent = "0";
-        }
-      }
-
-      return;
-    }
-
-    // MULTI HANDLING REMOVED (now in restoreMenuVariantQty)
-  });
-}
-
 
 
 function cleanCartConsistency(cartArr) {
@@ -5500,46 +5459,7 @@ function addMultiVariant(itemId, variantId, unit, price, disc) {
   updateCart(itemId, variantId, "add", meta);
 }
 
-  function restoreMenuVariantQty() {
-
-  if (!Array.isArray(cart)) return;
-
-  // 1️⃣ Hide ALL multi variant boxes & reset qty text
-  document.querySelectorAll("div[id^='box-']").forEach(b => b.classList.add("hidden"));
-  document.querySelectorAll("span[id^='qtyText-']").forEach(q => q.textContent = "");
-  document.querySelectorAll("input[data-variant-id][data-item-id]").forEach(r => r.checked = false);
-
-  // 2️⃣ Restore items from cart
-  cart.forEach(ci => {
-
-    const itemId = String(ci.itemId);
-    const variantId = String(ci.variantId || "");
-    const qty = Number(ci.qty || 1);
-
-    // Skip singles (handled separately)
-    if (!variantId) return;
-
-    // 🔹 Show correct multi variant qty boxes
-    const boxes = document.querySelectorAll(`div[id^="box-${itemId}_${variantId}-"]`);
-
-    boxes.forEach(box => {
-      box.classList.remove("hidden");
-
-      const qtyLabel = box.querySelector(`span[id^="qtyText-${itemId}_${variantId}-"]`);
-      if (qtyLabel) qtyLabel.textContent = qty;
-    });
-
-    // 🔹 Tick correct radio(s)
-    const radios = document.querySelectorAll(
-      `input[data-item-id="${itemId}"][data-variant-id="${variantId}"]`
-    );
-    radios.forEach(r => r.checked = true);
-  });
-}
-
-
-
-
+  
 function removeAllOldMultiEvents() {
   document.querySelectorAll("input[data-variant-id]").forEach(el => {
     const clean = el.cloneNode(true); 
@@ -5592,9 +5512,8 @@ function buildCartObject(itemId, variantId, meta = {}) {
   variantId = String(variantId);
 
   // Read correct storage
-  let cartArr = isLoggedIn()
-    ? JSON.parse(localStorage.getItem("cart") || "[]")
-    : JSON.parse(localStorage.getItem("guestCart") || "[]");
+let cartArr = getCart();  // master engine safe getter
+
 
   // Find match
   let existing = cartArr.find(c =>
@@ -5661,32 +5580,33 @@ function getCart() {
   
 function setCart(updatedCart) {
 
-  // Always ensure array
   if (!Array.isArray(updatedCart)) updatedCart = [];
 
-  // Global sync
+  // 1) LOCAL UPDATE (FAST)
   cart = updatedCart;
   window.cart = updatedCart;
 
-  // Save to correct storage
   if (!isLoggedIn()) {
     localStorage.setItem("guestCart", JSON.stringify(updatedCart));
   } else {
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   }
 
-  // Optional backend trigger (only after master engine complete)
-  try {
-    if (isLoggedIn() && typeof saveCartToBackend === "function") {
-      saveCartToBackend(updatedCart);
-    }
-  } catch (e) {
-    console.warn("Backend save skipped:", e);
-  }
+  // 2) UI update (FAST)
   refreshUI();
+
+  // 3) BACKEND SAVE (DELAYED + SAFE)
+  if (isLoggedIn()) {
+    if (window.cartSaveTimer) clearTimeout(window.cartSaveTimer);
+
+    window.cartSaveTimer = setTimeout(() => {
+      saveCartToBackend(updatedCart);
+    }, 300);   // 300ms debounce - prevents overwrite bug
+  }
+
   return updatedCart;
- 
 }
+
 function refreshUI() {
   try { updateCartBadge(); } catch(e){}
   try { refreshCartDrawer(); } catch(e){}
@@ -5960,6 +5880,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
