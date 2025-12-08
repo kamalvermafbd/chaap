@@ -5030,9 +5030,12 @@ function toggleCartDrawer() {
    
 }
 
-  document.addEventListener("DOMContentLoaded", updateCartBadge);
-document.addEventListener("DOMContentLoaded", loadCartOnStart);
-  
+  document.addEventListener("DOMContentLoaded", () => {
+  loadCartOnStart();     
+  restoreFullCartUI();   
+  updateCartBadge();    
+});
+
 // ===== SWIPE TO CLOSE Drawer (Zomato style) =====
 let touchStartX = 0;
 
@@ -5904,6 +5907,7 @@ function variantMinus(itemId, variantId, idx) {
 </script>
 </body>
 </html>
+
 
 
 
