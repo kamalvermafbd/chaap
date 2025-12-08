@@ -5525,26 +5525,29 @@ function setCart(updatedCart) {
 
   if (!Array.isArray(updatedCart)) updatedCart = [];
 
-  // 1) LOCAL UPDATE (FAST)
+  // 1) Update master engine globals
   cart = updatedCart;
   window.cart = updatedCart;
 
+  // 2) Save to correct storage
   if (!isLoggedIn()) {
     localStorage.setItem("guestCart", JSON.stringify(updatedCart));
   } else {
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   }
 
-  // 2) UI update (FAST)
+  // 3) UI update (FAST, NO BLOCK)
   refreshUI();
 
-  // 3) BACKEND SAVE (DELAYED + SAFE)
+  // 4) Backend SAVE (DEBOUNCED — prevents overwrite)
   if (isLoggedIn()) {
-    if (window.cartSaveTimer) clearTimeout(window.cartSaveTimer);
+
+    if (window.cartSaveTimer)
+      clearTimeout(window.cartSaveTimer);
 
     window.cartSaveTimer = setTimeout(() => {
       saveCartToBackend(updatedCart);
-    }, 300);   // 300ms debounce - prevents overwrite bug
+    }, 400);   // slightly increased debounce = safer
   }
 
   return updatedCart;
@@ -5818,6 +5821,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
