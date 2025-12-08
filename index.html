@@ -5965,10 +5965,34 @@ function refreshCheckout() {
   if (subtotalEl) subtotalEl.textContent = "₹" + subtotal.toFixed(2);
 }
 
+function getCartForOrder() {
+
+  const cartArr = getCart();  // master engine getter
+
+  // Clean + prepare final order cart
+  const finalList = cartArr.map(ci => ({
+
+    itemId: String(ci.itemId || ""),
+    variantId: String(ci.variantId || ""),
+
+    name: ci.name || "",
+    unit: ci.unit || "",
+
+    qty: Number(ci.qty || 1),
+
+    rate: Number(ci.rate || 0),
+    discPercent: Number(ci.discPercent || 0),
+
+    image: ci.image || ""
+  }));
+
+  return finalList;
+}
   
 </script>
 </body>
 </html>
+
 
 
 
