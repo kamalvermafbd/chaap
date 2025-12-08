@@ -5247,31 +5247,34 @@ function hideCartOverlay() {
   const boxId     = `box-${itemId}_${variantId}-${idx}`;
   const qtyTextId = `qtyText-${itemId}_${variantId}-${idx}`;
 
-  // 1️⃣ Hide all variant boxes for this card
+  // 1️⃣ Hide ALL other variant qty-boxes of this card
   document.querySelectorAll(`div[id^="box-${itemId}_"][id$="-${idx}"]`)
     .forEach(b => b.classList.add("hidden"));
 
-  // 2️⃣ Show selected variant box
+  // 2️⃣ Show selected variant qty-box
   const targetBox = document.getElementById(boxId);
   if (targetBox) targetBox.classList.remove("hidden");
 
-  // 3️⃣ Check if already in cart
+  // 3️⃣ Check existing cart item
   const ex = findCartItem(itemId, variantId);
 
   if (ex) {
     // Restore qty
     const qtyLabel = document.getElementById(qtyTextId);
     if (qtyLabel) qtyLabel.textContent = ex.qty;
-    return;
+    return; // IMPORTANT → no add on re-select
   }
 
-  // 4️⃣ New variant selected → DO NOT auto add
-  // → Just show qty = 1 in UI
+  // 4️⃣ If not in cart → add via Master Engine
+  updateCart(itemId, variantId, "add", {
+    unit,
+    price,
+    discount: disc
+  });
+
+  // 5️⃣ Initialize qty = 1
   const qtyLabel = document.getElementById(qtyTextId);
   if (qtyLabel) qtyLabel.textContent = "1";
-
-  // ❌ NO ADD-TO-CART HERE
-  // updateCart() must run only on + button click
 }
 
 
@@ -5696,6 +5699,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
