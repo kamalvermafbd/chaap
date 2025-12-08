@@ -4838,6 +4838,8 @@ async function openCartDrawer() {
 
   // 3) Rebuild drawer UI
   openCartPanel(freshCart);
+    renderCart();
+
 
   // 4) Update totals + badge
   try { updateDrawerTotals(); } catch(e){}
@@ -5754,6 +5756,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
