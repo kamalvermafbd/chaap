@@ -4914,33 +4914,24 @@ async function openCheckout() {
 }
 async function openCartDrawer() {
 
-  // 1) Overlay ON (optional)
-  try { showCartOverlay("Loading cart…"); } catch(e){}
+  // 1) Always get latest cart (master engine)
+  const freshCart = getCart();
 
-  // 2) Safe load backend/guest merged cart
-  const freshCart = await loadCartBeforeDrawer();
-
-  // 3) Set globals
+  // 2) Sync global
   cart = freshCart;
   window.cart = freshCart;
 
-  // 4) Restore full UI before opening
-
-  updateCartBadge();
-
-  // 5) Build drawer UI
+  // 3) Rebuild drawer UI
   openCartPanel(freshCart);
 
-  // 6) Drawer totals
+  // 4) Update totals + badge
   try { updateDrawerTotals(); } catch(e){}
+  try { updateCartBadge(); } catch(e){}
 
-  // 7) Open drawer
+  // 5) Open drawer
   document.getElementById("cartBackdrop").classList.add("active");
   document.getElementById("cartDrawer").classList.add("active");
   document.body.style.overflow = "hidden";
-
-  // 8) Overlay OFF
-  try { hideCartOverlay(); } catch(e){}
 }
 
 function closeCartDrawer() {
@@ -5223,19 +5214,15 @@ function menuPlus_multi(id) {
 
 function loadCartOnStart() {
 
-  // Always get correct cart (guest/login)
-  const cartArr = getCart();
+  const cartArr = getCart();    // master engine getter
 
-  // Set globals
   cart = cartArr;
   window.cart = cartArr;
 
-  // Restore menu UI (single + multi)
-  restoreFullCartUI();
-
-  // Update badge
   updateCartBadge();
+  restoreFullCartUI();
 }
+
 
   
 function refreshCartDrawer() {
@@ -5314,16 +5301,14 @@ function removeItemFromDrawer(itemId, variantId = "") {
 
 async function loadCartBeforeDrawer() {
 
-  // Master Engine se hamesha latest cart lo
   const cartArr = getCart();   // guest => guestCart, login => cart (localStorage)
 
-  // Safe globals set
   cart = Array.isArray(cartArr) ? cartArr : [];
   window.cart = cart;
 
-  // Drawer / checkout isi ko use karega
   return cart;
 }
+
 
 function updateDrawerTotals() {
 
@@ -5839,6 +5824,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
