@@ -5636,45 +5636,41 @@ function variantMinus(itemId, variantId, idx) {
   const cartArr = getCart();
   if (!Array.isArray(cartArr)) return;
 
-  // RESET all UI -------------------------------
-  // Hide ALL multi variant boxes + clear qty
+  // RESET ALL UI FIRST
   document.querySelectorAll("div[id^='box-']").forEach(b => b.classList.add("hidden"));
   document.querySelectorAll("span[id^='qtyText-']").forEach(q => q.textContent = "");
   document.querySelectorAll("input[data-variant-id][data-item-id]").forEach(r => r.checked = false);
 
-  // Reset ALL single item UI
   document.querySelectorAll("[id^='qtyBox-']").forEach(b => b.classList.add("hidden"));
   document.querySelectorAll("[id^='addBtn-']").forEach(btn => btn.classList.remove("hidden"));
 
 
-  // RESTORE from CART ---------------------------
+  // RESTORE FROM CART
   cartArr.forEach(ci => {
 
     const itemId = String(ci.itemId);
     const variantId = String(ci.variantId || "");
     const qty = Number(ci.qty || 1);
 
-    // -------------------------------------------
-    // SINGLE ITEM RESTORE
-    // -------------------------------------------
+    // -------------------------
+    // SINGLE ITEMS
+    // -------------------------
     if (!variantId) {
       const addBtn  = document.getElementById("addBtn-" + itemId);
       const qtyBox  = document.getElementById("qtyBox-" + itemId);
       const qtyText = document.getElementById("qtyText-" + itemId);
 
-      if (qtyBox && addBtn && qtyText) {
+      if (addBtn && qtyBox && qtyText) {
         addBtn.classList.add("hidden");
         qtyBox.classList.remove("hidden");
         qtyText.textContent = qty;
       }
-
-      return; // very important
+      return;
     }
 
-
-    // -------------------------------------------
-    // MULTI VARIANT RESTORE
-    // -------------------------------------------
+    // -------------------------
+    // MULTI VARIANT ITEMS
+    // -------------------------
 
     const boxes = document.querySelectorAll(`div[id^="box-${itemId}_${variantId}-"]`);
 
@@ -5685,14 +5681,13 @@ function variantMinus(itemId, variantId, idx) {
       if (qtyLabel) qtyLabel.textContent = qty;
     });
 
-    // Tick correct radio buttons (FULL / HALF)
     const radios = document.querySelectorAll(
       `input[data-item-id="${itemId}"][data-variant-id="${variantId}"]`
     );
-    radios.forEach(r => r.checked = true);
-
+    radios.forEach(r => (r.checked = true));
   });
 }
+
   
 function refreshCheckout() {
 
@@ -5823,6 +5818,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
