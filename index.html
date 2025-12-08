@@ -4437,7 +4437,7 @@ async function onUserLogin(mobile) {
   // 6) Render UI
   // -------------------------------
   renderCart();
-  setTimeout(() => renderCart(), 50);
+  setTimeout(() => refreshUI(), 50);
 }
 
 
@@ -5410,12 +5410,13 @@ function setCart(updatedCart) {
 
   return updatedCart;
 }
-
 function refreshUI() {
   try { updateCartBadge(); } catch(e){}
   try { refreshCartDrawer(); } catch(e){}
   try { renderCart(); } catch(e){}
   try { updateDrawerTotals(); } catch(e){}
+  //  MOST IMPORTANT: menu cards pe qty / ADD button sync
+  try { restoreFullCartUI(); } catch(e){}
 }
 
   
@@ -5681,6 +5682,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
