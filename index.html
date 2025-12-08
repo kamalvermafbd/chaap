@@ -1626,70 +1626,79 @@ if (!isLoggedIn()) {
   alert(`${name} (${unit}) added to cart`);
 }
 
-function openCartPanel(cartArr = null) {
+function openCartPanel(cartArr = []) {
 
   // Always use master engine getter
-  const cart = cartArr || getCart();
+  const list = Array.isArray(cartArr) && cartArr.length > 0
+    ? cartArr
+    : getCart();
 
-  const container = document.getElementById("drawerItemsContainer");
+  const container = document.getElementById("drawerItemsList");
   if (!container) return;
 
-  container.innerHTML = "";   // Clear old
+  container.innerHTML = "";  // clear old
 
-  cart.forEach(ci => {
+  // No items case
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div class="p-4 text-center text-gray-500">
+        Your cart is empty
+      </div>
+    `;
+    try { updateDrawerTotals(); } catch(e){}
+    return;
+  }
+
+  let html = "";
+
+  list.forEach(ci => {
 
     const itemId = String(ci.itemId);
     const variantId = String(ci.variantId || "");
+
     const rowId = variantId
       ? `drawerRow-${itemId}_${variantId}`
       : `drawerRow-${itemId}`;
 
-    // Price calculation
-    const mrp = Number(ci.rate || 0);
-    const disc = Number(ci.discPercent || 0);
     const qty = Number(ci.qty || 1);
+    const rate = Number(ci.rate || 0);
+    const disc = Number(ci.discPercent || 0);
 
-    const priceAfterDisc = mrp - (mrp * disc / 100);
+    const priceAfterDisc = rate - (rate * disc / 100);
     const lineTotal = (priceAfterDisc * qty).toFixed(2);
 
-    // UNIT Label (Full / Half / Single)
-    const unitLabel = ci.unit ? `(${ci.unit})` : "";
+    const unitText = ci.unit ? `<span class="text-sm text-gray-500">${ci.unit}</span>` : "";
 
-    // BUILD ROW
-    const row = `
-      <div class="drawer-row flex justify-between items-center py-2 border-b"
+    html += `
+      <div class="drawer-row flex justify-between items-center py-3 border-b"
            id="${rowId}"
-           data-price="${mrp}"
+           data-price="${rate}"
            data-disc="${disc}">
-       
+        
         <div class="flex flex-col">
-          <span class="font-semibold">${ci.name} ${unitLabel}</span>
-          <span class="text-sm text-gray-500">
-            ₹${priceAfterDisc.toFixed(2)} x ${qty}
-          </span>
+          <span class="font-semibold">${ci.name}</span>
+          ${unitText}
         </div>
 
         <div class="flex items-center gap-3">
-
-          <button class="drawer-minus px-2 bg-gray-300 rounded"
-            onclick="updateCart('${itemId}', '${variantId}', 'dec')">−</button>
+          <button class="px-2 bg-gray-300 rounded"
+            onclick="updateCart('${itemId}','${variantId}','dec')">−</button>
 
           <span class="drawer-qty font-semibold">${qty}</span>
 
-          <button class="drawer-plus px-2 bg-gray-300 rounded"
-            onclick="updateCart('${itemId}', '${variantId}', 'add')">+</button>
+          <button class="px-2 bg-gray-300 rounded"
+            onclick="updateCart('${itemId}','${variantId}','add')">+</button>
         </div>
 
-        <div class="drawer-total w-16 text-right font-semibold">
+        <div class="font-semibold drawer-total">
           ₹${lineTotal}
         </div>
       </div>
     `;
-
-    container.insertAdjacentHTML("beforeend", row);
   });
 
-  // Update totals at end
+  container.innerHTML = html;
+
   try { updateDrawerTotals(); } catch(e){}
 }
 
@@ -5670,6 +5679,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
