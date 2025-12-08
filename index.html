@@ -656,8 +656,9 @@ style="
     &times;
   </button>
 <h2 class="text-xl font-semibold mb-3">Your Cart</h2> 
-<div id="cartItems"></div> 
-<div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold"> <span>Total:</span> <span>₹<span id="cartTotal">0</span></span> </div> 
+<div id="drawerItemsList"></div> 
+<div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold"> 
+  <span>Total:</span> <span>₹<span id="drawerTotalAmount">0</span></span> </div> 
 <button onclick="openCheckout()" class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg"> Checkout </button> </div> 
 
 <button onclick="openCartDrawer()" 
@@ -3450,7 +3451,7 @@ window.addEventListener("load", () => {
     cart = guest;
     window.cart = guest;
     renderCart();
-    openCart();  
+    openCartDrawer();
      document.getElementById("cartToggleBar")?.classList.add("active-cart");
   }
 }
@@ -5680,6 +5681,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
