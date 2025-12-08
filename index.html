@@ -4338,7 +4338,8 @@ async function onUserLogin(mobile) {
 
   // ALWAYS load email first (IMPORTANT)
   const email = localStorage.getItem("userEmail") || "";
-  //  Ensure sessionId exists
+
+  // Ensure sessionId exists
   let sessionId = localStorage.getItem("sessionId");
   if (!sessionId) {
     sessionId = "SESS-" + Date.now();
@@ -4379,19 +4380,9 @@ async function onUserLogin(mobile) {
   }));
 
   // -------------------------------
-  // 3A) Merge (guest + backend)
+  // 3A) Merge guest + backend (ONLY ONCE)
   // -------------------------------
-  let merged = mergeCarts(guestCart, backendCart);  
-
-  // -------------------------------
-  // 3B) Add backend items NOT in merged
-  // -------------------------------
-  backendCart.forEach(b => {
-    const exists = merged.some(m =>
-      m.itemId == b.itemId && m.variantId == b.variantId
-    );
-    if (!exists) merged.push(b);
-  });
+  let merged = mergeCarts(guestCart, backendCart);
 
   // -------------------------------
   // 3D) Final Normalize
@@ -4419,8 +4410,8 @@ async function onUserLogin(mobile) {
   // -------------------------------
   cart = finalMerged;
   window.cart = finalMerged;
-localStorage.setItem("userEmail", email);
 
+  localStorage.setItem("userEmail", email);
   await saveCartToBackend(finalMerged);
 
   // Clear guest cart
@@ -4435,29 +4426,9 @@ localStorage.setItem("userEmail", email);
   // 6) Render UI
   // -------------------------------
   renderCart();
-  // STEP 5B — Force second render to fix stale UI
-setTimeout(() => renderCart(), 50);
-// === STEP 5C — Final backend verify after login ===
-setTimeout(async () => {
-  try {
-    const check = await apiPost("getCart", { mobile });
-    const latest = check.cart || check.data || [];
-
-    // Compare backend vs local
-    if (JSON.stringify(latest) !== JSON.stringify(cart)) {
-      console.warn("🔧 Login Sync: Backend mismatch → correcting");
-      localStorage.setItem("cart", JSON.stringify(latest));
-      cart = latest;
-      window.cart = latest;
-      renderCart();
-    }
-
-  } catch (err) {
-    console.error("Login final verify error:", err);
-  }
-}, 1000);
-
+  setTimeout(() => renderCart(), 50);
 }
+
 
 async function someCartAction() {
   showCartOverlay("Working...");
@@ -5699,6 +5670,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
