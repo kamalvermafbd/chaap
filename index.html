@@ -1918,38 +1918,6 @@ async function updateQty(index, newQty) {
 }
 
 
-function openCheckout() {
-  autofillMobileForLoggedIn();
-  
-  resetCheckoutFieldsDefault();   // FIRST reset UI
-
-  setupAddressUIVisibility();      // THEN show/hide Change Address
-
-  // MOVE THIS LINE ↓ HERE (after login autofill + reset)
-  loadPrimaryAddress();  
- setTimeout(() => toggleAddressField(), 50);
-  if (cart.length === 0) {
-    alert("Your cart is empty!");
-    return;
-  }
-
-  document.getElementById("cartOverlay").style.display = "none";
-
-  // Reset Saved-Address UI
-  document.getElementById("changeAddressBtn").classList.add("hidden");
-  document.getElementById("addressSelectContainer").classList.add("hidden");
-  document.getElementById("newAddressForm").classList.add("hidden");
-  document.getElementById("savedAddressDropdown").innerHTML = "";
-
-  if (!isLoggedIn()) {
-    document.getElementById("mobile").value = "";
-    document.getElementById("customerName").value = "";
-    document.getElementById("email").value = "";
-    document.getElementById("address").value = "";
-  }
-  refreshCheckoutCart();
-  document.getElementById('checkoutModal').style.display = 'flex';
-}
 
     
 function loadPrimaryAddress() {
@@ -3465,7 +3433,7 @@ window.addEventListener("load", () => {
     const firstMenu = document.querySelector("#premiumMenu li");
     if (firstMenu) firstMenu.classList.add("active");
   }
-   loadUserCartOnStart();
+   loadCartOnStart();
   if (!isLoggedIn()) {
   const guest = JSON.parse(localStorage.getItem("guestCart") || "[]");
 
@@ -4611,18 +4579,7 @@ setTimeout(async () => {
 }, 1000);
 
 }
-function showCartOverlay(msg = "Updating your cart…") {
-  const o = document.getElementById("cartOverlay");
-  if (o) {
-    o.textContent = msg;
-    o.style.display = "flex";
-  }
-}
 
-function hideCartOverlay() {
-  const o = document.getElementById("cartOverlay");
-  if (o) o.style.display = "none";
-}
 async function someCartAction() {
   showCartOverlay("Working...");
 
@@ -6003,6 +5960,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
