@@ -4203,129 +4203,10 @@ item.itemId = String(
 
 
 
-function addVariantToCart(name) {
-  const safe = slugify(name);
-  const selected = document.querySelector(`input[name^="var-${safe}-"]:checked`);
-  if (!selected) return null;
-
-  const mrp  = Number(selected.dataset.mrp || 0);
-  const disc = Number(selected.dataset.disc || 0);
-
-  return {
-    name: name,
-    unit: selected.dataset.unit,
-    rate: mrp,
-    discPercent: disc,
-    variantId: selected.dataset.variantId,
-    itemId: menuItems.find(m => m.name === name)?.itemId
-};
-
-}
-
-
-
 
 
 // Delegated click handler for all Add buttons (works for Single and Multi)
 // ADD-TO-CART HANDLER
-document.addEventListener('click', function (e) {
-  const btn = e.target.closest('.add-btn');
-  if (!btn) return;
-
-  const name = btn.dataset.name;
-
-  if (btn.classList.contains('disabled-btn')) {
-    alert("Please select an option before adding to cart.");
-    return;
-  }
-
-  // MULTI ITEM
-  if (btn.id && btn.id.startsWith("btn-")) {
-    const info = addVariantToCart(name);
-    if (!info) return alert("Please select an option before adding to cart.");
-
-    if (!info.rate || info.rate <= 0 || isNaN(info.rate)) {
-      alert("Price not found for this variant.");
-      return;
-    }
-
-  addToCart(info.name, info.unit, info.rate, info.discPercent, info.itemId, info.variantId);
-    updateCartBadge();
-
-btn.classList.add("added-flash");
-setTimeout(() => btn.classList.remove("added-flash"), 250);
-
-// 1a — RESET VARIANT RADIOS
-const parentCard = btn.closest(".menu-item");
-if (parentCard) {
-  parentCard.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
-}
-
-// 1b — DISABLE ADD BUTTON (only appearance)
-
-
-// 1d — FULL DATA RESET (correct place)
-btn.dataset.price = "";
-btn.dataset.unit = "";
-btn.dataset.disc = "";
-
-    return;
-  }
-
-  // SINGLE ITEM
-  const unit = btn.dataset.unit || "";
-  const price = Number(btn.dataset.price || 0);
-  const discPercent = Number(btn.dataset.disc || 0);
-
-  if (!price || price <= 0 || isNaN(price)) {
-    alert("Price not found for this item.");
-    return;
-  }
-
-  addToCart(name, unit, price, discPercent, btn.dataset.itemId, "");
-updateCartBadge();
-
-  // INSERT Z2 HERE
-btn.classList.add("added-flash");
-setTimeout(() => btn.classList.remove("added-flash"), 250);
-
-
-});
-
-
-// DELETE HANDLER — MUST BE BELOW ADD HANDLER
-document.addEventListener("click", function (e) {
-  const del = e.target.closest(".delete-btn");
-  if (!del) return;
-
-  const index = Number(del.dataset.index);
-  removeItem(index);
-});
-  // QTY HANDLER (INCREASE / DECREASE) — Prevent double events
-document.addEventListener("click", async function (e) {
-
-  const inc = e.target.closest(".qty-inc");
-  const dec = e.target.closest(".qty-dec");
-
-  if (!inc && !dec) return;
-
-  const index = Number((inc || dec).dataset.index);
-  if (isNaN(index)) return;
-
-  // 1 — Modify qty safely
-  if (inc) cart[index].qty++;
-  if (dec) cart[index].qty = Math.max(1, cart[index].qty - 1);
-
-  // 2 — Update local cart immediately (NO flicker)
-  
-
-  // 3 — Re-render cart smoothly
-  renderCart();
-
-  // 4 — Backend save (but only ONE at a time)
-  await saveCartToBackend();
-});
-
 
 async function saveCartToBackend(cartData = null) {
   return new Promise(async (resolve) => {
@@ -5393,19 +5274,6 @@ function hideCartOverlay() {
   // updateCart() must run only on + button click
 }
 
-function addMultiVariant(itemId, variantId, unit, price, disc) {
-  console.log("ADD MULTI →", itemId, variantId, unit, price, disc);
-
-  const meta = {
-    name: "",
-    unit: unit,
-    price: price,
-    discount: disc,
-    type: "multi"
-  };
-
-  updateCart(itemId, variantId, "add", meta);
-}
 
   
 function removeAllOldMultiEvents() {
@@ -5680,6 +5548,7 @@ function variantMinus(itemId, variantId, idx) {
     // MULTI VARIANT ITEMS
     // -------------------------
 
+    // All boxes of this variant (all card-index versions)
     const boxes = document.querySelectorAll(`div[id^="box-${itemId}_${variantId}-"]`);
 
     boxes.forEach(box => {
@@ -5689,12 +5558,14 @@ function variantMinus(itemId, variantId, idx) {
       if (qtyLabel) qtyLabel.textContent = qty;
     });
 
+    // Tick all matching radios
     const radios = document.querySelectorAll(
       `input[data-item-id="${itemId}"][data-variant-id="${variantId}"]`
     );
     radios.forEach(r => (r.checked = true));
   });
 }
+
 
   
 function refreshCheckout() {
@@ -5825,6 +5696,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
