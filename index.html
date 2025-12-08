@@ -4989,27 +4989,29 @@ async function openCheckout() {
 }
 async function openCartDrawer() {
 
-  // ⭐ 1) Overlay ON
-  showCartOverlay("Loading your cart…");
+  // 1) Optional: small overlay (avoid flicker)
+  try { showCartOverlay("Loading…"); } catch(e){}
 
-  // ⭐ 2) Safe badge update
+  // 2) Always update badge + menu UI before drawer opens
+  restoreFullCartUI();
   updateCartBadge();
-  restoreFullCartUI();  
 
-  // ⭐ 3) Load latest cart (backend/guest)
-  await loadCartBeforeDrawer();
+  // 3) Load latest cart (guest → local / login → backend merge)
+  const freshCart = await loadCartBeforeDrawer();
 
-  // ⭐ 4) Drawer UI build karo — ALWAYS fresh cart
- const freshCart = getCart();
+  // 4) Drawer UI build with master engine
   openCartPanel(freshCart);
 
-  // ⭐ 5) Overlay OFF — after UI ready
-  hideCartOverlay();
+  // 5) Update totals
+  try { updateDrawerTotals(); } catch(e){}
 
-  // ⭐ 6) Drawer open
+  // 6) Open drawer
   document.getElementById("cartBackdrop").classList.add("active");
   document.getElementById("cartDrawer").classList.add("active");
   document.body.style.overflow = "hidden";
+
+  // 7) Hide overlay
+  try { hideCartOverlay(); } catch(e){}
 }
 
 function closeCartDrawer() {
@@ -5902,6 +5904,7 @@ function variantMinus(itemId, variantId, idx) {
 </script>
 </body>
 </html>
+
 
 
 
