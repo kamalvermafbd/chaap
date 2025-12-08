@@ -4989,28 +4989,32 @@ async function openCheckout() {
 }
 async function openCartDrawer() {
 
-  // 1) Optional: small overlay (avoid flicker)
-  try { showCartOverlay("Loading…"); } catch(e){}
+  // 1) Overlay ON (optional)
+  try { showCartOverlay("Loading cart…"); } catch(e){}
 
-  // 2) Always update badge + menu UI before drawer opens
+  // 2) Safe load backend/guest merged cart
+  const freshCart = await loadCartBeforeDrawer();
+
+  // 3) Set globals
+  cart = freshCart;
+  window.cart = freshCart;
+
+  // 4) Restore full UI before opening
   restoreFullCartUI();
   updateCartBadge();
 
-  // 3) Load latest cart (guest → local / login → backend merge)
-  const freshCart = await loadCartBeforeDrawer();
-
-  // 4) Drawer UI build with master engine
+  // 5) Build drawer UI
   openCartPanel(freshCart);
 
-  // 5) Update totals
+  // 6) Drawer totals
   try { updateDrawerTotals(); } catch(e){}
 
-  // 6) Open drawer
+  // 7) Open drawer
   document.getElementById("cartBackdrop").classList.add("active");
   document.getElementById("cartDrawer").classList.add("active");
   document.body.style.overflow = "hidden";
 
-  // 7) Hide overlay
+  // 8) Overlay OFF
   try { hideCartOverlay(); } catch(e){}
 }
 
@@ -5902,11 +5906,70 @@ function variantMinus(itemId, variantId, idx) {
 
   });
 }
+  
+function refreshCheckout() {
+
+  // Always use master cart getter
+  const cartArr = getCart();
+
+  const container = document.getElementById("checkoutItemsContainer");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  let subtotal = 0;
+
+  cartArr.forEach(ci => {
+
+    const itemId = String(ci.itemId);
+    const variantId = String(ci.variantId || "");
+    const qty = Number(ci.qty || 1);
+
+    const mrp = Number(ci.rate || 0);
+    const disc = Number(ci.discPercent || 0);
+
+    const priceAfterDisc = mrp - (mrp * disc / 100);
+    const lineTotal = (priceAfterDisc * qty).toFixed(2);
+
+    subtotal += priceAfterDisc * qty;
+
+    const row = `
+      <div class="checkout-row flex justify-between py-2 border-b">
+
+        <div>
+          <div class="font-semibold">${ci.name}</div>
+          ${ci.unit ? `<div class="text-sm text-gray-500">${ci.unit}</div>` : ""}
+          <div class="text-sm">₹${priceAfterDisc.toFixed(2)} x ${qty}</div>
+        </div>
+
+        <div class="flex items-center gap-3">
+
+          <button class="px-2 bg-gray-300 rounded"
+            onclick="updateCart('${itemId}', '${variantId}', 'dec'); refreshCheckout();">−</button>
+
+          <span class="font-semibold">${qty}</span>
+
+          <button class="px-2 bg-gray-300 rounded"
+            onclick="updateCart('${itemId}', '${variantId}', 'add'); refreshCheckout();">+</button>
+        </div>
+
+        <div class="w-16 text-right font-semibold">₹${lineTotal}</div>
+      </div>
+    `;
+
+    container.insertAdjacentHTML("beforeend", row);
+  });
+
+  // Subtotal section
+  const subtotalEl = document.getElementById("checkoutSubtotal");
+  if (subtotalEl) subtotalEl.textContent = "₹" + subtotal.toFixed(2);
+}
 
   
 </script>
 </body>
 </html>
+
 
 
 
