@@ -5327,51 +5327,22 @@ function menuPlus_multi(id) {
   }
 }
 
-async function loadCartOnStart() {
+function loadCartOnStart() {
 
-  let cartArr = [];
+  // Always get correct cart (guest/login)
+  const cartArr = getCart();
 
-  // Logged-in user → load backend
-  if (isLoggedIn()) {
-    try {
-      const res = await apiGet("getCart", {
-        mobile: localStorage.getItem("userMobile")
-      });
-
-      cartArr = Array.isArray(res) ? res : [];
-
-      // Sync locally
-      localStorage.setItem("cart", JSON.stringify(cartArr));
-
-    } catch (e) {
-      console.error("Cart load failed:", e);
-      cartArr = JSON.parse(localStorage.getItem("cart") || "[]");
-    }
-  }
-
-  // Guest user → load local guest cart
-  else {
-    cartArr = JSON.parse(localStorage.getItem("guestCart") || "[]");
-  }
-
-  // VERY IMPORTANT: Set global cart[] for system
+  // Set globals
   cart = cartArr;
-cart = cleanCartConsistency(cart);
-//  C3-C — Save cleaned cart back
-if (isLoggedIn()) {
-  localStorage.setItem("cart", JSON.stringify(cart));
-} else {
-  localStorage.setItem("guestCart", JSON.stringify(cart));
-}
+  window.cart = cartArr;
 
-  // Restore UI qty buttons
- setTimeout(restoreMenuQuantities, 120);
+  // Restore menu UI (single + multi)
+  restoreFullCartUI();
 
   // Update badge
-  window.cartReady = true;
-  restoreFullCartUI();
   updateCartBadge();
 }
+
   
 function refreshCartDrawer() {
   if (!window.cartReady) return;
@@ -5886,5 +5857,6 @@ function variantMinus(itemId, variantId, idx) {
 </script>
 </body>
 </html>
+
 
 
