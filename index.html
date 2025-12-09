@@ -662,7 +662,11 @@ style="
 <h2 class="text-xl font-semibold mb-3">Your Cart</h2> 
 <div id="drawerItemsList"></div> 
 <div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold"> 
-  <span>Base Total:</span> <span><span id="drawerTotalAmount">0</span></span> </div> 
+  <span>Base Total:</span> <span><span id="currency_drawerSubtotal"></span><span id="drawerTotalAmount">0</span></span> </div>
+  <script>
+  document.getElementById("currency_drawerSubtotal").innerText = CURRENCY;
+</script>
+
 <!-- NEW BASE + TAX + GRAND TOTAL BLOCK (SHIFTED FROM VIEW CART) -->
 <div class="mt-4 border-t pt-3">
  
@@ -859,8 +863,11 @@ style="
 
   
 <p id="cartBaseTotal" class="text-right font-semibold mt-2 mb-4">
-  Total: ₹<span id="cartTotal">0.00</span>
+  Total: <span id="currency_cartBaseTotal"></span><span id="cartTotal">0.00</span>
 </p>
+<script>
+  document.getElementById("currency_cartBaseTotal").innerText = CURRENCY;
+</script>
 
 <!-- Tax Summary Comes Here -->
 <div id="taxSummary" class="text-right font-semibold mt-2"></div>
@@ -1895,21 +1902,22 @@ cartItemsContainer.appendChild(card);
 
     const grandTotalCalc = parseFloat((taxableAmount + cgstAmt + sgstAmt + igstAmt).toFixed(2));
 
-    taxHtml = `
-      ${restaurantTax.servicePercent > 0 
-        ? `<p style="margin:2px 0;">Service Charges (${restaurantTax.servicePercent}%): ₹${serviceAmt.toFixed(2)}</p>`
-        : ""
-      }
+   taxHtml = `
+  ${restaurantTax.servicePercent > 0 
+    ? `<p style="margin:2px 0;">Service Charges (${restaurantTax.servicePercent}%): ${CURRENCY}${serviceAmt.toFixed(2)}</p>`
+    : ""
+  }
 
-      <p style="margin:2px 0;">CGST (${restaurantTax.cgstPercent}%): ₹${cgstAmt.toFixed(2)}</p>
-      <p style="margin:2px 0;">SGST (${restaurantTax.sgstPercent}%): ₹${sgstAmt.toFixed(2)}</p>
-      ${restaurantTax.igstPercent > 0 ? `<p style="margin:2px 0;">IGST (${restaurantTax.igstPercent}%): ₹${igstAmt.toFixed(2)}</p>` : ""}
-      <div class="flex justify-between items-center mt-4">
-  <div class="font-semibold text-lg text-gray-800">Grand Total</div>
-  <div class="font-semibold text-lg text-red-500">₹${grandTotalCalc.toFixed(2)}</div>
-</div>
+  <p style="margin:2px 0;">CGST (${restaurantTax.cgstPercent}%): ${CURRENCY}${cgstAmt.toFixed(2)}</p>
+  <p style="margin:2px 0;">SGST (${restaurantTax.sgstPercent}%): ${CURRENCY}${sgstAmt.toFixed(2)}</p>
+  ${restaurantTax.igstPercent > 0 ? `<p style="margin:2px 0;">IGST (${restaurantTax.igstPercent}%): ${CURRENCY}${igstAmt.toFixed(2)}</p>` : ""}
 
-    `;
+  <div class="flex justify-between items-center mt-4">
+    <div class="font-semibold text-lg text-gray-800">Grand Total</div>
+    <div class="font-semibold text-lg text-red-500">${CURRENCY}${grandTotalCalc.toFixed(2)}</div>
+  </div>
+`;
+
   }
 
   const taxSummaryEl = document.getElementById("taxSummary");
@@ -5744,6 +5752,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
