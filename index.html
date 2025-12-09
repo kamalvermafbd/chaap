@@ -603,6 +603,13 @@ body::before {
    .cart {
   display: none;
 }
+#cartDrawer {
+  right: -350px; 
+  transition: 0.3s ease-in-out;
+}
+#cartDrawer.active {
+  right: 0;
+}
 
   </style>
 </head>
@@ -5742,6 +5749,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
