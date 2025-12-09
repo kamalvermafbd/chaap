@@ -5630,7 +5630,8 @@ function refreshCheckout() {
             onclick="updateCart('${itemId}', '${variantId}', 'add'); refreshCheckout();">+</button>
         </div>
 
-        <div class="font-semibold">₹${lineTotal}</div>
+        <div class="font-semibold">${fmt(lineTotal)}</div>
+
 
       </div>
     `;
@@ -5769,6 +5770,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
