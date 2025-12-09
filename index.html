@@ -1158,12 +1158,14 @@ style="
   <script>
 window.cartReady = false;
 // === GLOBAL CURRENCY SETUP ===
-const CURRENCY = (window.CURRENCY || "₹");
+window.CURRENCY = window.CURRENCY || "₹";
+
 
 function fmt(amount, digits = 2) {
   if (amount === null || amount === undefined) amount = 0;
   const n = Number(amount) || 0;
-  return `${CURRENCY}${n.toFixed(digits)}`;
+  return `${window.CURRENCY}${n.toFixed(digits)}`;
+
 }
 
 function fmtNoSymbol(amount, digits = 2) {
@@ -5813,6 +5815,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
