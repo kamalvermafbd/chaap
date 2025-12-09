@@ -1170,6 +1170,20 @@ function fmtNoSymbol(amount, digits = 2) {
   const n = Number(amount) || 0;
   return n.toFixed(digits);
 }
+    // === AUTO LOAD RESTAURANT CURRENCY ===
+async function loadRestaurantSettings() {
+  try {
+    const res = await apiGet("getRestaurantInfo");
+
+    if (res && res.success && res.currency) {
+      window.CURRENCY = res.currency.trim();
+      console.log("🔥 Currency Loaded:", window.CURRENCY);
+    }
+  } catch (err) {
+    console.error("Currency load error:", err);
+  }
+}
+
 // === END CURRENCY SETUP ===
 
     function animateQty(id) {
@@ -3463,8 +3477,8 @@ function updateSignupOverlayMessage(msg) {
 }
 
 // === FINAL STABLE LOAD HANDLER ===
-window.addEventListener("load", () => {
-
+window.addEventListener("load", async () => {
+  await loadRestaurantSettings();
 
   // clear login fields
   const loginMobile = document.getElementById("loginMobile");
@@ -5799,6 +5813,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
