@@ -1722,7 +1722,7 @@ function openCartPanel(cartArr = []) {
         </div>
 
         <div class="font-semibold drawer-total">
-          ₹${lineTotal}
+           ${fmt(lineTotal)}
         </div>
       </div>
     `;
@@ -1886,7 +1886,8 @@ cartItemsContainer.appendChild(card);
 
   // ===== FINAL TOTAL SET =====
   let baseTotal = parseFloat(grandTotal.toFixed(2));
-  document.getElementById("cartTotal").innerText = baseTotal.toFixed(2);
+  document.getElementById("cartTotal").innerText = fmt(baseTotal);
+
 
   // TAX BLOCK unchanged
   let taxHtml = "";
@@ -5625,7 +5626,8 @@ function refreshCheckout() {
 
   // Subtotal
   const subtotalEl = document.getElementById("checkoutSubtotal");
-  if (subtotalEl) subtotalEl.textContent = "₹" + subtotal.toFixed(2);
+  if (subtotalEl) subtotalEl.textContent = fmt(subtotal);
+
 }
 
 
@@ -5742,7 +5744,8 @@ function refreshCheckoutCart() {
   subtotal = subtotal.toFixed(2);
 
   const totalEl = document.getElementById("drawerTotalAmount");
-  if (totalEl) totalEl.textContent = "₹" + subtotal;
+  if (totalEl) totalEl.textContent = fmt(subtotal);
+
 
   // badge update (optional safe)
   try { updateCartBadge(); } catch(e){}
@@ -5752,6 +5755,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
