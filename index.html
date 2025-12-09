@@ -600,7 +600,10 @@ body::before {
   .add-btn {
   display: none !important;
 }
- 
+   .cart {
+  display: none;
+}
+
   </style>
 </head>
 <body>
@@ -662,10 +665,7 @@ style="
 <!-- NEW BASE + TAX + GRAND TOTAL BLOCK (SHIFTED FROM VIEW CART) -->
 <div class="mt-4 border-t pt-3">
 
-  <p class="flex justify-between font-semibold text-lg">
-    
-    <span>₹<span id="cartTotal">0.00</span></span>
-  </p>
+ //check
 
   <div id="taxSummary" class="text-right font-semibold mt-2"></div>
 
@@ -5743,6 +5743,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
