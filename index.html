@@ -5684,10 +5684,34 @@ function refreshCheckoutCart() {
     .forEach(r => (r.checked = false));
 }
 
-  
+  function updateDrawerTotals() {
+
+  const cartArr = getCart();  // master engine safe getter
+  let subtotal = 0;
+
+  cartArr.forEach(ci => {
+    const mrp = Number(ci.rate || 0);
+    const disc = Number(ci.discPercent || 0);
+    const qty = Number(ci.qty || 1);
+
+    const priceAfterDisc = mrp - (mrp * disc / 100);
+    subtotal += priceAfterDisc * qty;
+  });
+
+  subtotal = subtotal.toFixed(2);
+
+  const totalEl = document.getElementById("drawerTotalAmount");
+  if (totalEl) totalEl.textContent = "₹" + subtotal;
+
+  // badge update (optional safe)
+  try { updateCartBadge(); } catch(e){}
+}
+
+
 </script>
 </body>
 </html>
+
 
 
 
