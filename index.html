@@ -4822,18 +4822,20 @@ async function openCartDrawer() {
   cart = freshCart;
   window.cart = freshCart;
 
-  // 3) Rebuild drawer UI
-  openCartPanel(freshCart);
-renderCart();  
-  // 4) Update totals + badge
-  try { updateDrawerTotals(); } catch(e){}
-  try { updateCartBadge(); } catch(e){}
-
-  // 5) Open drawer
+  // ⭐ First open drawer visually
   document.getElementById("cartBackdrop").classList.add("active");
   document.getElementById("cartDrawer").classList.add("active");
   document.body.style.overflow = "hidden";
+
+  // 3) Rebuild drawer UI
+  openCartPanel(freshCart);
+  renderCart();
+
+  // 4) Update totals + badge
+  try { updateDrawerTotals(); } catch(e){}
+  try { updateCartBadge(); } catch(e){}
 }
+
 
 function closeCartDrawer() {
   document.getElementById("cartBackdrop").classList.remove("active");
@@ -5740,6 +5742,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
