@@ -5960,6 +5960,7 @@ function refreshCheckoutCart() {
   const cartArr = getCart();  // master engine safe getter
   let subtotal = 0;
 
+  // 1) Base total (item discount ke baad)
   cartArr.forEach(ci => {
     const mrp = Number(ci.rate || 0);
     const disc = Number(ci.discPercent || 0);
@@ -5969,20 +5970,54 @@ function refreshCheckoutCart() {
     subtotal += priceAfterDisc * qty;
   });
 
-  subtotal = subtotal.toFixed(2);
+  subtotal = Number(subtotal.toFixed(2));
 
+  // 2) Apply best offer
+  const bestOffer = getBestOffer(subtotal);
+  let offerDiscount = 0;
+
+  if (bestOffer) {
+    offerDiscount = Number(bestOffer.value || 0);
+
+    // Show applied offer message (drawer UI)
+    const appliedBox = document.getElementById("bestOfferApplied");
+    if (appliedBox) {
+      appliedBox.style.display = "block";
+      appliedBox.innerHTML = `🎉 ${bestOffer.text} (You saved ${fmt(offerDiscount)})`;
+    }
+  } else {
+    const appliedBox = document.getElementById("bestOfferApplied");
+    if (appliedBox) appliedBox.style.display = "none";
+  }
+
+  // 3) Final payable
+  let finalPayable = subtotal - offerDiscount;
+  if (finalPayable < 0) finalPayable = 0;
+  finalPayable = Number(finalPayable.toFixed(2));
+
+  // 4) Update subtotal UI
   const totalEl = document.getElementById("drawerTotalAmount");
   if (totalEl) totalEl.textContent = fmt(subtotal);
 
+  // 5) Update tax + final payable section
+  const taxBox = document.getElementById("taxSummary");
+  if (taxBox) {
+    taxBox.innerHTML = `
+      <div class="text-right text-gray-700">
+        <div>Offer Discount: - ${fmt(offerDiscount)}</div>
+        <div class="font-bold text-lg mt-1">Payable: ${fmt(finalPayable)}</div>
+      </div>
+    `;
+  }
 
-  // badge update (optional safe)
+  // 6) badge update safe call
   try { updateCartBadge(); } catch(e){}
 }
-
 
 </script>
 </body>
 </html>
+
 
 
 
