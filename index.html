@@ -607,6 +607,14 @@ body::before {
 #menuSearch:-webkit-autofill {
   box-shadow: 0 0 0px 1000px white inset !important;
 }
+    
+/* Chrome autofill yellow/grey overlay ko 100% neutralize */
+#menuSearch:-webkit-autofill,
+#menuSearch:-webkit-autofill:hover,
+#menuSearch:-webkit-autofill:focus {
+    -webkit-text-fill-color: #000 !important;
+    transition: background-color 9999s ease-in-out 0s;
+}
   </style>
 </head>
 <body>
@@ -5880,6 +5888,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
