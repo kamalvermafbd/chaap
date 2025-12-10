@@ -1464,6 +1464,11 @@ apiGet("getCatAllocations")
   .then(res => {
     document.getElementById("restaurantName").innerHTML = "&#127860; " + res.name;
     document.getElementById("restaurantAddress").innerText = res.address;
+    
+window.couponMode = (res.coupon || "").toLowerCase();
+console.log("Coupon Mode =", window.couponMode);
+
+    
  // NEW (store tax settings globally)
     restaurantTax.taxType        = res.taxType || "";
     restaurantTax.servicePercent = (res.servicePercent && res.servicePercent !== "NIL") ? Number(res.servicePercent) : 0;
@@ -6128,6 +6133,7 @@ function updateDrawerTotals() {
 </script>
 </body>
 </html>
+
 
 
 
