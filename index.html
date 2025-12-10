@@ -5606,6 +5606,42 @@ function getBestOffer(total) {
 
   return best;
 }
+// STEP 2A – Apply Coupon button (open offer list)
+function openCouponList() {
+  const offers = getAvailableOffers();   // already created in Step 1B
+  const listBox = document.getElementById("offerList");
+
+  if (!listBox) return;
+
+  // Show list box
+  listBox.style.display = "block";
+
+  // Fill offer list dynamically
+  listBox.innerHTML = offers.map(o => `
+    <div class="p-2 border-b cursor-pointer hover:bg-gray-100" 
+         onclick="applyCoupon('${o.id}')">
+       ${o.text}
+    </div>
+  `).join("");
+}
+
+
+// STEP 2B – Manual coupon apply
+let selectedCoupon = null;
+
+function applyCoupon(couponId) {
+  const offers = getAvailableOffers();
+
+  // find selected offer
+  selectedCoupon = offers.find(o => o.id === couponId) || null;
+
+  // close offer list
+  const listBox = document.getElementById("offerList");
+  if (listBox) listBox.style.display = "none";
+
+  // re-calc totals with selected coupon
+  updateDrawerTotals();
+}
 
   
 // STEP 1B → Cart items ke image ko restore karne ka helper
@@ -5954,8 +5990,7 @@ function refreshCheckoutCart() {
     .querySelectorAll("input[data-variant-id][data-item-id]")
     .forEach(r => (r.checked = false));
 }
-
-  function updateDrawerTotals() {
+function updateDrawerTotals() {
 
   const cartArr = getCart();  // master engine safe getter
   let subtotal = 0;
@@ -5972,25 +6007,55 @@ function refreshCheckoutCart() {
 
   subtotal = Number(subtotal.toFixed(2));
 
-  // 2) Apply best offer
-  const bestOffer = getBestOffer(subtotal);
+  // ----------------------------
+  // 2) OFFER LOGIC (manual selectedCoupon OR auto best offer)
+  // ----------------------------
+  // `selectedCoupon` is expected (declared globally when user applies a coupon).
+  let offer = null;
   let offerDiscount = 0;
 
-  if (bestOffer) {
-    offerDiscount = Number(bestOffer.value || 0);
-
-    // Show applied offer message (drawer UI)
-    const appliedBox = document.getElementById("bestOfferApplied");
-    if (appliedBox) {
-      appliedBox.style.display = "block";
-      appliedBox.innerHTML = `🎉 ${bestOffer.text} (You saved ${fmt(offerDiscount)})`;
+  if (typeof selectedCoupon !== "undefined" && selectedCoupon) {
+    const o = selectedCoupon;
+    // ensure numeric checks and presence of min
+    const minAmt = Number(o.min || 0);
+    if (subtotal >= minAmt) {
+      offer = o;
+      if (o.discount) {
+        offerDiscount = subtotal * (Number(o.discount) / 100);
+      } else if (o.flat) {
+        offerDiscount = Number(o.flat || 0);
+      }
+    } else {
+      // selected coupon invalid for current subtotal -> clear it
+      selectedCoupon = null;
     }
-  } else {
-    const appliedBox = document.getElementById("bestOfferApplied");
-    if (appliedBox) appliedBox.style.display = "none";
   }
 
-  // 3) Final payable
+  // auto best offer if no manual selected coupon
+  if (!selectedCoupon) {
+    const best = getBestOffer(subtotal);
+    if (best) {
+      offer = best;
+      offerDiscount = Number(best.value || 0);
+    }
+  }
+
+  // round offer discount
+  offerDiscount = Number((offerDiscount || 0).toFixed(2));
+
+  // Update "Best Offer Applied" UI
+  const appliedBox = document.getElementById("bestOfferApplied");
+  if (appliedBox) {
+    if (offer) {
+      appliedBox.style.display = "block";
+      appliedBox.innerHTML = `🎉 ${offer.text} (You saved ${fmt(offerDiscount)})`;
+    } else {
+      appliedBox.style.display = "none";
+      appliedBox.innerHTML = "";
+    }
+  }
+
+  // 3) Final payable after offer
   let finalPayable = subtotal - offerDiscount;
   if (finalPayable < 0) finalPayable = 0;
   finalPayable = Number(finalPayable.toFixed(2));
@@ -5999,7 +6064,7 @@ function refreshCheckoutCart() {
   const totalEl = document.getElementById("drawerTotalAmount");
   if (totalEl) totalEl.textContent = fmt(subtotal);
 
-  // 5) Update tax + final payable section
+  // 5) Update tax + final payable section (tax logic not modified here)
   const taxBox = document.getElementById("taxSummary");
   if (taxBox) {
     taxBox.innerHTML = `
@@ -6017,6 +6082,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
