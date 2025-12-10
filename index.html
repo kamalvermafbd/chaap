@@ -1478,14 +1478,18 @@ apiGet("getRestaurantInfo")
     // === COUPON UI CONTROL ===
     const couponSection = document.getElementById("offerSection");
     const applyBtn = document.getElementById("applyCouponBtn");
+    
+if (window.couponMode === "manualcoupon") {
 
-    // FIXED COMPARISON
-    if (window.couponMode === "manualcoupon") {
-      // Manual mode – user chooses coupon
+      console.log("MODE = Manual Coupon");
+
       if (couponSection) couponSection.style.display = "block";
       if (applyBtn) applyBtn.style.display = "block";
+
     } else {
-      // Auto mode – hide apply button, show best offer automatically
+
+      console.log("MODE = BEST OFFER");
+
       if (applyBtn) applyBtn.style.display = "none";
       if (couponSection) couponSection.style.display = "block";
     }
@@ -6082,7 +6086,7 @@ function updateDrawerTotals() {
   cartArr.forEach(ci => {
     const mrp = Number(ci.rate || 0);
     const disc = Number(ci.discPercent || 0);
-    const qty = Number(ci.qty || 1);
+    const qty  = Number(ci.qty || 1);
 
     const priceAfterDisc = mrp - (mrp * disc / 100);
     subtotal += priceAfterDisc * qty;
@@ -6097,9 +6101,9 @@ function updateDrawerTotals() {
   let appliedOfferText = "";
 
   const mode = (window.couponMode || "").toLowerCase();
-  
+
   // ------------ MANUAL MODE ---------------
-  if (mode === "manual") {
+  if (mode === "manualcoupon") {
 
     if (selectedCoupon) {
       const o = selectedCoupon;
@@ -6117,7 +6121,7 @@ function updateDrawerTotals() {
         appliedOfferText = `🎁 ${o.text} applied`;
 
       } else {
-        selectedCoupon = null;
+        selectedCoupon = null; // subtotal kam hua → remove
       }
     }
   }
@@ -6148,7 +6152,6 @@ function updateDrawerTotals() {
   if (payable < 0) payable = 0;
   payable = Number(payable.toFixed(2));
 
-
   // =====================================================
   // ========== 3) TAX + SERVICE CHARGE ==================
   // =====================================================
@@ -6174,14 +6177,10 @@ function updateDrawerTotals() {
   igstAmt     = Number(igstAmt.toFixed(2));
   grandTotal  = Number(grandTotal.toFixed(2));
 
-
   // ========== UPDATE UI ==========
-
-  // SUBTOTAL
   const totalEl = document.getElementById("drawerTotalAmount");
   if (totalEl) totalEl.textContent = fmt(subtotal);
 
-  // TAX BLOCK
   const taxBox = document.getElementById("taxSummary");
   if (taxBox) {
     taxBox.innerHTML = `
@@ -6200,9 +6199,11 @@ function updateDrawerTotals() {
 }
 
 
+
 </script>
 </body>
 </html>
+
 
 
 
