@@ -663,7 +663,8 @@ style="
   </span>
 </div>
 
-  <div id="cartBackdrop" onclick="closeCartDrawer()"></div> 
+<!-- CART BACKDROP + DRAWER -->
+<div id="cartBackdrop" onclick="closeCartDrawer()"></div> 
 <div id="cartDrawer"> 
 
   <button onclick="closeCartDrawer()" 
@@ -674,7 +675,6 @@ style="
   <h2 class="text-xl font-semibold mb-3">Your Cart</h2> 
   <div id="drawerItemsList"></div>
 
-
   <!-- OFFER SECTION (BOTTOM OF DRAWER) -->
   <div id="offerSection" class="p-3 border-t mt-3" style="background:#fff;">
 
@@ -684,9 +684,10 @@ style="
       💝 Apply Coupon
     </button>
 
-    <!-- 🔥 Alert message goes HERE -->
+    <!-- Alert / success message -->
     <div id="bestOfferApplied" class="mt-2 text-green-600 font-medium" style="display:none;"></div>
 
+    <!-- (old) inline offer list – ab use nahi kar rahe, but rehne do -->
     <div id="offerList"
           class="mt-3 bg-gray-50 p-2 rounded-lg border"
           style="display:none; max-height:220px; overflow:auto;">
@@ -701,30 +702,35 @@ style="
 
   </div>
 
-
+  <!-- BASE TOTAL -->
   <div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold">
     <span>Base Total:</span>
     <span id="drawerTotalAmount">0</span>
   </div>
 
-
-  <!-- NEW BASE + TAX + GRAND TOTAL BLOCK -->
+  <!-- TAX + GRAND TOTAL BLOCK -->
   <div class="mt-4 border-t pt-3">
     <div id="taxSummary" class="text-right font-semibold mt-2"></div>
-
     <div class="flex justify-between mt-4 text-xl font-bold"></div>
   </div>
+
+  <!-- ✅ CHECKOUT BUTTON AB DRAWER KE ANDAR -->
+  <button onclick="openCheckout()" 
+          class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg">
+    Checkout
+  </button>
 
 </div> <!-- END cartDrawer -->
 
 
 
 <!-- ======================================== -->
-<!-- ✅ COUPON LIST OVERLAY (PLACE HERE ONLY) -->
+<!-- ✅ COUPON LIST OVERLAY (FULL SCREEN)    -->
 <!-- ======================================== -->
 
 <div id="couponListOverlay" 
-     class="fixed inset-0 bg-black bg-opacity-40 hidden z-50">
+     class="fixed inset-0 bg-black bg-opacity-40 hidden"
+     style="z-index:100000;">  <!-- z-index drawer se bada -->
 
   <!-- Bottom Sheet -->
   <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl 
@@ -741,7 +747,6 @@ style="
 
   </div>
 </div>
-
 
 
 
@@ -6319,6 +6324,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
