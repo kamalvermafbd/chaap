@@ -5695,34 +5695,44 @@ function getBestOffer(total) {
 // STEP 2A – Apply Coupon button (open offer list)
 async function openCouponList() {
 
-  // ⭐ Ensure latest offers fetched before opening list
+  // ⭐ Always fetch latest offers before show
   if (!window.liveOffers || window.liveOffers.length === 0) {
     await fetchOffersFromBackend();
   }
 
   const offers = window.liveOffers || [];
-  const listBox = document.getElementById("offerList");
+  const box = document.getElementById("couponListContainer");
 
-  if (!listBox) return;
+  // Show the overlay
+  document.getElementById("couponListOverlay").classList.remove("hidden");
 
-  listBox.style.display = "block";
+  if (!box) return;
 
+  // Clear old data
+  box.innerHTML = "";
+
+  // No offers case
   if (offers.length === 0) {
-    listBox.innerHTML = `
-      <div class="p-2 text-gray-500">
+    box.innerHTML = `
+      <div class="p-3 text-gray-500 text-center">
         No offers available
       </div>`;
     return;
   }
 
-  listBox.innerHTML = offers.map(o => `
-    <div class="p-2 border-b cursor-pointer hover:bg-gray-100"
+  // Render coupons in overlay
+  box.innerHTML = offers.map(o => `
+    <div class="p-3 border rounded-lg mb-3 cursor-pointer hover:bg-gray-100"
          onclick="applyCoupon('${o.id}')">
        <div class="font-semibold">${o.text}</div>
        <div class="text-sm text-gray-500">Min: ${fmt(o.min)}</div>
     </div>
   `).join("");
 }
+function closeCouponList() {
+  document.getElementById("couponListOverlay").classList.add("hidden");
+}
+
 let selectedCoupon = null;
 
 function applyCoupon(couponId) {
@@ -6309,6 +6319,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
