@@ -1169,6 +1169,39 @@ style="
 
 
   <script>
+
+document.addEventListener("DOMContentLoaded", function() {
+    const s = document.getElementById("menuSearch");
+
+    // multiple attempts to beat Chrome autofill timing
+    const clearNow = () => {
+        if (s) {
+            s.value = "";
+            s.setAttribute("value", "");
+        }
+    };
+
+    clearNow();
+    setTimeout(clearNow, 100);
+    setTimeout(clearNow, 300);
+});
+document.addEventListener("DOMContentLoaded", function() {
+    const s = document.getElementById("menuSearch");
+    if (!s) return;
+
+    // JAB USER SEARCH BOX PE CLICK/FOCUS KARE → autofill ko turant blank
+    s.addEventListener("focus", () => {
+        s.value = "";
+        s.setAttribute("value", "");
+    });
+
+    // Kuch browsers mousedown pe autofill karte hain
+    s.addEventListener("mousedown", () => {
+        s.value = "";
+        s.setAttribute("value", "");
+    });
+});
+
 window.cartReady = false;
 // === GLOBAL CURRENCY SETUP ===
 window.CURRENCY = window.CURRENCY || "₹";
@@ -5847,6 +5880,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
