@@ -6201,7 +6201,7 @@ function updateDrawerTotals() {
 
   try { updateCartBadge(); } catch(e){}
 }
-
+</script>
 <div id="couponAlert"
      style="display:none; position:fixed; bottom:20px; left:50%; 
             transform:translateX(-50%); background:#ffdddd; 
@@ -6209,7 +6209,7 @@ function updateDrawerTotals() {
             box-shadow:0 3px 12px rgba(0,0,0,0.15);
             font-size:15px; z-index:9999;">
 </div>
-
+<script>
 function showCouponAlert(msg) {
   const box = document.getElementById("couponAlert");
   if (!box) return;
@@ -6225,6 +6225,7 @@ function showCouponAlert(msg) {
 </script>
 </body>
 </html>
+
 
 
 
