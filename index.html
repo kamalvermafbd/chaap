@@ -1467,19 +1467,25 @@ apiGet("getRestaurantInfo")
     document.getElementById("restaurantAddress").innerText = res.address;
 
     // STORE COUPON MODE (manual / auto)
-    window.couponMode = (res.coupon || "").trim().toLowerCase();
+    window.couponMode = (res.coupon || "")
+      .toString()
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z]/g, "");   // Manual Coupon → manualcoupon
+
     console.log("Coupon Mode =", window.couponMode);
 
     // === COUPON UI CONTROL ===
     const couponSection = document.getElementById("offerSection");
     const applyBtn = document.getElementById("applyCouponBtn");
 
-    if (window.couponMode === "manual coupon") {
+    // FIXED COMPARISON
+    if (window.couponMode === "manualcoupon") {
       // Manual mode – user chooses coupon
       if (couponSection) couponSection.style.display = "block";
       if (applyBtn) applyBtn.style.display = "block";
     } else {
-      // Auto mode – hide apply button
+      // Auto mode – hide apply button, show best offer automatically
       if (applyBtn) applyBtn.style.display = "none";
       if (couponSection) couponSection.style.display = "block";
     }
@@ -6197,6 +6203,7 @@ function updateDrawerTotals() {
 </script>
 </body>
 </html>
+
 
 
 
