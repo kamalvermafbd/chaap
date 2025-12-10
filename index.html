@@ -681,7 +681,13 @@ style="
           class="w-full py-2 rounded-lg border text-left px-3 bg-gray-100">
     💝 Apply Coupon
   </button>
-
+ <!-- 🔥 Alert message goes HERE -->
+  <div id="couponMessage" 
+       style="display:none; margin-top:10px; 
+              background:#ffefef; color:#b30000; 
+              padding:8px 12px; border-radius:6px; 
+              font-size:14px; border:1px solid #ffcccc;">
+  </div>
   <div id="bestOfferApplied" class="mt-2 text-green-600 font-medium" style="display:none;"></div>
 
   <div id="offerList"
@@ -5703,21 +5709,22 @@ function applyCoupon(couponId) {
     return sum + (mrp - (mrp * disc / 100)) * qty;
   }, 0);
 
-  // Minimum order check
+  // ✨ Minimum order check
   if (subtotal < Number(o.min || 0)) {
 
-   showCouponAlert(
-  `⚠ Cannot apply "${o.text}" — Min order ${fmt(o.min)} required.`
-);
+    showCouponMessage(
+      `⚠ Cannot apply "${o.text}"<br> ` +
+      `Minimum required: ${fmt(o.min)}<br>` +
+      `Your subtotal: ${fmt(subtotal)}`
+    );
 
-    // DO NOT APPLY — DO NOT CLOSE LIST
+    // LIST ko collapse nahi karte
     return;
   }
 
   // APPLY COUPON
   selectedCoupon = o;
 
-  // close list
   const listBox = document.getElementById("offerList");
   if (listBox) listBox.style.display = "none";
 
@@ -6221,10 +6228,23 @@ function showCouponAlert(msg) {
     box.style.display = "none";
   }, 3000); // hide after 3 seconds
 }
+function showCouponMessage(msg) {
+  const box = document.getElementById("couponMessage");
+  if (!box) return;
+
+  box.innerHTML = msg;
+  box.style.display = "block";
+
+  // auto hide after 3 seconds
+  setTimeout(() => {
+    box.style.display = "none";
+  }, 3000);
+}
 
 </script>
 </body>
 </html>
+
 
 
 
