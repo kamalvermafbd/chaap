@@ -670,7 +670,28 @@ style="
     &times;
   </button>
 <h2 class="text-xl font-semibold mb-3">Your Cart</h2> 
-<div id="drawerItemsList"></div> 
+<div id="drawerItemsList"></div>
+
+<!-- OFFER SECTION (BOTTOM OF DRAWER) -->
+<div id="offerSection" class="p-3 border-t mt-3" style="background:#fff;">
+
+  <button id="applyCouponBtn"
+          onclick="openCouponList()"
+          class="w-full py-2 rounded-lg border text-left px-3 bg-gray-100">
+    💝 Apply Coupon
+  </button>
+
+  <div id="bestOfferApplied" class="mt-2 text-green-600 font-medium" style="display:none;"></div>
+
+  <div id="offerList"
+        class="mt-3 bg-gray-50 p-2 rounded-lg border"
+        style="display:none; max-height:220px; overflow:auto;">
+  </div>
+
+</div>
+
+
+  
 <div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold">
   <span>Base Total:</span>
   <span id="drawerTotalAmount">0</span>
@@ -5555,6 +5576,38 @@ function getMenuImage(itemId, variantId) {
 
   return item.image || "";
 }
+// ---------- STEP 1B: Offers data + best-offer calculation ----------
+
+function getAvailableOffers() {
+  return [
+    { id: "OFF10",  text: "10% OFF on orders above ₹199", min: 199, discount: 10 },
+    { id: "SAVE50", text: "Flat ₹50 OFF on orders above ₹299", min: 299, flat: 50 },
+    { id: "OFF20",  text: "20% OFF on orders above ₹499", min: 499, discount: 20 }
+  ];
+}
+
+function getBestOffer(total) {
+  const offers = getAvailableOffers();
+  let best = null;
+  let bestValue = 0;
+
+  offers.forEach(o => {
+    if (total >= (o.min || 0)) {
+      let val = 0;
+      if (o.discount) val = total * (o.discount / 100);
+      if (o.flat) val = o.flat;
+
+      if (val > bestValue) {
+        bestValue = val;
+        best = { ...o, value: Number(val.toFixed(2)) };
+      }
+    }
+  });
+
+  return best;
+}
+
+  
 // STEP 1B → Cart items ke image ko restore karne ka helper
 function restoreCartImages(cartArr) {
   if (!Array.isArray(cartArr)) return [];
@@ -5930,6 +5983,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
