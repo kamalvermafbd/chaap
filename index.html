@@ -5646,9 +5646,14 @@ function getBestOffer(total) {
   return best;
 }
 // STEP 2A – Apply Coupon button (open offer list)
-function openCouponList() {
+async function openCouponList() {
 
-  const offers = window.liveOffers || [];   // ⭐ backend offers
+  // ⭐ Ensure latest offers fetched before opening list
+  if (!window.liveOffers || window.liveOffers.length === 0) {
+    await fetchOffersFromBackend();
+  }
+
+  const offers = window.liveOffers || [];
   const listBox = document.getElementById("offerList");
 
   if (!listBox) return;
@@ -5671,7 +5676,6 @@ function openCouponList() {
     </div>
   `).join("");
 }
-
 let selectedCoupon = null;
 
 function applyCoupon(couponId) {
@@ -6193,5 +6197,6 @@ function updateDrawerTotals() {
 </script>
 </body>
 </html>
+
 
 
