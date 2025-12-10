@@ -604,7 +604,9 @@ body::before {
   display: none;
 }
 
-
+#menuSearch:-webkit-autofill {
+  box-shadow: 0 0 0px 1000px white inset !important;
+}
   </style>
 </head>
 <body>
@@ -809,15 +811,18 @@ style="
         </select>
 
         <!-- Search -->
-      <input 
-  type="search"
+      <input
+  type="text"
   id="menuSearch"
-  name="search_food"
+  name="never_autofill_search"
   placeholder="Search food item..."
-  autocomplete="new-password"
+  autocomplete="off"
+  inputmode="search"
+  aria-autocomplete="none"
   autocorrect="off"
   autocapitalize="off"
   spellcheck="false"
+  onfocus="this.setAttribute('autocomplete','off')"
   oninput="filterMenu()"
   style="width:45%;max-width:200px;padding:10px;font-size:16px;
          border-radius:6px;border:1px solid #ccc;margin-left:10px;">
@@ -5842,6 +5847,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
