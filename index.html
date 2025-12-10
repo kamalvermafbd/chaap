@@ -615,6 +615,39 @@ body::before {
     -webkit-text-fill-color: #000 !important;
     transition: background-color 9999s ease-in-out 0s;
 }
+
+    /* === COUPON OVERLAY + BOTTOM SHEET === */
+
+#couponListOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: none;
+  z-index: 100000; /* Drawer (99999) se upar */
+}
+
+#couponListOverlay.active {
+  display: block;
+}
+
+/* Bottom Sheet Panel */
+#couponSheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  background: #ffffff;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+
+  max-height: 75vh;
+  overflow-y: auto;
+
+  transform: translateY(100%);      /* hidden by default */
+  transition: transform 0.30s ease; /* smooth slide */
+}
+
   </style>
 </head>
 <body>
@@ -6322,6 +6355,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
