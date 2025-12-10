@@ -6041,12 +6041,14 @@ function refreshCheckoutCart() {
     .querySelectorAll("input[data-variant-id][data-item-id]")
     .forEach(r => (r.checked = false));
 }
+
+
 function updateDrawerTotals() {
 
-  const cartArr = getCart();  // master engine safe getter
+  const cartArr = getCart();
   let subtotal = 0;
 
-  // 1) Base total (item discount ke baad)
+  // ========== 1) Base Subtotal ==========
   cartArr.forEach(ci => {
     const mrp = Number(ci.rate || 0);
     const disc = Number(ci.discPercent || 0);
@@ -6058,118 +6060,117 @@ function updateDrawerTotals() {
 
   subtotal = Number(subtotal.toFixed(2));
 
-  // ----------------------------
-  // 2) OFFER LOGIC (manual selectedCoupon OR auto best offer)
-  // ----------------------------
-  // `selectedCoupon` is expected (declared globally when user applies a coupon).
-  let offer = null;
+  // =====================================================
+  // ========== 2) COUPON & OFFER LOGIC ==================
+  // =====================================================
   let offerDiscount = 0;
+  let appliedOfferText = "";
 
-  if (typeof selectedCoupon !== "undefined" && selectedCoupon) {
-    const o = selectedCoupon;
-    // ensure numeric checks and presence of min
-    const minAmt = Number(o.min || 0);
-    if (subtotal >= minAmt) {
-      offer = o;
-      if (o.discount) {
-        offerDiscount = subtotal * (Number(o.discount) / 100);
-      } else if (o.flat) {
-        offerDiscount = Number(o.flat || 0);
+  const mode = (window.couponMode || "").toLowerCase();
+  
+  // ------------ MANUAL MODE ---------------
+  if (mode === "manual") {
+
+    if (selectedCoupon) {
+      const o = selectedCoupon;
+
+      if (subtotal >= Number(o.min || 0)) {
+
+        if (o.discount) {
+          offerDiscount = subtotal * (o.discount / 100);
+        }
+        if (o.flat) {
+          offerDiscount = Number(o.flat);
+        }
+
+        offerDiscount = Number(offerDiscount.toFixed(2));
+        appliedOfferText = `🎁 ${o.text} applied`;
+
+      } else {
+        selectedCoupon = null;
       }
-    } else {
-      // selected coupon invalid for current subtotal -> clear it
-      selectedCoupon = null;
     }
   }
 
-  // auto best offer if no manual selected coupon
-  if (!selectedCoupon) {
+  // ------------ AUTO MODE -----------------
+  else {
     const best = getBestOffer(subtotal);
+
     if (best) {
-      offer = best;
       offerDiscount = Number(best.value || 0);
+      appliedOfferText = `🎉 ${best.text} (Saved ${fmt(offerDiscount)})`;
     }
   }
 
-  // round offer discount
-  offerDiscount = Number((offerDiscount || 0).toFixed(2));
-
-  // Update "Best Offer Applied" UI
+  // Update Offer Message Box
   const appliedBox = document.getElementById("bestOfferApplied");
   if (appliedBox) {
-    if (offer) {
+    if (offerDiscount > 0) {
       appliedBox.style.display = "block";
-      appliedBox.innerHTML = `🎉 ${offer.text} (You saved ${fmt(offerDiscount)})`;
+      appliedBox.innerHTML = appliedOfferText;
     } else {
       appliedBox.style.display = "none";
-      appliedBox.innerHTML = "";
     }
   }
 
-  // 3) Final payable after offer
-  let finalPayable = subtotal - offerDiscount;
-  if (finalPayable < 0) finalPayable = 0;
-  finalPayable = Number(finalPayable.toFixed(2));
+  // ========== Subtotal after offer ==========
+  let payable = subtotal - offerDiscount;
+  if (payable < 0) payable = 0;
+  payable = Number(payable.toFixed(2));
 
-  // 4) Update subtotal UI
+
+  // =====================================================
+  // ========== 3) TAX + SERVICE CHARGE ==================
+  // =====================================================
+  const t = restaurantTax || {};
+
+  let serviceAmt = 0;
+  if (t.servicePercent > 0) {
+    serviceAmt = payable * (t.servicePercent / 100);
+  }
+
+  let taxable = payable + serviceAmt;
+
+  let cgstAmt = taxable * ((t.cgstPercent || 0) / 100);
+  let sgstAmt = taxable * ((t.sgstPercent || 0) / 100);
+  let igstAmt = taxable * ((t.igstPercent || 0) / 100);
+
+  let grandTotal = taxable + cgstAmt + sgstAmt + igstAmt;
+
+  serviceAmt  = Number(serviceAmt.toFixed(2));
+  taxable     = Number(taxable.toFixed(2));
+  cgstAmt     = Number(cgstAmt.toFixed(2));
+  sgstAmt     = Number(sgstAmt.toFixed(2));
+  igstAmt     = Number(igstAmt.toFixed(2));
+  grandTotal  = Number(grandTotal.toFixed(2));
+
+
+  // ========== UPDATE UI ==========
+
+  // SUBTOTAL
   const totalEl = document.getElementById("drawerTotalAmount");
   if (totalEl) totalEl.textContent = fmt(subtotal);
 
-  // 5) Update tax + final payable section (tax logic not modified here)
+  // TAX BLOCK
   const taxBox = document.getElementById("taxSummary");
   if (taxBox) {
     taxBox.innerHTML = `
       <div class="text-right text-gray-700">
         <div>Offer Discount: - ${fmt(offerDiscount)}</div>
-        <div class="font-bold text-lg mt-1">Payable: ${fmt(finalPayable)}</div>
+        <div>Service Charge: ${fmt(serviceAmt)}</div>
+        <div>CGST: ${fmt(cgstAmt)}</div>
+        <div>SGST: ${fmt(sgstAmt)}</div>
+        <div>IGST: ${fmt(igstAmt)}</div>
+        <div class="font-bold text-lg mt-1">Grand Total: ${fmt(grandTotal)}</div>
       </div>
     `;
   }
 
-  // 6) badge update safe call
   try { updateCartBadge(); } catch(e){}
 }
+
 
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
