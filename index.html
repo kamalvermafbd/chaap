@@ -615,39 +615,6 @@ body::before {
     -webkit-text-fill-color: #000 !important;
     transition: background-color 9999s ease-in-out 0s;
 }
-
-    /* === COUPON OVERLAY + BOTTOM SHEET === */
-
-#couponListOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  display: none;
-  z-index: 100000; /* Drawer (99999) se upar */
-}
-
-#couponListOverlay.active {
-  display: block;
-}
-
-/* Bottom Sheet Panel */
-#couponSheet {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-
-  background: #ffffff;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-
-  max-height: 75vh;
-  overflow-y: auto;
-
-  transform: translateY(100%);      /* hidden by default */
-  transition: transform 0.30s ease; /* smooth slide */
-}
-
   </style>
 </head>
 <body>
@@ -718,7 +685,10 @@ style="
   
   <div id="bestOfferApplied" class="mt-2 text-green-600 font-medium" style="display:none;"></div>
 
-  
+  <div id="offerList"
+        class="mt-3 bg-gray-50 p-2 rounded-lg border"
+        style="display:none; max-height:220px; overflow:auto;">
+  </div>
 <div id="couponMessage" 
        style="display:none; margin-top:10px; 
               background:#ffefef; color:#b30000; 
@@ -751,44 +721,7 @@ style="
 
   
 <button onclick="openCheckout()" class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg"> Checkout </button> </div> 
-<!-- ======================================== -->
-<!-- COUPON LIST OVERLAY (BOTTOM SHEET) -->
-<!-- ======================================== -->
-<div id="couponListOverlay" 
-     class="hidden"
-     style="position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:100000;">
 
-  <!-- BOTTOM SHEET PANEL -->
-  <div id="couponSheet"
-       style="
-         position:absolute;
-         left:0;
-         right:0;
-         bottom:0;
-         background:#fff;
-         border-top-left-radius:20px;
-         border-top-right-radius:20px;
-         max-height:75vh;
-         overflow-y:auto;
-         transform:translateY(100%);
-         transition:transform 0.30s ease;
-         padding:16px;
-         box-shadow:0 -4px 12px rgba(0,0,0,0.15);
-       ">
-
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-      <h2 style="font-size:18px; font-weight:600;">Available Coupons</h2>
-      <button onclick="closeCouponList()" style="font-size:22px;">✕</button>
-    </div>
-
-    <div id="couponListContainer"></div>
-
-  </div>
-</div>
-
-
-  </div>
-</div>
 <button onclick="openCartDrawer()" 
   style="position:absolute; right:160px; top:60px; background:#ff6347; color:white;
   padding:8px 12px; border-radius:6px; border:none;"> View Cart (<span id="cartCount">0</span>) </button>
@@ -5734,69 +5667,36 @@ function getBestOffer(total) {
   return best;
 }
 // STEP 2A – Apply Coupon button (open offer list)
-// STEP 2A – Apply Coupon button (open overlay list)
 async function openCouponList() {
 
-  // Always fetch latest offers
+  // ⭐ Ensure latest offers fetched before opening list
   if (!window.liveOffers || window.liveOffers.length === 0) {
     await fetchOffersFromBackend();
   }
 
-  const offers  = window.liveOffers || [];
-  const overlay = document.getElementById("couponListOverlay");
-  const box     = document.getElementById("couponListContainer");
-  const sheet   = document.getElementById("couponSheet");
+  const offers = window.liveOffers || [];
+  const listBox = document.getElementById("offerList");
 
-  if (!overlay || !box || !sheet) return;
+  if (!listBox) return;
 
-  // Show overlay
-  overlay.classList.add("active");
-  overlay.style.display = "block";
+  listBox.style.display = "block";
 
-  // Clear old
-  box.innerHTML = "";
-
-  // No offers
   if (offers.length === 0) {
-    box.innerHTML = `
-      <div class="p-3 text-gray-500 text-center">
+    listBox.innerHTML = `
+      <div class="p-2 text-gray-500">
         No offers available
       </div>`;
     return;
   }
 
-  // Render list
-  box.innerHTML = offers.map(o => `
-    <div class="p-3 border rounded-lg mb-3 cursor-pointer hover:bg-gray-100"
+  listBox.innerHTML = offers.map(o => `
+    <div class="p-2 border-b cursor-pointer hover:bg-gray-100"
          onclick="applyCoupon('${o.id}')">
        <div class="font-semibold">${o.text}</div>
        <div class="text-sm text-gray-500">Min: ${fmt(o.min)}</div>
     </div>
   `).join("");
-
-  // ⭐ Slide sheet UP
-  sheet.style.transform = "translateY(0)";
 }
-
-
-// STEP 2B – Overlay close helper
-function closeCouponList() {
-  const overlay = document.getElementById("couponListOverlay");
-  const sheet   = document.getElementById("couponSheet");
-
-  if (!overlay || !sheet) return;
-
-  // Slide down first
-  sheet.style.transform = "translateY(100%)";
-
-  // Hide overlay AFTER animation
-  setTimeout(() => {
-    overlay.classList.remove("active");
-    overlay.style.display = "none";
-  }, 250);
-}
-
-
 let selectedCoupon = null;
 
 function applyCoupon(couponId) {
@@ -5841,8 +5741,7 @@ function applyCoupon(couponId) {
     appliedBox.style.display = "block";
     appliedBox.innerHTML = `🎉 ${o.text} applied`;
   }
- // coupon apply hote hi overlay band
-  closeCouponList();
+
   updateDrawerTotals();
 }
 
@@ -6384,13 +6283,6 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
 
 
 
