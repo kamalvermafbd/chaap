@@ -5712,21 +5712,6 @@ function applyCoupon(couponId) {
   updateDrawerTotals();   // reapply totals with coupon
 }
 
-let isOfferListOpen = false;
-
-function toggleCouponList() {
-  const listBox = document.getElementById("offerList");
-  if (!listBox) return;
-
-  if (isOfferListOpen) {
-    listBox.style.display = "none";
-    isOfferListOpen = false;
-  } else {
-    openCouponList();
-    listBox.style.display = "block";
-    isOfferListOpen = true;
-  }
-}
 
 
   
@@ -6204,6 +6189,7 @@ function updateDrawerTotals() {
 </script>
 </body>
 </html>
+
 
 
 
