@@ -1462,27 +1462,47 @@ apiGet("getCatAllocations")
 
 apiGet("getRestaurantInfo")
   .then(res => {
+
     document.getElementById("restaurantName").innerHTML = "&#127860; " + res.name;
     document.getElementById("restaurantAddress").innerText = res.address;
-    
-window.couponMode = (res.coupon || "").toLowerCase();
-console.log("Coupon Mode =", window.couponMode);
 
-    
- // NEW (store tax settings globally)
+    // STORE COUPON MODE (manual / auto)
+    window.couponMode = (res.coupon || "").trim().toLowerCase();
+    console.log("Coupon Mode =", window.couponMode);
+
+    // === COUPON UI CONTROL ===
+    const couponSection = document.getElementById("offerSection");
+    const applyBtn = document.getElementById("applyCouponBtn");
+
+    if (window.couponMode === "manual coupon") {
+      // Manual mode – user chooses coupon
+      if (couponSection) couponSection.style.display = "block";
+      if (applyBtn) applyBtn.style.display = "block";
+    } else {
+      // Auto mode – hide apply button
+      if (applyBtn) applyBtn.style.display = "none";
+      if (couponSection) couponSection.style.display = "block";
+    }
+
+    // TAX SETTINGS
     restaurantTax.taxType        = res.taxType || "";
-    restaurantTax.servicePercent = (res.servicePercent && res.servicePercent !== "NIL") ? Number(res.servicePercent) : 0;
+    restaurantTax.servicePercent = (res.servicePercent && res.servicePercent !== "NIL") 
+                                   ? Number(res.servicePercent) 
+                                   : 0;
 
     restaurantTax.cgstPercent    = Number(res.cgstPercent) || 0;
     restaurantTax.sgstPercent    = Number(res.sgstPercent) || 0;
     restaurantTax.igstPercent    = Number(res.igstPercent) || 0;
 
     console.log("Restaurant Tax Settings Loaded:", restaurantTax);
-  
-    })
+  })
   .catch(err => {
     console.error("Restaurant info load error:", err);
   });
+
+
+
+    
 function slugify(s) {
   return String(s || "")
     .toLowerCase()
@@ -6173,4 +6193,5 @@ function updateDrawerTotals() {
 </script>
 </body>
 </html>
+
 
