@@ -1687,7 +1687,6 @@ if (!isLoggedIn()) {
 
 function openCartPanel(cartArr = []) {
 
-  // Always use master engine getter
   const list = Array.isArray(cartArr) && cartArr.length > 0
     ? cartArr
     : getCart();
@@ -1695,9 +1694,8 @@ function openCartPanel(cartArr = []) {
   const container = document.getElementById("drawerItemsList");
   if (!container) return;
 
-  container.innerHTML = "";  // clear old
+  container.innerHTML = "";
 
-  // No items case
   if (list.length === 0) {
     container.innerHTML = `
       <div class="p-4 text-center text-gray-500">
@@ -1714,43 +1712,66 @@ function openCartPanel(cartArr = []) {
 
     const itemId = String(ci.itemId);
     const variantId = String(ci.variantId || "");
-
-    const rowId = variantId
-      ? `drawerRow-${itemId}_${variantId}`
-      : `drawerRow-${itemId}`;
-
     const qty = Number(ci.qty || 1);
     const rate = Number(ci.rate || 0);
     const disc = Number(ci.discPercent || 0);
 
-    const priceAfterDisc = rate - (rate * disc / 100);
-    const lineTotal = (priceAfterDisc * qty).toFixed(2);
-
-    const unitText = ci.unit ? `<span class="text-sm text-gray-500">${ci.unit}</span>` : "";
+    const discAmt = (rate * disc) / 100;
+    const netRate = rate - discAmt;
+    const lineTotal = (netRate * qty).toFixed(2);
 
     html += `
-      <div class="drawer-row flex justify-between items-center py-3 border-b"
-           id="${rowId}"
-           data-price="${rate}"
-           data-disc="${disc}">
-        
-        <div class="flex flex-col">
-          <span class="font-semibold">${ci.name}</span>
-          ${unitText}
-        </div>
+      <div class="flex gap-3 py-2 border-b">
 
-        <div class="flex items-center gap-3">
-          <button class="px-2 bg-gray-300 rounded"
-            onclick="updateCart('${itemId}','${variantId}','dec')">−</button>
+        <!-- IMAGE -->
+        <img 
+          src="${ci.image || 'https://via.placeholder.com/60'}" 
+          class="w-16 h-16 rounded object-cover"
+        />
 
-          <span class="drawer-qty font-semibold">${qty}</span>
+        <!-- RIGHT SIDE DETAILS -->
+        <div class="flex-1">
 
-          <button class="px-2 bg-gray-300 rounded"
-            onclick="updateCart('${itemId}','${variantId}','add')">+</button>
-        </div>
+          <!-- NAME + UNIT -->
+          <div class="font-semibold text-gray-800">
+            ${ci.name} 
+            <span class="text-sm text-gray-500">${ci.unit || ""}</span>
+          </div>
 
-        <div class="font-semibold drawer-total">
-           ${fmt(lineTotal)}
+          <!-- MRP + DISCOUNT -->
+          <div class="text-xs text-gray-600 mt-1 leading-tight">
+            <div>MRP: <span class="font-semibold">${fmt(rate)}</span></div>
+
+            ${disc > 0 ? `
+              <div>Discount: <span class="font-semibold">${disc}%</span></div>
+              <div>Disc Amt: <span class="font-semibold">${fmt(discAmt)}</span></div>
+              <div>Net Rate: <span class="font-semibold">${fmt(netRate)}</span></div>
+            ` : ""}
+          </div>
+
+          <!-- QTY + TOTAL -->
+          <div class="flex justify-between items-center mt-2">
+
+            <div class="flex items-center gap-2">
+              <button 
+                class="px-2 bg-gray-300 rounded"
+                onclick="updateCart('${itemId}','${variantId}','dec')"
+              >−</button>
+
+              <span class="font-semibold">${qty}</span>
+
+              <button 
+                class="px-2 bg-gray-300 rounded"
+                onclick="updateCart('${itemId}','${variantId}','add')"
+              >+</button>
+            </div>
+
+            <div class="font-bold text-gray-800 text-base">
+              ${fmt(lineTotal)}
+            </div>
+
+          </div>
+
         </div>
       </div>
     `;
@@ -1760,8 +1781,6 @@ function openCartPanel(cartArr = []) {
 
   try { updateDrawerTotals(); } catch(e){}
 }
-
-
 
 function renderCart() {
 if (blockRender) return;
@@ -5815,6 +5834,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
