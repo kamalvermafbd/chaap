@@ -1460,7 +1460,7 @@ apiGet("getCatAllocations")
   })
   .catch(err => console.error("cat allocation load error:", err));
 
-    apiGet("getRestaurantInfo")
+apiGet("getRestaurantInfo")
   .then(res => {
     document.getElementById("restaurantName").innerHTML = "&#127860; " + res.name;
     document.getElementById("restaurantAddress").innerText = res.address;
@@ -6133,6 +6133,7 @@ function updateDrawerTotals() {
 </script>
 </body>
 </html>
+
 
 
 
