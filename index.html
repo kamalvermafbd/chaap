@@ -665,55 +665,81 @@ style="
 
   <div id="cartBackdrop" onclick="closeCartDrawer()"></div> 
 <div id="cartDrawer"> 
-   <button onclick="closeCartDrawer()" 
+
+  <button onclick="closeCartDrawer()" 
     class="absolute right-3 top-3 text-gray-500 hover:text-gray-800 text-2xl font-bold">
     &times;
   </button>
-<h2 class="text-xl font-semibold mb-3">Your Cart</h2> 
-<div id="drawerItemsList"></div>
 
-<!-- OFFER SECTION (BOTTOM OF DRAWER) -->
-<div id="offerSection" class="p-3 border-t mt-3" style="background:#fff;">
-
-  <button id="applyCouponBtn"
-          onclick="openCouponList()"
-
-          class="w-full py-2 rounded-lg border text-left px-3 bg-gray-100">
-    💝 Apply Coupon
-  </button>
- <!-- 🔥 Alert message goes HERE -->
-  
-  <div id="bestOfferApplied" class="mt-2 text-green-600 font-medium" style="display:none;"></div>
-
-  <div id="offerList"
-        class="mt-3 bg-gray-50 p-2 rounded-lg border"
-        style="display:none; max-height:220px; overflow:auto;">
-  </div>
-<div id="couponMessage" 
-       style="display:none; margin-top:10px; 
-              background:#ffefef; color:#b30000; 
-              padding:8px 12px; border-radius:6px; 
-              font-size:14px; border:1px solid #ffcccc;">
-  </div>
-</div>
+  <h2 class="text-xl font-semibold mb-3">Your Cart</h2> 
+  <div id="drawerItemsList"></div>
 
 
-  
-<div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold">
-  <span>Base Total:</span>
-  <span id="drawerTotalAmount">0</span>
-</div>
+  <!-- OFFER SECTION (BOTTOM OF DRAWER) -->
+  <div id="offerSection" class="p-3 border-t mt-3" style="background:#fff;">
 
+    <button id="applyCouponBtn"
+            onclick="openCouponList()"
+            class="w-full py-2 rounded-lg border text-left px-3 bg-gray-100">
+      💝 Apply Coupon
+    </button>
 
-<!-- NEW BASE + TAX + GRAND TOTAL BLOCK (SHIFTED FROM VIEW CART) -->
-<div class="mt-4 border-t pt-3">
- 
-  <div id="taxSummary" class="text-right font-semibold mt-2"></div>
+    <!-- 🔥 Alert message goes HERE -->
+    <div id="bestOfferApplied" class="mt-2 text-green-600 font-medium" style="display:none;"></div>
 
-  <div class="flex justify-between mt-4 text-xl font-bold">
-    
+    <div id="offerList"
+          class="mt-3 bg-gray-50 p-2 rounded-lg border"
+          style="display:none; max-height:220px; overflow:auto;">
+    </div>
+
+    <div id="couponMessage" 
+         style="display:none; margin-top:10px; 
+                background:#ffefef; color:#b30000; 
+                padding:8px 12px; border-radius:6px; 
+                font-size:14px; border:1px solid #ffcccc;">
+    </div>
+
   </div>
 
+
+  <div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold">
+    <span>Base Total:</span>
+    <span id="drawerTotalAmount">0</span>
+  </div>
+
+
+  <!-- NEW BASE + TAX + GRAND TOTAL BLOCK -->
+  <div class="mt-4 border-t pt-3">
+    <div id="taxSummary" class="text-right font-semibold mt-2"></div>
+
+    <div class="flex justify-between mt-4 text-xl font-bold"></div>
+  </div>
+
+</div> <!-- END cartDrawer -->
+
+
+
+<!-- ======================================== -->
+<!-- ✅ COUPON LIST OVERLAY (PLACE HERE ONLY) -->
+<!-- ======================================== -->
+
+<div id="couponListOverlay" 
+     class="fixed inset-0 bg-black bg-opacity-40 hidden z-50">
+
+  <!-- Bottom Sheet -->
+  <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl 
+              p-4 h-[75%] overflow-y-auto shadow-lg">
+
+    <div class="flex justify-between items-center mb-3">
+      <h2 class="text-lg font-semibold">Available Coupons</h2>
+      <button onclick="closeCouponList()" class="text-xl">✕</button>
+    </div>
+
+    <div id="couponListContainer">
+      <!-- Coupons will auto-render here -->
+    </div>
+
+  </div>
 </div>
 
 
@@ -6283,6 +6309,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
