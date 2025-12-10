@@ -676,7 +676,7 @@ style="
 <div id="offerSection" class="p-3 border-t mt-3" style="background:#fff;">
 
   <button id="applyCouponBtn"
-          onclick="openCouponList()"
+          onclick="toggleCouponList()"
           class="w-full py-2 rounded-lg border text-left px-3 bg-gray-100">
     💝 Apply Coupon
   </button>
@@ -5643,6 +5643,22 @@ function applyCoupon(couponId) {
   updateDrawerTotals();
 }
 
+let isOfferListOpen = false;
+
+function toggleCouponList() {
+  const listBox = document.getElementById("offerList");
+  if (!listBox) return;
+
+  if (isOfferListOpen) {
+    listBox.style.display = "none";
+    isOfferListOpen = false;
+  } else {
+    openCouponList();
+    listBox.style.display = "block";
+    isOfferListOpen = true;
+  }
+}
+
   
 // STEP 1B → Cart items ke image ko restore karne ka helper
 function restoreCartImages(cartArr) {
@@ -6082,6 +6098,7 @@ function updateDrawerTotals() {
 </script>
 </body>
 </html>
+
 
 
 
