@@ -5706,11 +5706,9 @@ function applyCoupon(couponId) {
   // Minimum order check
   if (subtotal < Number(o.min || 0)) {
 
-    alert(
-      `⚠ Cannot apply "${o.text}"\n\n` +
-      `Minimum order required: ${fmt(o.min)}\n` +
-      `Your subtotal: ${fmt(subtotal)}`
-    );
+   showCouponAlert(
+  `⚠ Cannot apply "${o.text}" — Min order ${fmt(o.min)} required.`
+);
 
     // DO NOT APPLY — DO NOT CLOSE LIST
     return;
@@ -6204,11 +6202,30 @@ function updateDrawerTotals() {
   try { updateCartBadge(); } catch(e){}
 }
 
+<div id="couponAlert"
+     style="display:none; position:fixed; bottom:20px; left:50%; 
+            transform:translateX(-50%); background:#ffdddd; 
+            color:#b30000; padding:12px 18px; border-radius:8px;
+            box-shadow:0 3px 12px rgba(0,0,0,0.15);
+            font-size:15px; z-index:9999;">
+</div>
 
+function showCouponAlert(msg) {
+  const box = document.getElementById("couponAlert");
+  if (!box) return;
+
+  box.innerHTML = msg;
+  box.style.display = "block";
+
+  setTimeout(() => {
+    box.style.display = "none";
+  }, 3000); // hide after 3 seconds
+}
 
 </script>
 </body>
 </html>
+
 
 
 
