@@ -809,16 +809,19 @@ style="
         </select>
 
         <!-- Search -->
-        <input type="text" id="menuSearch"
-               placeholder="Search food item..."
-           name="search_food"
+      <input 
+  type="search"
+  id="menuSearch"
+  name="search_food"
+  placeholder="Search food item..."
   autocomplete="new-password"
-          autocorrect="off"
+  autocorrect="off"
   autocapitalize="off"
-  spellcheck="false
-               oninput="filterMenu()"
-               style="width:45%;max-width:200px;padding:10px;font-size:16px;
-                      border-radius:6px;border:1px solid #ccc;margin-left:10px;">
+  spellcheck="false"
+  oninput="filterMenu()"
+  style="width:45%;max-width:200px;padding:10px;font-size:16px;
+         border-radius:6px;border:1px solid #ccc;margin-left:10px;">
+
 
         <!-- Clear -->
         <button onclick="clearFilters()"
@@ -5839,6 +5842,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
