@@ -5018,24 +5018,27 @@ async function openCheckout() {
 }
 
 
-  async function openCartDrawer() {
+async function openCartDrawer() {
 
-  //  ALWAYS fetch latest offers first
-  await fetchOffersFromBackend();
+  //  OPEN DRAWER INSTANTLY (NO DELAY)
+  document.getElementById("cartBackdrop").classList.add("active");
+  document.getElementById("cartDrawer").classList.add("active");
+  document.body.style.overflow = "hidden";
+
+  // Fetch offers in background (NO await)
+  fetchOffersFromBackend().then(() => {
+    try { updateDrawerTotals(); } catch(e){}
+  });
+
   // 1) Always get latest cart (master engine)
   let freshCart = getCart();
 
-  //  STEP 1D → Restore missing images
+  // STEP 1D → Restore missing images
   freshCart = restoreCartImages(freshCart);
 
   // 2) Sync global
   cart = freshCart;
   window.cart = freshCart;
-
-  //  First open drawer visually
-  document.getElementById("cartBackdrop").classList.add("active");
-  document.getElementById("cartDrawer").classList.add("active");
-  document.body.style.overflow = "hidden";
 
   // 3) Rebuild drawer UI
   openCartPanel(freshCart);
@@ -5045,6 +5048,7 @@ async function openCheckout() {
   try { updateDrawerTotals(); } catch(e){}
   try { updateCartBadge(); } catch(e){}
 }
+
 
 
 
@@ -6279,6 +6283,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
