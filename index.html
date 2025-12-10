@@ -4978,17 +4978,19 @@ async function openCheckout() {
 
   async function openCartDrawer() {
 
+  //  ALWAYS fetch latest offers first
+  await fetchOffersFromBackend();
   // 1) Always get latest cart (master engine)
   let freshCart = getCart();
 
-  // ⭐ STEP 1D → Restore missing images
+  //  STEP 1D → Restore missing images
   freshCart = restoreCartImages(freshCart);
 
   // 2) Sync global
   cart = freshCart;
   window.cart = freshCart;
 
-  // ⭐ First open drawer visually
+  //  First open drawer visually
   document.getElementById("cartBackdrop").classList.add("active");
   document.getElementById("cartDrawer").classList.add("active");
   document.body.style.overflow = "hidden";
@@ -5541,7 +5543,24 @@ if (action === "dec") {
   return setCart(cartArr);
 }
 }
-  
+
+async function fetchOffersFromBackend() {
+  try {
+    const res = await fetch(API_URL + "?api=getOffers");
+    const data = await res.json();
+
+    if (data.success && Array.isArray(data.offers)) {
+      window.liveOffers = data.offers;   // store globally
+      return data.offers;
+    }
+  } catch (err) {
+    console.error("Offer load error:", err);
+  }
+
+  window.liveOffers = [];
+  return [];
+}
+
 function getCart() {
 
   // Guest user
@@ -5578,16 +5597,11 @@ function getMenuImage(itemId, variantId) {
 }
 // ---------- STEP 1B: Offers data + best-offer calculation ----------
 
-function getAvailableOffers() {
-  return [
-    { id: "OFF10",  text: "10% OFF on orders above ₹199", min: 199, discount: 10 },
-    { id: "SAVE50", text: "Flat ₹50 OFF on orders above ₹299", min: 299, flat: 50 },
-    { id: "OFF20",  text: "20% OFF on orders above ₹499", min: 499, discount: 20 }
-  ];
-}
+
 
 function getBestOffer(total) {
-  const offers = getAvailableOffers();
+  const offers = window.liveOffers || [];
+
   let best = null;
   let bestValue = 0;
 
@@ -5608,39 +5622,54 @@ function getBestOffer(total) {
 }
 // STEP 2A – Apply Coupon button (open offer list)
 function openCouponList() {
-  const offers = getAvailableOffers();   // already created in Step 1B
+
+  const offers = window.liveOffers || [];   // ⭐ backend offers
   const listBox = document.getElementById("offerList");
 
   if (!listBox) return;
 
-  // Show list box
   listBox.style.display = "block";
 
-  // Fill offer list dynamically
+  if (offers.length === 0) {
+    listBox.innerHTML = `
+      <div class="p-2 text-gray-500">
+        No offers available
+      </div>`;
+    return;
+  }
+
   listBox.innerHTML = offers.map(o => `
-    <div class="p-2 border-b cursor-pointer hover:bg-gray-100" 
+    <div class="p-2 border-b cursor-pointer hover:bg-gray-100"
          onclick="applyCoupon('${o.id}')">
-       ${o.text}
+       <div class="font-semibold">${o.text}</div>
+       <div class="text-sm text-gray-500">Min: ${fmt(o.min)}</div>
     </div>
   `).join("");
 }
 
-
-// STEP 2B – Manual coupon apply
 let selectedCoupon = null;
 
 function applyCoupon(couponId) {
-  const offers = getAvailableOffers();
 
-  // find selected offer
+  const offers = window.liveOffers || [];  // ⭐ backend offers
+
   selectedCoupon = offers.find(o => o.id === couponId) || null;
 
-  // close offer list
+  // hide list
   const listBox = document.getElementById("offerList");
   if (listBox) listBox.style.display = "none";
 
-  // re-calc totals with selected coupon
-  updateDrawerTotals();
+  const appliedBox = document.getElementById("bestOfferApplied");
+  if (appliedBox) {
+    if (selectedCoupon) {
+      appliedBox.style.display = "block";
+      appliedBox.innerHTML = `🎉 ${selectedCoupon.text} applied`;
+    } else {
+      appliedBox.style.display = "none";
+    }
+  }
+
+  updateDrawerTotals();   // reapply totals with coupon
 }
 
 let isOfferListOpen = false;
@@ -5658,6 +5687,7 @@ function toggleCouponList() {
     isOfferListOpen = true;
   }
 }
+
 
   
 // STEP 1B → Cart items ke image ko restore karne ka helper
@@ -6098,6 +6128,7 @@ function updateDrawerTotals() {
 </script>
 </body>
 </html>
+
 
 
 
