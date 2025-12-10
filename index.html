@@ -721,7 +721,28 @@ style="
 
   
 <button onclick="openCheckout()" class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg"> Checkout </button> </div> 
+!-- ======================================== -->
+<!-- ✅ COUPON LIST OVERLAY (FULL SCREEN)    -->
+<!-- ======================================== -->
+<div id="couponListOverlay" 
+     class="fixed inset-0 bg-black bg-opacity-40 hidden"
+     style="z-index:100000;">
 
+  <!-- Bottom Sheet -->
+  <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl 
+              p-4 h-[75%] overflow-y-auto shadow-lg">
+
+    <div class="flex justify-between items-center mb-3">
+      <h2 class="text-lg font-semibold">Available Coupons</h2>
+      <button onclick="closeCouponList()" class="text-xl">✕</button>
+    </div>
+
+    <div id="couponListContainer">
+      <!-- Coupons will auto-render here -->
+    </div>
+
+  </div>
+</div>
 <button onclick="openCartDrawer()" 
   style="position:absolute; right:160px; top:60px; background:#ff6347; color:white;
   padding:8px 12px; border-radius:6px; border:none;"> View Cart (<span id="cartCount">0</span>) </button>
@@ -5667,36 +5688,51 @@ function getBestOffer(total) {
   return best;
 }
 // STEP 2A – Apply Coupon button (open offer list)
+// STEP 2A – Apply Coupon button (open overlay list)
 async function openCouponList() {
 
-  // ⭐ Ensure latest offers fetched before opening list
+  // ⭐ Always fetch latest offers before show
   if (!window.liveOffers || window.liveOffers.length === 0) {
     await fetchOffersFromBackend();
   }
 
-  const offers = window.liveOffers || [];
-  const listBox = document.getElementById("offerList");
+  const offers  = window.liveOffers || [];
+  const box     = document.getElementById("couponListContainer");
+  const overlay = document.getElementById("couponListOverlay");
 
-  if (!listBox) return;
+  if (!box || !overlay) return;
 
-  listBox.style.display = "block";
+  // Overlay show karo
+  overlay.classList.remove("hidden");
 
+  // Purana data clear
+  box.innerHTML = "";
+
+  // No offers case
   if (offers.length === 0) {
-    listBox.innerHTML = `
-      <div class="p-2 text-gray-500">
+    box.innerHTML = `
+      <div class="p-3 text-gray-500 text-center">
         No offers available
       </div>`;
     return;
   }
 
-  listBox.innerHTML = offers.map(o => `
-    <div class="p-2 border-b cursor-pointer hover:bg-gray-100"
+  // Coupons render in overlay
+  box.innerHTML = offers.map(o => `
+    <div class="p-3 border rounded-lg mb-3 cursor-pointer hover:bg-gray-100"
          onclick="applyCoupon('${o.id}')">
        <div class="font-semibold">${o.text}</div>
        <div class="text-sm text-gray-500">Min: ${fmt(o.min)}</div>
     </div>
   `).join("");
 }
+
+// STEP 2B – Overlay close helper
+function closeCouponList() {
+  const overlay = document.getElementById("couponListOverlay");
+  if (overlay) overlay.classList.add("hidden");
+}
+
 let selectedCoupon = null;
 
 function applyCoupon(couponId) {
@@ -5741,7 +5777,8 @@ function applyCoupon(couponId) {
     appliedBox.style.display = "block";
     appliedBox.innerHTML = `🎉 ${o.text} applied`;
   }
-
+ // coupon apply hote hi overlay band
+  closeCouponList();
   updateDrawerTotals();
 }
 
@@ -6283,6 +6320,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
