@@ -5702,6 +5702,7 @@ function applyCoupon(couponId) {
 
   if (!o) return;
 
+  // calculate subtotal
   const subtotal = getCart().reduce((sum, ci) => {
     const mrp = Number(ci.rate || 0);
     const disc = Number(ci.discPercent || 0);
@@ -5709,25 +5710,28 @@ function applyCoupon(couponId) {
     return sum + (mrp - (mrp * disc / 100)) * qty;
   }, 0);
 
-  // ✨ Minimum order check
+  // ❌ MINIMUM FAIL → RED MESSAGE (and DON’T APPLY)
   if (subtotal < Number(o.min || 0)) {
 
-    showCouponMessage(
-      `⚠ Cannot apply "${o.text}"<br> ` +
-      `Minimum required: ${fmt(o.min)}<br>` +
-      `Your subtotal: ${fmt(subtotal)}`
+    showCouponError(
+      `Cannot apply <b>${o.text}</b><br>
+       Minimum required: ${fmt(o.min)}<br>
+       Your subtotal: ${fmt(subtotal)}`
     );
 
-    // LIST ko collapse nahi karte
+    // list open rehne do
     return;
   }
 
-  // APPLY COUPON
+  // ✔ APPLY COUPON → GREEN SUCCESS BOX
   selectedCoupon = o;
+  showCouponSuccess(`🎉 ${o.text} applied successfully!`);
 
+  // hide list
   const listBox = document.getElementById("offerList");
   if (listBox) listBox.style.display = "none";
 
+  // update applied message at the bottom
   const appliedBox = document.getElementById("bestOfferApplied");
   if (appliedBox) {
     appliedBox.style.display = "block";
@@ -5737,6 +5741,37 @@ function applyCoupon(couponId) {
   updateDrawerTotals();
 }
 
+// 🔴 RED error message
+function showCouponError(msg) {
+  const box = document.getElementById("couponMessage");
+  if (!box) return;
+
+  box.style.display = "block";
+  box.style.background = "#ffefef";
+  box.style.color = "#b30000";
+  box.style.border = "1px solid #ffcccc";
+  box.innerHTML = msg;
+
+  setTimeout(() => {
+    box.style.display = "none";
+  }, 4000);
+}
+
+// 🟢 GREEN success message
+function showCouponSuccess(msg) {
+  const box = document.getElementById("couponMessage");
+  if (!box) return;
+
+  box.style.display = "block";
+  box.style.background = "#ecffec";
+  box.style.color = "#006600";
+  box.style.border = "1px solid #b6ffb6";
+  box.innerHTML = msg;
+
+  setTimeout(() => {
+    box.style.display = "none";
+  }, 4000);
+}
 
 
   
@@ -6244,6 +6279,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
