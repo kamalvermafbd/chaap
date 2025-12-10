@@ -5691,25 +5691,45 @@ let selectedCoupon = null;
 
 function applyCoupon(couponId) {
 
-  const offers = window.liveOffers || [];  // ⭐ backend offers
+  const offers = window.liveOffers || [];
+  const o = offers.find(x => x.id === couponId);
 
-  selectedCoupon = offers.find(o => o.id === couponId) || null;
+  if (!o) return;
 
-  // hide list
+  const subtotal = getCart().reduce((sum, ci) => {
+    const mrp = Number(ci.rate || 0);
+    const disc = Number(ci.discPercent || 0);
+    const qty = Number(ci.qty || 1);
+    return sum + (mrp - (mrp * disc / 100)) * qty;
+  }, 0);
+
+  // Minimum order check
+  if (subtotal < Number(o.min || 0)) {
+
+    alert(
+      `⚠ Cannot apply "${o.text}"\n\n` +
+      `Minimum order required: ${fmt(o.min)}\n` +
+      `Your subtotal: ${fmt(subtotal)}`
+    );
+
+    // DO NOT APPLY — DO NOT CLOSE LIST
+    return;
+  }
+
+  // APPLY COUPON
+  selectedCoupon = o;
+
+  // close list
   const listBox = document.getElementById("offerList");
   if (listBox) listBox.style.display = "none";
 
   const appliedBox = document.getElementById("bestOfferApplied");
   if (appliedBox) {
-    if (selectedCoupon) {
-      appliedBox.style.display = "block";
-      appliedBox.innerHTML = `🎉 ${selectedCoupon.text} applied`;
-    } else {
-      appliedBox.style.display = "none";
-    }
+    appliedBox.style.display = "block";
+    appliedBox.innerHTML = `🎉 ${o.text} applied`;
   }
 
-  updateDrawerTotals();   // reapply totals with coupon
+  updateDrawerTotals();
 }
 
 
@@ -6189,6 +6209,7 @@ function updateDrawerTotals() {
 </script>
 </body>
 </html>
+
 
 
 
