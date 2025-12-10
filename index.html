@@ -5750,7 +5750,7 @@ function applyCoupon(couponId) {
     return sum + (mrp - (mrp * disc / 100)) * qty;
   }, 0);
 
-  // ❌ MINIMUM FAIL → RED MESSAGE (and DON’T APPLY)
+  // ❌ MINIMUM FAIL → RED MESSAGE (NO CLOSE)
   if (subtotal < Number(o.min || 0)) {
 
     showCouponError(
@@ -5759,27 +5759,27 @@ function applyCoupon(couponId) {
        Your subtotal: ${fmt(subtotal)}`
     );
 
-    // list open rehne do
-    return;
+    return; // overlay open rehne do
   }
 
-  // ✔ APPLY COUPON → GREEN SUCCESS BOX
+  // ✔ SUCCESS FULLY APPLIED
   selectedCoupon = o;
   showCouponSuccess(`🎉 ${o.text} applied successfully!`);
 
-  // hide list
-  const listBox = document.getElementById("offerList");
-  if (listBox) listBox.style.display = "none";
-
-  // update applied message at the bottom
+  // show applied message in drawer
   const appliedBox = document.getElementById("bestOfferApplied");
   if (appliedBox) {
     appliedBox.style.display = "block";
     appliedBox.innerHTML = `🎉 ${o.text} applied`;
   }
 
+  // totals refresh
   updateDrawerTotals();
+
+  // ⭐ CLOSE OVERLAY (NEW)
+  closeCouponList();
 }
+
 
 // 🔴 RED error message
 function showCouponError(msg) {
@@ -6319,6 +6319,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
