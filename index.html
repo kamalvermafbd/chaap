@@ -5571,7 +5571,7 @@ if (action === "dec") {
 
 async function fetchOffersFromBackend() {
   try {
-    const res = await fetch(API_URL + "?api=getOffers");
+    const res = await fetch(API_BASE + "?api=getOffers");
     const data = await res.json();
 
     if (data.success && Array.isArray(data.offers)) {
@@ -6197,6 +6197,7 @@ function updateDrawerTotals() {
 </script>
 </body>
 </html>
+
 
 
 
