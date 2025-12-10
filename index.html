@@ -5737,7 +5737,7 @@ function getBestOffer(total) {
 // STEP 2A – Apply Coupon button (open overlay list)
 async function openCouponList() {
 
-  // ⭐ Always fetch latest offers before show
+  // Always fetch latest offers
   if (!window.liveOffers || window.liveOffers.length === 0) {
     await fetchOffersFromBackend();
   }
@@ -5745,17 +5745,18 @@ async function openCouponList() {
   const offers  = window.liveOffers || [];
   const overlay = document.getElementById("couponListOverlay");
   const box     = document.getElementById("couponListContainer");
+  const sheet   = document.getElementById("couponSheet");
 
-  if (!overlay || !box) return;
+  if (!overlay || !box || !sheet) return;
 
-  // ⭐ Overlay show
-  overlay.classList.remove("hidden");
+  // Show overlay
+  overlay.classList.add("active");
   overlay.style.display = "block";
 
-  // Clear old items
+  // Clear old
   box.innerHTML = "";
 
-  // No offers case
+  // No offers
   if (offers.length === 0) {
     box.innerHTML = `
       <div class="p-3 text-gray-500 text-center">
@@ -5764,34 +5765,37 @@ async function openCouponList() {
     return;
   }
 
-  // ⭐ Render coupons inside overlay bottom-sheet
+  // Render list
   box.innerHTML = offers.map(o => `
     <div class="p-3 border rounded-lg mb-3 cursor-pointer hover:bg-gray-100"
          onclick="applyCoupon('${o.id}')">
-       
        <div class="font-semibold">${o.text}</div>
        <div class="text-sm text-gray-500">Min: ${fmt(o.min)}</div>
-
     </div>
   `).join("");
-    document.getElementById("couponSheet").style.transform = "translateY(0)";
+
+  // ⭐ Slide sheet UP
+  sheet.style.transform = "translateY(0)";
 }
 
 
 // STEP 2B – Overlay close helper
 function closeCouponList() {
-  const ov = document.getElementById("couponListOverlay");
-  const sheet = document.getElementById("couponSheet");
+  const overlay = document.getElementById("couponListOverlay");
+  const sheet   = document.getElementById("couponSheet");
 
-  // Slide down
+  if (!overlay || !sheet) return;
+
+  // Slide down first
   sheet.style.transform = "translateY(100%)";
 
   // Hide overlay AFTER animation
   setTimeout(() => {
-    ov.classList.add("hidden");
-    ov.style.display = "none";
+    overlay.classList.remove("active");
+    overlay.style.display = "none";
   }, 250);
 }
+
 
 let selectedCoupon = null;
 
@@ -6380,6 +6384,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
