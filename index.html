@@ -5774,14 +5774,23 @@ async function openCouponList() {
 
     </div>
   `).join("");
+    document.getElementById("couponSheet").style.transform = "translateY(0)";
 }
 
 
 // STEP 2B – Overlay close helper
 function closeCouponList() {
   const ov = document.getElementById("couponListOverlay");
-  ov.classList.add("hidden");
-  ov.style.display = "none";
+  const sheet = document.getElementById("couponSheet");
+
+  // Slide down
+  sheet.style.transform = "translateY(100%)";
+
+  // Hide overlay AFTER animation
+  setTimeout(() => {
+    ov.classList.add("hidden");
+    ov.style.display = "none";
+  }, 250);
 }
 
 let selectedCoupon = null;
@@ -6371,6 +6380,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
