@@ -4955,11 +4955,13 @@ async function openCheckout() {
 }
 
 
-  
-async function openCartDrawer() {
+  async function openCartDrawer() {
 
   // 1) Always get latest cart (master engine)
-  const freshCart = getCart();
+  let freshCart = getCart();
+
+  // ⭐ STEP 1D → Restore missing images
+  freshCart = restoreCartImages(freshCart);
 
   // 2) Sync global
   cart = freshCart;
@@ -4978,6 +4980,7 @@ async function openCartDrawer() {
   try { updateDrawerTotals(); } catch(e){}
   try { updateCartBadge(); } catch(e){}
 }
+
 
 
 function closeCartDrawer() {
@@ -5260,7 +5263,10 @@ function menuPlus_multi(id) {
 
 function loadCartOnStart() {
 
-  const cartArr = getCart();    // master engine getter
+  let cartArr = getCart();   // master engine getter
+
+  // STEP 1C → image restore apply
+  cartArr = restoreCartImages(cartArr);
 
   cart = cartArr;
   window.cart = cartArr;
@@ -5530,6 +5536,40 @@ function getCart() {
   return c;
 }
 
+// STEP 1A → Menu se image fetch karne ka helper
+function getMenuImage(itemId, variantId) {
+  itemId = String(itemId);
+  variantId = String(variantId || "");
+
+  const item = (window.menuItems || []).find(
+    m => String(m.id) === itemId || String(m.itemId) === itemId
+  );
+
+  if (!item) return "";
+
+  // agar multi variant hai aur variant image rakhi hai
+  if (variantId && Array.isArray(item.variants)) {
+    const v = item.variants.find(x => String(x.variantId || x.id) === variantId);
+    if (v && v.image) return v.image;
+  }
+
+  return item.image || "";
+}
+// STEP 1B → Cart items ke image ko restore karne ka helper
+function restoreCartImages(cartArr) {
+  if (!Array.isArray(cartArr)) return [];
+
+  return cartArr.map(ci => {
+    ci = ci || {};
+
+    // Agar image missing hai → getMenuImage() se fetch karo
+    if (!ci.image || String(ci.image).trim() === "") {
+      ci.image = getMenuImage(ci.itemId, ci.variantId) || "";
+    }
+
+    return ci;
+  });
+}
   
 function setCart(updatedCart) {
 
@@ -5890,6 +5930,7 @@ function refreshCheckoutCart() {
 </script>
 </body>
 </html>
+
 
 
 
