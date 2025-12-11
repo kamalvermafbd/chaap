@@ -5687,45 +5687,56 @@ async function openCouponList() {
   const listBox = document.getElementById("offerList");
   const loader  = document.getElementById("offerLoadingText");
 
-  if (!overlay || !listBox || !loader) return;
+  try {
 
-  // ⭐ 1. OVERLAY ON
-  overlay.style.display = "block";
+      if (!overlay || !listBox || !loader) return;
 
-  // ⭐ 2. LIST visible + loader visible
-  listBox.style.display = "block";
-  loader.style.display = "block";
+      // ⭐ 1. OVERLAY ON
+      overlay.style.display = "block";
 
-  // ⭐ 3. PURANA LOGIC — fetch latest offers
-  if (!window.liveOffers || window.liveOffers.length === 0) {
-    await fetchOffersFromBackend();
+      // ⭐ 2. LIST + LOADER ON
+      listBox.style.display = "block";
+      loader.style.display = "block";
+
+      // ⭐ 3. Always fetch latest offers
+      if (!window.liveOffers || window.liveOffers.length === 0) {
+          await fetchOffersFromBackend();
+      }
+
+      const offers = window.liveOffers || [];
+
+      // ⭐ 4. Reset list BUT keep loader inside it
+      listBox.innerHTML = "";
+      listBox.appendChild(loader);
+      loader.style.display = "none";
+
+      // ⭐ 5. No offers
+      if (offers.length === 0) {
+          listBox.innerHTML += `
+            <div class="p-2 text-gray-500 text-center">
+              No offers available
+            </div>`;
+          return;
+      }
+
+      // ⭐ 6. Render offers
+      listBox.innerHTML += offers.map(o => `
+        <div class="p-2 border-b cursor-pointer hover:bg-gray-100"
+             onclick="applyCoupon('${o.id}')">
+           <div class="font-semibold">${o.text}</div>
+           <div class="text-sm text-gray-500">Min: ${fmt(o.min)}</div>
+        </div>
+      `).join("");
+
+  } catch (err) {
+
+      // ⭐ CRITICAL: Auto close overlay on ANY error
+      overlay.style.display = "none";
+
+      console.error("openCouponList ERROR:", err);
   }
-
-  const offers = window.liveOffers || [];
-
-  // ⭐ RESET LIST WITHOUT REMOVING LOADER
-  listBox.innerHTML = "";
-  listBox.appendChild(loader);
-  loader.style.display = "none";
-
-  // ⭐ 5. No offers case
-  if (offers.length === 0) {
-    listBox.innerHTML += `
-      <div class="p-2 text-gray-500 text-center">
-        No offers available
-      </div>`;
-    return;
-  }
-
-  // ⭐ 6. OLD rendering logic — SAME look
-  listBox.innerHTML += offers.map(o => `
-    <div class="p-2 border-b cursor-pointer hover:bg-gray-100"
-         onclick="applyCoupon('${o.id}')">
-       <div class="font-semibold">${o.text}</div>
-       <div class="text-sm text-gray-500">Min: ${fmt(o.min)}</div>
-    </div>
-  `).join("");
 }
+
 
 function closeCouponList() {
   const list = document.getElementById("offerList");
@@ -6324,6 +6335,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
