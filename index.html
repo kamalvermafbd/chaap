@@ -4205,7 +4205,7 @@ async function loginUser() {
     // 3️⃣ NOW do cart merge (AFTER email saved)
     await onUserLogin(mobile);
 //  NOW FETCH SIGNUP DISCOUNT 
-await fetchSignupDiscount(mobile);
+ fetchSignupDiscount(mobile);
 
     // 4️⃣ UI panel updates
     document.getElementById("userInfoBox").style.display = "block";
