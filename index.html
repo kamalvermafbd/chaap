@@ -4194,9 +4194,6 @@ async function loginUser() {
       return;
     }
 
-    // ⭐⭐⭐ NEW — STORE SIGNUP DISCOUNT ⭐⭐⭐
-    window.signupDiscount = Number(res.signupDiscount || 0);
-
 
     // 1️⃣ Save identity FIRST (IMPORTANT)
     localStorage.setItem("userMobile", mobile);
@@ -4207,6 +4204,8 @@ async function loginUser() {
 
     // 3️⃣ NOW do cart merge (AFTER email saved)
     await onUserLogin(mobile);
+//  NOW FETCH SIGNUP DISCOUNT 
+await fetchSignupDiscount(mobile);
 
     // 4️⃣ UI panel updates
     document.getElementById("userInfoBox").style.display = "block";
@@ -6333,6 +6332,20 @@ function updateDrawerTotals() {
   try { updateCartBadge(); } catch(e){}
 }
 
+
+async function fetchSignupDiscount(mobile) {
+  try {
+    let res = await apiPost("checkSignupDiscount", { mobile });
+
+    if (res.success) {
+      window.signupDiscount = Number(res.amount || 0);
+      updateDrawerTotals();  // UI refresh
+    }
+  } catch (e) {
+    console.error("Signup discount fetch error:", e);
+  }
+}
+
 </script>
 <div id="couponAlert"
      style="display:none; position:fixed; bottom:20px; left:50%; 
@@ -6369,6 +6382,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
