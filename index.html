@@ -675,9 +675,11 @@ style="
 <!-- OFFER SECTION (BOTTOM OF DRAWER) -->
   <!-- DARK OVERLAY FOR COUPON MODE -->
 <div id="couponOverlayBG"
+     onclick="closeCouponList()"
      style="position:fixed; inset:0; background:rgba(0,0,0,0.45);
             display:none; z-index:99998;">
 </div>
+
 
 <div id="offerSection" class="p-3 border-t mt-3" style="background:#fff;">
 
@@ -5733,6 +5735,7 @@ function closeCouponList() {
   if (bg) bg.style.display = "none";
 }
 
+
 let selectedCoupon = null;
 
 function applyCoupon(couponId) {
@@ -6321,6 +6324,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
