@@ -6265,7 +6265,8 @@ function updateDrawerTotals() {
     // Logged in user only
     const mobile = localStorage.getItem("mobile");
     if (mobile) {
-      signupDiscount = window.signupDiscount || 0; 
+      signupDiscount = Number(window.signupDiscount || 0);
+ 
       // signupDiscountAmount tum front-end me login ke time set karoge
       // example: window.signupDiscountAmount = 50;
     }
@@ -6368,6 +6369,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
