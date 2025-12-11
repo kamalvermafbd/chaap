@@ -2948,6 +2948,8 @@ const totalAmount = grandTotalFinal;
   // ?? REPLACEMENT (fetch API instead of google.script.run)
   apiPost("placeOrder", orderData)
     .then(res => {
+        window.signupDiscount = Number(res.signupDiscount || 0);
+
       if (res.success) {
         alert(
           `Order placed successfully!\nYour Order Number: ${res.orderNumber}\n\n${res.message}`
@@ -6369,6 +6371,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
