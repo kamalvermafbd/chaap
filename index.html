@@ -5597,6 +5597,16 @@ if (action === "dec") {
   return setCart(cartArr);
 }
 }
+function cleanCartInvalidItems(arr) {
+  return arr.filter(i =>
+    i &&
+    i.itemId && String(i.itemId).trim() !== "" &&
+    i.name && String(i.name).trim() !== "" &&
+    i.unit && String(i.unit).trim() !== "" &&
+    !isNaN(i.rate) &&
+    Number(i.rate) > 0
+  );
+}
 
 async function fetchOffersFromBackend() {
   try {
@@ -5838,7 +5848,8 @@ function restoreCartImages(cartArr) {
 function setCart(updatedCart) {
 
   if (!Array.isArray(updatedCart)) updatedCart = [];
-
+ // ⭐ SAFETY FIREWALL — remove invalid/blank items
+  updatedCart = cleanCartInvalidItems(updatedCart);
   // 1) Update master engine globals
   cart = updatedCart;
   window.cart = updatedCart;
@@ -6323,6 +6334,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
