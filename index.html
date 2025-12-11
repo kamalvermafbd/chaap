@@ -5724,9 +5724,9 @@ async function openCouponList() {
 }
 function closeCouponList() {
   document.getElementById("offerList").style.display = "none";
-  document.getElementById("couponOverlay").style.display = "none";
-
+  document.getElementById("couponOverlay").style.display = "none"; 
 }
+
 
 let selectedCoupon = null;
 
@@ -5753,7 +5753,8 @@ function applyCoupon(couponId) {
        Minimum required: ${fmt(o.min)}<br>
        Your subtotal: ${fmt(subtotal)}`
     );
- document.getElementById("couponOverlayBG").style.display = "none";
+  document.getElementById("couponOverlay").style.display = "none";
+
     // list open rehne do
     return;
   }
@@ -6315,6 +6316,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
