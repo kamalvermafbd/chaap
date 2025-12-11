@@ -673,14 +673,7 @@ style="
 <div id="drawerItemsList"></div>
 
 <!-- OFFER SECTION (BOTTOM OF DRAWER) -->
-  <!-- DARK OVERLAY FOR COUPON MODE -->
-<div id="couponOverlayBG"
-     onclick="closeCouponList()"
-     style="position:fixed; inset:0; background:rgba(0,0,0,0.45);
-            display:none; z-index:99998;">
-</div>
-
-
+  
 <div id="offerSection" class="p-3 border-t mt-3" style="background:#fff;">
 
   <button id="applyCouponBtn"
@@ -5684,67 +5677,57 @@ function getBestOffer(total) {
 // STEP 2A – Apply Coupon button (open offer list)
 async function openCouponList() {
 
-  const overlay = document.getElementById("couponOverlayBG");
   const listBox = document.getElementById("offerList");
   const loader  = document.getElementById("offerLoadingText");
 
   try {
+      if (!listBox || !loader) return;
 
-      if (!overlay || !listBox || !loader) return;
-
-      // ⭐ 1. OVERLAY ON
-      overlay.style.display = "block";
-
-      // ⭐ 2. LIST + LOADER ON
+      // ⭐ 1. SHOW LIST + LOADER
       listBox.style.display = "block";
-      loader.style.display = "block";
+      loader.style.display  = "block";
 
-      // ⭐ 3. Always fetch latest offers
+      // ⭐ 2. Fetch latest offers
       if (!window.liveOffers || window.liveOffers.length === 0) {
           await fetchOffersFromBackend();
       }
 
       const offers = window.liveOffers || [];
 
-      // ⭐ 4. Reset list BUT keep loader inside it
+      // ⭐ 3. Clear list but keep loader in top
       listBox.innerHTML = "";
       listBox.appendChild(loader);
       loader.style.display = "none";
 
-      // ⭐ 5. No offers
+      // ⭐ 4. No offers
       if (offers.length === 0) {
           listBox.innerHTML += `
-            <div class="p-2 text-gray-500 text-center">
-              No offers available
-            </div>`;
+              <div class="p-2 text-gray-500 text-center">
+                No offers available
+              </div>`;
           return;
       }
 
-      // ⭐ 6. Render offers
+      // ⭐ 5. Show offers
       listBox.innerHTML += offers.map(o => `
         <div class="p-2 border-b cursor-pointer hover:bg-gray-100"
              onclick="applyCoupon('${o.id}')">
-           <div class="font-semibold">${o.text}</div>
-           <div class="text-sm text-gray-500">Min: ${fmt(o.min)}</div>
+          <div class="font-semibold">${o.text}</div>
+          <div class="text-sm text-gray-500">Min: ${fmt(o.min)}</div>
         </div>
       `).join("");
 
   } catch (err) {
-
-      // ⭐ CRITICAL: Auto close overlay on ANY error
-      overlay.style.display = "none";
-
       console.error("openCouponList ERROR:", err);
   }
 }
 
-
 function closeCouponList() {
   const list = document.getElementById("offerList");
-  const bg = document.getElementById("couponOverlayBG");
+  const loader = document.getElementById("offerLoadingText");
 
   if (list) list.style.display = "none";
-  if (bg) bg.style.display = "none";
+  if (loader) loader.style.display = "none";
 }
 
 
@@ -6336,6 +6319,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
