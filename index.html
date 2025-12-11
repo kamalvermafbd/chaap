@@ -5748,7 +5748,7 @@ function applyCoupon(couponId) {
     return sum + (mrp - (mrp * disc / 100)) * qty;
   }, 0);
 
-  // ❌ MINIMUM FAIL → RED MESSAGE (and DON’T APPLY)
+  // ❌ MINIMUM FAIL
   if (subtotal < Number(o.min || 0)) {
 
     showCouponError(
@@ -5756,21 +5756,23 @@ function applyCoupon(couponId) {
        Minimum required: ${fmt(o.min)}<br>
        Your subtotal: ${fmt(subtotal)}`
     );
-  document.getElementById("couponOverlay").style.display = "none";
 
-    // list open rehne do
+    // ⛔ Black overlay mat chhoo → hata diya
+    // document.getElementById("couponOverlay").style.display = "none";
+
+    // list open hi rehne do
     return;
   }
 
-  // ✔ APPLY COUPON → GREEN SUCCESS BOX
+  // ✔ APPLY COUPON
   selectedCoupon = o;
   showCouponSuccess(`🎉 ${o.text} applied successfully!`);
 
-  // hide list
+  // hide offer list box
   const listBox = document.getElementById("offerList");
   if (listBox) listBox.style.display = "none";
 
-  // update applied message at the bottom
+  // success message bottom me
   const appliedBox = document.getElementById("bestOfferApplied");
   if (appliedBox) {
     appliedBox.style.display = "block";
@@ -5778,7 +5780,9 @@ function applyCoupon(couponId) {
   }
 
   updateDrawerTotals();
-   closeCouponList();
+
+  // close list fully
+  closeCouponList();
 }
 
 // 🔴 RED error message
@@ -6319,6 +6323,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
