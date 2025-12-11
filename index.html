@@ -673,6 +673,12 @@ style="
 <div id="drawerItemsList"></div>
 
 <!-- OFFER SECTION (BOTTOM OF DRAWER) -->
+  <!-- DARK OVERLAY FOR COUPON MODE -->
+<div id="couponOverlayBG"
+     style="position:fixed; inset:0; background:rgba(0,0,0,0.45);
+            display:none; z-index:99998;">
+</div>
+
 <div id="offerSection" class="p-3 border-t mt-3" style="background:#fff;">
 
   <button id="applyCouponBtn"
@@ -688,6 +694,12 @@ style="
   <div id="offerList"
         class="mt-3 bg-gray-50 p-2 rounded-lg border"
         style="display:none; max-height:220px; overflow:auto;">
+         <!-- 👇 STEP-2 loader added inside offerList -->
+     <div id="offerLoadingText" 
+          style="display:none; padding:10px; text-align:center; color:#666;">
+         Fetching offers, please wait…
+     </div>
+
   </div>
 <div id="couponMessage" 
        style="display:none; margin-top:10px; 
@@ -5669,18 +5681,30 @@ function getBestOffer(total) {
 // STEP 2A – Apply Coupon button (open offer list)
 async function openCouponList() {
 
-  // ⭐ Ensure latest offers fetched before opening list
+  const overlay = document.getElementById("couponOverlayBG");
+  const listBox = document.getElementById("offerList");
+  const loader  = document.getElementById("offerLoadingText");
+
+  if (!overlay || !listBox || !loader) return;
+
+  // ⭐ 1. OVERLAY ON
+  overlay.style.display = "block";
+
+  // ⭐ 2. LIST visible + loader visible
+  listBox.style.display = "block";
+  loader.style.display = "block";
+
+  // ⭐ 3. PURANA LOGIC — fetch latest offers
   if (!window.liveOffers || window.liveOffers.length === 0) {
     await fetchOffersFromBackend();
   }
 
   const offers = window.liveOffers || [];
-  const listBox = document.getElementById("offerList");
 
-  if (!listBox) return;
+  // ⭐ 4. Loader hide once data loaded
+  loader.style.display = "none";
 
-  listBox.style.display = "block";
-
+  // ⭐ 5. No offers case (same as old)
   if (offers.length === 0) {
     listBox.innerHTML = `
       <div class="p-2 text-gray-500">
@@ -5689,6 +5713,7 @@ async function openCouponList() {
     return;
   }
 
+  // ⭐ 6. OLD rendering logic — SAME look
   listBox.innerHTML = offers.map(o => `
     <div class="p-2 border-b cursor-pointer hover:bg-gray-100"
          onclick="applyCoupon('${o.id}')">
@@ -5697,6 +5722,11 @@ async function openCouponList() {
     </div>
   `).join("");
 }
+function closeCouponList() {
+  document.getElementById("offerList").style.display = "none";
+  document.getElementById("couponOverlayBG").style.display = "none";
+}
+
 let selectedCoupon = null;
 
 function applyCoupon(couponId) {
@@ -6283,6 +6313,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
