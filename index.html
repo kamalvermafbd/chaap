@@ -6259,17 +6259,13 @@ function updateDrawerTotals() {
   // ⭐⭐ 3) SIGNUP DISCOUNT APPLY (UI SIDE)
   // =====================================================
   let signupDiscount = 0;
-
-  try {
-    // Logged in user only
-    const mobile = localStorage.getItem("mobile");
+  
+try {
+    const mobile = localStorage.getItem("userMobile");
     if (mobile) {
       signupDiscount = Number(window.signupDiscount || 0);
- 
-      // signupDiscountAmount tum front-end me login ke time set karoge
-      // example: window.signupDiscountAmount = 50;
     }
-  } catch (e) {}
+} catch (e) {}
 
 
   // Reduce payable
@@ -6382,6 +6378,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
