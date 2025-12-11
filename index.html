@@ -5752,7 +5752,7 @@ function applyCoupon(couponId) {
        Minimum required: ${fmt(o.min)}<br>
        Your subtotal: ${fmt(subtotal)}`
     );
-
+ document.getElementById("couponOverlayBG").style.display = "none";
     // list open rehne do
     return;
   }
@@ -5773,6 +5773,7 @@ function applyCoupon(couponId) {
   }
 
   updateDrawerTotals();
+   closeCouponList();
 }
 
 // 🔴 RED error message
@@ -6313,6 +6314,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
