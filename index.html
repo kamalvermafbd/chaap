@@ -4186,47 +4186,49 @@ async function loginUser() {
   lockLoginForm(); // overlay ON
 
   apiPost("login", { mobile, password })
-  .then(async res => {   // <-- keep async
+    .then(async res => {
 
-    if (!res.success) {
-      unlockLoginForm();   // fail case → overlay off
-      alert(res.message || "Login failed.");
-      return;
-    }
+      if (!res.success) {
+        unlockLoginForm();
+        alert(res.message || "Login failed.");
+        return;
+      }
 
+      // 1️⃣ Save identity FIRST (IMPORTANT)
+      localStorage.setItem("userMobile", mobile);
+      localStorage.setItem("userEmail", res.email || "");
 
-    // 1️⃣ Save identity FIRST (IMPORTANT)
-    localStorage.setItem("userMobile", mobile);
-    localStorage.setItem("userEmail", res.email || "");
+      // 2️⃣ Update UI email immediately
+      document.getElementById("loggedEmail").innerText = res.email || "";
 
-    // 2️⃣ Update UI email immediately
-    document.getElementById("loggedEmail").innerText = res.email || "";
+      // 3️⃣ NOW do cart merge (AFTER email saved)
+      await onUserLogin(mobile);
 
-    // 3️⃣ NOW do cart merge (AFTER email saved)
-    await onUserLogin(mobile);
-//  NOW FETCH SIGNUP DISCOUNT 
- fetchSignupDiscount(mobile);
+      // ⭐ Fetch Signup Discount (NEW)
+      fetchSignupDiscount(mobile);
 
-    // 4️⃣ UI panel updates
-    document.getElementById("userInfoBox").style.display = "block";
-    document.querySelector("button[onclick='openLogin()']").style.display = "none";
-    document.querySelector("button[onclick='openSignup()']").style.display = "none";
-    document.getElementById("signupLabelBox").style.display = "none";
-    document.getElementById("logoutBtn").style.display = "inline-block";
-    document.getElementById("hamburgerBtn").style.display = "block";
-    document.getElementById("leftNav").style.display = "block";
+      // 4️⃣ UI panel updates
+      document.getElementById("userInfoBox").style.display = "block";
+      document.querySelector("button[onclick='openLogin()']").style.display = "none";
+      document.querySelector("button[onclick='openSignup()']").style.display = "none";
+      document.getElementById("signupLabelBox").style.display = "none";
+      document.getElementById("logoutBtn").style.display = "inline-block";
+      document.getElementById("hamburgerBtn").style.display = "block";
+      document.getElementById("leftNav").style.display = "block";
 
-    // close modal with slight delay
-    setTimeout(() => {
-      closeLogin();
-      unlockLoginForm();   
-    }, 50);
+      // close modal with slight delay
+      setTimeout(() => {
+        closeLogin();
+        unlockLoginForm();
+      }, 50);
 
-  })
-  .catch(err => {
-    unlockLoginForm();  // error → overlay off
-    alert("Login error: " + err.message);
-  });
+    })
+    .catch(err => {
+      unlockLoginForm();
+      alert("Login error: " + err.message);
+    });
+}
+
 
   function openMenuPageProperly(el) {
   activateMenu(el);
@@ -6378,6 +6380,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
