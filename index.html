@@ -6195,6 +6195,7 @@ function updateDrawerTotals() {
 
   subtotal = Number(subtotal.toFixed(2));
 
+
   // =====================================================
   // ========== 2) COUPON & OFFER LOGIC ==================
   // =====================================================
@@ -6222,7 +6223,7 @@ function updateDrawerTotals() {
         appliedOfferText = `🎁 ${o.text} applied`;
 
       } else {
-        selectedCoupon = null; // subtotal kam hua → remove
+        selectedCoupon = null;
       }
     }
   }
@@ -6237,6 +6238,7 @@ function updateDrawerTotals() {
     }
   }
 
+
   // Update Offer Message Box
   const appliedBox = document.getElementById("bestOfferApplied");
   if (appliedBox) {
@@ -6248,13 +6250,37 @@ function updateDrawerTotals() {
     }
   }
 
+
   // ========== Subtotal after offer ==========
   let payable = subtotal - offerDiscount;
   if (payable < 0) payable = 0;
   payable = Number(payable.toFixed(2));
 
+
   // =====================================================
-  // ========== 3) TAX + SERVICE CHARGE ==================
+  // ⭐⭐ 3) SIGNUP DISCOUNT APPLY (UI SIDE)
+  // =====================================================
+  let signupDiscount = 0;
+
+  try {
+    // Logged in user only
+    const mobile = localStorage.getItem("mobile");
+    if (mobile) {
+      signupDiscount = window.signupDiscountAmount || 0; 
+      // signupDiscountAmount tum front-end me login ke time set karoge
+      // example: window.signupDiscountAmount = 50;
+    }
+  } catch (e) {}
+
+
+  // Reduce payable
+  payable = payable - signupDiscount;
+  if (payable < 0) payable = 0;
+  payable = Number(payable.toFixed(2));
+
+
+  // =====================================================
+  // ========== 4) TAX + SERVICE CHARGE ==================
   // =====================================================
   const t = restaurantTax || {};
 
@@ -6278,6 +6304,7 @@ function updateDrawerTotals() {
   igstAmt     = Number(igstAmt.toFixed(2));
   grandTotal  = Number(grandTotal.toFixed(2));
 
+
   // ========== UPDATE UI ==========
   const totalEl = document.getElementById("drawerTotalAmount");
   if (totalEl) totalEl.textContent = fmt(subtotal);
@@ -6286,11 +6313,18 @@ function updateDrawerTotals() {
   if (taxBox) {
     taxBox.innerHTML = `
       <div class="text-right text-gray-700">
+
         <div>Offer Discount: - ${fmt(offerDiscount)}</div>
+
+        ${signupDiscount > 0 
+          ? `<div>Signup Discount: - ${fmt(signupDiscount)}</div>`
+          : ``}
+
         <div>Service Charge: ${fmt(serviceAmt)}</div>
         <div>CGST: ${fmt(cgstAmt)}</div>
         <div>SGST: ${fmt(sgstAmt)}</div>
         <div>IGST: ${fmt(igstAmt)}</div>
+        
         <div class="font-bold text-lg mt-1">Grand Total: ${fmt(grandTotal)}</div>
       </div>
     `;
@@ -6298,6 +6332,7 @@ function updateDrawerTotals() {
 
   try { updateCartBadge(); } catch(e){}
 }
+
 </script>
 <div id="couponAlert"
      style="display:none; position:fixed; bottom:20px; left:50%; 
@@ -6334,6 +6369,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
