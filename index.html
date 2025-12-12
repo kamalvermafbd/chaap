@@ -2863,7 +2863,7 @@ let lastLookupOrderType = "";
 
 }
 
- function placeOrder() {
+function placeOrder() {
   if (window._orderLock) return;
   window._orderLock = true;
 
@@ -2886,23 +2886,24 @@ let lastLookupOrderType = "";
   // ⭐ USE DRAWER TOTALS ONLY
   const dt = window._drawerTotals || {};
 
-  let baseTotal            = dt.baseTotal || 0;
-  let offerDisc            = dt.offerDiscount || 0;
- let signupDisc = Number(dt.signupDiscount);
-if (isNaN(signupDisc)) signupDisc = 0;
+  let baseTotal = Number(dt.baseTotal || 0);
+  let offerDisc = Number(dt.offerDiscount || 0);
 
-  let payableAfterDiscount = dt.payableAfterDiscount || 0;
+  let signupDisc = Number(dt.signupDiscount);
+  if (isNaN(signupDisc)) signupDisc = 0;
 
-  let serviceAmt           = dt.serviceAmt || 0;
-  let taxableAmount        = dt.taxableAmount || 0;
-  let cgstAmt              = dt.cgstAmt || 0;
-  let sgstAmt              = dt.sgstAmt || 0;
-  let igstAmt              = dt.igstAmt || 0;
-  let grandTotalFinal      = dt.grandTotal || 0;
+  let payableAfterDiscount = Number(dt.payableAfterDiscount || 0);
+
+  let serviceAmt      = Number(dt.serviceAmt || 0);
+  let taxableAmount   = Number(dt.taxableAmount || 0);
+  let cgstAmt         = Number(dt.cgstAmt || 0);
+  let sgstAmt         = Number(dt.sgstAmt || 0);
+  let igstAmt         = Number(dt.igstAmt || 0);
+  let grandTotalFinal = Number(dt.grandTotal || 0);
 
   const totalAmount = grandTotalFinal;
 
-  // ⭐ Build order object to send
+  // ⭐ Build order object
   const orderData = {
     customerName,
     email,
@@ -2918,6 +2919,10 @@ if (isNaN(signupDisc)) signupDisc = 0;
     sgstAmt,
     igstAmt,
     grandTotal: grandTotalFinal,
+
+    offerDiscount: offerDisc,
+    signupDiscount: signupDisc,
+    payableAfterDiscount: payableAfterDiscount,
 
     paymentMethod
   };
@@ -2941,7 +2946,6 @@ if (isNaN(signupDisc)) signupDisc = 0;
   overlay.innerText = "Processing your order... Please wait...";
   overlay.style.display = "flex";
 
-  // Disable fields
   document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
     .forEach(el => el.disabled = true);
 
@@ -2958,7 +2962,7 @@ if (isNaN(signupDisc)) signupDisc = 0;
         cart = [];
         localStorage.removeItem("cart");
         renderCart();
-        restoreMenuQuantities(); 
+        restoreMenuQuantities();
         closeCheckout();
       } else {
         alert(res.message || "Order failed.");
@@ -2979,6 +2983,7 @@ if (isNaN(signupDisc)) signupDisc = 0;
 
   window._orderLock = false;
 }
+
 
 function filterMenu() {
   const text = document.getElementById("menuSearch").value.toLowerCase();
@@ -6559,6 +6564,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
