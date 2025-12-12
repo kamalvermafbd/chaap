@@ -1171,11 +1171,14 @@ style="
 <div class="mt-3 grid grid-cols-2 gap-3">
 
   <!-- Place Order (LEFT) -->
-  <button type="submit"
-    class="w-full py-2.5 rounded-xl text-sm font-semibold
-           bg-orange-600 hover:bg-orange-700 text-white">
-    Place Order
-  </button>
+ <button
+  type="button"
+  onclick="placeOrder()"
+  class="w-full py-2.5 rounded-xl text-sm font-semibold
+         bg-orange-600 hover:bg-orange-700 text-white">
+  Place Order
+</button>
+
 
   <!-- Cancel (RIGHT - matching size & theme) -->
   <button type="button" onclick="closeCheckout()"
@@ -6527,6 +6530,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
