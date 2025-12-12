@@ -5025,7 +5025,6 @@ async function openCheckout() {
   document.getElementById("checkoutModal").style.display = "flex";
 }
 
-
 async function openCartDrawer() {
 
   //  OPEN DRAWER INSTANTLY (NO DELAY)
@@ -5051,20 +5050,28 @@ async function openCartDrawer() {
   // 3) Rebuild drawer UI
   openCartPanel(freshCart);
   renderCart();
-    // ----------------------------------------
-  // ⭐ G2: RESTORE COUPON AFTER REFRESH
+
   // ----------------------------------------
-  if (alreadyAppliedCouponId) {
-    const o = (window.liveOffers || []).find(x => x.id === alreadyAppliedCouponId);
-    if (o) selectedCoupon = o;   // silently attach
+  // ⭐ FIXED RESTORE: coupon should restore ONLY if valid
+  // ----------------------------------------
+  if (alreadyAppliedCouponId && (!selectedCoupon || selectedCoupon.id !== alreadyAppliedCouponId)) {
+
+    const offers = window.liveOffers || [];
+    const found = offers.find(x => x.id === alreadyAppliedCouponId);
+
+    if (found) {
+      selectedCoupon = found;
+    } else {
+      // coupon expired or removed → reset
+      alreadyAppliedCouponId = "";
+      selectedCoupon = null;
+    }
   }
 
   // 4) Update totals + badge
   try { updateDrawerTotals(); } catch(e){}
   try { updateCartBadge(); } catch(e){}
 }
-
-
 
 
 function closeCartDrawer() {
@@ -5774,55 +5781,21 @@ function applyCoupon(couponId) {
        Your subtotal: ${fmt(subtotal)}`
     );
 
-    // ⛔ Black overlay mat chhoo → hata diya
-    // document.getElementById("couponOverlay").style.display = "none";
-
-    // list open hi rehne do
     return;
   }
 
-  // ✔ APPLY COUPON
-  selectedCoupon = o;
-  showCouponSuccess(`🎉 ${o.text} applied successfully!`);
-function applyCoupon(couponId) {
-
-  const offers = window.liveOffers || [];
-  const o = offers.find(x => x.id === couponId);
-
-  if (!o) return;
-
-  // calculate subtotal
-  const subtotal = getCart().reduce((sum, ci) => {
-    const mrp = Number(ci.rate || 0);
-    const disc = Number(ci.discPercent || 0);
-    const qty = Number(ci.qty || 1);
-    return sum + (mrp - (mrp * disc / 100)) * qty;
-  }, 0);
-
-  // ❌ MINIMUM FAIL
-  if (subtotal < Number(o.min || 0)) {
-
-    showCouponError(
-      `Cannot apply <b>${o.text}</b><br>
-       Minimum required: ${fmt(o.min)}<br>
-       Your subtotal: ${fmt(subtotal)}`
-    );
-
-    return;
-  }
-
-  // ⭐ VERY IMPORTANT — Save applied coupon ID
+  // ⭐ VERY IMPORTANT — Save applied coupon ID for restore
   alreadyAppliedCouponId = couponId;
 
   // ✔ APPLY COUPON
   selectedCoupon = o;
   showCouponSuccess(`🎉 ${o.text} applied successfully!`);
 
-  // hide offer list box
+  // hide offer list
   const listBox = document.getElementById("offerList");
   if (listBox) listBox.style.display = "none";
 
-  // success message bottom me
+  // show applied message
   const appliedBox = document.getElementById("bestOfferApplied");
   if (appliedBox) {
     appliedBox.style.display = "block";
@@ -5834,24 +5807,6 @@ function applyCoupon(couponId) {
   // close list fully
   closeCouponList();
 }
-
-  // hide offer list box
-  const listBox = document.getElementById("offerList");
-  if (listBox) listBox.style.display = "none";
-
-  // success message bottom me
-  const appliedBox = document.getElementById("bestOfferApplied");
-  if (appliedBox) {
-    appliedBox.style.display = "block";
-    appliedBox.innerHTML = `🎉 ${o.text} applied`;
-  }
-
-  updateDrawerTotals();
-
-  // close list fully
-  closeCouponList();
-}
-
 // 🔴 RED error message
 function showCouponError(msg) {
   const box = document.getElementById("couponMessage");
@@ -6442,6 +6397,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
