@@ -6385,17 +6385,14 @@ if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type 
   // =====================================================
   // ⭐⭐ 3) SIGNUP DISCOUNT APPLY (UI SIDE)
   // =====================================================
-  let signupDiscount = 0;
-  try {
-    const mobile = localStorage.getItem("userMobile");
-    if (mobile) {
-      signupDiscount = Number(window.signupDiscount || 0);
-    }
-  } catch (e) {}
+// ⭐ SIGNUP DISCOUNT (persistent)
+let signupDisc = Number(localStorage.getItem("signupDiscount") || 0);
 
-  payable = payable - signupDiscount;
-  if (payable < 0) payable = 0;
-  payable = Number(payable.toFixed(2));
+// apply signup discount
+payable = payable - signupDisc;
+if (payable < 0) payable = 0;
+payable = Number(payable.toFixed(2));
+
 
 
   // =====================================================
@@ -6435,9 +6432,10 @@ if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type 
 
         <div>Offer Discount: - ${fmt(offerDiscount)}</div>
 
-        ${signupDiscount > 0 
-          ? `<div>Signup Discount: - ${fmt(signupDiscount)}</div>`
-          : ``}
+${signupDisc > 0 
+  ? `<div>Signup Discount: - ${fmt(signupDisc)}</div>`
+  : ``}
+
 
         <div>Service Charge: ${fmt(serviceAmt)}</div>
         <div>CGST: ${fmt(cgstAmt)}</div>
@@ -6501,6 +6499,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
