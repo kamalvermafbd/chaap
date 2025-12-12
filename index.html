@@ -6455,7 +6455,7 @@ if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type 
     <div class="flex justify-between"><span>IGST (${t.igstPercent}%): </span><span>${fmt(igstAmt)}</span></div>
 
         
-        <div class="font-bold text-lg mt-1">Grand Total: ${fmt(grandTotal)}</div>
+        <div class="flex justify-between"><span>Grand Total: ${fmt(grandTotal)}</span></div>
       </div>
     `;
   }
@@ -6512,6 +6512,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
