@@ -2862,7 +2862,6 @@ let lastLookupOrderType = "";
     });
 
 }
-
 function placeOrder() {
   if (window._orderLock) return;
   window._orderLock = true;
@@ -2876,14 +2875,15 @@ function placeOrder() {
 
   if (!/^[0-9]{10}$/.test(mobile)) {
     alert("Enter a valid 10-digit mobile number");
+    window._orderLock = false;
     return;
   }
   if (orderType === "Home Delivery" && !address) {
     alert("Please enter delivery address");
+    window._orderLock = false;
     return;
   }
 
-  // ⭐ USE DRAWER TOTALS ONLY
   const dt = window._drawerTotals || {};
 
   let baseTotal = Number(dt.baseTotal || 0);
@@ -2901,9 +2901,6 @@ function placeOrder() {
   let igstAmt         = Number(dt.igstAmt || 0);
   let grandTotalFinal = Number(dt.grandTotal || 0);
 
-  const totalAmount = grandTotalFinal;
-
-  // ⭐ Build order object
   const orderData = {
     customerName,
     email,
@@ -2922,18 +2919,13 @@ function placeOrder() {
 
     offerDiscount: offerDisc,
     signupDiscount: signupDisc,
-    payableAfterDiscount: payableAfterDiscount,
+    payableAfterDiscount,
 
     paymentMethod
   };
 
-  // ⭐ Coupon mapping FIXED
-  orderData.couponId =
-    selectedCoupon ? selectedCoupon.id : "";
-
-  orderData.couponType =
-    selectedCoupon ? selectedCoupon.type : "";
-
+  orderData.couponId = selectedCoupon ? selectedCoupon.id : "";
+  orderData.couponType = selectedCoupon ? selectedCoupon.type : "";
   orderData.couponDiscount =
     selectedCoupon
       ? (selectedCoupon.flat
@@ -2941,7 +2933,6 @@ function placeOrder() {
           : ((selectedCoupon.discount / 100) * baseTotal))
       : 0;
 
-  // ⭐ Show overlay
   const overlay = document.getElementById('loadingOverlay');
   overlay.innerText = "Processing your order... Please wait...";
   overlay.style.display = "flex";
@@ -2949,9 +2940,9 @@ function placeOrder() {
   document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
     .forEach(el => el.disabled = true);
 
-  // ⭐ API CALL
   apiPost("placeOrder", orderData)
     .then(res => {
+
       window.signupDiscount = Number(res.signupDiscount || 0);
 
       if (res.success) {
@@ -2971,6 +2962,8 @@ function placeOrder() {
       overlay.style.display = "none";
       document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
         .forEach(el => el.disabled = false);
+
+      window._orderLock = false;   // ✅ FIX: Yaha rakho
     })
     .catch(err => {
       console.error("Order error:", err);
@@ -2979,9 +2972,10 @@ function placeOrder() {
       overlay.style.display = "none";
       document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
         .forEach(el => el.disabled = false);
+
+      window._orderLock = false;   // ✅ FIX: Yaha bhi rakho
     });
 
-  window._orderLock = false;
 }
 
 
@@ -6564,6 +6558,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
