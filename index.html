@@ -5807,6 +5807,27 @@ function applyCoupon(couponId) {
   // close list fully
   closeCouponList();
 }
+  // ============================
+// G3: Auto-remove coupon on qty change
+// ============================
+function removeCouponIfNeeded() {
+  if (!selectedCoupon) return;
+
+  const type = (selectedCoupon.type || "").toLowerCase();
+
+  if (type === "onetime") {
+    selectedCoupon = null;
+    alreadyAppliedCouponId = "";
+
+    const appliedBox = document.getElementById("bestOfferApplied");
+    if (appliedBox) appliedBox.style.display = "none";
+
+    showCouponError("Quantity changed — please apply coupon again.");
+
+    updateDrawerTotals();
+  }
+}
+
 // 🔴 RED error message
 function showCouponError(msg) {
   const box = document.getElementById("couponMessage");
@@ -6397,6 +6418,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
