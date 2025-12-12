@@ -1247,8 +1247,9 @@ document.addEventListener("DOMContentLoaded", function() {
         s.setAttribute("value", "");
     });
 });
+// ⭐ Restore signup discount on refresh (GLOBAL)
+window.signupDiscount = Number(localStorage.getItem("signupDiscount") || 0);
 
-window.cartReady = false;
 // === GLOBAL CURRENCY SETUP ===
 window.CURRENCY = window.CURRENCY || "₹";
 
@@ -3320,9 +3321,6 @@ function filterMenu() {
     </button>
 
     
-window.signupDiscount = Number(localStorage.getItem("signupDiscount") || 0);
-
-
   </div>
 </div>
 
@@ -4218,20 +4216,26 @@ async function loginUser() {
         return;
       }
 
-      // 1️⃣ Save identity FIRST (IMPORTANT)
+      // 1️⃣ Save user identity
       localStorage.setItem("userMobile", mobile);
       localStorage.setItem("userEmail", res.email || "");
 
-      // 2️⃣ Update UI email immediately
+      // 2️⃣ Save SIGNUP DISCOUNT immediately (most important)
+      const sd = Number(res.signupDiscount || 0);
+      localStorage.setItem("signupDiscount", sd);
+      window.signupDiscount = sd;
+      console.log("🔥 Signup Discount Saved:", sd);
+
+      // 3️⃣ Update UI email
       document.getElementById("loggedEmail").innerText = res.email || "";
 
-      // 3️⃣ NOW do cart merge (AFTER email saved)
+      // 4️⃣ Merge guest cart → backend cart
       await onUserLogin(mobile);
 
-      // ⭐ Fetch Signup Discount (NEW)
-      fetchSignupDiscount(mobile);
+      // 5️⃣ Recalculate drawer totals so discount shows instantly
+      try { updateDrawerTotals(); } catch(e){ console.error(e); }
 
-      // 4️⃣ UI panel updates
+      // 6️⃣ Update UI panels
       document.getElementById("userInfoBox").style.display = "block";
       document.querySelector("button[onclick='openLogin()']").style.display = "none";
       document.querySelector("button[onclick='openSignup()']").style.display = "none";
@@ -4240,7 +4244,7 @@ async function loginUser() {
       document.getElementById("hamburgerBtn").style.display = "block";
       document.getElementById("leftNav").style.display = "block";
 
-      // close modal with slight delay
+      // 7️⃣ Close modal
       setTimeout(() => {
         closeLogin();
         unlockLoginForm();
@@ -6505,6 +6509,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
