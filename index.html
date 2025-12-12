@@ -6439,23 +6439,48 @@ if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type 
   const taxBox = document.getElementById("taxSummary");
   if (taxBox) {
     taxBox.innerHTML = `
-      <div class="text-right text-gray-700">
+  <div class="text-right text-gray-700 space-y-1.5">
 
-        <div>Offer Discount: - ${fmt(offerDiscount)}</div>
+    <div class="flex justify-between">
+      <span>Offer Discount:</span>
+      <span>- ${fmt(offerDiscount)}</span>
+    </div>
 
-        ${signupDiscount > 0 
-          ? `<div>Signup Discount: - ${fmt(signupDiscount)}</div>`
-          : ``}
+    ${signupDisc > 0 
+      ? `<div class="flex justify-between">
+           <span>Signup Discount:</span>
+           <span>- ${fmt(signupDisc)}</span>
+         </div>`
+      : ``}
 
-        <div>Service Charge (${t.servicePercent}%): ${fmt(serviceAmt)}</div>
-    <div>CGST (${t.cgstPercent}%): ${fmt(cgstAmt)}</div>
-    <div>SGST (${t.sgstPercent}%): ${fmt(sgstAmt)}</div>
-    <div>IGST (${t.igstPercent}%): ${fmt(igstAmt)}</div>
+    <div class="flex justify-between">
+      <span>Service Charge (${t.servicePercent}%):</span>
+      <span>${fmt(serviceAmt)}</span>
+    </div>
 
-        
-        <div class="font-bold text-lg mt-1">Grand Total: ${fmt(grandTotal)}</div>
-      </div>
-    `;
+    <div class="flex justify-between">
+      <span>CGST (${t.cgstPercent}%):</span>
+      <span>${fmt(cgstAmt)}</span>
+    </div>
+
+    <div class="flex justify-between">
+      <span>SGST (${t.sgstPercent}%):</span>
+      <span>${fmt(sgstAmt)}</span>
+    </div>
+
+    <div class="flex justify-between">
+      <span>IGST (${t.igstPercent}%):</span>
+      <span>${fmt(igstAmt)}</span>
+    </div>
+
+    <div class="flex justify-between font-bold text-lg pt-2 border-t">
+      <span>Grand Total:</span>
+      <span>${fmt(grandTotal)}</span>
+    </div>
+
+  </div>
+`;
+
   }
 
   try { updateCartBadge(); } catch(e){}
@@ -6510,6 +6535,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
