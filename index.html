@@ -2142,6 +2142,21 @@ async function updateQty(index, newQty) {
   newQty = Number(newQty);
   if (isNaN(newQty) || newQty < 1) newQty = 1;
 
+  // ⭐ G3: REMOVE COUPON IF QTY CHANGES (only for onetime coupons)
+  if (selectedCoupon && selectedCoupon.type === "onetime") {
+
+      // remove coupon
+      selectedCoupon = null;
+      alreadyAppliedCouponId = "";
+
+      // show message to user
+      showCouponError("Coupon removed because cart quantity changed. Please apply again.");
+
+      // hide coupon applied box
+      const appliedBox = document.getElementById("bestOfferApplied");
+      if (appliedBox) appliedBox.style.display = "none";
+  }
+
   // 2 — Update cart safely
   cart[index].qty = newQty;
 
@@ -2149,7 +2164,7 @@ async function updateQty(index, newQty) {
   if (!isLoggedIn()) {
     localStorage.setItem("guestCart", JSON.stringify(cart));
   } else {
-    
+    // logged-in → backend sync handled below
   }
 
   // 4 — Re-render cart instantly (no delay, no flicker)
@@ -2160,8 +2175,6 @@ async function updateQty(index, newQty) {
 
   await saveCartToBackend();
 }
-
-
 
     
 function loadPrimaryAddress() {
@@ -5068,6 +5081,24 @@ async function openCartDrawer() {
     }
   }
 
+  // ----------------------------------------
+// ⭐ G4: REVALIDATE COUPON on drawer open
+// ----------------------------------------
+if (selectedCoupon && selectedCoupon.type === "onetime") {
+
+    const subtotal = cart.reduce((sum, ci) => {
+        const mrp = Number(ci.rate || 0);
+        const disc = Number(ci.discPercent || 0);
+        const qty  = Number(ci.qty || 1);
+        return sum + (mrp - (mrp * disc / 100)) * qty;
+    }, 0);
+
+    if (subtotal < Number(selectedCoupon.min || 0)) {
+        selectedCoupon = null;
+        alreadyAppliedCouponId = "";
+        showCouponError("Coupon removed because cart value changed.");
+    }
+}
   // 4) Update totals + badge
   try { updateDrawerTotals(); } catch(e){}
   try { updateCartBadge(); } catch(e){}
@@ -6236,6 +6267,20 @@ function updateDrawerTotals() {
   });
 
   subtotal = Number(subtotal.toFixed(2));
+  // ----------------------------------------
+// ⭐ G4: REVALIDATE COUPON on totals update
+// ----------------------------------------
+if (selectedCoupon && selectedCoupon.type === "onetime") {
+
+    const min = Number(selectedCoupon.min || 0);
+
+    if (subtotal < min) {
+        selectedCoupon = null;
+        alreadyAppliedCouponId = "";
+        showCouponError("Coupon removed due to quantity/value change.");
+    }
+}
+
 
   // =====================================================
   // ⭐⭐ RESTORE COUPON ON REFRESH (MAIN FIX)
@@ -6428,6 +6473,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
