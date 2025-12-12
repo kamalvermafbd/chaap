@@ -5659,14 +5659,32 @@ function cleanCartInvalidItems(arr) {
     Number(i.rate) > 0
   );
 }
+function getUserMobile() {
+  return localStorage.getItem("mobile") || "";
+}
+
+function getCartSubtotal() {
+  let subtotal = 0;
+  cart.forEach(ci => {
+    const rate = Number(ci.rate || 0);
+    const disc = Number(ci.discPercent || 0);
+    const qty = Number(ci.qty || 1);
+    subtotal += (rate - (rate * disc / 100)) * qty;
+  });
+  return subtotal;
+}
 
 async function fetchOffersFromBackend() {
   try {
-    const res = await fetch(API_BASE + "?api=getOffers");
+    const mobile = isLoggedIn() ? getUserMobile() : "";
+    const cartTotal = getCartSubtotal();  // ⭐ MIN is checked on backend also
+
+    const res = await fetch(API_BASE + "?api=getOffers&mobile=" + mobile + "&cartTotal=" + cartTotal);
+
     const data = await res.json();
 
     if (data.success && Array.isArray(data.offers)) {
-      window.liveOffers = data.offers;   // store globally
+      window.liveOffers = data.offers;
       return data.offers;
     }
   } catch (err) {
@@ -6511,6 +6529,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
