@@ -6447,10 +6447,11 @@ if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type 
           ? `<div>Signup Discount: - ${fmt(signupDiscount)}</div>`
           : ``}
 
-        <div>Service Charge: ${fmt(serviceAmt)}</div>
-        <div>CGST: ${fmt(cgstAmt)}</div>
-        <div>SGST: ${fmt(sgstAmt)}</div>
-        <div>IGST: ${fmt(igstAmt)}</div>
+        <div>Service Charge (${t.servicePercent}%): ${fmt(serviceAmt)}</div>
+    <div>CGST (${t.cgstPercent}%): ${fmt(cgstAmt)}</div>
+    <div>SGST (${t.sgstPercent}%): ${fmt(sgstAmt)}</div>
+    <div>IGST (${t.igstPercent}%): ${fmt(igstAmt)}</div>
+
         
         <div class="font-bold text-lg mt-1">Grand Total: ${fmt(grandTotal)}</div>
       </div>
@@ -6509,6 +6510,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
