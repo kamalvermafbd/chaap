@@ -2875,12 +2875,12 @@ function placeOrder() {
 
   if (!/^[0-9]{10}$/.test(mobile)) {
     alert("Enter a valid 10-digit mobile number");
-    window._orderLock = false;   // ⭐ IMPORTANT
+    window._orderLock = false;
     return;
   }
   if (orderType === "Home Delivery" && !address) {
     alert("Please enter delivery address");
-    window._orderLock = false;   // ⭐ IMPORTANT
+    window._orderLock = false;
     return;
   }
 
@@ -2888,8 +2888,7 @@ function placeOrder() {
 
   let baseTotal = Number(dt.baseTotal || 0);
   let offerDisc = Number(dt.offerDiscount || 0);
-  let signupDisc = Number(dt.signupDiscount);
-  if (isNaN(signupDisc)) signupDisc = 0;
+  let signupDisc = Number(dt.signupDiscount || 0);
   let payableAfterDiscount = Number(dt.payableAfterDiscount || 0);
 
   let serviceAmt      = Number(dt.serviceAmt || 0);
@@ -2908,6 +2907,10 @@ function placeOrder() {
     cartItems: cart,
 
     baseTotal,
+    offerDiscount: offerDisc,
+    signupDiscount: signupDisc,
+    payableAfterDiscount,
+
     serviceAmt,
     taxableAmount,
     cgstAmt,
@@ -2915,20 +2918,16 @@ function placeOrder() {
     igstAmt,
     grandTotal: grandTotalFinal,
 
-    offerDiscount: offerDisc,
-    signupDiscount: signupDisc,
-    payableAfterDiscount,
-    paymentMethod
-  };
+    paymentMethod,
 
-  orderData.couponId = selectedCoupon ? selectedCoupon.id : "";
-  orderData.couponType = selectedCoupon ? selectedCoupon.type : "";
-  orderData.couponDiscount =
-    selectedCoupon
-      ? (selectedCoupon.flat
-          ? selectedCoupon.flat
-          : ((selectedCoupon.discount / 100) * baseTotal))
-      : 0;
+    couponId: selectedCoupon ? selectedCoupon.id : "",
+    couponType: selectedCoupon ? selectedCoupon.type : "",
+    couponDiscount: selectedCoupon
+        ? (selectedCoupon.flat
+              ? selectedCoupon.flat
+              : ((selectedCoupon.discount / 100) * baseTotal))
+        : 0
+  };
 
   const overlay = document.getElementById('loadingOverlay');
   overlay.innerText = "Processing your order... Please wait...";
@@ -2937,10 +2936,8 @@ function placeOrder() {
   document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
     .forEach(el => el.disabled = true);
 
-
   apiPost("placeOrder", orderData)
     .then(res => {
-
       window.signupDiscount = Number(res.signupDiscount || 0);
 
       if (res.success) {
@@ -2956,24 +2953,20 @@ function placeOrder() {
       } else {
         alert(res.message || "Order failed.");
       }
-
-      overlay.style.display = "none";
-      document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
-        .forEach(el => el.disabled = false);
-
-      window._orderLock = false;  // ⭐ FINAL RELEASE
     })
     .catch(err => {
       console.error("Order error:", err);
       alert("Error placing order. Please try again.");
-
+    })
+    .finally(() => {
       overlay.style.display = "none";
       document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
         .forEach(el => el.disabled = false);
 
-      window._orderLock = false;  // ⭐ RELEASE EVEN ON ERROR
+      window._orderLock = false;
     });
 }
+
 
 
 
@@ -6556,6 +6549,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
