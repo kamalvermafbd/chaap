@@ -5051,6 +5051,13 @@ async function openCartDrawer() {
   // 3) Rebuild drawer UI
   openCartPanel(freshCart);
   renderCart();
+    // ----------------------------------------
+  // ⭐ G2: RESTORE COUPON AFTER REFRESH
+  // ----------------------------------------
+  if (alreadyAppliedCouponId) {
+    const o = (window.liveOffers || []).find(x => x.id === alreadyAppliedCouponId);
+    if (o) selectedCoupon = o;   // silently attach
+  }
 
   // 4) Update totals + badge
   try { updateDrawerTotals(); } catch(e){}
@@ -5740,8 +5747,8 @@ function closeCouponList() {
   if (loader) loader.style.display = "none";
 }
 
-
-let selectedCoupon = null;
+let selectedCoupon = null;        // coupon object (UI + totals)
+let alreadyAppliedCouponId = "";  // coupon ID (restore + protection)
 
 function applyCoupon(couponId) {
 
@@ -5777,6 +5784,56 @@ function applyCoupon(couponId) {
   // ✔ APPLY COUPON
   selectedCoupon = o;
   showCouponSuccess(`🎉 ${o.text} applied successfully!`);
+function applyCoupon(couponId) {
+
+  const offers = window.liveOffers || [];
+  const o = offers.find(x => x.id === couponId);
+
+  if (!o) return;
+
+  // calculate subtotal
+  const subtotal = getCart().reduce((sum, ci) => {
+    const mrp = Number(ci.rate || 0);
+    const disc = Number(ci.discPercent || 0);
+    const qty = Number(ci.qty || 1);
+    return sum + (mrp - (mrp * disc / 100)) * qty;
+  }, 0);
+
+  // ❌ MINIMUM FAIL
+  if (subtotal < Number(o.min || 0)) {
+
+    showCouponError(
+      `Cannot apply <b>${o.text}</b><br>
+       Minimum required: ${fmt(o.min)}<br>
+       Your subtotal: ${fmt(subtotal)}`
+    );
+
+    return;
+  }
+
+  // ⭐ VERY IMPORTANT — Save applied coupon ID
+  alreadyAppliedCouponId = couponId;
+
+  // ✔ APPLY COUPON
+  selectedCoupon = o;
+  showCouponSuccess(`🎉 ${o.text} applied successfully!`);
+
+  // hide offer list box
+  const listBox = document.getElementById("offerList");
+  if (listBox) listBox.style.display = "none";
+
+  // success message bottom me
+  const appliedBox = document.getElementById("bestOfferApplied");
+  if (appliedBox) {
+    appliedBox.style.display = "block";
+    appliedBox.innerHTML = `🎉 ${o.text} applied`;
+  }
+
+  updateDrawerTotals();
+
+  // close list fully
+  closeCouponList();
+}
 
   // hide offer list box
   const listBox = document.getElementById("offerList");
@@ -6177,7 +6234,6 @@ function refreshCheckoutCart() {
     .forEach(r => (r.checked = false));
 }
 
-
 function updateDrawerTotals() {
 
   const cartArr = getCart();
@@ -6194,6 +6250,16 @@ function updateDrawerTotals() {
   });
 
   subtotal = Number(subtotal.toFixed(2));
+
+  // =====================================================
+  // ⭐⭐ RESTORE COUPON ON REFRESH (MAIN FIX)
+  // =====================================================
+  try {
+    if (!selectedCoupon && alreadyAppliedCouponId && window.liveOffers) {
+      const found = window.liveOffers.find(o => o.id === alreadyAppliedCouponId);
+      if (found) selectedCoupon = found;
+    }
+  } catch (e) {}
 
 
   // =====================================================
@@ -6261,16 +6327,13 @@ function updateDrawerTotals() {
   // ⭐⭐ 3) SIGNUP DISCOUNT APPLY (UI SIDE)
   // =====================================================
   let signupDiscount = 0;
-  
-try {
+  try {
     const mobile = localStorage.getItem("userMobile");
     if (mobile) {
       signupDiscount = Number(window.signupDiscount || 0);
     }
-} catch (e) {}
+  } catch (e) {}
 
-
-  // Reduce payable
   payable = payable - signupDiscount;
   if (payable < 0) payable = 0;
   payable = Number(payable.toFixed(2));
@@ -6330,7 +6393,6 @@ try {
   try { updateCartBadge(); } catch(e){}
 }
 
-
 async function fetchSignupDiscount(mobile) {
   try {
     let res = await apiPost("checkSignupDiscount", { mobile });
@@ -6380,6 +6442,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
