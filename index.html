@@ -2875,12 +2875,12 @@ function placeOrder() {
 
   if (!/^[0-9]{10}$/.test(mobile)) {
     alert("Enter a valid 10-digit mobile number");
-    window._orderLock = false;
+    window._orderLock = false;   // ⭐ IMPORTANT
     return;
   }
   if (orderType === "Home Delivery" && !address) {
     alert("Please enter delivery address");
-    window._orderLock = false;
+    window._orderLock = false;   // ⭐ IMPORTANT
     return;
   }
 
@@ -2888,10 +2888,8 @@ function placeOrder() {
 
   let baseTotal = Number(dt.baseTotal || 0);
   let offerDisc = Number(dt.offerDiscount || 0);
-
   let signupDisc = Number(dt.signupDiscount);
   if (isNaN(signupDisc)) signupDisc = 0;
-
   let payableAfterDiscount = Number(dt.payableAfterDiscount || 0);
 
   let serviceAmt      = Number(dt.serviceAmt || 0);
@@ -2920,7 +2918,6 @@ function placeOrder() {
     offerDiscount: offerDisc,
     signupDiscount: signupDisc,
     payableAfterDiscount,
-
     paymentMethod
   };
 
@@ -2939,6 +2936,7 @@ function placeOrder() {
 
   document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
     .forEach(el => el.disabled = true);
+
 
   apiPost("placeOrder", orderData)
     .then(res => {
@@ -2963,7 +2961,7 @@ function placeOrder() {
       document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
         .forEach(el => el.disabled = false);
 
-      window._orderLock = false;   // ✅ FIX: Yaha rakho
+      window._orderLock = false;  // ⭐ FINAL RELEASE
     })
     .catch(err => {
       console.error("Order error:", err);
@@ -2973,10 +2971,10 @@ function placeOrder() {
       document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
         .forEach(el => el.disabled = false);
 
-      window._orderLock = false;   // ✅ FIX: Yaha bhi rakho
+      window._orderLock = false;  // ⭐ RELEASE EVEN ON ERROR
     });
-
 }
+
 
 
 function filterMenu() {
@@ -6558,6 +6556,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
