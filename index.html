@@ -6446,10 +6446,19 @@ if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type 
         ${signupDiscount > 0 
           ? `<div class="flex justify-between"><span>Signup Discount:</span><span> - ${fmt(signupDiscount)}</span></div>`
           : ``}
-
+ <!-- ⭐ NEW LINE: Total After Discount -->
+    <div class="flex justify-between font-semibold pt-1">
+      <span>Total after discount:</span>
+      <span>${fmt(Number((subtotal - offerDiscount - signupDisc).toFixed(2)))}</span>
+    </div>
         <div class="flex justify-between"><span>Service Charge (${t.servicePercent}%):</span>
       <span> ${fmt(serviceAmt)}</span></div>
-      
+        <!-- ⭐ NEW LINE: Total After Charges -->
+    <div class="flex justify-between font-semibold">
+      <span>Total after charges:</span>
+      <span>${fmt(Number((payable + serviceAmt).toFixed(2)))}</span>
+    </div>
+
     <div class="flex justify-between"><span>CGST (${t.cgstPercent}%):</span> <span>${fmt(cgstAmt)}</span></div>
     <div class="flex justify-between"><span>SGST (${t.sgstPercent}%): </span><span>${fmt(sgstAmt)}</span></div>
     <div class="flex justify-between"><span>IGST (${t.igstPercent}%): </span><span>${fmt(igstAmt)}</span></div>
@@ -6512,6 +6521,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
