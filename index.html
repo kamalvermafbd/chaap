@@ -2863,6 +2863,11 @@ let lastLookupOrderType = "";
 
 }
 function placeOrder() {
+ console.log("---- DEBUG START ----");
+console.log("getCart() returns:", getCart());
+console.log("global cart variable:", cart);
+
+
   if (window._orderLock) return;
   window._orderLock = true;
 
@@ -6549,6 +6554,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
