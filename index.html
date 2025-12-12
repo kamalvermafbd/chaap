@@ -2956,6 +2956,7 @@ let lastLookupOrderType = "";
         cart = [];
         localStorage.removeItem("cart");
         renderCart();
+        restoreMenuQuantities(); 
         closeCheckout();
       } else {
         alert(res.message || "Order failed.");
@@ -6278,6 +6279,44 @@ function updateDrawerTotals() {
   });
 
   subtotal = Number(subtotal.toFixed(2));
+
+  // ⭐ If cart is empty → force all values to zero
+if (cartArr.length === 0) {
+
+    const totalEl = document.getElementById("drawerTotalAmount");
+  if (totalEl) totalEl.textContent = fmt(0);
+
+  const taxBox = document.getElementById("taxSummary");
+  if (taxBox) {
+    taxBox.innerHTML = `
+      <div class="text-right text-gray-700 space-y-1.5">
+        <div class="flex justify-between"><span>Offer Discount:</span><span>- 0</span></div>
+        <div class="flex justify-between"><span>Signup Discount:</span><span>- 0</span></div>
+        <div class="flex justify-between"><span>Total after discount:</span><span>0</span></div>
+        <div class="flex justify-between"><span>Service Charge:</span><span>0</span></div>
+        <div class="flex justify-between"><span>Total after charges:</span><span>0</span></div>
+        <div class="flex justify-between"><span>CGST:</span><span>0</span></div>
+        <div class="flex justify-between"><span>SGST:</span><span>0</span></div>
+        <div class="flex justify-between"><span>IGST:</span><span>0</span></div>
+        <div class="flex justify-between font-bold text-lg"><span>Grand Total:</span><span>0</span></div>
+      </div>
+    `;
+  }
+  window._drawerTotals = {
+    baseTotal: 0,
+    offerDiscount: 0,
+    signupDiscount: 0,
+    payableAfterDiscount: 0,
+    serviceAmt: 0,
+    taxableAmount: 0,
+    cgstAmt: 0,
+    sgstAmt: 0,
+    igstAmt: 0,
+    grandTotal: 0
+  };
+  return;
+}
+
   // ----------------------------------------
 // ⭐ G4: REVALIDATE COUPON on totals update
 // ----------------------------------------
@@ -6516,6 +6555,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
