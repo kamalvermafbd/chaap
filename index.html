@@ -2143,7 +2143,7 @@ async function updateQty(index, newQty) {
   if (isNaN(newQty) || newQty < 1) newQty = 1;
 
   // ⭐ G3: REMOVE COUPON IF QTY CHANGES (only for onetime coupons)
-  if (selectedCoupon && selectedCoupon.type === "onetime") {
+  if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type === "regular"))  {
 
       // remove coupon
       selectedCoupon = null;
@@ -6277,7 +6277,8 @@ function updateDrawerTotals() {
   // ----------------------------------------
 // ⭐ G4: REVALIDATE COUPON on totals update
 // ----------------------------------------
-if (selectedCoupon && selectedCoupon.type === "onetime") {
+if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type === "regular"))
+ {
 
     const min = Number(selectedCoupon.min || 0);
 
@@ -6480,6 +6481,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
