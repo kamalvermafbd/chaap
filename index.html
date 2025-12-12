@@ -2888,7 +2888,9 @@ let lastLookupOrderType = "";
 
   let baseTotal            = dt.baseTotal || 0;
   let offerDisc            = dt.offerDiscount || 0;
-  let signupDisc           = dt.signupDiscount || 0;
+ let signupDisc = Number(dt.signupDiscount);
+if (isNaN(signupDisc)) signupDisc = 0;
+
   let payableAfterDiscount = dt.payableAfterDiscount || 0;
 
   let serviceAmt           = dt.serviceAmt || 0;
@@ -6412,7 +6414,9 @@ if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type 
   try {
     const mobile = localStorage.getItem("userMobile");
     if (mobile) {
-      signupDiscount = Number(window.signupDiscount || 0);
+      signupDiscount = Number(window.signupDiscount);
+if (isNaN(signupDiscount)) signupDiscount = 0;
+
     }
   } catch (e) {}
 
@@ -6555,6 +6559,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
