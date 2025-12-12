@@ -2954,7 +2954,7 @@ console.log("global cart variable:", cart);
         cart = [];
         localStorage.removeItem("cart");
         renderCart();
-        restoreMenuQuantities();
+      
         closeCheckout();
       } else {
         alert(res.message || "Order failed.");
@@ -6555,6 +6555,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
