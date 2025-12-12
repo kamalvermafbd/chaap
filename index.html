@@ -2943,6 +2943,13 @@ const totalAmount = grandTotalFinal;
 
   paymentMethod
 };
+orderData.couponId = selectedCoupon ? selectedCoupon.id : "";
+orderData.couponType = selectedCoupon ? selectedCoupon.type : "";
+orderData.couponDiscount = selectedCoupon 
+    ? (selectedCoupon.flat 
+        ? selectedCoupon.flat 
+        : ((selectedCoupon.discount / 100) * baseTotal)) 
+    : 0;
 
 
   // ?? Show overlay & lock UI
@@ -6473,6 +6480,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
