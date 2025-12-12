@@ -5736,6 +5736,36 @@ function getBestOffer(total) {
 
   return best;
 }
+ 
+async function fetchOffersFromBackend() {
+  try {
+    const res = await apiGet("getOffers"); // <-- App Script backend function
+    let offers = res.offers || [];
+
+    const today = new Date();
+
+    // Filter valid offers
+    offers = offers.filter(o => {
+      if (String(o.active).toUpperCase() !== "TRUE") return false;
+
+      const start = new Date(o.startDate);
+      const end   = new Date(o.endDate);
+
+      return today >= start && today <= end;
+    });
+
+    // Store globally for reuse
+    window.liveOffers = offers;
+
+    return offers;
+  }
+  catch (err) {
+    console.error("Offer fetch error:", err);
+    window.liveOffers = [];
+    return [];
+  }
+}
+
 // STEP 2A – Apply Coupon button (open offer list)
 async function openCouponList() {
 
@@ -6481,6 +6511,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
