@@ -2863,10 +2863,9 @@ let lastLookupOrderType = "";
 
 }
 function placeOrder() {
- console.log("---- DEBUG START ----");
-console.log("getCart() returns:", getCart());
-console.log("global cart variable:", cart);
-
+  console.log("---- DEBUG START ----");
+  console.log("getCart() returns:", getCart());
+  console.log("global cart variable:", cart);
 
   if (window._orderLock) return;
   window._orderLock = true;
@@ -2891,18 +2890,6 @@ console.log("global cart variable:", cart);
 
   const dt = window._drawerTotals || {};
 
-  let baseTotal = Number(dt.baseTotal || 0);
-  let offerDisc = Number(dt.offerDiscount || 0);
-  let signupDisc = Number(dt.signupDiscount || 0);
-  let payableAfterDiscount = Number(dt.payableAfterDiscount || 0);
-
-  let serviceAmt      = Number(dt.serviceAmt || 0);
-  let taxableAmount   = Number(dt.taxableAmount || 0);
-  let cgstAmt         = Number(dt.cgstAmt || 0);
-  let sgstAmt         = Number(dt.sgstAmt || 0);
-  let igstAmt         = Number(dt.igstAmt || 0);
-  let grandTotalFinal = Number(dt.grandTotal || 0);
-
   const orderData = {
     customerName,
     email,
@@ -2911,27 +2898,24 @@ console.log("global cart variable:", cart);
     address,
     cartItems: getCart(),
 
+    baseTotal: Number(dt.baseTotal || 0),
+    offerDiscount: Number(dt.offerDiscount || 0),
+    signupDiscount: Number(dt.signupDiscount || 0),
+    payableAfterDiscount: Number(dt.payableAfterDiscount || 0),
 
-    baseTotal,
-    offerDiscount: offerDisc,
-    signupDiscount: signupDisc,
-    payableAfterDiscount,
-
-    serviceAmt,
-    taxableAmount,
-    cgstAmt,
-    sgstAmt,
-    igstAmt,
-    grandTotal: grandTotalFinal,
+    serviceAmt: Number(dt.serviceAmt || 0),
+    taxableAmount: Number(dt.taxableAmount || 0),
+    cgstAmt: Number(dt.cgstAmt || 0),
+    sgstAmt: Number(dt.sgstAmt || 0),
+    igstAmt: Number(dt.igstAmt || 0),
+    grandTotal: Number(dt.grandTotal || 0),
 
     paymentMethod,
 
     couponId: selectedCoupon ? selectedCoupon.id : "",
     couponType: selectedCoupon ? selectedCoupon.type : "",
     couponDiscount: selectedCoupon
-        ? (selectedCoupon.flat
-              ? selectedCoupon.flat
-              : ((selectedCoupon.discount / 100) * baseTotal))
+        ? (selectedCoupon.flat ? selectedCoupon.flat : ((selectedCoupon.discount / 100) * dt.baseTotal))
         : 0
   };
 
@@ -2944,17 +2928,22 @@ console.log("global cart variable:", cart);
 
   apiPost("placeOrder", orderData)
     .then(res => {
-      window.signupDiscount = Number(res.signupDiscount || 0);
 
       if (res.success) {
+
         alert(
           `Order placed successfully!\nYour Order Number: ${res.orderNumber}\n\n${res.message}`
         );
 
+        // reset cart properly
         cart = [];
-        localStorage.removeItem("cart");
+        localStorage.setItem("cart", JSON.stringify([]));
         renderCart();
-      
+
+        // reset signup discount
+        window.signupDiscount = 0;
+        localStorage.removeItem("signupDiscount");
+
         closeCheckout();
       } else {
         alert(res.message || "Order failed.");
@@ -2966,15 +2955,13 @@ console.log("global cart variable:", cart);
     })
     .finally(() => {
       overlay.style.display = "none";
+
       document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
         .forEach(el => el.disabled = false);
 
       window._orderLock = false;
     });
 }
-
-
-
 
 function filterMenu() {
   const text = document.getElementById("menuSearch").value.toLowerCase();
@@ -6555,6 +6542,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
