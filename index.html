@@ -2926,6 +2926,7 @@ function placeOrder() {
           : ((selectedCoupon.discount / 100) * Number(dt.baseTotal || 0)))
       : 0
   };
+console.log("🚀 ORDER PAYLOAD TO BACKEND:", JSON.stringify(orderData, null, 2));
 
   const overlay = document.getElementById('loadingOverlay');
   overlay.innerText = "Processing your order... Please wait...";
@@ -6553,6 +6554,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
