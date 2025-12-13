@@ -2754,6 +2754,7 @@ function toggleAddressField() {
 
   // --- 4) Always show overlay (both cases) ---
   overlay.style.display = "flex";
+  overlay.offsetHeight;   // 🔥 FORCE browser repaint (IMPORTANT)
   orderSelect.disabled = true;
 
   // ==========================================================
@@ -2808,7 +2809,10 @@ function toggleAddressField() {
           addressField.required = false;
         }
 
-        overlay.style.display = "none";
+        setTimeout(() => {
+  overlay.style.display = "none";
+}, 150); // 150ms enough for human eye
+
         orderSelect.disabled = false;
 
       });
@@ -6691,6 +6695,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
