@@ -2942,9 +2942,19 @@ function placeOrder() {
         );
 
         // ✅ SAME cart reference ko empty karo
-        cart.length = 0;
-        localStorage.setItem("cart", JSON.stringify([]));
-        renderCart();
+        // 1️⃣ clear global cart
+cart.length = 0;
+
+// 2️⃣ clear storage (guest + logged in safe)
+localStorage.removeItem("cart");
+localStorage.removeItem("guestCart");
+
+// 3️⃣ reset drawer totals
+window._drawerTotals = null;
+
+// 4️⃣ UI refresh
+renderCart();
+
 
         // ✅ signup discount reset
         window.signupDiscount = 0;
@@ -5672,19 +5682,12 @@ async function fetchOffersFromBackend() {
 }
 
 function getCart() {
-
-  // Guest user
-  if (!isLoggedIn()) {
-    let g = JSON.parse(localStorage.getItem("guestCart") || "[]");
-    if (!Array.isArray(g)) g = [];
-    return g;
+  if (!Array.isArray(cart)) {
+    cart = [];
   }
-
-  // Logged-in user
-  let c = JSON.parse(localStorage.getItem("cart") || "[]");
-  if (!Array.isArray(c)) c = [];
-  return c;
+  return cart;
 }
+
 
 // STEP 1A → Menu se image fetch karne ka helper
 function getMenuImage(itemId, variantId) {
@@ -6548,6 +6551,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
