@@ -5183,12 +5183,20 @@ function closeCartDrawer() {
   const backdrop = document.getElementById("cartBackdrop");
   const drawer   = document.getElementById("cartDrawer");
 
-  backdrop && backdrop.classList.remove("active");
-  drawer && drawer.classList.remove("active");
+  if (drawer) {
+    drawer.classList.remove("active");
+    drawer.style.display = "none";
+  }
 
-  // SAFE reset
-  document.body.style.overflow = "";
+  if (backdrop) {
+    backdrop.classList.remove("active");
+    backdrop.style.display = "none";
+    backdrop.style.pointerEvents = "none";
+  }
+
+  document.body.style.overflow = "auto";
 }
+
 
 
 function toggleCartDrawer() {
@@ -6643,6 +6651,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
