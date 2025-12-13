@@ -2737,6 +2737,7 @@ function toggleAddressField() {
   const overlay = document.getElementById("loadingOverlay");
   const orderSelect = document.getElementById("orderType");
   const changeBtn = document.getElementById("changeAddressBtn");
+  const deliverySection = document.getElementById("deliverySection");
 
   // NEW FIELDS
   const pincodeField = document.getElementById("pincode");
@@ -2830,7 +2831,7 @@ function toggleAddressField() {
   pincodeWrapper.style.display = "none";
   cityWrapper.style.display    = "none";
   stateWrapper.style.display   = "none";
-const deliverySection = document.getElementById("deliverySection");
+
 
   apiGet("getCustomerDetailsByMobile", { mobile })
     .then(rows => {
