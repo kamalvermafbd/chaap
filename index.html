@@ -4260,18 +4260,10 @@ function hideAllPages() {
 function apiPost(api, data = {}) {
   return fetch(API_BASE + "?api=" + api, {
     method: "POST",
-    redirect: "manual",        // ⭐ VERY IMPORTANT
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(data)
-  }).then(res => {
-    if (res.status === 302) {
-      throw new Error("302 redirect blocked");
-    }
-    return res.json();
-  });
+    body: JSON.stringify(data)  // ??? ?? header ?? ????
+  }).then(res => res.json());
 }
+
 
 
 function isLoggedIn() {
@@ -6569,6 +6561,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
