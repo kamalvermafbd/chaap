@@ -1443,7 +1443,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbyPV98xYo8eNGn7d5ZpE8l9JMxAW_P610z_EBRwylhfOrUDl9n1I2K2XALyU7C_I3nImg/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbyGKUQ2S4RQBtGBoQHb3MCLLpai7-pgrdU8swWIrPi6sDgcj1G8dNUoW_S6x_t_dXWa1g/exec";
 
 function apiGet(api, params = {}) {
   const url = new URL(API_BASE);
@@ -2948,7 +2948,9 @@ cart.length = 0;
 // 2️⃣ clear storage (guest + logged in safe)
 localStorage.removeItem("cart");
 localStorage.removeItem("guestCart");
-
+  //  FIX: signup discount one-time only
+  window.signupDiscount = 0;
+  localStorage.removeItem("signupDiscount");
 // 3️⃣ reset drawer totals
 window._drawerTotals = null;
 
@@ -6551,6 +6553,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
