@@ -2862,6 +2862,8 @@ let lastLookupOrderType = "";
     });
 
 }
+
+    
 function placeOrder() {
   console.log("---- DEBUG START ----");
   console.log("getCart() returns:", getCart());
@@ -2882,6 +2884,7 @@ function placeOrder() {
     window._orderLock = false;
     return;
   }
+
   if (orderType === "Home Delivery" && !address) {
     alert("Please enter delivery address");
     window._orderLock = false;
@@ -2890,13 +2893,16 @@ function placeOrder() {
 
   const dt = window._drawerTotals || {};
 
+  // 🔒 IMPORTANT: cart ka COPY bhejo (reference nahi)
+  const safeCartItems = getCart().map(i => ({ ...i }));
+
   const orderData = {
     customerName,
     email,
     mobile,
     orderType,
     address,
-    cartItems: getCart(),
+    cartItems: safeCartItems,
 
     baseTotal: Number(dt.baseTotal || 0),
     offerDiscount: Number(dt.offerDiscount || 0),
@@ -2915,8 +2921,10 @@ function placeOrder() {
     couponId: selectedCoupon ? selectedCoupon.id : "",
     couponType: selectedCoupon ? selectedCoupon.type : "",
     couponDiscount: selectedCoupon
-        ? (selectedCoupon.flat ? selectedCoupon.flat : ((selectedCoupon.discount / 100) * dt.baseTotal))
-        : 0
+      ? (selectedCoupon.flat
+          ? selectedCoupon.flat
+          : ((selectedCoupon.discount / 100) * Number(dt.baseTotal || 0)))
+      : 0
   };
 
   const overlay = document.getElementById('loadingOverlay');
@@ -2928,19 +2936,17 @@ function placeOrder() {
 
   apiPost("placeOrder", orderData)
     .then(res => {
-
       if (res.success) {
-
         alert(
           `Order placed successfully!\nYour Order Number: ${res.orderNumber}\n\n${res.message}`
         );
 
-        // reset cart properly
-        cart = [];
+        // ✅ SAME cart reference ko empty karo
+        cart.length = 0;
         localStorage.setItem("cart", JSON.stringify([]));
         renderCart();
 
-        // reset signup discount
+        // ✅ signup discount reset
         window.signupDiscount = 0;
         localStorage.removeItem("signupDiscount");
 
@@ -2955,13 +2961,13 @@ function placeOrder() {
     })
     .finally(() => {
       overlay.style.display = "none";
-
       document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
         .forEach(el => el.disabled = false);
 
       window._orderLock = false;
     });
 }
+
 
 function filterMenu() {
   const text = document.getElementById("menuSearch").value.toLowerCase();
@@ -6542,6 +6548,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
