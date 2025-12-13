@@ -4260,12 +4260,18 @@ function hideAllPages() {
 function apiPost(api, data = {}) {
   return fetch(API_BASE + "?api=" + api, {
     method: "POST",
-    redirect: "follow",          // 🔥 IMPORTANT
-    headers: {
-      "Content-Type": "text/plain;charset=UTF-8"
-    },
+    redirect: "follow", // ⭐ MUST
     body: JSON.stringify(data)
-  }).then(res => res.json());
+  })
+  .then(async res => {
+    const text = await res.text();   // 🔑 GAS redirect safe
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      console.error("API RAW RESPONSE:", text);
+      throw new Error("Invalid JSON from backend");
+    }
+  });
 }
 
 
@@ -6564,6 +6570,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
