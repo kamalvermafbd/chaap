@@ -3000,12 +3000,12 @@ window._drawerTotals = null;
 
 // 4️⃣ UI refresh
 renderCart();
+if (typeof restoreMenuQuantities === "function") {
+  restoreMenuQuantities();
+}
 
+      
 
-        // ✅ signup discount reset
-        window.signupDiscount = 0;
-        localStorage.removeItem("signupDiscount");
-resetMenuCartUI();  
         closeCheckout();
       } else {
         alert(res.message || "Order failed.");
@@ -6613,6 +6613,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
