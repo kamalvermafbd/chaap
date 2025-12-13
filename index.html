@@ -2788,6 +2788,7 @@ function toggleAddressField() {
         if (orderType === "Home Delivery") {
 
           // Address + 3 other fields visible
+            deliverySection.style.display = "block"; 
           addressWrapper.style.display = "block";
           pincodeWrapper.style.display = "block";
           cityWrapper.style.display    = "block";
@@ -2798,6 +2799,7 @@ function toggleAddressField() {
 
         } else {
           // Takeaway / Dine-In → hide address + pincode/city/state
+            deliverySection.style.display = "none";   
           addressWrapper.style.display = "none";
           pincodeWrapper.style.display = "none";
           cityWrapper.style.display    = "none";
@@ -2828,6 +2830,7 @@ function toggleAddressField() {
   pincodeWrapper.style.display = "none";
   cityWrapper.style.display    = "none";
   stateWrapper.style.display   = "none";
+const deliverySection = document.getElementById("deliverySection");
 
   apiGet("getCustomerDetailsByMobile", { mobile })
     .then(rows => {
@@ -2840,10 +2843,12 @@ function toggleAddressField() {
         addressField.value = "";
 
         if (orderType === "Home Delivery") {
+          deliverySection.style.display = "block";
           addressWrapper.style.display = "block";
  addressField.required = true;
     addressField.readOnly = false;
     } else {
+          deliverySection.style.display = "none"; 
     addressWrapper.style.display = "none";
     addressField.required = false;
         }
@@ -6688,6 +6693,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
