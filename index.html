@@ -5144,9 +5144,16 @@ async function openCheckout() {
 
 async function openCartDrawer() {
 
-  //  OPEN DRAWER INSTANTLY (NO DELAY)
-  document.getElementById("cartBackdrop").classList.add("active");
-  document.getElementById("cartDrawer").classList.add("active");
+  const backdrop = document.getElementById("cartBackdrop");
+  const drawer   = document.getElementById("cartDrawer");
+
+  // 🔓 UNLOCK drawer if it was hard-closed earlier
+  if (backdrop) backdrop.style.display = "block";
+  if (drawer) drawer.style.display = "block";
+
+  // OPEN DRAWER INSTANTLY (NO DELAY)
+  backdrop && backdrop.classList.add("active");
+  drawer && drawer.classList.add("active");
   document.body.style.overflow = "hidden";
 
   // Fetch offers in background (NO await)
@@ -5186,28 +5193,28 @@ async function openCartDrawer() {
   }
 
   // ----------------------------------------
-// ⭐ G4: REVALIDATE COUPON on drawer open
-// ----------------------------------------
-if (selectedCoupon && selectedCoupon.type === "onetime") {
+  // ⭐ G4: REVALIDATE COUPON on drawer open
+  // ----------------------------------------
+  if (selectedCoupon && selectedCoupon.type === "onetime") {
 
     const subtotal = cart.reduce((sum, ci) => {
-        const mrp = Number(ci.rate || 0);
-        const disc = Number(ci.discPercent || 0);
-        const qty  = Number(ci.qty || 1);
-        return sum + (mrp - (mrp * disc / 100)) * qty;
+      const mrp = Number(ci.rate || 0);
+      const disc = Number(ci.discPercent || 0);
+      const qty  = Number(ci.qty || 1);
+      return sum + (mrp - (mrp * disc / 100)) * qty;
     }, 0);
 
     if (subtotal < Number(selectedCoupon.min || 0)) {
-        selectedCoupon = null;
-        alreadyAppliedCouponId = "";
-        showCouponError("Coupon removed because cart value changed.");
+      selectedCoupon = null;
+      alreadyAppliedCouponId = "";
+      showCouponError("Coupon removed because cart value changed.");
     }
-}
+  }
+
   // 4) Update totals + badge
   try { updateDrawerTotals(); } catch(e){}
   try { updateCartBadge(); } catch(e){}
 }
-
 
 function closeCartDrawer() {
   const backdrop = document.getElementById("cartBackdrop");
@@ -6681,6 +6688,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
