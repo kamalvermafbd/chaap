@@ -2862,6 +2862,31 @@ let lastLookupOrderType = "";
     });
 
 }
+function normalizeCartForOrder(cart) {
+  return cart.map(item => {
+    const qty = Number(item.qty || 1);
+    const rate = Number(item.rate || item.price || 0);
+    const discPercent = Number(item.discPercent || 0);
+
+    const discAmt = +(rate * discPercent / 100).toFixed(2);
+    const netRate = +(rate - discAmt).toFixed(2);
+    const netAmt  = +(netRate * qty).toFixed(2);
+
+    return {
+      itemId: item.itemId || "",
+      variantId: item.variantId || "",
+      name: item.name,
+      unit: item.unit || "",
+      qty: qty,
+      rate: rate,
+      discPercent: discPercent,
+      discAmt: discAmt,
+      netAmt: netAmt,
+      total: netAmt,          // ⭐ IMPORTANT
+      image: item.image || ""
+    };
+  });
+}
 
     
 function placeOrder() {
@@ -2902,7 +2927,8 @@ function placeOrder() {
     mobile,
     orderType,
     address,
-    cartItems: safeCartItems,
+    cartItems: normalizeCartForOrder(safeCartItems),
+
 
     baseTotal: Number(dt.baseTotal || 0),
     offerDiscount: Number(dt.offerDiscount || 0),
@@ -6570,6 +6596,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
