@@ -4260,10 +4260,13 @@ function hideAllPages() {
 function apiPost(api, data = {}) {
   return fetch(API_BASE + "?api=" + api, {
     method: "POST",
-    body: JSON.stringify(data)  // ??? ?? header ?? ????
+    redirect: "follow",          // 🔥 IMPORTANT
+    headers: {
+      "Content-Type": "text/plain;charset=UTF-8"
+    },
+    body: JSON.stringify(data)
   }).then(res => res.json());
 }
-
 
 
 function isLoggedIn() {
@@ -6561,6 +6564,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
