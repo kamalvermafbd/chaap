@@ -2681,7 +2681,10 @@ document.getElementById("mobile").addEventListener("input", function () {
 
 let lastLookupMobile = "";
 let lastLookupOrderType = "";
-    function toggleAddressField() {
+
+
+    
+function toggleAddressField() {
 
   const mobile = document.getElementById("mobile").value.trim();
   const orderType = document.getElementById("orderType").value;
@@ -2806,8 +2809,13 @@ let lastLookupOrderType = "";
         emailField.value = "";
         addressField.value = "";
 
-        if (orderType !== "Home Delivery") {
-          addressWrapper.style.display = "none";
+        if (orderType === "Home Delivery") {
+          addressWrapper.style.display = "block";
+ addressField.required = true;
+    addressField.readOnly = false;
+    } else {
+    addressWrapper.style.display = "none";
+    addressField.required = false;
         }
         return;
       }
@@ -2862,6 +2870,9 @@ let lastLookupOrderType = "";
     });
 
 }
+
+
+    
 function normalizeCartForOrder(cart) {
   return cart.map(item => {
     const qty = Number(item.qty || 1);
@@ -6632,6 +6643,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
