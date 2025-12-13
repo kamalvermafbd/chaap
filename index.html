@@ -5164,10 +5164,16 @@ if (selectedCoupon && selectedCoupon.type === "onetime") {
 
 
 function closeCartDrawer() {
-  document.getElementById("cartBackdrop").classList.remove("active");
-  document.getElementById("cartDrawer").classList.remove("active");
-document.body.style.overflow = originalBodyOverflow;
+  const backdrop = document.getElementById("cartBackdrop");
+  const drawer   = document.getElementById("cartDrawer");
+
+  backdrop && backdrop.classList.remove("active");
+  drawer && drawer.classList.remove("active");
+
+  // SAFE reset
+  document.body.style.overflow = "";
 }
+
 
 function toggleCartDrawer() {
   const drawer = document.getElementById("cartDrawer");
@@ -6621,6 +6627,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
