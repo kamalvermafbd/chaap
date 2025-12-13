@@ -5683,12 +5683,17 @@ async function fetchOffersFromBackend() {
   window.liveOffers = [];
   return [];
 }
-
 function getCart() {
-  if (!Array.isArray(cart)) {
-    cart = [];
+
+  // Guest user
+  if (!isLoggedIn()) {
+    let g = JSON.parse(localStorage.getItem("guestCart") || "[]");
+    return g;
   }
-  return cart;
+
+  // Logged-in user
+  let c = JSON.parse(localStorage.getItem("cart") || "[]");
+  return c;
 }
 
 
@@ -6554,6 +6559,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
