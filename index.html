@@ -2887,7 +2887,7 @@ function normalizeCartForOrder(cart) {
     };
   });
 }
-    
+
 function resetMenuCartUI() {
   document.querySelectorAll("[data-qty]").forEach(el => {
     el.innerText = "0";
@@ -2898,11 +2898,9 @@ function resetMenuCartUI() {
     btn.classList.add("hidden");
   });
 
-  // ✅ ADD THIS
-  document.querySelectorAll(".qty-plus").forEach(btn => {
-    btn.classList.remove("hidden");
-  });
+  // ❗ OFFER / PRICE / DISCOUNT KO TOUCH NAHI KARNA
 }
+
 
 
     
@@ -3000,7 +2998,7 @@ window._drawerTotals = null;
 
 // 4️⃣ UI refresh
 renderCart();
-
+resetMenuCartUI(); 
 
       
 
@@ -6611,6 +6609,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
