@@ -5073,6 +5073,9 @@ function updateCartBadge() {
 
 async function openCheckout() {
 
+  // ✅ 0️⃣ FIRST — close drawer cart
+  closeCartDrawer();
+
   // Always use master cart (NO backend calls)
   const freshCart = getCart();
 
@@ -5093,8 +5096,10 @@ async function openCheckout() {
   // Build checkout items
   refreshCheckout();
 
+  // ✅ LAST — open checkout modal
   document.getElementById("checkoutModal").style.display = "flex";
 }
+
 
 async function openCartDrawer() {
 
@@ -6627,6 +6632,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
