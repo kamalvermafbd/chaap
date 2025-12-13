@@ -2889,19 +2889,28 @@ function normalizeCartForOrder(cart) {
 }
 
 function resetMenuCartUI() {
-   console.log("✅ resetMenuCartUI called");
-  document.querySelectorAll("[data-qty]").forEach(el => {
-    el.innerText = "0";
-    el.classList.add("hidden");
-  });
+  console.log("✅ resetMenuCartUI called");
 
-  document.querySelectorAll(".qty-minus").forEach(btn => {
-    btn.classList.add("hidden");
-  });
+  // sab menu + buttons pakdo
+  document.querySelectorAll("button[onclick^='menuPlus']").forEach(plusBtn => {
 
-  // ❗ OFFER / PRICE / DISCOUNT KO TOUCH NAHI KARNA
+    // minus button (previous sibling)
+    const minusBtn = plusBtn.previousElementSibling;
+
+    // qty text node (minus aur plus ke beech)
+    const qtyNode = plusBtn.previousSibling;
+
+    // qty reset
+    if (qtyNode && qtyNode.nodeType === Node.TEXT_NODE) {
+      qtyNode.textContent = "0";
+    }
+
+    // minus hide
+    if (minusBtn && minusBtn.tagName === "BUTTON") {
+      minusBtn.classList.add("hidden");
+    }
+  });
 }
-
 
 
     
@@ -6610,6 +6619,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
