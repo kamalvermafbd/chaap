@@ -3011,6 +3011,10 @@ renderCart();
 
 
         closeCheckout();
+
+         setTimeout(() => {
+    location.reload();
+  }, 300);
       } else {
         alert(res.message || "Order failed.");
       }
@@ -6617,6 +6621,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
