@@ -2887,6 +2887,23 @@ function normalizeCartForOrder(cart) {
     };
   });
 }
+    
+function resetMenuCartUI() {
+  document.querySelectorAll("[data-qty]").forEach(el => {
+    el.innerText = "0";
+    el.classList.add("hidden");
+  });
+
+  document.querySelectorAll(".qty-minus").forEach(btn => {
+    btn.classList.add("hidden");
+  });
+
+  // ✅ ADD THIS
+  document.querySelectorAll(".qty-plus").forEach(btn => {
+    btn.classList.remove("hidden");
+  });
+}
+
 
     
 function placeOrder() {
@@ -2988,7 +3005,7 @@ renderCart();
         // ✅ signup discount reset
         window.signupDiscount = 0;
         localStorage.removeItem("signupDiscount");
-
+resetMenuCartUI();  
         closeCheckout();
       } else {
         alert(res.message || "Order failed.");
@@ -6596,6 +6613,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
