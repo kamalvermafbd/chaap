@@ -1184,17 +1184,32 @@ style="
 </div>
 
       
-      <!-- Payment -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
-        <select id="paymentMethod" required
-                class="w-full border border-gray-300 rounded-lg p-2.5 bg-white
-                       focus:outline-none focus:ring-2 focus:ring-orange-500">
-          <option value="">Select Payment</option>
-          <option value="Cash on Delivery">Cash on Delivery</option>
-          <option value="Online">Online</option>
-        </select>
-      </div>
+     <!-- Payment Method -->
+<div>
+  <label class="block text-sm font-medium text-gray-700 mb-1">
+    Payment Method
+  </label>
+
+  <!-- Hidden input (same id so backend / placeOrder stays safe) -->
+  <input type="hidden" id="paymentMethod" value="">
+
+  <div class="flex gap-2">
+    <button type="button"
+            class="payment-btn flex-1 border border-gray-300 rounded-lg py-2 text-sm
+                   hover:border-orange-500"
+            data-value="Cash on Delivery">
+      Cash on Delivery
+    </button>
+
+    <button type="button"
+            class="payment-btn flex-1 border border-gray-300 rounded-lg py-2 text-sm
+                   hover:border-orange-500"
+            data-value="Online">
+      Online
+    </button>
+  </div>
+</div>
+
 <!-- BUTTONS -->
 <div class="mt-3 grid grid-cols-2 gap-3">
 
@@ -6700,10 +6715,25 @@ function showCouponMessage(msg) {
     box.style.display = "none";
   }, 3000);
 }
+ document.querySelectorAll(".payment-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
 
+      // remove active from all
+      document.querySelectorAll(".payment-btn").forEach(b => {
+        b.classList.remove("bg-orange-500", "text-white", "border-orange-500");
+      });
+
+      // add active to clicked
+      btn.classList.add("bg-orange-500", "text-white", "border-orange-500");
+
+      // set hidden input value (IMPORTANT)
+      document.getElementById("paymentMethod").value = btn.dataset.value;
+    });
+  });
 </script>
 </body>
 </html>
+
 
 
 
