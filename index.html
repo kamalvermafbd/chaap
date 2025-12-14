@@ -5154,6 +5154,15 @@ async function openCheckout() {
   // ✅ LAST — open checkout modal
   const modal = document.getElementById("checkoutModal");
   modal.style.display = "flex";
+
+  // 🔁 RE-APPLY UI if order type already selected
+setTimeout(() => {
+  const orderType = document.getElementById("orderType")?.value;
+  if (orderType) {
+    toggleAddressField();
+  }
+}, 0);
+
 }
 
 
@@ -6695,6 +6704,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
