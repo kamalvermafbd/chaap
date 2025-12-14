@@ -2729,7 +2729,6 @@ let lastLookupOrderType = "";
     
 function toggleAddressField() {
     console.log("🔥 toggleAddressField CALLED");
-showOrderOverlay();
 
   const mobile = document.getElementById("mobile").value.trim();
   const orderType = document.getElementById("orderType").value;
@@ -2746,35 +2745,37 @@ if (!/^[0-9]{10}$/.test(mobile)) {
 }
 
 
+// --- 2) Base references ---
+const nameField = document.getElementById("customerName");
+const emailField = document.getElementById("email");
+const addressField = document.getElementById("address");
 
-  // --- 2) Base references ---
-  const nameField = document.getElementById("customerName");
-  const emailField = document.getElementById("email");
-  const addressField = document.getElementById("address");
+const addressWrapper = document.getElementById("addressWrapper");
+const paymentField = document.getElementById("paymentMethod");
+const overlay = document.getElementById("loadingOverlay");
+const orderSelect = document.getElementById("orderType");
+const changeBtn = document.getElementById("changeAddressBtn");
+const deliverySection = document.getElementById("deliverySection");
 
-  const addressWrapper = document.getElementById("addressWrapper");
-  const paymentField = document.getElementById("paymentMethod");
-  const overlay = document.getElementById("loadingOverlay");
-  const orderSelect = document.getElementById("orderType");
-  const changeBtn = document.getElementById("changeAddressBtn");
-  const deliverySection = document.getElementById("deliverySection");
-
-    // STEP-4A: debounce duplicate lookup
+// ✅ STEP-UI: OrderType based UI (ALWAYS RUNS)
+if (orderType === "Home Delivery") {
+  deliverySection.style.display = "block";
+  addressField.required = true;
+} else {
+  deliverySection.style.display = "none";
+  addressField.required = false;
+}
+showOrderOverlay();
+// ✅ STEP-4A: debounce duplicate lookup (ONLY skip API)
 if (
   mobile === lastLookupMobile &&
   orderType === lastLookupOrderType
 ) {
-    // already same state → just ensure UI visible
-  if (orderType === "Home Delivery") {
-    deliverySection.style.display = "block";
-     addressField.required = true;
-  } else {
-    deliverySection.style.display = "none";
-  addressField.required = false;
-  }
-hideOrderOverlay(); 
+  console.log("⚠️ Same mobile + orderType, API skipped");
+  hideOrderOverlay();   // optional but safe
   return;
 }
+
 
   // NEW FIELDS
   const pincodeField = document.getElementById("pincode");
@@ -2807,6 +2808,7 @@ hideOrderOverlay();
 
     lastLookupMobile = mobile;
 lastLookupOrderType = orderType;
+
 
     // Fetch everything from USER SHEET
     apiGet("getUserProfile", { mobile })
@@ -2866,6 +2868,7 @@ hideOrderOverlay();
 
   lastLookupMobile = mobile;
 lastLookupOrderType = orderType;
+
 
   apiGet("getCustomerDetailsByMobile", { mobile })
     .then(rows => {
@@ -6726,6 +6729,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
