@@ -2576,9 +2576,13 @@ document.getElementById("saveNewAddressBtn").addEventListener("click", async () 
 
 
     function closeCheckout() {
-      document.getElementById('checkoutModal').style.display = 'none';
-      document.body.style.overflow = "";
-    }
+  const modal = document.getElementById("checkoutModal");
+  if (modal) modal.style.display = "none";
+
+  // 🔓 MOST IMPORTANT
+  document.body.style.overflow = "";
+}
+
 function deleteCart() {
   showCartOverlay("Clearing cart…");
 
@@ -5091,6 +5095,9 @@ async function openCheckout() {
   // ✅ 0️⃣ FIRST — close drawer cart
   closeCartDrawer();
 
+  // 🔒 ADD THIS (VERY IMPORTANT)
+  document.body.style.overflow = "hidden";
+
   // Always use master cart (NO backend calls)
   const freshCart = getCart();
 
@@ -5099,6 +5106,7 @@ async function openCheckout() {
 
   if (freshCart.length === 0) {
     alert("Your cart is empty!");
+    document.body.style.overflow = ""; // safety
     return;
   }
 
@@ -5112,8 +5120,10 @@ async function openCheckout() {
   refreshCheckout();
 
   // ✅ LAST — open checkout modal
-  document.getElementById("checkoutModal").style.display = "flex";
+  const modal = document.getElementById("checkoutModal");
+  modal.style.display = "flex";
 }
+
 
 
 async function openCartDrawer() {
@@ -6655,6 +6665,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
