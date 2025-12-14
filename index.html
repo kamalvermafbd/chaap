@@ -989,20 +989,14 @@ style="
 <!-- CHECKOUT MODAL (Tailwind Updated — with ALL your original fields) -->
 
 <div id="checkoutModal"
-     class="fixed inset-0 bg-black/50 hidden z-[99999]
-            flex items-end sm:items-center justify-center p-2">
+     class="fixed inset-0 bg-black bg-opacity-40 hidden z-[9999] flex items-center justify-center p-2">
 
-<div class="bg-white w-full max-w-[380px]
-            rounded-2xl shadow-2xl p-5 relative animate-fadeIn
-            max-h-[85vh] overflow-y-auto">
-
+  <div class="bg-white w-[92%] max-w-[360px] rounded-xl shadow-lg p-4 relative animate-fadeIn 
+              max-h-[82vh] overflow-y-auto">
 
     <!-- Close Button -->
     <button onclick="closeCheckout()"
-             class="absolute top-3 right-3 w-9 h-9
-               flex items-center justify-center
-               rounded-full bg-gray-100 hover:bg-gray-200
-               text-gray-600 text-lg">
+            class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-xl font-semibold">
       ✕
     </button>
 
@@ -1011,9 +1005,7 @@ style="
     </h2>
 
     <form id="checkoutForm" class="space-y-3">
-<h3 class="text-sm font-semibold text-gray-700 border-b pb-1">
-  Customer Details
-</h3>
+
       <!-- Mobile -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Mobile</label>
@@ -1062,10 +1054,6 @@ style="
                class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
                       focus:outline-none focus:ring-2 focus:ring-orange-500">
       </div>
-<div id="deliverySection">
-      <h3 class="text-sm font-semibold text-gray-700 border-b pb-1 mt-3">
-  Delivery Address
-</h3>
 
       <!-- Address -->
 <div id="addressWrapper">
@@ -1167,11 +1155,6 @@ style="
 </div>
 </div>
 
-  </div>
-<h3 class="text-sm font-semibold text-gray-700 border-b pb-1 mt-3">
-  Payment Method
-</h3>
-
       
       <!-- Payment -->
       <div>
@@ -1185,33 +1168,27 @@ style="
         </select>
       </div>
 <!-- BUTTONS -->
+<div class="mt-3 grid grid-cols-2 gap-3">
 
-<div class="sticky bottom-0 bg-white pt-3 border-t mt-4">
-  <div class="flex items-center justify-between gap-3">
+  <!-- Place Order (LEFT) -->
+ <button
+  type="button"
+  onclick="placeOrder()"
+  class="w-full py-2.5 rounded-xl text-sm font-semibold
+         bg-orange-600 hover:bg-orange-700 text-white">
+  Place Order
+</button>
 
-    
-    <div class="flex gap-2">
-      <button
-        type="button"
-        onclick="closeCheckout()"
-        class="px-4 py-2.5 rounded-xl text-sm font-semibold
-               bg-orange-100 text-orange-700 border border-orange-300
-               hover:bg-orange-200">
-        Cancel
-      </button>
 
-      <button
-        type="button"
-        onclick="placeOrder()"
-        class="px-5 py-2.5 rounded-xl text-sm font-semibold
-               bg-orange-600 hover:bg-orange-700 text-white">
-        Place Order
-      </button>
-    </div>
+  <!-- Cancel (RIGHT - matching size & theme) -->
+  <button type="button" onclick="closeCheckout()"
+    class="w-full py-2.5 rounded-xl text-sm font-semibold
+           bg-orange-100 text-orange-700 border border-orange-300
+           hover:bg-orange-200">
+    Cancel
+  </button>
 
-  </div>
 </div>
-
 
 
 
@@ -1230,7 +1207,7 @@ style="
     top: 0; left: 0;
     width: 100%; height: 100%;
     background: rgba(0,0,0,0.5);
-    z-index:999999;
+    z-index: 9999;
     justify-content: center;
     align-items: center;
     color: white;
@@ -1241,10 +1218,6 @@ style="
 
 
   <script>
-function updateCheckoutPayable(total) {
-  const el = document.getElementById("checkoutPayable");
-  if (el) el.innerText = fmt(total);
-}
 
 document.addEventListener("DOMContentLoaded", function() {
     const s = document.getElementById("menuSearch");
@@ -2706,76 +2679,34 @@ document.getElementById("mobile").addEventListener("input", function () {
   }
 });
 
-    function showOrderOverlay() {
-  const overlay = document.getElementById("loadingOverlay");
-  const orderSelect = document.getElementById("orderType");
-
-  if (overlay) overlay.style.display = "flex";
-  if (orderSelect) orderSelect.disabled = true;
-}
-
-function hideOrderOverlay() {
-  const overlay = document.getElementById("loadingOverlay");
-  const orderSelect = document.getElementById("orderType");
-
-  if (overlay) overlay.style.display = "none";
-  if (orderSelect) orderSelect.disabled = false;
-}
-
 let lastLookupMobile = "";
 let lastLookupOrderType = "";
 
 
     
 function toggleAddressField() {
-    console.log("🔥 toggleAddressField CALLED");
 
   const mobile = document.getElementById("mobile").value.trim();
   const orderType = document.getElementById("orderType").value;
 
- if (!orderType) {
-  hideOrderOverlay();
-  return;
-}
+  if (!orderType) return;
 
-if (!/^[0-9]{10}$/.test(mobile)) {
-  alert("Enter a valid 10-digit mobile number.");
-  hideOrderOverlay();
-  return;
-}
+  // --- 1) Validate mobile ---
+  if (!/^[0-9]{10}$/.test(mobile)) {
+    alert("Enter a valid 10-digit mobile number.");
+    return;
+  }
 
+  // --- 2) Base references ---
+  const nameField = document.getElementById("customerName");
+  const emailField = document.getElementById("email");
+  const addressField = document.getElementById("address");
 
-// --- 2) Base references ---
-const nameField = document.getElementById("customerName");
-const emailField = document.getElementById("email");
-const addressField = document.getElementById("address");
-
-const addressWrapper = document.getElementById("addressWrapper");
-const paymentField = document.getElementById("paymentMethod");
-const overlay = document.getElementById("loadingOverlay");
-const orderSelect = document.getElementById("orderType");
-const changeBtn = document.getElementById("changeAddressBtn");
-const deliverySection = document.getElementById("deliverySection");
-
-// ✅ STEP-UI: OrderType based UI (ALWAYS RUNS)
-if (orderType === "Home Delivery") {
-  deliverySection.style.display = "block";
-  addressField.required = true;
-} else {
-  deliverySection.style.display = "none";
-  addressField.required = false;
-}
-showOrderOverlay();
-// ✅ STEP-4A: debounce duplicate lookup (ONLY skip API)
-if (
-  mobile === lastLookupMobile &&
-  orderType === lastLookupOrderType
-) {
-  console.log("⚠️ Same mobile + orderType, API skipped");
-  hideOrderOverlay();   // optional but safe
-  return;
-}
-
+  const addressWrapper = document.getElementById("addressWrapper");
+  const paymentField = document.getElementById("paymentMethod");
+  const overlay = document.getElementById("loadingOverlay");
+  const orderSelect = document.getElementById("orderType");
+  const changeBtn = document.getElementById("changeAddressBtn");
 
   // NEW FIELDS
   const pincodeField = document.getElementById("pincode");
@@ -2786,7 +2717,6 @@ if (
   const cityWrapper    = document.getElementById("cityWrapper");
   const stateWrapper   = document.getElementById("stateWrapper");
 
-
   if (!nameField || !emailField || !addressField) return;
 
   // --- 3) Make name + email always visible ---
@@ -2795,20 +2725,17 @@ if (
   paymentField.style.display = "block";
 
   // --- 4) Always show overlay (both cases) ---
+  overlay.style.display = "flex";
+  orderSelect.disabled = true;
 
   // ==========================================================
   //                LOGGED-IN USER LOGIC
   // ==========================================================
   if (isLoggedIn()) {
-  
 
     nameField.readOnly = true;
     emailField.readOnly = true;
     addressField.readOnly = true;
-
-    lastLookupMobile = mobile;
-lastLookupOrderType = orderType;
-
 
     // Fetch everything from USER SHEET
     apiGet("getUserProfile", { mobile })
@@ -2828,24 +2755,33 @@ lastLookupOrderType = orderType;
       .finally(() => {
 
         // UI rules based on order type
-        // STEP-2A FINAL: single source of truth
-if (orderType === "Home Delivery") {
+        if (orderType === "Home Delivery") {
 
-  // show full delivery block
-  deliverySection.style.display = "block";
-  addressField.required = true;
-  changeBtn?.classList.remove("hidden");
+          // Address + 3 other fields visible
+          addressWrapper.style.display = "block";
+          pincodeWrapper.style.display = "block";
+          cityWrapper.style.display    = "block";
+          stateWrapper.style.display   = "block";
+          changeBtn?.classList.remove("hidden");
 
-} else {
+          addressField.required = true;
 
-  // hide full delivery block
-  deliverySection.style.display = "none";
-  addressField.required = false;
-  changeBtn?.classList.add("hidden");
-}
-hideOrderOverlay();
+        } else {
+          // Takeaway / Dine-In → hide address + pincode/city/state
+          addressWrapper.style.display = "none";
+          pincodeWrapper.style.display = "none";
+          cityWrapper.style.display    = "none";
+          stateWrapper.style.display   = "none";
 
- });
+          changeBtn?.classList.add("hidden");
+
+          addressField.required = false;
+        }
+
+        overlay.style.display = "none";
+        orderSelect.disabled = false;
+
+      });
 
     return; // STOP HERE — DO NOT TOUCH GUEST LOGIC
   }
@@ -2863,13 +2799,6 @@ hideOrderOverlay();
   cityWrapper.style.display    = "none";
   stateWrapper.style.display   = "none";
 
-// STEP-3A: show overlay for guest lookup
-
-
-  lastLookupMobile = mobile;
-lastLookupOrderType = orderType;
-
-
   apiGet("getCustomerDetailsByMobile", { mobile })
     .then(rows => {
 
@@ -2881,11 +2810,11 @@ lastLookupOrderType = orderType;
         addressField.value = "";
 
         if (orderType === "Home Delivery") {
-          deliverySection.style.display = "block";
+          addressWrapper.style.display = "block";
  addressField.required = true;
     addressField.readOnly = false;
     } else {
-          deliverySection.style.display = "none"; 
+    addressWrapper.style.display = "none";
     addressField.required = false;
         }
         return;
@@ -2919,13 +2848,13 @@ lastLookupOrderType = orderType;
 
       // ----- Show/hide based on order type -----
       if (orderType === "Home Delivery") {
-        deliverySection.style.display = "block";
+        addressWrapper.style.display = "block";
         addressField.required = true;
         addressField.readOnly = false;
         addressField.value = latestHD || "";
 
       } else {
-          deliverySection.style.display = "none";
+        addressWrapper.style.display = "none";
         addressField.value = "";
         addressField.required = false;
       }
@@ -2934,10 +2863,10 @@ lastLookupOrderType = orderType;
     .catch(err => {
       console.error(err);
       alert("Error loading customer details.");
-      
     })
     .finally(() => {
-        hideOrderOverlay();
+      overlay.style.display = "none";
+      orderSelect.disabled = false;
     });
 
 }
@@ -5185,16 +5114,9 @@ async function openCheckout() {
 
 async function openCartDrawer() {
 
-  const backdrop = document.getElementById("cartBackdrop");
-  const drawer   = document.getElementById("cartDrawer");
-
-  // 🔓 UNLOCK drawer if it was hard-closed earlier
-  if (backdrop) backdrop.style.display = "block";
-  if (drawer) drawer.style.display = "block";
-
-  // OPEN DRAWER INSTANTLY (NO DELAY)
-  backdrop && backdrop.classList.add("active");
-  drawer && drawer.classList.add("active");
+  //  OPEN DRAWER INSTANTLY (NO DELAY)
+  document.getElementById("cartBackdrop").classList.add("active");
+  document.getElementById("cartDrawer").classList.add("active");
   document.body.style.overflow = "hidden";
 
   // Fetch offers in background (NO await)
@@ -5234,28 +5156,28 @@ async function openCartDrawer() {
   }
 
   // ----------------------------------------
-  // ⭐ G4: REVALIDATE COUPON on drawer open
-  // ----------------------------------------
-  if (selectedCoupon && selectedCoupon.type === "onetime") {
+// ⭐ G4: REVALIDATE COUPON on drawer open
+// ----------------------------------------
+if (selectedCoupon && selectedCoupon.type === "onetime") {
 
     const subtotal = cart.reduce((sum, ci) => {
-      const mrp = Number(ci.rate || 0);
-      const disc = Number(ci.discPercent || 0);
-      const qty  = Number(ci.qty || 1);
-      return sum + (mrp - (mrp * disc / 100)) * qty;
+        const mrp = Number(ci.rate || 0);
+        const disc = Number(ci.discPercent || 0);
+        const qty  = Number(ci.qty || 1);
+        return sum + (mrp - (mrp * disc / 100)) * qty;
     }, 0);
 
     if (subtotal < Number(selectedCoupon.min || 0)) {
-      selectedCoupon = null;
-      alreadyAppliedCouponId = "";
-      showCouponError("Coupon removed because cart value changed.");
+        selectedCoupon = null;
+        alreadyAppliedCouponId = "";
+        showCouponError("Coupon removed because cart value changed.");
     }
-  }
-
+}
   // 4) Update totals + badge
   try { updateDrawerTotals(); } catch(e){}
   try { updateCartBadge(); } catch(e){}
 }
+
 
 function closeCartDrawer() {
   const backdrop = document.getElementById("cartBackdrop");
@@ -6729,117 +6651,6 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
