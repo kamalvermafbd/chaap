@@ -2992,6 +2992,9 @@ function placeOrder() {
   const orderType = document.getElementById('orderType').value;
   const address = document.getElementById('address').value.trim();
   const paymentMethod = document.getElementById('paymentMethod').value;
+// ✅ OPTION A: Address sirf Home Delivery me hi save hoga
+const finalAddress =
+  orderType === "Home Delivery" ? address : "";
 
   if (!orderType) {
   alert("Please select Order Type");
@@ -3027,7 +3030,7 @@ if (!paymentMethod) {
     email,
     mobile,
     orderType,
-    address,
+    address: finalAddress,
     cartItems: normalizeCartForOrder(safeCartItems),
 
 
@@ -6745,6 +6748,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
