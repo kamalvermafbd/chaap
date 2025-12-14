@@ -2705,6 +2705,15 @@ document.getElementById("mobile").addEventListener("input", function () {
     }
   }
 });
+
+    function showOrderOverlay() {
+  const overlay = document.getElementById("loadingOverlay");
+  const orderSelect = document.getElementById("orderType");
+
+  if (overlay) overlay.style.display = "flex";
+  if (orderSelect) orderSelect.disabled = true;
+}
+
 function hideOrderOverlay() {
   const overlay = document.getElementById("loadingOverlay");
   const orderSelect = document.getElementById("orderType");
@@ -6717,6 +6726,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
