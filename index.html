@@ -2579,9 +2579,14 @@ document.getElementById("saveNewAddressBtn").addEventListener("click", async () 
   const modal = document.getElementById("checkoutModal");
   if (modal) modal.style.display = "none";
 
-  // 🔓 MOST IMPORTANT
-  document.body.style.overflow = "";
+  // 🔥 MOST IMPORTANT
+  document.body.style.overflow = "auto";
+
+  // safety: kisi overlay ne focus na roka ho
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) overlay.style.display = "none";
 }
+
 
 function deleteCart() {
   showCartOverlay("Clearing cart…");
@@ -5127,7 +5132,7 @@ async function openCheckout() {
 
 
 async function openCartDrawer() {
-
+ closeCheckout();
   //  OPEN DRAWER INSTANTLY (NO DELAY)
   document.getElementById("cartBackdrop").classList.add("active");
   document.getElementById("cartDrawer").classList.add("active");
@@ -5199,17 +5204,15 @@ function closeCartDrawer() {
 
   if (drawer) {
     drawer.classList.remove("active");
-    drawer.style.display = "none";
   }
 
   if (backdrop) {
     backdrop.classList.remove("active");
-    backdrop.style.display = "none";
-    backdrop.style.pointerEvents = "none";
   }
 
   document.body.style.overflow = "auto";
 }
+
 
 
 
@@ -6665,6 +6668,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
