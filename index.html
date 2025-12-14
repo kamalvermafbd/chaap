@@ -2734,12 +2734,17 @@ showOrderOverlay();
   const mobile = document.getElementById("mobile").value.trim();
   const orderType = document.getElementById("orderType").value;
 
-  if (!orderType) return;
-  // --- 1) Validate mobile ---
-  if (!/^[0-9]{10}$/.test(mobile)) {
-    alert("Enter a valid 10-digit mobile number.");
-    return;
-  }
+ if (!orderType) {
+  hideOrderOverlay();
+  return;
+}
+
+if (!/^[0-9]{10}$/.test(mobile)) {
+  alert("Enter a valid 10-digit mobile number.");
+  hideOrderOverlay();
+  return;
+}
+
 
 
   // --- 2) Base references ---
@@ -6721,6 +6726,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
