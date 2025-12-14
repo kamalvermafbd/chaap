@@ -2742,7 +2742,9 @@ function toggleAddressField() {
   const orderSelect = document.getElementById("orderType");
   const changeBtn = document.getElementById("changeAddressBtn");
   const deliverySection = document.getElementById("deliverySection");
-
+overlay.style.display = "flex";
+overlay.offsetHeight;
+orderSelect.disabled = true;
     // STEP-4A: debounce duplicate lookup
 if (
   mobile === lastLookupMobile &&
@@ -2756,7 +2758,7 @@ if (
     deliverySection.style.display = "none";
   addressField.required = false;
   }
-
+hideOrderOverlay(); 
   return;
 }
 
@@ -6716,6 +6718,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
