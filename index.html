@@ -2705,6 +2705,13 @@ document.getElementById("mobile").addEventListener("input", function () {
     }
   }
 });
+function hideOrderOverlay() {
+  const overlay = document.getElementById("loadingOverlay");
+  const orderSelect = document.getElementById("orderType");
+
+  if (overlay) overlay.style.display = "none";
+  if (orderSelect) orderSelect.disabled = false;
+}
 
 let lastLookupMobile = "";
 let lastLookupOrderType = "";
@@ -2717,12 +2724,12 @@ function toggleAddressField() {
   const orderType = document.getElementById("orderType").value;
 
   if (!orderType) return;
-
   // --- 1) Validate mobile ---
   if (!/^[0-9]{10}$/.test(mobile)) {
     alert("Enter a valid 10-digit mobile number.");
     return;
   }
+
 
   // --- 2) Base references ---
   const nameField = document.getElementById("customerName");
@@ -2736,6 +2743,23 @@ function toggleAddressField() {
   const changeBtn = document.getElementById("changeAddressBtn");
   const deliverySection = document.getElementById("deliverySection");
 
+    // STEP-4A: debounce duplicate lookup
+if (
+  mobile === lastLookupMobile &&
+  orderType === lastLookupOrderType
+) {
+    // already same state → just ensure UI visible
+  if (orderType === "Home Delivery") {
+    deliverySection.style.display = "block";
+     addressField.required = true;
+  } else {
+    deliverySection.style.display = "none";
+  addressField.required = false;
+  }
+
+  return;
+}
+
   // NEW FIELDS
   const pincodeField = document.getElementById("pincode");
   const cityField    = document.getElementById("city");
@@ -2744,6 +2768,9 @@ function toggleAddressField() {
   const pincodeWrapper = document.getElementById("pincodeWrapper");
   const cityWrapper    = document.getElementById("cityWrapper");
   const stateWrapper   = document.getElementById("stateWrapper");
+// STEP-1B: default safe state
+deliverySection.style.display = "none";
+addressField.required = false;
 
   if (!nameField || !emailField || !addressField) return;
 
@@ -2753,18 +2780,21 @@ function toggleAddressField() {
   paymentField.style.display = "block";
 
   // --- 4) Always show overlay (both cases) ---
-  overlay.style.display = "flex";
-  overlay.offsetHeight;   // 🔥 FORCE browser repaint (IMPORTANT)
-  orderSelect.disabled = true;
 
   // ==========================================================
   //                LOGGED-IN USER LOGIC
   // ==========================================================
   if (isLoggedIn()) {
+  overlay.style.display = "flex";
+  overlay.offsetHeight;   // 🔥 FORCE browser repaint (IMPORTANT)
+  orderSelect.disabled = true;
 
     nameField.readOnly = true;
     emailField.readOnly = true;
     addressField.readOnly = true;
+
+    lastLookupMobile = mobile;
+lastLookupOrderType = orderType;
 
     // Fetch everything from USER SHEET
     apiGet("getUserProfile", { mobile })
@@ -2784,38 +2814,24 @@ function toggleAddressField() {
       .finally(() => {
 
         // UI rules based on order type
-        if (orderType === "Home Delivery") {
+        // STEP-2A FINAL: single source of truth
+if (orderType === "Home Delivery") {
 
-          // Address + 3 other fields visible
-            deliverySection.style.display = "block"; 
-          addressWrapper.style.display = "block";
-          pincodeWrapper.style.display = "block";
-          cityWrapper.style.display    = "block";
-          stateWrapper.style.display   = "block";
-          changeBtn?.classList.remove("hidden");
+  // show full delivery block
+  deliverySection.style.display = "block";
+  addressField.required = true;
+  changeBtn?.classList.remove("hidden");
 
-          addressField.required = true;
+} else {
 
-        } else {
-          // Takeaway / Dine-In → hide address + pincode/city/state
-            deliverySection.style.display = "none";   
-          addressWrapper.style.display = "none";
-          pincodeWrapper.style.display = "none";
-          cityWrapper.style.display    = "none";
-          stateWrapper.style.display   = "none";
+  // hide full delivery block
+  deliverySection.style.display = "none";
+  addressField.required = false;
+  changeBtn?.classList.add("hidden");
+}
+hideOrderOverlay();
 
-          changeBtn?.classList.add("hidden");
-
-          addressField.required = false;
-        }
-
-        setTimeout(() => {
-  overlay.style.display = "none";
-}, 150); // 150ms enough for human eye
-
-        orderSelect.disabled = false;
-
-      });
+ });
 
     return; // STOP HERE — DO NOT TOUCH GUEST LOGIC
   }
@@ -2833,6 +2849,13 @@ function toggleAddressField() {
   cityWrapper.style.display    = "none";
   stateWrapper.style.display   = "none";
 
+// STEP-3A: show overlay for guest lookup
+overlay.style.display = "flex";
+overlay.offsetHeight;
+orderSelect.disabled = true;
+
+  lastLookupMobile = mobile;
+lastLookupOrderType = orderType;
 
   apiGet("getCustomerDetailsByMobile", { mobile })
     .then(rows => {
@@ -2846,12 +2869,10 @@ function toggleAddressField() {
 
         if (orderType === "Home Delivery") {
           deliverySection.style.display = "block";
-          addressWrapper.style.display = "block";
  addressField.required = true;
     addressField.readOnly = false;
     } else {
           deliverySection.style.display = "none"; 
-    addressWrapper.style.display = "none";
     addressField.required = false;
         }
         return;
@@ -2885,13 +2906,13 @@ function toggleAddressField() {
 
       // ----- Show/hide based on order type -----
       if (orderType === "Home Delivery") {
-        addressWrapper.style.display = "block";
+        deliverySection.style.display = "block";
         addressField.required = true;
         addressField.readOnly = false;
         addressField.value = latestHD || "";
 
       } else {
-        addressWrapper.style.display = "none";
+          deliverySection.style.display = "none";
         addressField.value = "";
         addressField.required = false;
       }
@@ -2900,10 +2921,10 @@ function toggleAddressField() {
     .catch(err => {
       console.error(err);
       alert("Error loading customer details.");
+      
     })
     .finally(() => {
-      overlay.style.display = "none";
-      orderSelect.disabled = false;
+        hideOrderOverlay();
     });
 
 }
@@ -6695,6 +6716,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
