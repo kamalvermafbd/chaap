@@ -5148,6 +5148,8 @@ async function openCheckout() {
 
   // Build checkout items
   refreshCheckout();
+  // 🔴 IMPORTANT: hide Change Address by default
+  document.getElementById("changeAddressBtn")?.classList.add("hidden");
 
   // ✅ LAST — open checkout modal
   const modal = document.getElementById("checkoutModal");
@@ -6693,6 +6695,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
