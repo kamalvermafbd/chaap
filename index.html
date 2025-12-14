@@ -2993,6 +2993,18 @@ function placeOrder() {
   const address = document.getElementById('address').value.trim();
   const paymentMethod = document.getElementById('paymentMethod').value;
 
+  if (!orderType) {
+  alert("Please select Order Type");
+  window._orderLock = false;
+  return;
+}
+if (!paymentMethod) {
+  alert("Please select Payment Method");
+  window._orderLock = false;
+  return;
+}
+
+
   if (!/^[0-9]{10}$/.test(mobile)) {
     alert("Enter a valid 10-digit mobile number");
     window._orderLock = false;
@@ -6733,6 +6745,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
