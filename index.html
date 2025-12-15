@@ -3463,21 +3463,33 @@ function logoutUser() {
 
   
 function forceClearOverlays() {
-  [
+
+  const ids = [
     "loadingOverlay",
     "cartBackdrop",
     "cartOverlay",
     "newAddressModal",
     "couponOverlayBG"
-  ].forEach(id => {
+  ];
+
+  ids.forEach(id => {
     const el = document.getElementById(id);
-    if (el) {
-      el.style.display = "none";
-      el.classList.remove("active","flex","show");
-    }
+    if (!el) return;
+
+    // display based overlays
+    el.style.display = "none";
+
+    // class based overlays
+    el.classList.remove("active");
+    el.classList.remove("flex");
+    el.classList.remove("show");
+    el.classList.add("hidden");
   });
+
+  // 🔒 scroll unlock (MOST IMPORTANT)
   document.body.style.overflow = "auto";
 }
+
 
 
 </script>
@@ -6861,6 +6873,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
