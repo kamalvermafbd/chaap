@@ -3487,13 +3487,21 @@ function logoutUser() {
   }, 50);
 }
 function forceClearOverlays() {
-  ["cartBackdrop","cartOverlay","couponOverlayBG","newAddressModal"]
+
+  ["loadingOverlay","cartOverlay","newAddressModal","couponOverlayBG"]
     .forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
-      el.classList.remove("active","flex","show");
       el.style.display = "none";
+      el.classList.add("hidden");
     });
+
+  const backdrop = document.getElementById("cartBackdrop");
+  if (backdrop) {
+    backdrop.classList.remove("active");
+    backdrop.style.display = "none";
+    backdrop.style.pointerEvents = "none";
+  }
 
   document.body.style.overflow = "auto";
 }
@@ -6891,6 +6899,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
