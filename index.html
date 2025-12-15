@@ -3381,6 +3381,7 @@ function filterMenu() {
 
 function openLogin() {
   console.log("✅ openLogin START");
+      forceClearOverlays(); 
   const modal = document.getElementById("loginModal");
   modal.style.display = "flex";
 modal.classList.remove("hidden");
@@ -6876,6 +6877,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
