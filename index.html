@@ -5021,6 +5021,8 @@ function closeNewAddressModal() {
 }
 
 function saveNewAddress() {
+if (window._savingAddress) return;
+window._savingAddress = true;
 
   const mobile =
     localStorage.getItem("mobile") ||
@@ -5028,8 +5030,15 @@ function saveNewAddress() {
 
   if (!mobile) {
     alert("Login required.");
+    window._savingAddress = false;
     return;
   }
+  const btn = document.getElementById("saveNewAddressBtn");
+if (btn) {
+  btn.disabled = true;
+  btn.innerText = "Saving...";
+}
+
 
   const addr  = document.getElementById("newAddressField").value.trim();
   const pin   = document.getElementById("newPincode").value.trim();
@@ -5038,6 +5047,12 @@ function saveNewAddress() {
 
   if (!addr || pin.length !== 6 || !city || !state) {
     alert("Please fill all address fields correctly.");
+    window._savingAddress = false;
+if (btn) {
+    btn.disabled = false;
+    btn.innerText = "Save Address";
+}
+    
     return;
   }
 
@@ -5051,8 +5066,19 @@ function saveNewAddress() {
   .then(res => {
     if (!res || !res.success) {
       alert(res?.message || "Failed to save address.");
+      window._savingAddress = false;
+
+  if (btn) {
+    btn.disabled = false;
+    btn.innerText = "Save Address";
+  }
       return;
     }
+window._savingAddress = false;
+if (btn) {
+  btn.disabled = false;
+  btn.innerText = "Save Address";
+}
 
     // ✅ Close modal
     closeNewAddressModal();
@@ -5081,6 +5107,11 @@ function saveNewAddress() {
    console.log("NEW MODAL SAVE FLOW RUNNING");
 
     console.warn("Save address fetch failed, but may be saved:", err);
+window._savingAddress = false;
+if (btn) {
+  btn.disabled = false;
+  btn.innerText = "Save Address";
+}
 
   closeNewAddressModal();
   onChangeAddressClick();
@@ -6724,6 +6755,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
