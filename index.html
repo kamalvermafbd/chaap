@@ -642,19 +642,12 @@ body::before {
 #cartBackdrop.active {
   pointer-events: auto;
 }
-/* 🔥 EMERGENCY UNBLOCK FIX */
-#cartBackdrop,
-#cartOverlay,
-#loadingOverlay,
-#couponOverlayBG,
-#newAddressModal {
-  pointer-events: none !important;
-}
+
+/* login/signup always clickable */
 #loginModal {
   pointer-events: auto !important;
-  z-index: 999999 !important;
+  z-index: 20000 !important;
 }
-
 
   </style>
 </head>
@@ -3494,35 +3487,22 @@ function logoutUser() {
 }
 function forceClearOverlays() {
 
-  const ids = [
-    "loadingOverlay",
-    "cartOverlay",
-    "newAddressModal",
-    "couponOverlayBG"
-    // ❌ cartBackdrop alag handle hoga
-  ];
+  ["loadingOverlay","cartOverlay","newAddressModal","couponOverlayBG"]
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.display = "none";
+      el.classList.add("hidden");
+    });
 
-  ids.forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-
-    el.style.display = "none";
-    el.classList.remove("active", "flex", "show");
-    el.classList.add("hidden");
-  });
-
-  // 🔥 ONLY backdrop should block clicks
   const backdrop = document.getElementById("cartBackdrop");
   if (backdrop) {
-    backdrop.style.display = "none";
     backdrop.classList.remove("active");
-    backdrop.classList.add("hidden");
+    backdrop.style.display = "none";
     backdrop.style.pointerEvents = "none";
   }
 
-  // 🔓 restore screen
   document.body.style.overflow = "auto";
-  document.body.style.pointerEvents = "auto";
 }
 
 
@@ -6908,6 +6888,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
