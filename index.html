@@ -633,29 +633,20 @@ body::before {
 #checkoutModal ::-webkit-scrollbar-thumb:hover {
   background-color: rgba(0, 0, 0, 0.4);
 }
-
-#loginModal {
-  z-index: 100000 !important;   /* drawer se bhi upar */
-  pointer-events: auto !important;
-}
-
-header {
-  position: relative;
-  z-index: 1;
-}
-
+/* 🔒 Inactive cart backdrop should NOT block clicks */
 #cartBackdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.25);
-  display: none;
-  z-index: 99998;
-  pointer-events: none;   /* default OFF */
+  pointer-events: none;
 }
 
+/* 🔥 Only block clicks when cart is actually open */
 #cartBackdrop.active {
-  display: block;
-  pointer-events: auto;  /* ONLY when cart open */
+  pointer-events: auto;
+}
+
+/* login/signup always clickable */
+#loginModal {
+  pointer-events: auto !important;
+  z-index: 20000 !important;
 }
 
   </style>
@@ -3186,11 +3177,13 @@ function filterMenu() {
 
 <!-- LOGIN OVERLAY (NEW TAILWIND VERSION) -->
 <div id="loginModal"
-  class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+  class="fixed inset-0 bg-black bg-opacity-50 z-[20000] hidden flex items-center justify-center">
 
-    <div class="bg-white w-full max-w-sm rounded-xl p-5 relative">
+    <div class="bg-white w-11/12 max-w-sm rounded-xl p-6 shadow-xl relative 
+              flex flex-col gap-4">
 
 
+    <!-- Close -->
     <button onclick="closeLogin()"
       class="absolute top-3 right-3 text-gray-600 text-2xl font-semibold">
       &times;
@@ -3212,12 +3205,15 @@ function filterMenu() {
       placeholder="Enter Password"
       class="w-full border border-gray-300 rounded-lg px-4 py-3 text-base 
        focus:ring-2 focus:ring-orange-400 outline-none"
-       />
+ 
+      />
 
     <!-- Login Button -->
     <button onclick="loginUser()"
       class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold 
-       shadow-md hover:bg-orange-600 transition">
+       shadow-md hover:bg-orange-600 transition"
+
+      >
       Login
     </button>
 
@@ -3227,6 +3223,10 @@ function filterMenu() {
   style="background:none; border:none; padding:0;">
   Forgot Password?
 </button>
+
+
+
+
 
 
 <!-- Signup Link -->
@@ -3385,14 +3385,24 @@ function filterMenu() {
 <script>
 
 function openLogin() {
-  forceClearOverlays();
+  console.log("✅ openLogin START");
+    
   const modal = document.getElementById("loginModal");
-   modal.style.display = "flex";
+  modal.style.display = "flex";
   modal.classList.remove("hidden");
-  
- document.getElementById("signupLabelBox").style.display = "none";
-}
+modal.style.pointerEvents = "auto";
+  modal.style.zIndex = "10000";
+  // 🔥 MOST IMPORTANT FIX
+  modal.querySelectorAll(".hidden").forEach(e => e.classList.remove("hidden"));
 
+  document.body.style.overflow = "hidden";
+  document.getElementById("signupLabelBox").style.display = "none";
+
+  console.log("✅ openLogin END");
+}
+  window.addEventListener("load", () => {
+    document.body.style.pointerEvents = "auto";
+  });
 
 function closeLogin() {
   const modal = document.getElementById("loginModal");
@@ -3476,6 +3486,7 @@ function logoutUser() {
   }, 50);
 }
 function forceClearOverlays() {
+
   ["loadingOverlay","cartOverlay","newAddressModal","couponOverlayBG"]
     .forEach(id => {
       const el = document.getElementById(id);
@@ -3488,7 +3499,7 @@ function forceClearOverlays() {
   if (backdrop) {
     backdrop.classList.remove("active");
     backdrop.style.display = "none";
-    backdrop.style.pointerEvents = "none"; // ⭐ MUST
+    backdrop.style.pointerEvents = "none";
   }
 
   document.body.style.overflow = "auto";
@@ -6877,18 +6888,6 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
