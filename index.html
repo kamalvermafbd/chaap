@@ -2644,6 +2644,7 @@ document.getElementById("saveNewAddressBtn").addEventListener("click", async () 
   } catch (err) {
     alert("Error saving address: " + err.message);
   }
+console.log("OLD ADDRESS SAVE FLOW RUNNING");
 
   btn.innerText = "Save Address";
   btn.disabled = false;
@@ -5204,6 +5205,8 @@ function saveNewAddress() {
   })
   .catch(err => {
     console.error(err);
+   console.log("NEW MODAL SAVE FLOW RUNNING");
+
     console.warn("Save address fetch failed, but may be saved:", err);
 
   closeNewAddressModal();
@@ -6848,6 +6851,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
