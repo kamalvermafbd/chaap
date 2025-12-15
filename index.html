@@ -668,7 +668,6 @@ body::before {
     Processing your order...
   </div>
 
-
 <div id="cartOverlay" class="fixed inset-0 bg-black bg-opacity-45 z-50 text-white text-xl font-medium flex items-center justify-center hidden">
   Updating your cart…
 </div>
@@ -3495,16 +3494,6 @@ function forceClearOverlays() {
       el.style.display = "none";
       el.classList.add("hidden");
     });
-
-  const backdrop = document.getElementById("cartBackdrop");
-  if (backdrop) {
-    backdrop.classList.remove("active");
-    backdrop.style.display = "none";
-    backdrop.style.pointerEvents = "none";
-  }
-
-  document.body.style.overflow = "auto";
-}
 
   const backdrop = document.getElementById("cartBackdrop");
   if (backdrop) {
@@ -6899,9 +6888,6 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
-
-
-
 
 
 
