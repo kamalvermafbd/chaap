@@ -4929,6 +4929,7 @@ function onChangeAddressClick() {
   const status = document.getElementById("addressStatus");
   if (status) {
     status.innerText = "Fetching your saved address…";
+     status.className = "text-sm text-red-600 font-medium";
     status.classList.remove("hidden");
   }
   const mobile = localStorage.getItem("mobile") || localStorage.getItem("userMobile");
@@ -6774,6 +6775,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
