@@ -4976,12 +4976,22 @@ function onChangeAddressClick() {
         : [];
 
       // 2️⃣ If nothing saved → show new form
-      if (!primary && multiList.length === 0) {
-        newFormBox.classList.remove("hidden");
-        autofillNewAddressMobile();
-        if (overlay) overlay.style.display = "none";
-        return;
-      }
+      // 2️⃣ If nothing saved → DO NOT auto-open new address form in checkout
+if (!primary && multiList.length === 0) {
+  dropdownBox.classList.add("hidden");
+
+  // just inform user
+  const status = document.getElementById("addressStatus");
+  if (status) {
+    status.innerText = "No saved address found. Please add a new address.";
+    status.className = "text-sm text-red-600 font-medium";
+    status.classList.remove("hidden");
+  }
+
+  if (overlay) overlay.style.display = "none";
+  return;
+}
+
 
       // 3️⃣ Show dropdown box
       dropdownBox.classList.remove("hidden");
@@ -6775,6 +6785,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
