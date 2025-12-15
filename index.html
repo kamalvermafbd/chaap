@@ -639,10 +639,6 @@ body::before {
   pointer-events: auto !important;
 }
 
-#cartBackdrop {
-  pointer-events: none;
-}
-
 
 
   </style>
@@ -3462,7 +3458,6 @@ function logoutUser() {
   }, 50);
 }
 function forceClearOverlays() {
-
   ["loadingOverlay","cartOverlay","newAddressModal","couponOverlayBG"]
     .forEach(id => {
       const el = document.getElementById(id);
@@ -3475,7 +3470,7 @@ function forceClearOverlays() {
   if (backdrop) {
     backdrop.classList.remove("active");
     backdrop.style.display = "none";
-    backdrop.style.pointerEvents = "none";
+    backdrop.style.pointerEvents = "none"; // ⭐ MUST
   }
 
   document.body.style.overflow = "auto";
@@ -6864,6 +6859,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
