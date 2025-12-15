@@ -3469,11 +3469,11 @@ function logoutUser() {
     alert("Logged out successfully.");
   }, 50);
 }
-
- function forceClearOverlays() {
+function forceClearOverlays() {
 
   const ids = [
     "loadingOverlay",
+    "cartBackdrop",
     "cartOverlay",
     "newAddressModal",
     "couponOverlayBG"
@@ -3484,21 +3484,14 @@ function logoutUser() {
     if (!el) return;
 
     el.style.display = "none";
+    el.style.pointerEvents = "none";   // 🔥 MOST IMPORTANT
     el.classList.remove("active", "flex", "show");
     el.classList.add("hidden");
   });
 
-  // 🔥 cartBackdrop SPECIAL handling
-  const backdrop = document.getElementById("cartBackdrop");
-  if (backdrop) {
-    backdrop.style.display = "none";
-    backdrop.classList.remove("active");
-    backdrop.classList.add("hidden");
-    backdrop.style.pointerEvents = "none";   // ⭐ MOST IMPORTANT
-  }
-
-  // 🔓 unlock scroll
+  // 🔓 unlock screen fully
   document.body.style.overflow = "auto";
+  document.body.style.pointerEvents = "auto";
 }
 
 
@@ -6883,6 +6876,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
