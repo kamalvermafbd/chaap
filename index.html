@@ -3481,10 +3481,10 @@ function forceClearOverlays() {
 
   const ids = [
     "loadingOverlay",
-    "cartBackdrop",
     "cartOverlay",
     "newAddressModal",
     "couponOverlayBG"
+    // ❌ cartBackdrop alag handle hoga
   ];
 
   ids.forEach(id => {
@@ -3492,15 +3492,24 @@ function forceClearOverlays() {
     if (!el) return;
 
     el.style.display = "none";
-    el.style.pointerEvents = "none";   // 🔥 MOST IMPORTANT
     el.classList.remove("active", "flex", "show");
     el.classList.add("hidden");
   });
 
-  // 🔓 unlock screen fully
+  // 🔥 ONLY backdrop should block clicks
+  const backdrop = document.getElementById("cartBackdrop");
+  if (backdrop) {
+    backdrop.style.display = "none";
+    backdrop.classList.remove("active");
+    backdrop.classList.add("hidden");
+    backdrop.style.pointerEvents = "none";
+  }
+
+  // 🔓 restore screen
   document.body.style.overflow = "auto";
   document.body.style.pointerEvents = "auto";
 }
+
 
 
 </script>
@@ -6884,6 +6893,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
