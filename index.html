@@ -2522,133 +2522,6 @@ document.getElementById("savedAddressDropdown").addEventListener("change", async
   }
 });
 
-document.getElementById("saveNewAddressBtn").addEventListener("click", async () => {
-
-  const mobile = localStorage.getItem("userMobile");
-  if (!mobile) return alert("You must be logged in to save address.");
-
-  // Read fields
-  const addr  = document.getElementById("newAddressField").value.trim();
-  const pin   = document.getElementById("newPincode").value.trim();
-  const city  = document.getElementById("newCity").value.trim();
-  const state = document.getElementById("newState").value.trim();
-
-  // Validations
-  if (!addr) return alert("Please enter address.");
-  if (!pin || pin.length !== 6) return alert("Enter valid 6-digit pincode.");
-  if (!city) return alert("City is missing.");
-  if (!state) return alert("State is missing.");
-
-  // Disable button
-  const btn = document.getElementById("saveNewAddressBtn");
-  btn.innerText = "Saving...";
-  btn.disabled = true;
-
-  try {
-    const res = await fetch(
-      "https://script.google.com/macros/s/AKfycbz8B-nwXivGHzKgcWT8zTvS4sAWG6dKfsDh8rsn29CGXCeIxxeNJ9NaPcL03cQBGHEf/exec",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          action: "addMultiAddress",
-          mobile,
-          address: addr,
-          pincode: pin,
-          city,
-          state
-        })
-      }
-    ).then(r => r.json());
-
-    if (!res.success) {
-      alert(res.message || "Failed to save address.");
-      btn.innerText = "Save Address";
-      btn.disabled = false;
-      return;
-    }
-
-    alert("Address saved successfully!");
-
-    // -----------------------------
-    //  STEP-1: fill main checkout fields
-    // -----------------------------
-    document.getElementById("address").value = addr;
-    document.getElementById("pincode").value = pin;
-    document.getElementById("city").value = city;
-    document.getElementById("state").value = state;
-
-    // -----------------------------
-    //  STEP-2: hide new address form
-    // -----------------------------
-    document.getElementById("newAddressForm").classList.add("hidden");
-
-    // -----------------------------
-    //  STEP-3: reload dropdown
-    // -----------------------------
-    const dropdown = document.getElementById("savedAddressDropdown");
-    const box = document.getElementById("addressSelectContainer");
-
-    const data = await loadSavedAddresses();
-
-    dropdown.innerHTML = "";
-
-    // Primary
-    if (data.primaryObj) {
-      const p = data.primaryObj;
-      const opt = document.createElement("option");
-      opt.value = JSON.stringify(p);
-      opt.textContent = `Primary: ${p.address}, ${p.pincode}, ${p.city}, ${p.state}`;
-      dropdown.appendChild(opt);
-    }
-
-    // Multi
-    data.multiObjList.forEach(a => {
-      const opt = document.createElement("option");
-      opt.value = JSON.stringify(a);
-      opt.textContent = `${a.address}, ${a.pincode}, ${a.city}, ${a.state}`;
-      dropdown.appendChild(opt);
-    });
-
-    // Add New
-    const addNew = document.createElement("option");
-    addNew.value = "__ADD_NEW__";
-    addNew.textContent = "➕ Add New Address";
-    dropdown.appendChild(addNew);
-
-    // -----------------------------
-    //  STEP-4: auto-select the new saved address
-    // -----------------------------
-    const newObj = {
-      address: addr,
-      pincode: pin,
-      city,
-      state,
-      type: "multi"
-    };
-
-    dropdown.value = JSON.stringify(newObj);
-
-    // -----------------------------
-    //  STEP-5: show dropdown container
-    // -----------------------------
-    box.classList.remove("hidden");
-
-    // -----------------------------
-    //  STEP-6: clear new-form fields
-    // -----------------------------
-    document.getElementById("newAddressField").value = "";
-    document.getElementById("newPincode").value = "";
-    document.getElementById("newCity").value = "";
-    document.getElementById("newState").value = "";
-
-  } catch (err) {
-    alert("Error saving address: " + err.message);
-  }
-console.log("OLD ADDRESS SAVE FLOW RUNNING");
-
-  btn.innerText = "Save Address";
-  btn.disabled = false;
-});
 
 
 
@@ -6851,6 +6724,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
