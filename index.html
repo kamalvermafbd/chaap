@@ -644,6 +644,19 @@ header {
   z-index: 1;
 }
 
+#cartBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+  display: none;
+  z-index: 99998;
+  pointer-events: none;   /* default OFF */
+}
+
+#cartBackdrop.active {
+  display: block;
+  pointer-events: auto;  /* ONLY when cart open */
+}
 
   </style>
 </head>
@@ -6864,6 +6877,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
