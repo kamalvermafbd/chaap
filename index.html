@@ -3379,13 +3379,13 @@ function filterMenu() {
 
 <script>
 
-//open login
 function openLogin() {
+  console.log("✅ openLogin START");
   const modal = document.getElementById("loginModal");
   modal.style.display = "flex";
 modal.classList.remove("hidden");
   document.getElementById("signupLabelBox").style.display = "none";
-
+   console.log("✅ openLogin END");
 }
 
 function closeLogin() {
@@ -6883,6 +6883,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
