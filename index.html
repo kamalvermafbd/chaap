@@ -1142,7 +1142,12 @@ style="
   id="changeAddressBtn"
   type="button"
   onclick="onChangeAddressClick()"
-  class="hidden bg-blue-600 text-white px-3 py-1 rounded-md text-sm mt-2">
+  class="hidden w-full mt-2
+         border border-orange-500 text-orange-600
+         bg-white
+         py-2.5 rounded-xl text-sm font-semibold
+         hover:bg-orange-50
+         transition">
   Change Address
 </button>
 <p id="addressStatus"
@@ -1161,7 +1166,11 @@ style="
   <!-- STEP 3D BUTTON BELOW DROPDOWN -->
   <button type="button"
         onclick="onChangeAddressAddNew()"
-        class="mt-2 px-3 py-1 bg-gray-600 text-white rounded text-sm">
+         class="w-full mt-2
+         bg-orange-100 text-orange-700
+         py-2.5 rounded-xl text-sm font-semibold
+         hover:bg-orange-200
+         transition">
   + Add New Address
 </button>
 
@@ -6755,6 +6764,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
