@@ -634,7 +634,18 @@ body::before {
   background-color: rgba(0, 0, 0, 0.4);
 }
 
+#loginModal {
+  z-index: 100000 !important;   /* drawer se bhi upar */
+  pointer-events: auto !important;
+}
 
+#cartBackdrop {
+  pointer-events: none;
+}
+
+#cartBackdrop.active {
+  pointer-events: auto;
+}
 
   </style>
 </head>
@@ -3366,6 +3377,7 @@ function openLogin() {
   const modal = document.getElementById("loginModal");
    modal.style.display = "flex";
   modal.classList.remove("hidden");
+   document.body.style.overflow = "hidden";
  document.getElementById("signupLabelBox").style.display = "none";
 }
 
@@ -6854,6 +6866,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
