@@ -642,6 +642,18 @@ body::before {
 #cartBackdrop.active {
   pointer-events: auto;
 }
+/* 🔥 EMERGENCY UNBLOCK FIX */
+#cartBackdrop,
+#cartOverlay,
+#loadingOverlay,
+#couponOverlayBG,
+#newAddressModal {
+  pointer-events: none !important;
+}
+#loginModal {
+  pointer-events: auto !important;
+  z-index: 999999 !important;
+}
 
 
   </style>
@@ -3385,7 +3397,8 @@ function openLogin() {
   const modal = document.getElementById("loginModal");
   modal.style.display = "flex";
   modal.classList.remove("hidden");
-
+modal.style.pointerEvents = "auto";
+  modal.style.zIndex = "10000";
   // 🔥 MOST IMPORTANT FIX
   modal.querySelectorAll(".hidden").forEach(e => e.classList.remove("hidden"));
 
@@ -3394,7 +3407,9 @@ function openLogin() {
 
   console.log("✅ openLogin END");
 }
-
+  window.addEventListener("load", () => {
+    document.body.style.pointerEvents = "auto";
+  });
 
 function closeLogin() {
   const modal = document.getElementById("loginModal");
@@ -6893,6 +6908,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
