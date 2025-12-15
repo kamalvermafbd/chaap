@@ -5152,17 +5152,18 @@ async function saveNewAddressFromModal() {
 
   function onChangeAddressAddNew() {
 
-  // ❌ Checkout ke andar inline form kabhi mat dikhao
-  const inlineForm = document.getElementById("newAddressForm");
-  if (inlineForm) inlineForm.classList.add("hidden");
-
-  // ✅ Separate New Address modal open karo
+  // ✅ Open New Address modal
   const modal = document.getElementById("newAddressModal");
   if (!modal) return;
 
   modal.classList.remove("hidden");
   modal.classList.add("flex");
+
+  // ✅ Show form INSIDE modal
+  const form = document.getElementById("newAddressForm");
+  if (form) form.classList.remove("hidden");
 }
+
 function closeNewAddressModal() {
 
   const modal = document.getElementById("newAddressModal");
@@ -6867,6 +6868,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
