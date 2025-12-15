@@ -645,7 +645,7 @@ body::before {
     top: 0; left: 0;
     width: 100%; height: 100%;
     background: rgba(0,0,0,0.5);
-    z-index: 20000;
+    z-index: 9999;
     justify-content: center;
     align-items: center;
     color: white;
@@ -1159,15 +1159,12 @@ style="
     <!-- Options added dynamically -->
   </select>
   <!-- STEP 3D BUTTON BELOW DROPDOWN -->
-  <button type="button"
-        onclick="onChangeAddressAddNew()"
-        class="mt-2 px-3 py-1 bg-gray-600 text-white rounded text-sm">
-  + Add New Address
-</button>
+  <button onclick="onChangeAddressAddNew()"
+          class="mt-2 px-3 py-1 bg-gray-600 text-white rounded text-sm">
+    + Add New Address
+  </button>
+</div>
 
-  </div>   <!-- ✅ CLOSE addressSelectContainer -->
-
-</div>   
 
       
      <!-- Payment Method -->
@@ -1224,7 +1221,6 @@ style="
 
     </form>
 
-
   </div>
 </div>
 
@@ -1275,6 +1271,7 @@ style="
   </button>
 
 </div>
+
 
 
 
@@ -2756,7 +2753,6 @@ let lastLookupOrderType = "";
 
     
 function toggleAddressField() {
-console.log("toggleAddressField fired");
 
   const mobile = document.getElementById("mobile").value.trim();
   const orderType = document.getElementById("orderType").value;
@@ -2765,7 +2761,6 @@ console.log("toggleAddressField fired");
 
   // --- 1) Validate mobile ---
   if (!/^[0-9]{10}$/.test(mobile)) {
-      console.log("mobile invalid, returning");   
     alert("Enter a valid 10-digit mobile number.");
     return;
   }
@@ -2796,7 +2791,7 @@ console.log("toggleAddressField fired");
   nameField.closest("div").style.display = "block";
   emailField.closest("div").style.display = "block";
   paymentField.style.display = "block";
-console.log("overlay about to show");   //
+
   // --- 4) Always show overlay (both cases) ---
   overlay.style.display = "flex";
   orderSelect.disabled = true;
@@ -5152,18 +5147,17 @@ async function saveNewAddressFromModal() {
 
   function onChangeAddressAddNew() {
 
-  // ✅ Open New Address modal
+  // ❌ Checkout ke andar inline form kabhi mat dikhao
+  const inlineForm = document.getElementById("newAddressForm");
+  if (inlineForm) inlineForm.classList.add("hidden");
+
+  // ✅ Separate New Address modal open karo
   const modal = document.getElementById("newAddressModal");
   if (!modal) return;
 
   modal.classList.remove("hidden");
   modal.classList.add("flex");
-
-  // ✅ Show form INSIDE modal
-  const form = document.getElementById("newAddressForm");
-  if (form) form.classList.remove("hidden");
 }
-
 function closeNewAddressModal() {
 
   const modal = document.getElementById("newAddressModal");
@@ -6868,12 +6862,6 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
-
-
-
-
-
-
 
 
 
