@@ -1269,10 +1269,12 @@ style="
 
 
   <label class="text-sm font-medium mt-3">Pincode</label>
-  <select id="newPincode"
-        class="w-full border px-2 py-2 rounded bg-white">
-  <option value="">Select Pincode</option>
-</select>
+  <input id="newPincode"
+       maxlength="6"
+       oninput="onNewPincodeChange()"
+       class="w-full border px-2 py-2 rounded"
+       placeholder="Enter pincode" />
+
 
 
   <label class="text-sm font-medium mt-3">City</label>
@@ -6781,6 +6783,37 @@ async function loadPincodeDropdown() {
   }
 }
 
+function onNewPincodeChange() {
+  const pin = document.getElementById("newPincode").value.trim();
+  const cityInput  = document.getElementById("newCity");
+  const stateInput = document.getElementById("newState");
+
+  // reset on partial input
+  if (pin.length < 6) {
+    cityInput.value = "";
+    stateInput.value = "";
+    return;
+  }
+
+  // only when 6 digits
+  apiGet("getCityStateByPincode", { pincode: pin })
+    .then(res => {
+      if (res && res.found) {
+        cityInput.value  = res.city || "";
+        stateInput.value = res.state || "";
+      } else {
+        // allow manual entry
+        cityInput.value = "";
+        stateInput.value = "";
+      }
+    })
+    .catch(err => {
+      console.error("Pincode lookup failed", err);
+      cityInput.value = "";
+      stateInput.value = "";
+    });
+}
+
 
 
 
@@ -6788,6 +6821,7 @@ async function loadPincodeDropdown() {
 </script>
 </body>
 </html>
+
 
 
 
