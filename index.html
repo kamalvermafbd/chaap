@@ -633,15 +633,6 @@ body::before {
 #checkoutModal ::-webkit-scrollbar-thumb:hover {
   background-color: rgba(0, 0, 0, 0.4);
 }
-/* 🔒 Inactive cart backdrop should NOT block clicks */
-#cartBackdrop {
-  pointer-events: none;
-}
-
-/* 🔥 Only block clicks when cart is actually open */
-#cartBackdrop.active {
-  pointer-events: auto;
-}
 
 /* login/signup always clickable */
 #loginModal {
@@ -6888,6 +6879,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
