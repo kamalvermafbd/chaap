@@ -652,21 +652,7 @@ body::before {
   </style>
 </head>
 <body>
-  <div id="loadingOverlay" style="
-  
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 15000;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-size: 24px;
-  ">
-    Processing your order...
-  </div>
+ 
 
 <div id="cartOverlay" class="fixed inset-0 bg-black bg-opacity-45 z-50 text-white text-xl font-medium flex items-center justify-center hidden">
   Updating your cart…
@@ -3486,14 +3472,16 @@ function logoutUser() {
   }, 50);
 }
 function forceClearOverlays() {
-
-  ["loadingOverlay","cartOverlay","newAddressModal","couponOverlayBG"]
+  ["cartBackdrop","cartOverlay","couponOverlayBG","newAddressModal"]
     .forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
+      el.classList.remove("active","flex","show");
       el.style.display = "none";
-      el.classList.add("hidden");
     });
+
+  document.body.style.overflow = "auto";
+}
 
   const backdrop = document.getElementById("cartBackdrop");
   if (backdrop) {
@@ -6888,6 +6876,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
