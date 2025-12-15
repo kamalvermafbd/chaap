@@ -665,7 +665,7 @@ body::before {
 </div>
 
 
-  <button onclick="openLogin()" 
+  <button onclick="event.stopPropagation(); openLogin()" 
         style="position:absolute; right:100px; top:60px; z-index:9999;
                background:#444;color:white;padding:8px 14px;border:none;
                border-radius:6px;cursor:pointer;">
@@ -6880,6 +6880,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
