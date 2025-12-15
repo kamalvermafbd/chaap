@@ -1129,6 +1129,9 @@ style="
   class="hidden bg-blue-600 text-white px-3 py-1 rounded-md text-sm mt-2">
   Change Address
 </button>
+<p id="addressStatus"
+   class="text-xs text-gray-500 mt-1 hidden">
+</p>
 
 
 
@@ -4922,7 +4925,12 @@ function autofillMobileForLoggedIn() {
 // Run when checkout modal shows up
 
 function onChangeAddressClick() {
-
+ // 🔹 STATUS MESSAGE SHOW
+  const status = document.getElementById("addressStatus");
+  if (status) {
+    status.innerText = "Fetching your saved address…";
+    status.classList.remove("hidden");
+  }
   const mobile = localStorage.getItem("mobile") || localStorage.getItem("userMobile");
   if (!mobile) return;
 
@@ -5015,19 +5023,39 @@ function onChangeAddressClick() {
 
         const optionsReady = ddl.options.length > 0;
         const visible = !dropdownBox.classList.contains("hidden");
+// ⭐ SUPER SAFE OVERLAY HIDE → when dropdown truly visible
+const waitRender = setInterval(() => {
 
-        if (optionsReady && visible) {
-          clearInterval(waitRender);
+  const optionsReady = ddl.options.length > 0;
+  const visible = !dropdownBox.classList.contains("hidden");
 
-          // ensure browser paints dropdown before hiding overlay
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              if (overlay) overlay.style.display = "none";
-            });
-          });
+  if (optionsReady && visible) {
+    clearInterval(waitRender);
+
+    // ensure browser paints dropdown before hiding overlay
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (overlay) overlay.style.display = "none";
+
+        // ✅ SUCCESS MESSAGE (STEP-1C)
+        const status = document.getElementById("addressStatus");
+        if (status) {
+          status.innerText = "Address loaded successfully";
+          status.className = "text-sm text-green-600 font-medium";
+          status.classList.remove("hidden");
+
+          // auto hide after 1.5 sec
+          setTimeout(() => {
+            status.classList.add("hidden");
+          }, 1500);
         }
+      });
+    });
+  }
 
-      }, 50);
+}, 50);
+
+
 
       // 5️⃣ Dropdown change handler
       ddl.onchange = () => {
@@ -5045,6 +5073,8 @@ function onChangeAddressClick() {
       console.error("Address load error:", err);
       alert("Unable to load saved addresses.");
       if (overlay) overlay.style.display = "none";
+    const status = document.getElementById("addressStatus");
+  if (status) status.classList.add("hidden");
   });
 }
 
@@ -6750,6 +6780,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
