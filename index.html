@@ -1150,6 +1150,44 @@ style="
 </div>
 
 
+<!-- ADD NEW ADDRESS FORM -->
+<div id="newAddressForm" class="mt-4 hidden border p-3 rounded bg-gray-50">
+
+  <label class="text-sm font-medium">Mobile</label>
+  <input id="newAddressMobile"
+         class="w-full border px-2 py-2 rounded bg-gray-200 text-gray-700"
+         readonly />
+
+  <label class="text-sm font-medium mt-3">Address</label>
+  <textarea id="newAddressField"
+            class="w-full border px-2 py-2 rounded"
+            placeholder="Enter full address"></textarea>
+
+  <label class="text-sm font-medium mt-3">Pincode</label>
+  <input id="newPincode"
+         class="w-full border px-2 py-2 rounded"
+         maxlength="6"
+         placeholder="Enter pincode" />
+
+  <label class="text-sm font-medium mt-3">City</label>
+  <input id="newCity"
+         class="w-full border px-2 py-2 rounded"
+         placeholder="Enter city" />
+
+  <label class="text-sm font-medium mt-3">State</label>
+  <input id="newState"
+         class="w-full border px-2 py-2 rounded"
+         placeholder="Enter state" />
+
+  <button id="saveNewAddressBtn"
+        onclick="saveNewAddress()"
+        class="mt-4 w-full bg-green-600 text-white py-2 rounded">
+  Save Address
+</button>
+
+</div>
+</div>
+
       
      <!-- Payment Method -->
 <div>
@@ -1208,53 +1246,6 @@ style="
   </div>
 </div>
 
-
-<!-- NEW ADDRESS MODAL (STEP-2A) -->
-<div id="newAddressModal"
-     class="fixed inset-0 bg-black bg-opacity-40 hidden z-[10000]
-            flex items-center justify-center">
-
-  <div class="bg-white w-full max-w-[380px]
-              rounded-2xl shadow-xl p-4 relative">
-
-    <!-- Placeholder (STEP-2A only) -->
-   <h3 class="text-lg font-semibold mb-2">Add New Address</h3>
-
-<div id="newAddressForm" class="mt-4 hidden border p-3 rounded bg-gray-50">
-
-  <label class="text-sm font-medium">Mobile</label>
-  <input id="newAddressMobile"
-         class="w-full border px-2 py-2 rounded bg-gray-200 text-gray-700"
-         readonly />
-
-  <label class="text-sm font-medium mt-3">Address</label>
-  <textarea id="newAddressField"
-            class="w-full border px-2 py-2 rounded"
-            placeholder="Enter full address"></textarea>
-
-  <label class="text-sm font-medium mt-3">Pincode</label>
-  <input id="newPincode"
-         class="w-full border px-2 py-2 rounded"
-         maxlength="6"
-         placeholder="Enter pincode" />
-
-  <label class="text-sm font-medium mt-3">City</label>
-  <input id="newCity"
-         class="w-full border px-2 py-2 rounded"
-         placeholder="Enter city" />
-
-  <label class="text-sm font-medium mt-3">State</label>
-  <input id="newState"
-         class="w-full border px-2 py-2 rounded"
-         placeholder="Enter state" />
-
-  <button id="saveNewAddressBtn"
-          onclick="saveNewAddress()"
-          class="mt-4 w-full bg-green-600 text-white py-2 rounded">
-    Save Address
-  </button>
-
-</div>
 
 
 <div id="loadingOverlay" style="
@@ -6853,18 +6844,9 @@ function showCouponMessage(msg) {
       document.getElementById("paymentMethod").value = btn.dataset.value;
     });
   });
-
-
-
-
-
 </script>
 </body>
 </html>
-
-
-
-
 
 
 
