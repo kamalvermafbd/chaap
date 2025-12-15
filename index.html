@@ -6844,9 +6844,30 @@ function showCouponMessage(msg) {
       document.getElementById("paymentMethod").value = btn.dataset.value;
     });
   });
+
+
+<!-- NEW ADDRESS MODAL (STEP-2A) -->
+<div id="newAddressModal"
+     class="fixed inset-0 bg-black bg-opacity-40 hidden z-[10000]
+            flex items-center justify-center">
+
+  <div class="bg-white w-full max-w-[380px]
+              rounded-2xl shadow-xl p-4 relative">
+
+    <!-- Placeholder (STEP-2A only) -->
+    <h3 class="text-lg font-semibold mb-2">Add New Address</h3>
+    <p class="text-sm text-gray-500">
+      Modal created. Form will be moved here in next step.
+    </p>
+
+  </div>
+</div>
+
+
 </script>
 </body>
 </html>
+
 
 
 
