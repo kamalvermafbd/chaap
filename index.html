@@ -5083,21 +5083,83 @@ if (!primary && multiList.length === 0) {
   });
 }
 
+async function saveNewAddressFromModal() {
+
+  const mobile =
+    localStorage.getItem("mobile") ||
+    localStorage.getItem("userMobile");
+
+  if (!mobile) {
+    alert("Mobile not found");
+    return;
+  }
+
+  // 1️⃣ Read values from modal
+  const address = document.getElementById("newAddress").value.trim();
+  const pincode = document.getElementById("newPincode").value.trim();
+  const city    = document.getElementById("newCity").value.trim();
+  const state   = document.getElementById("newState").value.trim();
+
+  if (!address || !pincode || !city || !state) {
+    alert("Please fill all address fields");
+    return;
+  }
+
+  // 2️⃣ Save to backend
+  const payload = {
+    mobile,
+    address,
+    pincode,
+    city,
+    state
+  };
+
+  let res;
+  try {
+    res = await apiPost("saveUserAddress", payload);
+  } catch (e) {
+    alert("Failed to save address");
+    return;
+  }
+
+  if (!res || !res.success) {
+    alert(res?.message || "Address save failed");
+    return;
+  }
+
+  // 3️⃣ Refresh address dropdown (reuse existing flow)
+  await onChangeAddressClick();
+
+  // 4️⃣ Close modal
+  closeNewAddressModal();
+}
 
 
   function onChangeAddressAddNew() {
- const mobile = localStorage.getItem("mobile") || localStorage.getItem("userMobile");
 
-  if (!mobile) return;
+  // ❌ Checkout ke andar inline form kabhi mat dikhao
+  const inlineForm = document.getElementById("newAddressForm");
+  if (inlineForm) inlineForm.classList.add("hidden");
 
-  const dropdownBox = document.getElementById("addressSelectContainer");
-  const newFormBox = document.getElementById("newAddressForm");
+  // ✅ Separate New Address modal open karo
+  const modal = document.getElementById("newAddressModal");
+  if (!modal) return;
 
-  dropdownBox.classList.add("hidden");
-  newFormBox.classList.remove("hidden");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+function closeNewAddressModal() {
 
-  // Autofill mobile inside new-address form
-  document.getElementById("newAddressMobile").value = mobile;
+  const modal = document.getElementById("newAddressModal");
+  if (!modal) return;
+
+  // hide modal
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+
+  // ❌ safety: checkout ke andar inline form kabhi visible na ho
+  const inlineForm = document.getElementById("newAddressForm");
+  if (inlineForm) inlineForm.classList.add("hidden");
 }
 
 function saveNewAddress() {
@@ -6785,6 +6847,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
