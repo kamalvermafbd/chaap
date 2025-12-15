@@ -2541,18 +2541,23 @@ document.getElementById("savedAddressDropdown").addEventListener("change", async
 
 
 
-    function closeCheckout() {
+function closeCheckout() {
   const modal = document.getElementById("checkoutModal");
   if (modal) modal.style.display = "none";
 
-  // 🔥 MOST IMPORTANT
+  // 🔥 Restore scroll
   document.body.style.overflow = "auto";
 
-  // safety: kisi overlay ne focus na roka ho
+  // 🔥 Kill loading overlay if any
   const overlay = document.getElementById("loadingOverlay");
   if (overlay) overlay.style.display = "none";
-}
 
+  // 🔥 Kill ALL leftover backdrops / overlays
+  forceClearOverlays();
+
+  // ✅ EXTRA SAFETY (important)
+  document.activeElement && document.activeElement.blur();
+}
 
 function deleteCart() {
   showCartOverlay("Clearing cart…");
@@ -3397,8 +3402,6 @@ function closeLogin() {
   if (label) label.style.display = "block";
 }
 
-
-
 function logoutUser() {
   // UI resets
   document.getElementById("userInfoBox").style.display = "none";
@@ -3413,7 +3416,7 @@ function logoutUser() {
 
   document.getElementById("leftNav").style.display = "none";
   document.getElementById("leftNav").classList.remove("active");
-  
+
   document.getElementById("menuWrapper").style.display = "block";
   document.getElementById("pageWrapper").style.display = "none";
 
@@ -3421,23 +3424,21 @@ function logoutUser() {
   document.getElementById("ordersPage").style.display = "none";
   document.getElementById("offersPage").style.display = "none";
 
-  document.querySelectorAll("#premiumMenu li").forEach(li => li.classList.remove("active"));
+  document.querySelectorAll("#premiumMenu li").forEach(li =>
+    li.classList.remove("active")
+  );
   document.getElementById("mainContent").style.marginLeft = "0";
 
   // ==== LOGIN IDENTITY CLEAR ====
   localStorage.removeItem("userMobile");
   localStorage.removeItem("userEmail");
 
-  // ❗ Do NOT use localStorage.removeItem("mobile")
-  // Because system never sets "mobile" key anywhere.
-
   // ==== CART LOGOUT RULE ====
-  // Clear only local mirrors — backend cart remains safe.
   localStorage.removeItem("cart");
   localStorage.removeItem("guestCart");
   cart = [];
   window.cart = [];
-resetMenuUIForLogout();
+  resetMenuUIForLogout();
 
   // Reset session
   localStorage.removeItem("sessionId");
@@ -3451,9 +3452,32 @@ resetMenuUIForLogout();
   // Re-render cart
   renderCart();
 
-  alert("Logged out successfully.");
+  // 🔥 VERY IMPORTANT: clear overlays BEFORE alert
+  forceClearOverlays();
+
+  // ✅ Alert AFTER cleanup
+  setTimeout(() => {
+    alert("Logged out successfully.");
+  }, 50);
 }
 
+  
+function forceClearOverlays() {
+  [
+    "loadingOverlay",
+    "cartBackdrop",
+    "cartOverlay",
+    "newAddressModal",
+    "couponOverlayBG"
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.display = "none";
+      el.classList.remove("active","flex","show");
+    }
+  });
+  document.body.style.overflow = "auto";
+}
 
 
 </script>
@@ -6837,6 +6861,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
