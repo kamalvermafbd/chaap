@@ -633,11 +633,41 @@ body::before {
 #checkoutModal ::-webkit-scrollbar-thumb:hover {
   background-color: rgba(0, 0, 0, 0.4);
 }
+/* 🔒 Inactive cart backdrop should NOT block clicks */
+#cartBackdrop {
+  pointer-events: none;
+}
 
+/* 🔥 Only block clicks when cart is actually open */
+#cartBackdrop.active {
+  pointer-events: auto;
+}
+
+/* login/signup always clickable */
+#loginModal {
+  pointer-events: auto !important;
+  z-index: 20000 !important;
+}
 
   </style>
 </head>
 <body>
+  <div id="loadingOverlay" style="
+  
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 15000;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 24px;
+  ">
+    Processing your order...
+  </div>
+
 <div id="cartOverlay" class="fixed inset-0 bg-black bg-opacity-45 z-50 text-white text-xl font-medium flex items-center justify-center hidden">
   Updating your cart…
 </div>
@@ -1126,7 +1156,12 @@ style="
   id="changeAddressBtn"
   type="button"
   onclick="onChangeAddressClick()"
-  class="hidden bg-blue-600 text-white px-3 py-1 rounded-md text-sm mt-2">
+  class="hidden w-full mt-2
+         border border-orange-500 text-orange-600
+         bg-white
+         py-2.5 rounded-xl text-sm font-semibold
+         hover:bg-orange-50
+         transition">
   Change Address
 </button>
 <p id="addressStatus"
@@ -1143,50 +1178,19 @@ style="
     <!-- Options added dynamically -->
   </select>
   <!-- STEP 3D BUTTON BELOW DROPDOWN -->
-  <button onclick="onChangeAddressAddNew()"
-          class="mt-2 px-3 py-1 bg-gray-600 text-white rounded text-sm">
-    + Add New Address
-  </button>
-</div>
-
-
-<!-- ADD NEW ADDRESS FORM -->
-<div id="newAddressForm" class="mt-4 hidden border p-3 rounded bg-gray-50">
-
-  <label class="text-sm font-medium">Mobile</label>
-  <input id="newAddressMobile"
-         class="w-full border px-2 py-2 rounded bg-gray-200 text-gray-700"
-         readonly />
-
-  <label class="text-sm font-medium mt-3">Address</label>
-  <textarea id="newAddressField"
-            class="w-full border px-2 py-2 rounded"
-            placeholder="Enter full address"></textarea>
-
-  <label class="text-sm font-medium mt-3">Pincode</label>
-  <input id="newPincode"
-         class="w-full border px-2 py-2 rounded"
-         maxlength="6"
-         placeholder="Enter pincode" />
-
-  <label class="text-sm font-medium mt-3">City</label>
-  <input id="newCity"
-         class="w-full border px-2 py-2 rounded"
-         placeholder="Enter city" />
-
-  <label class="text-sm font-medium mt-3">State</label>
-  <input id="newState"
-         class="w-full border px-2 py-2 rounded"
-         placeholder="Enter state" />
-
-  <button id="saveNewAddressBtn"
-        onclick="saveNewAddress()"
-        class="mt-4 w-full bg-green-600 text-white py-2 rounded">
-  Save Address
+  <button type="button"
+        onclick="onChangeAddressAddNew()"
+         class="w-full mt-2
+         bg-orange-100 text-orange-700
+         py-2.5 rounded-xl text-sm font-semibold
+         hover:bg-orange-200
+         transition">
+  + Add New Address
 </button>
 
-</div>
-</div>
+  </div>   <!-- ✅ CLOSE addressSelectContainer -->
+
+</div>   
 
       
      <!-- Payment Method -->
@@ -1243,26 +1247,83 @@ style="
 
     </form>
 
+
   </div>
 </div>
 
 
+<!-- NEW ADDRESS MODAL (STEP-2A) -->
+<div id="newAddressModal"
+     class="fixed inset-0 bg-black bg-opacity-40 hidden z-[10000]
+            flex items-center justify-center">
 
-<div id="loadingOverlay" style="
-  
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 9999;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-size: 24px;
-  ">
-    Processing your order...
-  </div>
+  <div class="bg-white w-full max-w-[380px]
+              rounded-2xl shadow-xl p-4 relative">
+
+    <!-- Placeholder (STEP-2A only) -->
+   <h3 class="text-lg font-semibold mb-2">Add New Address</h3>
+
+<div id="newAddressForm" class="mt-4 hidden border p-3 rounded bg-gray-50">
+
+  <label class="text-sm font-medium">Mobile</label>
+  <input id="newAddressMobile"
+         class="w-full border px-2 py-2 rounded bg-gray-200 text-gray-700"
+         readonly />
+
+  <label class="text-sm font-medium mt-3">Address</label>
+  <textarea id="newAddressField"
+  autocomplete="off"
+  autocorrect="off"
+  autocapitalize="off"
+  spellcheck="false"
+  name="new-address-never"
+  class="w-full border px-2 py-2 rounded"
+  placeholder="Enter full address">
+</textarea>
+
+
+  <label class="text-sm font-medium mt-3">Pincode</label>
+  <input id="newPincode"
+       maxlength="6"
+       oninput="onNewPincodeChange()"
+       class="w-full border px-2 py-2 rounded"
+       placeholder="Enter pincode" />
+<p id="pincodeStatus"
+   class="text-xs text-gray-500 mt-1 hidden">
+  Checking pincode…
+</p>
+
+
+
+  <label class="text-sm font-medium mt-3">City</label>
+  <input id="newCity"
+         class="w-full border px-2 py-2 rounded"
+         placeholder="Enter city" />
+
+  <label class="text-sm font-medium mt-3">State</label>
+  <input id="newState"
+         class="w-full border px-2 py-2 rounded"
+         placeholder="Enter state" />
+
+  <button id="saveNewAddressBtn"
+          onclick="saveNewAddress()"
+          class="mt-4 w-full bg-green-600 text-white py-2 rounded">
+    Save Address
+  </button>
+  <button type="button"
+        onclick="closeNewAddressModal()"
+        class="mt-2 w-full bg-gray-200 text-gray-700 py-2 rounded">
+  Cancel
+</button>
+<button type="button"
+        onclick="closeNewAddressModal()"
+        class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-xl font-bold">
+  ✕
+</button>
+
+
+</div>
+
 
 
   <script>
@@ -1491,7 +1552,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbyEvZuVjO2HkO3PYuH5EdHfQv8hUOwh-Z_DaL8G5ys4WZWYVcgm1O_7MLRCKM3maswi6w/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbxleEglSOjPz55V7xead3ipNhrYlFWE0MeTayb0R-ncMH9JfYh1PMtz-VTd9WeqiHzd/exec";
 
 function apiGet(api, params = {}) {
   const url = new URL(API_BASE);
@@ -2491,147 +2552,26 @@ document.getElementById("savedAddressDropdown").addEventListener("change", async
   }
 });
 
-document.getElementById("saveNewAddressBtn").addEventListener("click", async () => {
-
-  const mobile = localStorage.getItem("userMobile");
-  if (!mobile) return alert("You must be logged in to save address.");
-
-  // Read fields
-  const addr  = document.getElementById("newAddressField").value.trim();
-  const pin   = document.getElementById("newPincode").value.trim();
-  const city  = document.getElementById("newCity").value.trim();
-  const state = document.getElementById("newState").value.trim();
-
-  // Validations
-  if (!addr) return alert("Please enter address.");
-  if (!pin || pin.length !== 6) return alert("Enter valid 6-digit pincode.");
-  if (!city) return alert("City is missing.");
-  if (!state) return alert("State is missing.");
-
-  // Disable button
-  const btn = document.getElementById("saveNewAddressBtn");
-  btn.innerText = "Saving...";
-  btn.disabled = true;
-
-  try {
-    const res = await fetch(
-      "https://script.google.com/macros/s/AKfycbz8B-nwXivGHzKgcWT8zTvS4sAWG6dKfsDh8rsn29CGXCeIxxeNJ9NaPcL03cQBGHEf/exec",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          action: "addMultiAddress",
-          mobile,
-          address: addr,
-          pincode: pin,
-          city,
-          state
-        })
-      }
-    ).then(r => r.json());
-
-    if (!res.success) {
-      alert(res.message || "Failed to save address.");
-      btn.innerText = "Save Address";
-      btn.disabled = false;
-      return;
-    }
-
-    alert("Address saved successfully!");
-
-    // -----------------------------
-    //  STEP-1: fill main checkout fields
-    // -----------------------------
-    document.getElementById("address").value = addr;
-    document.getElementById("pincode").value = pin;
-    document.getElementById("city").value = city;
-    document.getElementById("state").value = state;
-
-    // -----------------------------
-    //  STEP-2: hide new address form
-    // -----------------------------
-    document.getElementById("newAddressForm").classList.add("hidden");
-
-    // -----------------------------
-    //  STEP-3: reload dropdown
-    // -----------------------------
-    const dropdown = document.getElementById("savedAddressDropdown");
-    const box = document.getElementById("addressSelectContainer");
-
-    const data = await loadSavedAddresses();
-
-    dropdown.innerHTML = "";
-
-    // Primary
-    if (data.primaryObj) {
-      const p = data.primaryObj;
-      const opt = document.createElement("option");
-      opt.value = JSON.stringify(p);
-      opt.textContent = `Primary: ${p.address}, ${p.pincode}, ${p.city}, ${p.state}`;
-      dropdown.appendChild(opt);
-    }
-
-    // Multi
-    data.multiObjList.forEach(a => {
-      const opt = document.createElement("option");
-      opt.value = JSON.stringify(a);
-      opt.textContent = `${a.address}, ${a.pincode}, ${a.city}, ${a.state}`;
-      dropdown.appendChild(opt);
-    });
-
-    // Add New
-    const addNew = document.createElement("option");
-    addNew.value = "__ADD_NEW__";
-    addNew.textContent = "➕ Add New Address";
-    dropdown.appendChild(addNew);
-
-    // -----------------------------
-    //  STEP-4: auto-select the new saved address
-    // -----------------------------
-    const newObj = {
-      address: addr,
-      pincode: pin,
-      city,
-      state,
-      type: "multi"
-    };
-
-    dropdown.value = JSON.stringify(newObj);
-
-    // -----------------------------
-    //  STEP-5: show dropdown container
-    // -----------------------------
-    box.classList.remove("hidden");
-
-    // -----------------------------
-    //  STEP-6: clear new-form fields
-    // -----------------------------
-    document.getElementById("newAddressField").value = "";
-    document.getElementById("newPincode").value = "";
-    document.getElementById("newCity").value = "";
-    document.getElementById("newState").value = "";
-
-  } catch (err) {
-    alert("Error saving address: " + err.message);
-  }
-
-  btn.innerText = "Save Address";
-  btn.disabled = false;
-});
 
 
 
-    function closeCheckout() {
+function closeCheckout() {
   const modal = document.getElementById("checkoutModal");
   if (modal) modal.style.display = "none";
 
-  // 🔥 MOST IMPORTANT
+  // 🔥 Restore scroll
   document.body.style.overflow = "auto";
 
-  // safety: kisi overlay ne focus na roka ho
+  // 🔥 Kill loading overlay if any
   const overlay = document.getElementById("loadingOverlay");
   if (overlay) overlay.style.display = "none";
-}
 
+  // 🔥 Kill ALL leftover backdrops / overlays
+  forceClearOverlays();
+
+  // ✅ EXTRA SAFETY (important)
+  document.activeElement && document.activeElement.blur();
+}
 
 function deleteCart() {
   showCartOverlay("Clearing cart…");
@@ -2743,6 +2683,7 @@ let lastLookupOrderType = "";
 
     
 function toggleAddressField() {
+console.log("toggleAddressField fired");
 
   const mobile = document.getElementById("mobile").value.trim();
   const orderType = document.getElementById("orderType").value;
@@ -2751,6 +2692,7 @@ function toggleAddressField() {
 
   // --- 1) Validate mobile ---
   if (!/^[0-9]{10}$/.test(mobile)) {
+      console.log("mobile invalid, returning");   
     alert("Enter a valid 10-digit mobile number.");
     return;
   }
@@ -2781,7 +2723,7 @@ function toggleAddressField() {
   nameField.closest("div").style.display = "block";
   emailField.closest("div").style.display = "block";
   paymentField.style.display = "block";
-
+console.log("overlay about to show");   //
   // --- 4) Always show overlay (both cases) ---
   overlay.style.display = "flex";
   orderSelect.disabled = true;
@@ -3235,7 +3177,7 @@ function filterMenu() {
 
 <!-- LOGIN OVERLAY (NEW TAILWIND VERSION) -->
 <div id="loginModal"
-  class="fixed inset-0 bg-black bg-opacity-50 z-[9999] hidden flex items-center justify-center">
+  class="fixed inset-0 bg-black bg-opacity-50 z-[20000] hidden flex items-center justify-center">
 
     <div class="bg-white w-11/12 max-w-sm rounded-xl p-6 shadow-xl relative 
               flex flex-col gap-4">
@@ -3442,14 +3384,25 @@ function filterMenu() {
 
 <script>
 
-//open login
 function openLogin() {
+  console.log("✅ openLogin START");
+    
   const modal = document.getElementById("loginModal");
   modal.style.display = "flex";
-modal.classList.remove("hidden");
+  modal.classList.remove("hidden");
+modal.style.pointerEvents = "auto";
+  modal.style.zIndex = "10000";
+  // 🔥 MOST IMPORTANT FIX
+  modal.querySelectorAll(".hidden").forEach(e => e.classList.remove("hidden"));
+
+  document.body.style.overflow = "hidden";
   document.getElementById("signupLabelBox").style.display = "none";
 
+  console.log("✅ openLogin END");
 }
+  window.addEventListener("load", () => {
+    document.body.style.pointerEvents = "auto";
+  });
 
 function closeLogin() {
   const modal = document.getElementById("loginModal");
@@ -3474,8 +3427,6 @@ function closeLogin() {
   if (label) label.style.display = "block";
 }
 
-
-
 function logoutUser() {
   // UI resets
   document.getElementById("userInfoBox").style.display = "none";
@@ -3490,7 +3441,7 @@ function logoutUser() {
 
   document.getElementById("leftNav").style.display = "none";
   document.getElementById("leftNav").classList.remove("active");
-  
+
   document.getElementById("menuWrapper").style.display = "block";
   document.getElementById("pageWrapper").style.display = "none";
 
@@ -3498,23 +3449,21 @@ function logoutUser() {
   document.getElementById("ordersPage").style.display = "none";
   document.getElementById("offersPage").style.display = "none";
 
-  document.querySelectorAll("#premiumMenu li").forEach(li => li.classList.remove("active"));
+  document.querySelectorAll("#premiumMenu li").forEach(li =>
+    li.classList.remove("active")
+  );
   document.getElementById("mainContent").style.marginLeft = "0";
 
   // ==== LOGIN IDENTITY CLEAR ====
   localStorage.removeItem("userMobile");
   localStorage.removeItem("userEmail");
 
-  // ❗ Do NOT use localStorage.removeItem("mobile")
-  // Because system never sets "mobile" key anywhere.
-
   // ==== CART LOGOUT RULE ====
-  // Clear only local mirrors — backend cart remains safe.
   localStorage.removeItem("cart");
   localStorage.removeItem("guestCart");
   cart = [];
   window.cart = [];
-resetMenuUIForLogout();
+  resetMenuUIForLogout();
 
   // Reset session
   localStorage.removeItem("sessionId");
@@ -3528,7 +3477,32 @@ resetMenuUIForLogout();
   // Re-render cart
   renderCart();
 
-  alert("Logged out successfully.");
+  // 🔥 VERY IMPORTANT: clear overlays BEFORE alert
+  forceClearOverlays();
+
+  // ✅ Alert AFTER cleanup
+  setTimeout(() => {
+    alert("Logged out successfully.");
+  }, 50);
+}
+function forceClearOverlays() {
+
+  ["loadingOverlay","cartOverlay","newAddressModal","couponOverlayBG"]
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.display = "none";
+      el.classList.add("hidden");
+    });
+
+  const backdrop = document.getElementById("cartBackdrop");
+  if (backdrop) {
+    backdrop.classList.remove("active");
+    backdrop.style.display = "none";
+    backdrop.style.pointerEvents = "none";
+  }
+
+  document.body.style.overflow = "auto";
 }
 
 
@@ -4976,12 +4950,22 @@ function onChangeAddressClick() {
         : [];
 
       // 2️⃣ If nothing saved → show new form
-      if (!primary && multiList.length === 0) {
-        newFormBox.classList.remove("hidden");
-        autofillNewAddressMobile();
-        if (overlay) overlay.style.display = "none";
-        return;
-      }
+      // 2️⃣ If nothing saved → DO NOT auto-open new address form in checkout
+if (!primary && multiList.length === 0) {
+  dropdownBox.classList.add("hidden");
+
+  // just inform user
+  const status = document.getElementById("addressStatus");
+  if (status) {
+    status.innerText = "No saved address found. Please add a new address.";
+    status.className = "text-sm text-red-600 font-medium";
+    status.classList.remove("hidden");
+  }
+
+  if (overlay) overlay.style.display = "none";
+  return;
+}
+
 
       // 3️⃣ Show dropdown box
       dropdownBox.classList.remove("hidden");
@@ -5075,74 +5059,133 @@ function onChangeAddressClick() {
 
 
 
-  function onChangeAddressAddNew() {
- const mobile = localStorage.getItem("mobile") || localStorage.getItem("userMobile");
+function onChangeAddressAddNew() {
 
-  if (!mobile) return;
+  // ✅ Open New Address modal
+  const modal = document.getElementById("newAddressModal");
+  if (!modal) return;
 
-  const dropdownBox = document.getElementById("addressSelectContainer");
-  const newFormBox = document.getElementById("newAddressForm");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
 
-  dropdownBox.classList.add("hidden");
-  newFormBox.classList.remove("hidden");
+  // ✅ Show form INSIDE modal
+  const form = document.getElementById("newAddressForm");
+  if (form) form.classList.remove("hidden");
+   loadPincodeDropdown();
+}
 
-  // Autofill mobile inside new-address form
-  document.getElementById("newAddressMobile").value = mobile;
+function closeNewAddressModal() {
+
+  const modal = document.getElementById("newAddressModal");
+  if (!modal) return;
+
+  // hide modal
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+
+  // ❌ safety: checkout ke andar inline form kabhi visible na ho
+  const inlineForm = document.getElementById("newAddressForm");
+  if (inlineForm) inlineForm.classList.add("hidden");
 }
 
 function saveNewAddress() {
-  const mobile = localStorage.getItem("userMobile");
-  if (!mobile) return alert("Login required.");
+if (window._savingAddress) return;
+window._savingAddress = true;
 
-  const addr = document.getElementById("newAddressField").value.trim();
-  const pin  = document.getElementById("newPincode").value.trim();
-  const city = document.getElementById("newCity").value.trim();
+  const mobile =
+    localStorage.getItem("mobile") ||
+    localStorage.getItem("userMobile");
+
+  if (!mobile) {
+    alert("Login required.");
+    window._savingAddress = false;
+    return;
+  }
+  const btn = document.getElementById("saveNewAddressBtn");
+if (btn) {
+  btn.disabled = true;
+  btn.innerText = "Saving...";
+}
+
+
+  const addr  = document.getElementById("newAddressField").value.trim();
+  const pin   = document.getElementById("newPincode").value.trim();
+  const city  = document.getElementById("newCity").value.trim();
   const state = document.getElementById("newState").value.trim();
 
-  if (!addr) return alert("Please enter address.");
-  if (pin.length !== 6) return alert("Please enter valid 6-digit pincode.");
-  if (!city) return alert("Enter city.");
-  if (!state) return alert("Enter state.");
-
-  apiPost("saveUserNewAddress", { mobile, address: addr, pincode: pin, city, state })
-    .then(res => {
-      if (res.success) {
-        alert("Address saved successfully!");
-
-        // Hide form
-        const form = document.getElementById("newAddressForm");
-        form.classList.add("hidden");
-
-        // Clear new form inputs
-        document.getElementById("newAddressField").value = "";
-        document.getElementById("newPincode").value = "";
-        document.getElementById("newCity").value = "";
-        document.getElementById("newState").value = "";
-
-        // Show dropdown
-        document.getElementById("addressSelectContainer").classList.remove("hidden");
-
-        // Reload dropdown list
-        onChangeAddressClick();
-
-        // Auto-select new address
-        setTimeout(() => {
-          const ddl = document.getElementById("savedAddressDropdown");
-          if (ddl) {
-            ddl.value = addr;  // Pre-select newly added address
-          }
-          document.getElementById("address").value = addr; // Update main textarea
-        }, 400);
-
-      } else {
-        alert(res.message || "Failed to save address.");
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Error saving address.");
-    });
+  if (!addr || pin.length !== 6 || !city || !state) {
+    alert("Please fill all address fields correctly.");
+    window._savingAddress = false;
+if (btn) {
+    btn.disabled = false;
+    btn.innerText = "Save Address";
 }
+    
+    return;
+  }
+
+  apiPost("saveUserNewAddress", {
+    mobile,
+    address: addr,
+    pincode: pin,
+    city,
+    state
+  })
+  .then(res => {
+    if (!res || !res.success) {
+      alert(res?.message || "Failed to save address.");
+      window._savingAddress = false;
+
+  if (btn) {
+    btn.disabled = false;
+    btn.innerText = "Save Address";
+  }
+      return;
+    }
+window._savingAddress = false;
+if (btn) {
+  btn.disabled = false;
+  btn.innerText = "Save Address";
+}
+
+    // ✅ Close modal
+    closeNewAddressModal();
+
+    // ✅ Clear modal inputs
+    document.getElementById("newAddressField").value = "";
+    document.getElementById("newPincode").value = "";
+    document.getElementById("newCity").value = "";
+    document.getElementById("newState").value = "";
+
+    // ✅ Refresh dropdown
+    onChangeAddressClick();
+
+    // ✅ Auto-select newly added address
+    setTimeout(() => {
+      const ddl = document.getElementById("savedAddressDropdown");
+      if (ddl && ddl.options.length > 0) {
+        ddl.selectedIndex = ddl.options.length - 1;
+        ddl.dispatchEvent(new Event("change"));
+      }
+    }, 300);
+
+  })
+  .catch(err => {
+    console.error(err);
+   console.log("NEW MODAL SAVE FLOW RUNNING");
+
+    console.warn("Save address fetch failed, but may be saved:", err);
+window._savingAddress = false;
+if (btn) {
+  btn.disabled = false;
+  btn.innerText = "Save Address";
+}
+
+  closeNewAddressModal();
+  onChangeAddressClick();
+  });
+}
+
 
 const originalBodyOverflow = document.body.style.overflow || "";  
 // STEP 8 — Autofill New Address Form with logged-in mobile
@@ -6772,21 +6815,79 @@ function showCouponMessage(msg) {
       document.getElementById("paymentMethod").value = btn.dataset.value;
     });
   });
+async function loadPincodeDropdown() {
+  const ddl = document.getElementById("newPincode");
+  if (!ddl) return;
+
+  ddl.innerHTML = `<option value="">Select Pincode</option>`;
+
+  try {
+    const res = await apiGet("getCityList");
+
+    if (!res || !res.success || !Array.isArray(res.cities)) return;
+
+    res.cities.forEach(r => {
+      const opt = document.createElement("option");
+      opt.value = r.pin; // only pin as value
+      opt.textContent = `${r.pin} – ${r.city}, ${r.state}`;
+      ddl.appendChild(opt);
+    });
+
+  } catch (e) {
+    console.error("Pincode load failed", e);
+  }
+}
+  
+function onNewPincodeChange() {
+  const pin = document.getElementById("newPincode").value.trim();
+  const cityInput  = document.getElementById("newCity");
+  const stateInput = document.getElementById("newState");
+
+  // reset on partial input
+  if (pin.length < 6) {
+    cityInput.value = "";
+    stateInput.value = "";
+    cityInput.disabled = false;
+    stateInput.disabled = false;
+    return;
+  }
+
+  // 🔒 show wait inside fields
+  cityInput.value = "Checking…";
+  stateInput.value = "Please wait";
+  cityInput.disabled = true;
+  stateInput.disabled = true;
+
+  apiGet("getCityStateByPincode", { pincode: pin })
+    .then(res => {
+      if (res && res.found) {
+        cityInput.value  = res.city || "";
+        stateInput.value = res.state || "";
+      } else {
+        // manual entry allowed
+        cityInput.value = "";
+        stateInput.value = "";
+      }
+    })
+    .catch(err => {
+      console.error("Pincode lookup failed", err);
+      cityInput.value = "";
+      stateInput.value = "";
+    })
+    .finally(() => {
+      cityInput.disabled = false;
+      stateInput.disabled = false;
+    });
+}
+
+
+
+
+
+
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
