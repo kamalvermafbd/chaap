@@ -6786,23 +6786,26 @@ async function loadPincodeDropdown() {
     console.error("Pincode load failed", e);
   }
 }
+  
 function onNewPincodeChange() {
   const pin = document.getElementById("newPincode").value.trim();
   const cityInput  = document.getElementById("newCity");
   const stateInput = document.getElementById("newState");
-  const status = document.getElementById("pincodeStatus");
 
   // reset on partial input
   if (pin.length < 6) {
     cityInput.value = "";
     stateInput.value = "";
-    status && status.classList.add("hidden");
+    cityInput.disabled = false;
+    stateInput.disabled = false;
     return;
   }
 
-  // 🔹 show loading
-  status && (status.innerText = "Checking pincode…");
-  status && status.classList.remove("hidden");
+  // 🔒 show wait inside fields
+  cityInput.value = "Checking…";
+  stateInput.value = "Please wait";
+  cityInput.disabled = true;
+  stateInput.disabled = true;
 
   apiGet("getCityStateByPincode", { pincode: pin })
     .then(res => {
@@ -6810,7 +6813,7 @@ function onNewPincodeChange() {
         cityInput.value  = res.city || "";
         stateInput.value = res.state || "";
       } else {
-        // allow manual entry
+        // manual entry allowed
         cityInput.value = "";
         stateInput.value = "";
       }
@@ -6821,7 +6824,8 @@ function onNewPincodeChange() {
       stateInput.value = "";
     })
     .finally(() => {
-      setTimeout(() => status && status.classList.add("hidden"), 1200);
+      cityInput.disabled = false;
+      stateInput.disabled = false;
     });
 }
 
@@ -6833,6 +6837,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
