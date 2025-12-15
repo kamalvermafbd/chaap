@@ -633,6 +633,15 @@ body::before {
 #checkoutModal ::-webkit-scrollbar-thumb:hover {
   background-color: rgba(0, 0, 0, 0.4);
 }
+/* 🔒 Inactive cart backdrop should NOT block clicks */
+#cartBackdrop {
+  pointer-events: none;
+}
+
+/* 🔥 Only block clicks when cart is actually open */
+#cartBackdrop.active {
+  pointer-events: auto;
+}
 
 
   </style>
@@ -3461,12 +3470,10 @@ function logoutUser() {
   }, 50);
 }
 
-  
-function forceClearOverlays() {
+ function forceClearOverlays() {
 
   const ids = [
     "loadingOverlay",
-    "cartBackdrop",
     "cartOverlay",
     "newAddressModal",
     "couponOverlayBG"
@@ -3476,20 +3483,23 @@ function forceClearOverlays() {
     const el = document.getElementById(id);
     if (!el) return;
 
-    // display based overlays
     el.style.display = "none";
-
-    // class based overlays
-    el.classList.remove("active");
-    el.classList.remove("flex");
-    el.classList.remove("show");
+    el.classList.remove("active", "flex", "show");
     el.classList.add("hidden");
   });
 
-  // 🔒 scroll unlock (MOST IMPORTANT)
+  // 🔥 cartBackdrop SPECIAL handling
+  const backdrop = document.getElementById("cartBackdrop");
+  if (backdrop) {
+    backdrop.style.display = "none";
+    backdrop.classList.remove("active");
+    backdrop.classList.add("hidden");
+    backdrop.style.pointerEvents = "none";   // ⭐ MOST IMPORTANT
+  }
+
+  // 🔓 unlock scroll
   document.body.style.overflow = "auto";
 }
-
 
 
 </script>
@@ -6873,53 +6883,6 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
