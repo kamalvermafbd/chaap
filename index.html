@@ -1274,6 +1274,10 @@ style="
        oninput="onNewPincodeChange()"
        class="w-full border px-2 py-2 rounded"
        placeholder="Enter pincode" />
+<p id="pincodeStatus"
+   class="text-xs text-gray-500 mt-1 hidden">
+  Checking pincode…
+</p>
 
 
 
@@ -6782,20 +6786,24 @@ async function loadPincodeDropdown() {
     console.error("Pincode load failed", e);
   }
 }
-
 function onNewPincodeChange() {
   const pin = document.getElementById("newPincode").value.trim();
   const cityInput  = document.getElementById("newCity");
   const stateInput = document.getElementById("newState");
+  const status = document.getElementById("pincodeStatus");
 
   // reset on partial input
   if (pin.length < 6) {
     cityInput.value = "";
     stateInput.value = "";
+    status && status.classList.add("hidden");
     return;
   }
 
-  // only when 6 digits
+  // 🔹 show loading
+  status && (status.innerText = "Checking pincode…");
+  status && status.classList.remove("hidden");
+
   apiGet("getCityStateByPincode", { pincode: pin })
     .then(res => {
       if (res && res.found) {
@@ -6811,8 +6819,12 @@ function onNewPincodeChange() {
       console.error("Pincode lookup failed", err);
       cityInput.value = "";
       stateInput.value = "";
+    })
+    .finally(() => {
+      setTimeout(() => status && status.classList.add("hidden"), 1200);
     });
 }
+
 
 
 
@@ -6821,6 +6833,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
