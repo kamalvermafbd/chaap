@@ -635,11 +635,6 @@ body::before {
 }
 
 
-/* login/signup always clickable */
-#loginModal {
-  pointer-events: auto !important;
-  z-index: 100000 !important;
-}
 
   </style>
 </head>
@@ -3369,17 +3364,33 @@ function filterMenu() {
 
 function openLogin() {
   const modal = document.getElementById("loginModal");
+   modal.style.display = "flex";
   modal.classList.remove("hidden");
-  modal.style.display = "flex";
-  document.body.style.overflow = "hidden";
+ document.getElementById("signupLabelBox").style.display = "none";
 }
 
 
 function closeLogin() {
   const modal = document.getElementById("loginModal");
-  modal.classList.add("hidden");
+
+  // FULL HARD CLOSE
   modal.style.display = "none";
-  document.body.style.overflow = "auto";
+  modal.classList.add("hidden");
+
+  // REMOVE ANY POSSIBLE OVERLAY FREEZE
+  unlockLoginForm();
+
+  // Force hide all overlays inside login
+  const overlay = document.getElementById("loginProgressOverlay");
+  if (overlay) overlay.classList.add("hidden");
+
+  // Clear fields (safety)
+  document.getElementById("loginMobile").value = "";
+  document.getElementById("loginPassword").value = "";
+
+  // ⭐ IMPORTANT FIX: Show signup label again
+  const label = document.getElementById("signupLabelBox");
+  if (label) label.style.display = "block";
 }
 
 function logoutUser() {
@@ -6843,6 +6854,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
