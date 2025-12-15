@@ -638,22 +638,6 @@ body::before {
   </style>
 </head>
 <body>
-  <div id="loadingOverlay" style="
-  
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 20000;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-size: 24px;
-  ">
-    Processing your order...
-  </div>
-
 <div id="cartOverlay" class="fixed inset-0 bg-black bg-opacity-45 z-50 text-white text-xl font-medium flex items-center justify-center hidden">
   Updating your cart…
 </div>
@@ -1159,15 +1143,50 @@ style="
     <!-- Options added dynamically -->
   </select>
   <!-- STEP 3D BUTTON BELOW DROPDOWN -->
-  <button type="button"
-        onclick="onChangeAddressAddNew()"
-        class="mt-2 px-3 py-1 bg-gray-600 text-white rounded text-sm">
-  + Add New Address
+  <button onclick="onChangeAddressAddNew()"
+          class="mt-2 px-3 py-1 bg-gray-600 text-white rounded text-sm">
+    + Add New Address
+  </button>
+</div>
+
+
+<!-- ADD NEW ADDRESS FORM -->
+<div id="newAddressForm" class="mt-4 hidden border p-3 rounded bg-gray-50">
+
+  <label class="text-sm font-medium">Mobile</label>
+  <input id="newAddressMobile"
+         class="w-full border px-2 py-2 rounded bg-gray-200 text-gray-700"
+         readonly />
+
+  <label class="text-sm font-medium mt-3">Address</label>
+  <textarea id="newAddressField"
+            class="w-full border px-2 py-2 rounded"
+            placeholder="Enter full address"></textarea>
+
+  <label class="text-sm font-medium mt-3">Pincode</label>
+  <input id="newPincode"
+         class="w-full border px-2 py-2 rounded"
+         maxlength="6"
+         placeholder="Enter pincode" />
+
+  <label class="text-sm font-medium mt-3">City</label>
+  <input id="newCity"
+         class="w-full border px-2 py-2 rounded"
+         placeholder="Enter city" />
+
+  <label class="text-sm font-medium mt-3">State</label>
+  <input id="newState"
+         class="w-full border px-2 py-2 rounded"
+         placeholder="Enter state" />
+
+  <button id="saveNewAddressBtn"
+        onclick="saveNewAddress()"
+        class="mt-4 w-full bg-green-600 text-white py-2 rounded">
+  Save Address
 </button>
 
-  </div>   <!-- ✅ CLOSE addressSelectContainer -->
-
-</div>   
+</div>
+</div>
 
       
      <!-- Payment Method -->
@@ -1224,76 +1243,26 @@ style="
 
     </form>
 
-
   </div>
 </div>
 
 
-<!-- NEW ADDRESS MODAL (STEP-2A) -->
-<div id="newAddressModal"
-     class="fixed inset-0 bg-black bg-opacity-40 hidden z-[10000]
-            flex items-center justify-center">
 
-  <div class="bg-white w-full max-w-[380px]
-              rounded-2xl shadow-xl p-4 relative">
-
-    <!-- Placeholder (STEP-2A only) -->
-   <h3 class="text-lg font-semibold mb-2">Add New Address</h3>
-
-<div id="newAddressForm" class="mt-4 hidden border p-3 rounded bg-gray-50">
-
-  <label class="text-sm font-medium">Mobile</label>
-  <input id="newAddressMobile"
-         class="w-full border px-2 py-2 rounded bg-gray-200 text-gray-700"
-         readonly />
-
-  <label class="text-sm font-medium mt-3">Address</label>
-  <textarea id="newAddressField"
-  autocomplete="off"
-  autocorrect="off"
-  autocapitalize="off"
-  spellcheck="false"
-  name="new-address-never"
-  class="w-full border px-2 py-2 rounded"
-  placeholder="Enter full address">
-</textarea>
-
-
-  <label class="text-sm font-medium mt-3">Pincode</label>
-  <input id="newPincode"
-         class="w-full border px-2 py-2 rounded"
-         maxlength="6"
-         placeholder="Enter pincode" />
-
-  <label class="text-sm font-medium mt-3">City</label>
-  <input id="newCity"
-         class="w-full border px-2 py-2 rounded"
-         placeholder="Enter city" />
-
-  <label class="text-sm font-medium mt-3">State</label>
-  <input id="newState"
-         class="w-full border px-2 py-2 rounded"
-         placeholder="Enter state" />
-
-  <button id="saveNewAddressBtn"
-          onclick="saveNewAddress()"
-          class="mt-4 w-full bg-green-600 text-white py-2 rounded">
-    Save Address
-  </button>
-  <button type="button"
-        onclick="closeNewAddressModal()"
-        class="mt-2 w-full bg-gray-200 text-gray-700 py-2 rounded">
-  Cancel
-</button>
-<button type="button"
-        onclick="closeNewAddressModal()"
-        class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-xl font-bold">
-  ✕
-</button>
-
-
-</div>
-
+<div id="loadingOverlay" style="
+  
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 24px;
+  ">
+    Processing your order...
+  </div>
 
 
   <script>
@@ -2644,7 +2613,6 @@ document.getElementById("saveNewAddressBtn").addEventListener("click", async () 
   } catch (err) {
     alert("Error saving address: " + err.message);
   }
-console.log("OLD ADDRESS SAVE FLOW RUNNING");
 
   btn.innerText = "Save Address";
   btn.disabled = false;
@@ -2775,7 +2743,6 @@ let lastLookupOrderType = "";
 
     
 function toggleAddressField() {
-console.log("toggleAddressField fired");
 
   const mobile = document.getElementById("mobile").value.trim();
   const orderType = document.getElementById("orderType").value;
@@ -2784,7 +2751,6 @@ console.log("toggleAddressField fired");
 
   // --- 1) Validate mobile ---
   if (!/^[0-9]{10}$/.test(mobile)) {
-      console.log("mobile invalid, returning");   
     alert("Enter a valid 10-digit mobile number.");
     return;
   }
@@ -2815,7 +2781,7 @@ console.log("toggleAddressField fired");
   nameField.closest("div").style.display = "block";
   emailField.closest("div").style.display = "block";
   paymentField.style.display = "block";
-console.log("overlay about to show");   //
+
   // --- 4) Always show overlay (both cases) ---
   overlay.style.display = "flex";
   orderSelect.disabled = true;
@@ -5010,22 +4976,12 @@ function onChangeAddressClick() {
         : [];
 
       // 2️⃣ If nothing saved → show new form
-      // 2️⃣ If nothing saved → DO NOT auto-open new address form in checkout
-if (!primary && multiList.length === 0) {
-  dropdownBox.classList.add("hidden");
-
-  // just inform user
-  const status = document.getElementById("addressStatus");
-  if (status) {
-    status.innerText = "No saved address found. Please add a new address.";
-    status.className = "text-sm text-red-600 font-medium";
-    status.classList.remove("hidden");
-  }
-
-  if (overlay) overlay.style.display = "none";
-  return;
-}
-
+      if (!primary && multiList.length === 0) {
+        newFormBox.classList.remove("hidden");
+        autofillNewAddressMobile();
+        if (overlay) overlay.style.display = "none";
+        return;
+      }
 
       // 3️⃣ Show dropdown box
       dropdownBox.classList.remove("hidden");
@@ -5120,100 +5076,73 @@ if (!primary && multiList.length === 0) {
 
 
   function onChangeAddressAddNew() {
+ const mobile = localStorage.getItem("mobile") || localStorage.getItem("userMobile");
 
-  // ✅ Open New Address modal
-  const modal = document.getElementById("newAddressModal");
-  if (!modal) return;
+  if (!mobile) return;
 
-  modal.classList.remove("hidden");
-  modal.classList.add("flex");
+  const dropdownBox = document.getElementById("addressSelectContainer");
+  const newFormBox = document.getElementById("newAddressForm");
 
-  // ✅ Show form INSIDE modal
-  const form = document.getElementById("newAddressForm");
-  if (form) form.classList.remove("hidden");
-}
+  dropdownBox.classList.add("hidden");
+  newFormBox.classList.remove("hidden");
 
-function closeNewAddressModal() {
-
-  const modal = document.getElementById("newAddressModal");
-  if (!modal) return;
-
-  // hide modal
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
-
-  // ❌ safety: checkout ke andar inline form kabhi visible na ho
-  const inlineForm = document.getElementById("newAddressForm");
-  if (inlineForm) inlineForm.classList.add("hidden");
+  // Autofill mobile inside new-address form
+  document.getElementById("newAddressMobile").value = mobile;
 }
 
 function saveNewAddress() {
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) return alert("Login required.");
 
-  const mobile =
-    localStorage.getItem("mobile") ||
-    localStorage.getItem("userMobile");
-
-  if (!mobile) {
-    alert("Login required.");
-    return;
-  }
-
-  const addr  = document.getElementById("newAddressField").value.trim();
-  const pin   = document.getElementById("newPincode").value.trim();
-  const city  = document.getElementById("newCity").value.trim();
+  const addr = document.getElementById("newAddressField").value.trim();
+  const pin  = document.getElementById("newPincode").value.trim();
+  const city = document.getElementById("newCity").value.trim();
   const state = document.getElementById("newState").value.trim();
 
-  if (!addr || pin.length !== 6 || !city || !state) {
-    alert("Please fill all address fields correctly.");
-    return;
-  }
+  if (!addr) return alert("Please enter address.");
+  if (pin.length !== 6) return alert("Please enter valid 6-digit pincode.");
+  if (!city) return alert("Enter city.");
+  if (!state) return alert("Enter state.");
 
-  apiPost("saveUserNewAddress", {
-    mobile,
-    address: addr,
-    pincode: pin,
-    city,
-    state
-  })
-  .then(res => {
-    if (!res || !res.success) {
-      alert(res?.message || "Failed to save address.");
-      return;
-    }
+  apiPost("saveUserNewAddress", { mobile, address: addr, pincode: pin, city, state })
+    .then(res => {
+      if (res.success) {
+        alert("Address saved successfully!");
 
-    // ✅ Close modal
-    closeNewAddressModal();
+        // Hide form
+        const form = document.getElementById("newAddressForm");
+        form.classList.add("hidden");
 
-    // ✅ Clear modal inputs
-    document.getElementById("newAddressField").value = "";
-    document.getElementById("newPincode").value = "";
-    document.getElementById("newCity").value = "";
-    document.getElementById("newState").value = "";
+        // Clear new form inputs
+        document.getElementById("newAddressField").value = "";
+        document.getElementById("newPincode").value = "";
+        document.getElementById("newCity").value = "";
+        document.getElementById("newState").value = "";
 
-    // ✅ Refresh dropdown
-    onChangeAddressClick();
+        // Show dropdown
+        document.getElementById("addressSelectContainer").classList.remove("hidden");
 
-    // ✅ Auto-select newly added address
-    setTimeout(() => {
-      const ddl = document.getElementById("savedAddressDropdown");
-      if (ddl && ddl.options.length > 0) {
-        ddl.selectedIndex = ddl.options.length - 1;
-        ddl.dispatchEvent(new Event("change"));
+        // Reload dropdown list
+        onChangeAddressClick();
+
+        // Auto-select new address
+        setTimeout(() => {
+          const ddl = document.getElementById("savedAddressDropdown");
+          if (ddl) {
+            ddl.value = addr;  // Pre-select newly added address
+          }
+          document.getElementById("address").value = addr; // Update main textarea
+        }, 400);
+
+      } else {
+        alert(res.message || "Failed to save address.");
       }
-    }, 300);
-
-  })
-  .catch(err => {
-    console.error(err);
-   console.log("NEW MODAL SAVE FLOW RUNNING");
-
-    console.warn("Save address fetch failed, but may be saved:", err);
-
-  closeNewAddressModal();
-  onChangeAddressClick();
-  });
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error saving address.");
+    });
 }
-
 
 const originalBodyOverflow = document.body.style.overflow || "";  
 // STEP 8 — Autofill New Address Form with logged-in mobile
@@ -6843,13 +6772,31 @@ function showCouponMessage(msg) {
       document.getElementById("paymentMethod").value = btn.dataset.value;
     });
   });
-
-
-
-
-
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
