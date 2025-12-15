@@ -3384,10 +3384,17 @@ function openLogin() {
     
   const modal = document.getElementById("loginModal");
   modal.style.display = "flex";
-modal.classList.remove("hidden");
+  modal.classList.remove("hidden");
+
+  // 🔥 MOST IMPORTANT FIX
+  modal.querySelectorAll(".hidden").forEach(e => e.classList.remove("hidden"));
+
+  document.body.style.overflow = "hidden";
   document.getElementById("signupLabelBox").style.display = "none";
-   console.log("✅ openLogin END");
+
+  console.log("✅ openLogin END");
 }
+
 
 function closeLogin() {
   const modal = document.getElementById("loginModal");
@@ -6877,6 +6884,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
