@@ -1220,11 +1220,6 @@ style="
 
 
     </form>
-
-  </div>
-</div>
-
-
 <!-- NEW ADDRESS MODAL (STEP-2A) -->
 <div id="newAddressModal"
      class="fixed inset-0 bg-black bg-opacity-40 hidden z-[10000]
@@ -1271,6 +1266,11 @@ style="
   </button>
 
 </div>
+
+  </div>
+</div>
+
+
 
 
 
@@ -2753,6 +2753,7 @@ let lastLookupOrderType = "";
 
     
 function toggleAddressField() {
+console.log("toggleAddressField fired");
 
   const mobile = document.getElementById("mobile").value.trim();
   const orderType = document.getElementById("orderType").value;
@@ -2761,6 +2762,7 @@ function toggleAddressField() {
 
   // --- 1) Validate mobile ---
   if (!/^[0-9]{10}$/.test(mobile)) {
+      console.log("mobile invalid, returning");   
     alert("Enter a valid 10-digit mobile number.");
     return;
   }
@@ -2791,7 +2793,7 @@ function toggleAddressField() {
   nameField.closest("div").style.display = "block";
   emailField.closest("div").style.display = "block";
   paymentField.style.display = "block";
-
+console.log("overlay about to show");   //
   // --- 4) Always show overlay (both cases) ---
   overlay.style.display = "flex";
   orderSelect.disabled = true;
@@ -6862,6 +6864,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
