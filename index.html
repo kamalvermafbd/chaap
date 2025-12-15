@@ -1249,15 +1249,8 @@ style="
 
   <label class="text-sm font-medium mt-3">Address</label>
   <textarea id="newAddressField"
-  autocomplete="off"
-  autocorrect="off"
-  autocapitalize="off"
-  spellcheck="false"
-  name="new-address-never"
-  class="w-full border px-2 py-2 rounded"
-  placeholder="Enter full address">
-</textarea>
-
+            class="w-full border px-2 py-2 rounded"
+            placeholder="Enter full address"></textarea>
 
   <label class="text-sm font-medium mt-3">Pincode</label>
   <input id="newPincode"
@@ -1280,17 +1273,6 @@ style="
           class="mt-4 w-full bg-green-600 text-white py-2 rounded">
     Save Address
   </button>
-  <button type="button"
-        onclick="closeNewAddressModal()"
-        class="mt-2 w-full bg-gray-200 text-gray-700 py-2 rounded">
-  Cancel
-</button>
-<button type="button"
-        onclick="closeNewAddressModal()"
-        class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-xl font-bold">
-  ✕
-</button>
-
 
 </div>
 
@@ -2644,7 +2626,6 @@ document.getElementById("saveNewAddressBtn").addEventListener("click", async () 
   } catch (err) {
     alert("Error saving address: " + err.message);
   }
-console.log("OLD ADDRESS SAVE FLOW RUNNING");
 
   btn.innerText = "Save Address";
   btn.disabled = false;
@@ -5117,6 +5098,56 @@ if (!primary && multiList.length === 0) {
   });
 }
 
+async function saveNewAddressFromModal() {
+
+  const mobile =
+    localStorage.getItem("mobile") ||
+    localStorage.getItem("userMobile");
+
+  if (!mobile) {
+    alert("Mobile not found");
+    return;
+  }
+
+  // 1️⃣ Read values from modal
+  const address = document.getElementById("newAddress").value.trim();
+  const pincode = document.getElementById("newPincode").value.trim();
+  const city    = document.getElementById("newCity").value.trim();
+  const state   = document.getElementById("newState").value.trim();
+
+  if (!address || !pincode || !city || !state) {
+    alert("Please fill all address fields");
+    return;
+  }
+
+  // 2️⃣ Save to backend
+  const payload = {
+    mobile,
+    address,
+    pincode,
+    city,
+    state
+  };
+
+  let res;
+  try {
+    res = await apiPost("saveUserAddress", payload);
+  } catch (e) {
+    alert("Failed to save address");
+    return;
+  }
+
+  if (!res || !res.success) {
+    alert(res?.message || "Address save failed");
+    return;
+  }
+
+  // 3️⃣ Refresh address dropdown (reuse existing flow)
+  await onChangeAddressClick();
+
+  // 4️⃣ Close modal
+  closeNewAddressModal();
+}
 
 
   function onChangeAddressAddNew() {
@@ -5148,72 +5179,58 @@ function closeNewAddressModal() {
 }
 
 function saveNewAddress() {
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) return alert("Login required.");
 
-  const mobile =
-    localStorage.getItem("mobile") ||
-    localStorage.getItem("userMobile");
-
-  if (!mobile) {
-    alert("Login required.");
-    return;
-  }
-
-  const addr  = document.getElementById("newAddressField").value.trim();
-  const pin   = document.getElementById("newPincode").value.trim();
-  const city  = document.getElementById("newCity").value.trim();
+  const addr = document.getElementById("newAddressField").value.trim();
+  const pin  = document.getElementById("newPincode").value.trim();
+  const city = document.getElementById("newCity").value.trim();
   const state = document.getElementById("newState").value.trim();
 
-  if (!addr || pin.length !== 6 || !city || !state) {
-    alert("Please fill all address fields correctly.");
-    return;
-  }
+  if (!addr) return alert("Please enter address.");
+  if (pin.length !== 6) return alert("Please enter valid 6-digit pincode.");
+  if (!city) return alert("Enter city.");
+  if (!state) return alert("Enter state.");
 
-  apiPost("saveUserNewAddress", {
-    mobile,
-    address: addr,
-    pincode: pin,
-    city,
-    state
-  })
-  .then(res => {
-    if (!res || !res.success) {
-      alert(res?.message || "Failed to save address.");
-      return;
-    }
+  apiPost("saveUserNewAddress", { mobile, address: addr, pincode: pin, city, state })
+    .then(res => {
+      if (res.success) {
+        alert("Address saved successfully!");
 
-    // ✅ Close modal
-    closeNewAddressModal();
+        // Hide form
+        const form = document.getElementById("newAddressForm");
+        form.classList.add("hidden");
 
-    // ✅ Clear modal inputs
-    document.getElementById("newAddressField").value = "";
-    document.getElementById("newPincode").value = "";
-    document.getElementById("newCity").value = "";
-    document.getElementById("newState").value = "";
+        // Clear new form inputs
+        document.getElementById("newAddressField").value = "";
+        document.getElementById("newPincode").value = "";
+        document.getElementById("newCity").value = "";
+        document.getElementById("newState").value = "";
 
-    // ✅ Refresh dropdown
-    onChangeAddressClick();
+        // Show dropdown
+        document.getElementById("addressSelectContainer").classList.remove("hidden");
 
-    // ✅ Auto-select newly added address
-    setTimeout(() => {
-      const ddl = document.getElementById("savedAddressDropdown");
-      if (ddl && ddl.options.length > 0) {
-        ddl.selectedIndex = ddl.options.length - 1;
-        ddl.dispatchEvent(new Event("change"));
+        // Reload dropdown list
+        onChangeAddressClick();
+
+        // Auto-select new address
+        setTimeout(() => {
+          const ddl = document.getElementById("savedAddressDropdown");
+          if (ddl) {
+            ddl.value = addr;  // Pre-select newly added address
+          }
+          document.getElementById("address").value = addr; // Update main textarea
+        }, 400);
+
+      } else {
+        alert(res.message || "Failed to save address.");
       }
-    }, 300);
-
-  })
-  .catch(err => {
-    console.error(err);
-   console.log("NEW MODAL SAVE FLOW RUNNING");
-
-    console.warn("Save address fetch failed, but may be saved:", err);
-
-  closeNewAddressModal();
-  onChangeAddressClick();
-  });
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error saving address.");
+    });
 }
-
 
 const originalBodyOverflow = document.body.style.overflow || "";  
 // STEP 8 — Autofill New Address Form with logged-in mobile
@@ -6851,9 +6868,6 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
-
-
-
 
 
 
