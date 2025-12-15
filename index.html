@@ -1249,8 +1249,15 @@ style="
 
   <label class="text-sm font-medium mt-3">Address</label>
   <textarea id="newAddressField"
-            class="w-full border px-2 py-2 rounded"
-            placeholder="Enter full address"></textarea>
+  autocomplete="off"
+  autocorrect="off"
+  autocapitalize="off"
+  spellcheck="false"
+  name="new-address-never"
+  class="w-full border px-2 py-2 rounded"
+  placeholder="Enter full address">
+</textarea>
+
 
   <label class="text-sm font-medium mt-3">Pincode</label>
   <input id="newPincode"
@@ -5197,7 +5204,10 @@ function saveNewAddress() {
   })
   .catch(err => {
     console.error(err);
-    alert("Error saving address.");
+    console.warn("Save address fetch failed, but may be saved:", err);
+
+  closeNewAddressModal();
+  onChangeAddressClick();
   });
 }
 
@@ -6838,6 +6848,7 @@ function showCouponMessage(msg) {
 </script>
 </body>
 </html>
+
 
 
 
