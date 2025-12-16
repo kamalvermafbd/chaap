@@ -3138,6 +3138,8 @@ if (mobileInput) {
     }
 
     mobileInput.value = val;
+      // ✅ IMPORTANT: re-trigger logic after auto-fix
+    mobileInput.dispatchEvent(new Event("input"));
   });
 }
 
@@ -6999,6 +7001,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
