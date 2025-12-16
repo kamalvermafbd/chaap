@@ -3381,14 +3381,12 @@ function filterMenu() {
 <script>
 
 function openLogin() {
-  window.__AUTH_MODAL_OPEN = true;
-
   const modal = document.getElementById("loginModal");
   if (!modal) return;
-
-  modal.classList.remove("hidden");
+  modal.style.display = "flex";
   document.body.style.overflow = "hidden";
 }
+
 
 
 
@@ -6888,6 +6886,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
