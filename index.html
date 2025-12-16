@@ -828,6 +828,28 @@ style="
     
   </header>
 
+<div id="loginModal"
+     style="display:none"
+     class="fixed inset-0 bg-black bg-opacity-50 z-[999999] flex items-center justify-center">
+
+  <div class="bg-white w-full max-w-[380px] rounded-2xl shadow-xl p-4 relative">
+
+    <button onclick="closeLogin()"
+      class="absolute top-3 right-3 text-gray-600 text-2xl font-semibold">
+      &times;
+    </button>
+
+    <h2 class="text-xl font-semibold text-center mb-4">Login</h2>
+
+    <input id="loginMobile" placeholder="Mobile" class="border p-2 w-full mb-2">
+    <input id="loginPassword" type="password" placeholder="Password" class="border p-2 w-full mb-4">
+
+    <button onclick="loginUser()" class="bg-orange-500 text-white w-full py-2 rounded">
+      Login
+    </button>
+
+  </div>
+</div>
 
 <!-- LEFT NAVIGATION PANEL -->
 <!-- LEFT NAVIGATION PANEL -->
@@ -6887,6 +6909,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
