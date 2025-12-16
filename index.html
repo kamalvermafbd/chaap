@@ -3379,6 +3379,8 @@ function filterMenu() {
 <script>
 
 function openLogin() {
+    forceClearOverlays();
+
   window.__AUTH_MODAL_OPEN = true;
   console.log("✅ openLogin START");
 
@@ -3395,7 +3397,7 @@ function openLogin() {
   modal.style.pointerEvents = "auto";
 
   // 🔥 FIXED z-index (MUST be > 120000)
-  modal.style.zIndex = "130000";
+  modal.style.zIndex = "999999";
 
   document.body.style.overflow = "hidden";
 
@@ -6902,6 +6904,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
