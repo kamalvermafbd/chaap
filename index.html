@@ -1204,8 +1204,15 @@ style="
       Online
     </button>
   </div>
-</div>
+<!-- 🔴 PAYMENT ERROR MESSAGE (PASTE HERE) -->
+  <div id="paymentError"
+       class="hidden mt-2 text-red-600 font-bold text-base">
+  </div>
 
+ </div>
+
+
+      
 <!-- BUTTONS -->
 <div class="mt-3 grid grid-cols-2 gap-3">
 
@@ -1319,6 +1326,26 @@ style="
 
 
   <script>
+document.querySelectorAll(".payment-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+
+    // set payment value
+    document.getElementById("paymentMethod").value = btn.dataset.value;
+
+    // active UI
+    document.querySelectorAll(".payment-btn").forEach(b =>
+      b.classList.remove("border-orange-500", "bg-orange-50")
+    );
+    btn.classList.add("border-orange-500", "bg-orange-50");
+
+    // ✅ STEP-2: clear payment error instantly
+    const paymentError = document.getElementById("paymentError");
+    if (paymentError) {
+      paymentError.innerText = "";
+      paymentError.classList.add("hidden");
+    }
+  });
+});
 
 document.addEventListener("DOMContentLoaded", function() {
     const s = document.getElementById("menuSearch");
@@ -2940,11 +2967,22 @@ const finalAddress =
   window._orderLock = false;
   return;
 }
+const paymentError = document.getElementById("paymentError");
+
 if (!paymentMethod) {
-  alert("Please select Payment Method");
-  window._orderLock = false;
+  if (paymentError) {
+    paymentError.innerText = "⚠️ Please select a payment method";
+    paymentError.classList.remove("hidden");
+  }
   return;
 }
+
+// clear error when valid
+if (paymentError) {
+  paymentError.innerText = "";
+  paymentError.classList.add("hidden");
+}
+
 
 
   if (!/^[0-9]{10}$/.test(mobile)) {
@@ -6908,6 +6946,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
