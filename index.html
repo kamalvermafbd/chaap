@@ -3377,6 +3377,8 @@ function filterMenu() {
 <script>
 
 function openLogin() {
+  window.__AUTH_MODAL_OPEN = true;
+
   console.log("✅ openLogin START");
     alert ("login pressed");
   const modal = document.getElementById("loginModal");
@@ -3397,6 +3399,8 @@ modal.style.pointerEvents = "auto";
   });
 
 function closeLogin() {
+  window.__AUTH_MODAL_OPEN = false;
+
   const modal = document.getElementById("loginModal");
 
   // FULL HARD CLOSE
@@ -3732,20 +3736,25 @@ function updateSignupOverlayMessage(msg) {
 
 // === FINAL STABLE LOAD HANDLER ===
 window.addEventListener("load", async () => {
+
+  // 🔒 AUTH MODAL GUARD (must be first)
+  if (window.__AUTH_MODAL_OPEN === true) {
+    console.log("⛔ Load UI reset skipped (auth modal open)");
+    return;
+  }
+
   await loadRestaurantSettings();
 
-  // clear login fields
-  const loginMobile = document.getElementById("loginMobile");
+  // clear login fields (AFTER declare)
+  const loginMobile   = document.getElementById("loginMobile");
   const loginPassword = document.getElementById("loginPassword");
   if (loginMobile) loginMobile.value = "";
   if (loginPassword) loginPassword.value = "";
 
   const mobile = localStorage.getItem("userMobile");
   const email  = localStorage.getItem("userEmail");
-  //  LOAD USER CART FROM BACKEND IF LOGGED IN
 
-
-  // Always reset full UI first
+  // ---------------- UI RESET ----------------
   document.getElementById("menuWrapper").style.display = "block";
   document.getElementById("pageWrapper").style.display = "none";
 
@@ -3765,44 +3774,40 @@ window.addEventListener("load", async () => {
   document.querySelector("button[onclick='openSignup()']").style.display = "inline-block";
   document.getElementById("signupLabelBox").style.display = "block";
 
-  // ----- if logged in -----
+  // ---------------- LOGGED IN CASE ----------------
   if (mobile) {
 
-    // Show user info
     document.getElementById("loggedEmail").innerText = email || "";
     document.getElementById("userInfoBox").style.display = "block";
 
-    // Hide login/signup
     document.querySelector("button[onclick='openLogin()']").style.display = "none";
     document.querySelector("button[onclick='openSignup()']").style.display = "none";
     document.getElementById("signupLabelBox").style.display = "none";
 
-    // Show nav + hamburger
     document.getElementById("leftNav").style.display = "block";
     document.getElementById("hamburgerBtn").style.display = "block";
     document.getElementById("logoutBtn").style.display = "inline-block";
 
-    // Always show menu page after refresh
     showPage("menuPage");
 
-    // highlight first item
     const firstMenu = document.querySelector("#premiumMenu li");
     if (firstMenu) firstMenu.classList.add("active");
   }
-   loadCartOnStart();
-  if (!isLoggedIn()) {
-  const guest = JSON.parse(localStorage.getItem("guestCart") || "[]");
 
-  // Render only if actually a valid array
-  if (Array.isArray(guest) && guest.length > 0) {
-    cart = guest;
-    window.cart = guest;
-    renderCart();
-   
-     document.getElementById("cartToggleBar")?.classList.add("active-cart");
+  // ---------------- CART RESTORE ----------------
+  loadCartOnStart();
+
+  if (!isLoggedIn()) {
+    const guest = JSON.parse(localStorage.getItem("guestCart") || "[]");
+    if (Array.isArray(guest) && guest.length > 0) {
+      cart = guest;
+      window.cart = guest;
+      renderCart();
+      document.getElementById("cartToggleBar")?.classList.add("active-cart");
+    }
   }
-}
 });
+
 
 function validateLoginMobile() {
   const input = document.getElementById("loginMobile");
@@ -6880,6 +6885,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
