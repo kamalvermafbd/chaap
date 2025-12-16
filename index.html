@@ -3119,6 +3119,7 @@ renderCart();
       window._orderLock = false;
     });
 }
+    
 // -----------------------------
 // MOBILE INPUT CONTROL (10 digit, no starting 0)
 // -----------------------------
@@ -3138,10 +3139,33 @@ if (mobileInput) {
     }
 
     mobileInput.value = val;
+     // STEP 1a: hide mobile error while typing
+    const mobileError = document.getElementById("mobileError");
+    if (mobileError) {
+      mobileError.innerText = "";
+      mobileError.classList.add("hidden");
+    }
       // ✅ IMPORTANT: re-trigger logic after auto-fix
     mobileInput.dispatchEvent(new Event("input"));
   });
 }
+
+// -----------------------------
+// NAME INPUT – STEP 1b
+// hide name error while typing
+// -----------------------------
+const nameInput = document.getElementById("customerName");
+
+if (nameInput) {
+  nameInput.addEventListener("input", () => {
+    const nameError = document.getElementById("nameError");
+    if (nameError) {
+      nameError.innerText = "";
+      nameError.classList.add("hidden");
+    }
+  });
+}
+
 
 
 function filterMenu() {
@@ -7001,6 +7025,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
