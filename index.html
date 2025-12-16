@@ -3120,19 +3120,24 @@ renderCart();
     });
 }
 // -----------------------------
-// MOBILE INPUT CONTROL (10 digit)
+// MOBILE INPUT CONTROL (10 digit, no starting 0)
 // -----------------------------
 const mobileInput = document.getElementById("mobile");
 
 if (mobileInput) {
   mobileInput.addEventListener("input", () => {
-    // sirf digits allow
-    mobileInput.value = mobileInput.value.replace(/\D/g, "");
+    // allow only digits
+    let val = mobileInput.value.replace(/\D/g, "");
 
-    // max 10 digits
-    if (mobileInput.value.length > 10) {
-      mobileInput.value = mobileInput.value.slice(0, 10);
+    // remove starting zeros
+    val = val.replace(/^0+/, "");
+
+    // limit to 10 digits
+    if (val.length > 10) {
+      val = val.slice(0, 10);
     }
+
+    mobileInput.value = val;
   });
 }
 
@@ -6994,6 +6999,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
