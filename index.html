@@ -2933,6 +2933,9 @@ function resetMenuCartUI() {
 
     
 function placeOrder() {
+  console.log("🟢 placeOrder() called");
+console.log("🔒 orderLock before:", window._orderLock);
+
   console.log("---- DEBUG START ----");
   console.log("getCart() returns:", getCart());
   console.log("global cart variable:", cart);
@@ -2947,6 +2950,8 @@ function placeOrder() {
   const address = document.getElementById('address').value.trim();
   const paymentMethod = document.getElementById('paymentMethod').value;
 // STEP-2A: Ensure guest fields visibility before validation
+  console.log("📦 orderType:", orderType);
+
 updateGuestFieldsVisibility();
 
   // ----------------------------------
@@ -2996,6 +3001,8 @@ if (orderType) {
 
   // NAME mandatory once orderType selected
   if (!customerName) {
+    console.log("❌ Name validation hit", customerName);
+
   const nameInput = document.getElementById("customerName");
   const nameError = document.getElementById("nameError");
 
@@ -3032,6 +3039,8 @@ if (orderType) {
       emailError.classList.remove("hidden");
     }
     window._orderLock = false;
+    console.log("↩️ returning due to name validation");
+
     return;
   }
 }
@@ -7131,6 +7140,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
