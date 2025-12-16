@@ -2946,6 +2946,31 @@ function placeOrder() {
   const orderType = document.getElementById('orderType').value;
   const address = document.getElementById('address').value.trim();
   const paymentMethod = document.getElementById('paymentMethod').value;
+
+  // ----------------------------------
+// AUTO CUSTOMER LOOKUP (ONCE)
+// mobile + payment ready
+// ----------------------------------
+if (
+  /^[0-9]{10}$/.test(mobile) &&
+  paymentMethod &&
+  !window._customerLookupDone
+) {
+  const lookupOverlay = document.getElementById("loadingOverlay");
+  lookupOverlay.innerText = "Fetching your details...";
+  lookupOverlay.style.display = "flex";
+
+  window._customerLookupDone = true; // 🔒 run only once
+
+  lookupCustomerByMobile(mobile)
+  .finally(() => {
+    if (!window._orderSubmitting) {
+      lookupOverlay.style.display = "none";
+    }
+  });
+
+}
+
 // ✅ OPTION A: Address sirf Home Delivery me hi save hoga
 const finalAddress =
   orderType === "Home Delivery" ? address : "";
@@ -2962,6 +2987,7 @@ if (!paymentMethod) {
     paymentError.innerText = "⚠️ Please select a payment method";
     paymentError.classList.remove("hidden");
   }
+  window._orderLock = false; // ✅ ADD THIS
   return;
 }
 
@@ -3036,6 +3062,7 @@ if (addressError) {
 console.log("🚀 ORDER PAYLOAD TO BACKEND:", JSON.stringify(orderData, null, 2));
 
   const overlay = document.getElementById('loadingOverlay');
+  window._orderSubmitting = true; // ✅ ADD THIS
   overlay.innerText = "Processing your order... Please wait...";
   overlay.style.display = "flex";
 
@@ -3083,7 +3110,7 @@ renderCart();
       overlay.style.display = "none";
       document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
         .forEach(el => el.disabled = false);
-
+  window._orderSubmitting = false; // 
       window._orderLock = false;
     });
 }
@@ -6946,6 +6973,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
