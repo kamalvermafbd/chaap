@@ -2954,6 +2954,8 @@ function placeOrder() {
 if (
   /^[0-9]{10}$/.test(mobile) &&
   paymentMethod &&
+    customerName &&          
+  email &&    
   !window._customerLookupDone &&
   (
     orderType !== "Home Delivery" ||
@@ -7025,6 +7027,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
