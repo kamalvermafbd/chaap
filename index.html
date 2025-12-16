@@ -2946,6 +2946,8 @@ function placeOrder() {
   const orderType = document.getElementById('orderType').value;
   const address = document.getElementById('address').value.trim();
   const paymentMethod = document.getElementById('paymentMethod').value;
+// STEP-2A: Ensure guest fields visibility before validation
+updateGuestFieldsVisibility();
 
   // ----------------------------------
 // AUTO CUSTOMER LOOKUP (ONCE)
@@ -3165,7 +3167,11 @@ renderCart();
       window._orderLock = false;
     });
 }
-    
+    // STEP-1B: Order type change → show/hide fields
+document.getElementById("orderType")?.addEventListener("change", () => {
+  updateGuestFieldsVisibility();
+});
+
 // -----------------------------
 // MOBILE INPUT CONTROL (10 digit, no starting 0)
 // -----------------------------
@@ -7084,12 +7090,40 @@ function onNewPincodeChange() {
 
 
 
+function updateGuestFieldsVisibility() {
+  const orderType = document.getElementById("orderType")?.value;
+
+  const nameRow = document.getElementById("customerName")?.parentElement;
+  const emailRow = document.getElementById("email")?.parentElement;
+  const addressRow = document.getElementById("addressWrapper");
+
+  // pehle sab hide
+  if (nameRow) nameRow.style.display = "none";
+  if (emailRow) emailRow.style.display = "none";
+  if (addressRow) addressRow.style.display = "none";
+
+  if (!orderType) return;
+
+  // Dine In / Take Away
+  if (orderType === "Dine In" || orderType === "Take Away") {
+    if (nameRow) nameRow.style.display = "block";
+    if (emailRow) emailRow.style.display = "block";
+  }
+
+  // Home Delivery
+  if (orderType === "Home Delivery") {
+    if (nameRow) nameRow.style.display = "block";
+    if (emailRow) emailRow.style.display = "block";
+    if (addressRow) addressRow.style.display = "block";
+  }
+}
 
 
 
 </script>
 </body>
 </html>
+
 
 
 
