@@ -3119,6 +3119,22 @@ renderCart();
       window._orderLock = false;
     });
 }
+// -----------------------------
+// MOBILE INPUT CONTROL (10 digit)
+// -----------------------------
+const mobileInput = document.getElementById("mobile");
+
+if (mobileInput) {
+  mobileInput.addEventListener("input", () => {
+    // sirf digits allow
+    mobileInput.value = mobileInput.value.replace(/\D/g, "");
+
+    // max 10 digits
+    if (mobileInput.value.length > 10) {
+      mobileInput.value = mobileInput.value.slice(0, 10);
+    }
+  });
+}
 
 
 function filterMenu() {
@@ -6978,6 +6994,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
