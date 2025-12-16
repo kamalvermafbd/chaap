@@ -5069,7 +5069,6 @@ function onChangeAddressAddNew() {
   console.log("✅ New Address Modal opened cleanly");
 }
 
-
 function closeNewAddressModal() {
 
   const modal = document.getElementById("newAddressModal");
@@ -5086,10 +5085,17 @@ function closeNewAddressModal() {
     form.style.display = "none";
   }
 
-  // 🔑 Unlock body scroll
-  document.body.style.overflow = "auto";
+  // 🔁 Restore checkout modal
+  const checkout = document.getElementById("checkoutModal");
+  if (checkout) {
+    checkout.classList.remove("hidden");
+    checkout.style.display = "flex";
+  }
 
-  console.log("✅ New Address Modal closed");
+  // 🔑 KEEP body locked because checkout is open
+  document.body.style.overflow = "hidden";
+
+  console.log("✅ New Address Modal closed, checkout restored");
 }
 
 
@@ -6893,6 +6899,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
