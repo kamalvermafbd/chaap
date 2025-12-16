@@ -2986,45 +2986,50 @@ if (paymentError) {
     window._orderLock = false;
     return;
   }
+
+  // -----------------------------
+// FINAL GUEST VALIDATION (ORDER FLOW BASED)
+// -----------------------------
+if (orderType) {
+
+  // NAME mandatory once orderType selected
+  if (!customerName) {
+    const nameError = document.getElementById("nameError");
+    if (nameError) {
+      nameError.innerText = "⚠️ Name is required";
+      nameError.classList.remove("hidden");
+    }
+    window._orderLock = false;
+    return;
+  }
+
+  // EMAIL mandatory once orderType selected
+  if (!email) {
+    const emailError = document.getElementById("emailError");
+    if (emailError) {
+      emailError.innerText = "⚠️ Email is required";
+      emailError.classList.remove("hidden");
+    }
+    window._orderLock = false;
+    return;
+  }
+
+  // EMAIL format validation
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    const emailError = document.getElementById("emailError");
+    if (emailError) {
+      emailError.innerText = "⚠️ Enter a valid email address";
+      emailError.classList.remove("hidden");
+    }
+    window._orderLock = false;
+    return;
+  }
+}
+
 // -----------------------------
 // STEP 2: Guest user – visible fields mandatory
 // -----------------------------
 
-// NAME (visible → must have value)
-if (document.getElementById("customerName")?.offsetParent !== null && !customerName) {
-  const nameError = document.getElementById("nameError");
-  if (nameError) {
-    nameError.innerText = "⚠️ Name is required";
-    nameError.classList.remove("hidden");
-  }
-  window._orderLock = false;
-  return;
-}
-
-// EMAIL (visible → must have value)
-if (document.getElementById("email")?.offsetParent !== null && !email) {
-  const emailError = document.getElementById("emailError");
-  if (emailError) {
-    emailError.innerText = "⚠️ Email is required";
-    emailError.classList.remove("hidden");
-  }
-  window._orderLock = false;
-  return;
-}
-// EMAIL FORMAT (visible → must be valid)
-if (
-  document.getElementById("email")?.offsetParent !== null &&
-  email &&
-  !/^\S+@\S+\.\S+$/.test(email)
-) {
-  const emailError = document.getElementById("emailError");
-  if (emailError) {
-    emailError.innerText = "⚠️ Enter a valid email address";
-    emailError.classList.remove("hidden");
-  }
-  window._orderLock = false;
-  return;
-}
 
   const addressError = document.getElementById("addressError");
 
@@ -3187,7 +3192,11 @@ if (mobileInput) {
       mobileError.classList.add("hidden");
     }
       // ✅ IMPORTANT: re-trigger logic after auto-fix
-    mobileInput.dispatchEvent(new Event("input"));
+    if (mobileInput._internalTrigger) return;
+mobileInput._internalTrigger = true;
+mobileInput.dispatchEvent(new Event("input"));
+mobileInput._internalTrigger = false;
+
   });
 }
 
@@ -7081,6 +7090,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
