@@ -5073,16 +5073,25 @@ function onChangeAddressAddNew() {
 function closeNewAddressModal() {
 
   const modal = document.getElementById("newAddressModal");
-  if (!modal) return;
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+    modal.style.display = "none";
+  }
 
-  // hide modal
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
+  // Hide form safely
+  const form = document.getElementById("newAddressForm");
+  if (form) {
+    form.classList.add("hidden");
+    form.style.display = "none";
+  }
 
-  // ❌ safety: checkout ke andar inline form kabhi visible na ho
-  const inlineForm = document.getElementById("newAddressForm");
-  if (inlineForm) inlineForm.classList.add("hidden");
+  // 🔑 Unlock body scroll
+  document.body.style.overflow = "auto";
+
+  console.log("✅ New Address Modal closed");
 }
+
 
 function saveNewAddress() {
 if (window._savingAddress) return;
@@ -6884,6 +6893,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
