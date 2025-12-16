@@ -3196,7 +3196,7 @@ renderCart();
 document.getElementById("orderType")?.addEventListener("change", () => {
   updateGuestFieldsVisibility();
   // ✅ ADD THIS LINE
-  maybeRunCustomerLookup("orderType-change");
+ // maybeRunCustomerLookup("orderType-change");
 });
 
 // -----------------------------
@@ -3233,7 +3233,7 @@ if (mobileInput) {
 
     // 🔁 UI + lookup
     updateGuestFieldsVisibility();
-    maybeRunCustomerLookup("mobile-input");
+//    maybeRunCustomerLookup("mobile-input");
 
     mobileInput._internalTrigger = false;
   });
@@ -5506,7 +5506,7 @@ async function openCheckout() {
   modal.style.display = "flex";
   setTimeout(() => {
     updateGuestFieldsVisibility();
-    maybeRunCustomerLookup("checkout-open");
+    //maybeRunCustomerLookup("checkout-open");
   }, 0);
   // 🔁 RE-APPLY UI if order type already selected
 setTimeout(() => {
@@ -7168,6 +7168,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
