@@ -5038,6 +5038,7 @@ if (!primary && multiList.length === 0) {
 
 
 function onChangeAddressAddNew() {
+  closeCheckout();
 
   // ✅ Open New Address modal
   const modal = document.getElementById("newAddressModal");
@@ -5050,6 +5051,7 @@ function onChangeAddressAddNew() {
   const form = document.getElementById("newAddressForm");
   if (form) form.classList.remove("hidden");
    loadPincodeDropdown();
+   console.log("✅ New Address Modal opened cleanly");
 }
 
 function closeNewAddressModal() {
@@ -6866,6 +6868,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
