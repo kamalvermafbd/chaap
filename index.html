@@ -4875,9 +4875,12 @@ function autofillMobileForLoggedIn() {
   mobileInput.readOnly = true;
 }
 
-// Run when checkout modal shows up
+  
+window.__NEW_ADDRESS_FLOW = false;
 
 function onChangeAddressClick() {
+  window.__NEW_ADDRESS_FLOW = false;
+
  // 🔹 STATUS MESSAGE SHOW
   const status = document.getElementById("addressStatus");
   if (status) {
@@ -4941,7 +4944,10 @@ if (!primary && multiList.length === 0) {
     status.classList.remove("hidden");
   }
 
-  if (overlay) overlay.style.display = "none";
+  if (overlay && !window.__NEW_ADDRESS_FLOW) {
+  overlay.style.display = "none";
+}
+
   return;
 }
 
@@ -4993,8 +4999,9 @@ if (!primary && multiList.length === 0) {
     // ensure browser paints dropdown before hiding overlay
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        if (overlay) overlay.style.display = "none";
-
+       if (overlay && !window.__NEW_ADDRESS_FLOW) {
+  overlay.style.display = "none";
+}
         // ✅ SUCCESS MESSAGE (STEP-1C)
         const status = document.getElementById("addressStatus");
         if (status) {
@@ -5039,6 +5046,7 @@ if (!primary && multiList.length === 0) {
 
 
 function onChangeAddressAddNew() {
+window.__NEW_ADDRESS_FLOW = true;
 
   // 1️⃣ Hide checkout modal ONLY (no reset)
   const checkout = document.getElementById("checkoutModal");
@@ -6900,6 +6908,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
