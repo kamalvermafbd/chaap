@@ -1262,72 +1262,76 @@ style="
      class="fixed inset-0 bg-black bg-opacity-40 hidden z-[10000]
             flex items-center justify-center">
 
+  <!-- WHITE CARD -->
   <div class="bg-white w-full max-w-[380px]
               rounded-2xl shadow-xl p-4 relative">
 
-    <!-- Placeholder (STEP-2A only) -->
-   <h3 class="text-lg font-semibold mb-2">Add New Address</h3>
+    <!-- Title -->
+    <h3 class="text-lg font-semibold mb-2">Add New Address</h3>
 
-<div id="newAddressForm" class="mt-4 hidden border p-3 rounded bg-gray-50">
+    <!-- FORM WRAPPER -->
+    <div id="newAddressForm" class="mt-4 hidden border p-3 rounded bg-gray-50">
 
-  <label class="text-sm font-medium">Mobile</label>
-  <input id="newAddressMobile"
-         class="w-full border px-2 py-2 rounded bg-gray-200 text-gray-700"
-         readonly />
+      <label class="text-sm font-medium">Mobile</label>
+      <input id="newAddressMobile"
+             class="w-full border px-2 py-2 rounded bg-gray-200 text-gray-700"
+             readonly />
 
-  <label class="text-sm font-medium mt-3">Address</label>
-  <textarea id="newAddressField"
-  autocomplete="off"
-  autocorrect="off"
-  autocapitalize="off"
-  spellcheck="false"
-  name="new-address-never"
-  class="w-full border px-2 py-2 rounded"
-  placeholder="Enter full address">
-</textarea>
+      <label class="text-sm font-medium mt-3">Address</label>
+      <textarea id="newAddressField"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        name="new-address-never"
+        class="w-full border px-2 py-2 rounded"
+        placeholder="Enter full address"></textarea>
 
+      <label class="text-sm font-medium mt-3">Pincode</label>
+      <input id="newPincode"
+             maxlength="6"
+             oninput="onNewPincodeChange()"
+             class="w-full border px-2 py-2 rounded"
+             placeholder="Enter pincode" />
 
-  <label class="text-sm font-medium mt-3">Pincode</label>
-  <input id="newPincode"
-       maxlength="6"
-       oninput="onNewPincodeChange()"
-       class="w-full border px-2 py-2 rounded"
-       placeholder="Enter pincode" />
-<p id="pincodeStatus"
-   class="text-xs text-gray-500 mt-1 hidden">
-  Checking pincode…
-</p>
+      <p id="pincodeStatus"
+         class="text-xs text-gray-500 mt-1 hidden">
+        Checking pincode…
+      </p>
 
+      <label class="text-sm font-medium mt-3">City</label>
+      <input id="newCity"
+             class="w-full border px-2 py-2 rounded"
+             placeholder="Enter city" />
 
+      <label class="text-sm font-medium mt-3">State</label>
+      <input id="newState"
+             class="w-full border px-2 py-2 rounded"
+             placeholder="Enter state" />
 
-  <label class="text-sm font-medium mt-3">City</label>
-  <input id="newCity"
-         class="w-full border px-2 py-2 rounded"
-         placeholder="Enter city" />
+      <button id="saveNewAddressBtn"
+              onclick="saveNewAddress()"
+              class="mt-4 w-full bg-green-600 text-white py-2 rounded">
+        Save Address
+      </button>
 
-  <label class="text-sm font-medium mt-3">State</label>
-  <input id="newState"
-         class="w-full border px-2 py-2 rounded"
-         placeholder="Enter state" />
+      <button type="button"
+              onclick="closeNewAddressModal()"
+              class="mt-2 w-full bg-gray-200 text-gray-700 py-2 rounded">
+        Cancel
+      </button>
 
-  <button id="saveNewAddressBtn"
-          onclick="saveNewAddress()"
-          class="mt-4 w-full bg-green-600 text-white py-2 rounded">
-    Save Address
-  </button>
-  <button type="button"
-        onclick="closeNewAddressModal()"
-        class="mt-2 w-full bg-gray-200 text-gray-700 py-2 rounded">
-  Cancel
-</button>
-<button type="button"
-        onclick="closeNewAddressModal()"
-        class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-xl font-bold">
-  ✕
-</button>
+      <button type="button"
+              onclick="closeNewAddressModal()"
+              class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-xl font-bold">
+        ✕
+      </button>
 
+    </div> <!-- ✅ close newAddressForm -->
 
-</div>
+  </div> <!-- ✅ close white card -->
+
+</div> <!-- ✅ close newAddressModal -->
 
 
 
@@ -6903,6 +6907,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
