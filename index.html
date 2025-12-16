@@ -1106,6 +1106,11 @@ style="
             placeholder="Address"
             class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
                    focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+  <!-- 🔴 ADDRESS ERROR MESSAGE (PASTE HERE) -->
+<div id="addressError"
+     class="hidden mt-2 text-red-600 font-bold text-base">
+</div>
+
 </div>
 
 <!-- PINCODE -->
@@ -2991,11 +2996,23 @@ if (paymentError) {
     return;
   }
 
-  if (orderType === "Home Delivery" && !address) {
-    alert("Please enter delivery address");
-    window._orderLock = false;
-    return;
+  const addressError = document.getElementById("addressError");
+
+if (orderType === "Home Delivery" && !address) {
+  if (addressError) {
+    addressError.innerText = "⚠️ Please enter delivery address";
+    addressError.classList.remove("hidden");
   }
+  window._orderLock = false;
+  return;
+}
+
+// clear error if valid
+if (addressError) {
+  addressError.innerText = "";
+  addressError.classList.add("hidden");
+}
+
 
   const dt = window._drawerTotals || {};
 
@@ -6946,6 +6963,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
