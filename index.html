@@ -2951,32 +2951,7 @@ function placeOrder() {
 // AUTO CUSTOMER LOOKUP (ONCE)
 // mobile + payment ready
 // ----------------------------------
-if (
-  /^[0-9]{10}$/.test(mobile) &&
-  paymentMethod &&
-    customerName &&          
-  email &&    
-  !window._customerLookupDone &&
-  (
-    orderType !== "Home Delivery" ||
-    address
-  )
-) {
 
-  const lookupOverlay = document.getElementById("loadingOverlay");
-  lookupOverlay.innerText = "Fetching your details...";
-  lookupOverlay.style.display = "flex";
-
-  window._customerLookupDone = true; // 🔒 run only once
-
-  lookupCustomerByMobile(mobile)
-  .finally(() => {
-    if (!window._orderSubmitting) {
-      lookupOverlay.style.display = "none";
-    }
-  });
-
-}
 
 // ✅ OPTION A: Address sirf Home Delivery me hi save hoga
 const finalAddress =
@@ -3011,6 +2986,31 @@ if (paymentError) {
     window._orderLock = false;
     return;
   }
+// -----------------------------
+// STEP 2: Guest user – visible fields mandatory
+// -----------------------------
+
+// NAME (visible → must have value)
+if (document.getElementById("customerName")?.offsetParent !== null && !customerName) {
+  const nameError = document.getElementById("nameError");
+  if (nameError) {
+    nameError.innerText = "⚠️ Name is required";
+    nameError.classList.remove("hidden");
+  }
+  window._orderLock = false;
+  return;
+}
+
+// EMAIL (visible → must have value)
+if (document.getElementById("email")?.offsetParent !== null && !email) {
+  const emailError = document.getElementById("emailError");
+  if (emailError) {
+    emailError.innerText = "⚠️ Email is required";
+    emailError.classList.remove("hidden");
+  }
+  window._orderLock = false;
+  return;
+}
 
   const addressError = document.getElementById("addressError");
 
@@ -3021,14 +3021,39 @@ if (orderType === "Home Delivery" && !address) {
   }
   window._orderLock = false;
   return;
-}
-
-// clear error if valid
-if (addressError) {
+} else if (addressError) {
   addressError.innerText = "";
   addressError.classList.add("hidden");
 }
 
+  if (
+  /^[0-9]{10}$/.test(mobile) &&
+  paymentMethod &&
+    customerName &&          
+  email &&    
+  !window._customerLookupDone &&
+  (
+    orderType !== "Home Delivery" ||
+    address
+  )
+) {
+
+  const lookupOverlay = document.getElementById("loadingOverlay");
+  lookupOverlay.innerText = "Fetching your details...";
+  lookupOverlay.style.display = "flex";
+
+  window._customerLookupDone = true; // 🔒 run only once
+
+  lookupCustomerByMobile(mobile)
+  .finally(() => {
+    if (!window._orderSubmitting) {
+      lookupOverlay.style.display = "none";
+    }
+  });
+
+}
+
+// clear error if valid
 
   const dt = window._drawerTotals || {};
 
@@ -7027,6 +7052,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
