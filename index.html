@@ -2954,8 +2954,13 @@ function placeOrder() {
 if (
   /^[0-9]{10}$/.test(mobile) &&
   paymentMethod &&
-  !window._customerLookupDone
+  !window._customerLookupDone &&
+  (
+    orderType !== "Home Delivery" ||
+    address
+  )
 ) {
+
   const lookupOverlay = document.getElementById("loadingOverlay");
   lookupOverlay.innerText = "Fetching your details...";
   lookupOverlay.style.display = "flex";
@@ -6973,6 +6978,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
