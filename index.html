@@ -2996,6 +2996,14 @@ if (orderType) {
 
   // NAME mandatory once orderType selected
   if (!customerName) {
+    const nameError = document.getElementById("nameError");
+    if (nameError) {
+      nameError.innerText = "⚠️ Name is required";
+      nameError.classList.remove("hidden");
+    }
+    window._orderLock = false;
+    return;
+  }
 
   // EMAIL mandatory once orderType selected
   if (!email) {
@@ -7115,76 +7123,6 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
