@@ -5038,21 +5038,37 @@ if (!primary && multiList.length === 0) {
 
 
 function onChangeAddressAddNew() {
-  closeCheckout();
 
-  // ✅ Open New Address modal
+  // 1️⃣ Hide checkout modal ONLY (no reset)
+  const checkout = document.getElementById("checkoutModal");
+  if (checkout) {
+    checkout.classList.add("hidden");
+    checkout.style.display = "none";
+  }
+
+  // 🔑 Important: keep body locked for modal flow
+  document.body.style.overflow = "hidden";
+
+  // 2️⃣ Open New Address modal
   const modal = document.getElementById("newAddressModal");
   if (!modal) return;
 
   modal.classList.remove("hidden");
   modal.classList.add("flex");
+  modal.style.display = "flex";
+  modal.style.zIndex = "100000";
 
-  // ✅ Show form INSIDE modal
+  // 3️⃣ Show form INSIDE modal
   const form = document.getElementById("newAddressForm");
-  if (form) form.classList.remove("hidden");
-   loadPincodeDropdown();
-   console.log("✅ New Address Modal opened cleanly");
+  if (form) {
+    form.classList.remove("hidden");
+    form.style.display = "block";
+  }
+
+  loadPincodeDropdown();
+  console.log("✅ New Address Modal opened cleanly");
 }
+
 
 function closeNewAddressModal() {
 
@@ -6868,6 +6884,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
