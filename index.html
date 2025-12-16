@@ -665,12 +665,14 @@ body::before {
 </div>
 
 
-  <button onclick="event.stopPropagation(); openLogin()" 
+  <button id="loginBtn"
+        onclick="event.stopPropagation(); openLogin()"
         style="position:absolute; right:100px; top:60px; z-index:9999;
                background:#444;color:white;padding:8px 14px;border:none;
                border-radius:6px;cursor:pointer;">
   Login
 </button>
+
 <button id="logoutBtn"
         onclick="logoutUser()" 
         style="position:absolute; right:58px; top:60px; z-index:9999;
@@ -3770,8 +3772,11 @@ window.addEventListener("load", async () => {
   document.getElementById("logoutBtn").style.display = "none";
   document.getElementById("userInfoBox").style.display = "none";
 
-  document.querySelector("button[onclick='openLogin()']").style.display = "inline-block";
-  document.querySelector("button[onclick='openSignup()']").style.display = "inline-block";
+  const loginBtn  = document.getElementById("loginBtn");
+  const signupBtn = document.getElementById("signupBtn");
+
+  if (loginBtn)  loginBtn.style.display = "inline-block";
+  if (signupBtn) signupBtn.style.display = "inline-block";
   document.getElementById("signupLabelBox").style.display = "block";
 
   // ---------------- LOGGED IN CASE ----------------
@@ -3780,8 +3785,8 @@ window.addEventListener("load", async () => {
     document.getElementById("loggedEmail").innerText = email || "";
     document.getElementById("userInfoBox").style.display = "block";
 
-    document.querySelector("button[onclick='openLogin()']").style.display = "none";
-    document.querySelector("button[onclick='openSignup()']").style.display = "none";
+    if (loginBtn)  loginBtn.style.display = "none";
+    if (signupBtn) signupBtn.style.display = "none";
     document.getElementById("signupLabelBox").style.display = "none";
 
     document.getElementById("leftNav").style.display = "block";
@@ -3807,6 +3812,7 @@ window.addEventListener("load", async () => {
     }
   }
 });
+
 
 
 function validateLoginMobile() {
@@ -6885,6 +6891,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
