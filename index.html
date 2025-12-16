@@ -3381,11 +3381,20 @@ function filterMenu() {
 <script>
 
 function openLogin() {
+  document.body.style.pointerEvents = "auto";
+
   const modal = document.getElementById("loginModal");
   if (!modal) return;
+
+  modal.style.pointerEvents = "auto";
   modal.style.display = "flex";
+  modal.style.position = "fixed";
+  modal.style.inset = "0";
+  modal.style.zIndex = "999999";
+
   document.body.style.overflow = "hidden";
 }
+
 
 
 
@@ -6886,6 +6895,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
