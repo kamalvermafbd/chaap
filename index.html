@@ -3171,10 +3171,11 @@ function filterMenu() {
 
 <!-- LOGIN OVERLAY (NEW TAILWIND VERSION) -->
 <div id="loginModal"
-  class="fixed inset-0 bg-black bg-opacity-50 z-[120000] hidden flex items-center justify-center">
+   class="fixed inset-0 bg-black bg-opacity-50 hidden
+         flex items-center justify-center z-[999999]">
 
-    <div class="bg-white w-11/12 max-w-sm rounded-xl p-6 shadow-xl relative 
-              flex flex-col gap-4">
+ <div class="bg-white w-full max-w-[380px]
+              rounded-2xl shadow-xl p-4 relative">
 
 
     <!-- Close -->
@@ -3379,33 +3380,15 @@ function filterMenu() {
 <script>
 
 function openLogin() {
-    forceClearOverlays();
-
   window.__AUTH_MODAL_OPEN = true;
-  console.log("✅ openLogin START");
 
   const modal = document.getElementById("loginModal");
-  if (!modal) {
-    console.error("❌ loginModal not found");
-    return;
-  }
+  if (!modal) return;
 
-  // ✅ CORRECT VISIBILITY
   modal.classList.remove("hidden");
-  modal.classList.add("flex");
-  modal.style.display = "flex";
-  modal.style.pointerEvents = "auto";
-
-  // 🔥 FIXED z-index (MUST be > 120000)
-  modal.style.zIndex = "999999";
-
   document.body.style.overflow = "hidden";
-
-  const label = document.getElementById("signupLabelBox");
-  if (label) label.style.display = "none";
-
-  console.log("✅ openLogin END");
 }
+
 
 
 function closeLogin() {
@@ -6904,6 +6887,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
