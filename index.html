@@ -3011,6 +3011,20 @@ if (document.getElementById("email")?.offsetParent !== null && !email) {
   window._orderLock = false;
   return;
 }
+// EMAIL FORMAT (visible → must be valid)
+if (
+  document.getElementById("email")?.offsetParent !== null &&
+  email &&
+  !/^\S+@\S+\.\S+$/.test(email)
+) {
+  const emailError = document.getElementById("emailError");
+  if (emailError) {
+    emailError.innerText = "⚠️ Enter a valid email address";
+    emailError.classList.remove("hidden");
+  }
+  window._orderLock = false;
+  return;
+}
 
   const addressError = document.getElementById("addressError");
 
@@ -3193,6 +3207,21 @@ if (nameInput) {
   });
 }
 
+// -----------------------------
+// EMAIL INPUT – STEP 3b
+// hide email error while typing
+// -----------------------------
+const emailInput = document.getElementById("email");
+
+if (emailInput) {
+  emailInput.addEventListener("input", () => {
+    const emailError = document.getElementById("emailError");
+    if (emailError) {
+      emailError.innerText = "";
+      emailError.classList.add("hidden");
+    }
+  });
+}
 
 
 function filterMenu() {
@@ -7052,6 +7081,7 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
 
 
 
