@@ -1336,6 +1336,9 @@ style="
 
 
   <script>
+    window._customerLookupDone = false;
+window._lastLookupMobile = "";
+
 document.querySelectorAll(".payment-btn").forEach(btn => {
   btn.addEventListener("click", () => {
 
@@ -3192,6 +3195,8 @@ renderCart();
     // STEP-1B: Order type change → show/hide fields
 document.getElementById("orderType")?.addEventListener("change", () => {
   updateGuestFieldsVisibility();
+  // ✅ ADD THIS LINE
+  maybeRunCustomerLookup("orderType-change");
 });
 
 // -----------------------------
@@ -3201,6 +3206,7 @@ const mobileInput = document.getElementById("mobile");
 
 if (mobileInput) {
   mobileInput.addEventListener("input", () => {
+
     // allow only digits
     let val = mobileInput.value.replace(/\D/g, "");
 
@@ -3213,18 +3219,23 @@ if (mobileInput) {
     }
 
     mobileInput.value = val;
-     // STEP 1a: hide mobile error while typing
+
+    // hide mobile error while typing
     const mobileError = document.getElementById("mobileError");
     if (mobileError) {
       mobileError.innerText = "";
       mobileError.classList.add("hidden");
     }
-      // ✅ IMPORTANT: re-trigger logic after auto-fix
-    if (mobileInput._internalTrigger) return;
-mobileInput._internalTrigger = true;
-mobileInput.dispatchEvent(new Event("input"));
-mobileInput._internalTrigger = false;
 
+    // 🔒 prevent recursion
+    if (mobileInput._internalTrigger) return;
+    mobileInput._internalTrigger = true;
+
+    // 🔁 UI + lookup
+    updateGuestFieldsVisibility();
+    maybeRunCustomerLookup("mobile-input");
+
+    mobileInput._internalTrigger = false;
   });
 }
 
@@ -3258,6 +3269,15 @@ if (emailInput) {
       emailError.classList.add("hidden");
     }
   });
+}
+function maybeRunCustomerLookup(source = "") {
+
+  // 🔒 Logged-in users → NO guest lookup
+  if (isLoggedIn && isLoggedIn()) return;
+
+  const mobile = document.getElementById("mobile")?.value.trim();
+  const orderType = document.getElementById("orderType")?.value;
+  ...
 }
 
 
@@ -5473,9 +5493,6 @@ async function openCheckout() {
   // Autofill + UI setup
   autofillMobileForLoggedIn();
   resetCheckoutFieldsDefault();
-  // 🔑 FORCE restore guest fields immediately
-updateGuestFieldsVisibility();
-
   setupAddressUIVisibility();
   loadPrimaryAddress();
 
@@ -5489,6 +5506,7 @@ updateGuestFieldsVisibility();
   modal.style.display = "flex";
   setTimeout(() => {
     updateGuestFieldsVisibility();
+    maybeRunCustomerLookup("checkout-open");
   }, 0);
   // 🔁 RE-APPLY UI if order type already selected
 setTimeout(() => {
@@ -7150,6 +7168,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
