@@ -634,26 +634,10 @@ body::before {
   background-color: rgba(0, 0, 0, 0.4);
 }
 
-/* login/signup always clickable */
-#loginModal {
-  pointer-events: auto !important;
-  z-index: 100010 !important;
-}
-
 
   </style>
 </head>
 <body>
-  <div id="RED_TEST_BOX"
-     style="
-       display:none;
-       position:fixed;
-       inset:0;
-       background:red;
-       z-index:2147483647;
-     ">
-</div>
-
   <div id="loadingOverlay" style="
   
     display: none;
@@ -661,7 +645,7 @@ body::before {
     top: 0; left: 0;
     width: 100%; height: 100%;
     background: rgba(0,0,0,0.5);
-    z-index: 5000;
+    z-index: 20000;
     justify-content: center;
     align-items: center;
     color: white;
@@ -675,14 +659,12 @@ body::before {
 </div>
 
 
-  <button id="loginBtn"
-        onclick="event.stopPropagation(); openLogin()"
+  <button onclick="openLogin()" 
         style="position:absolute; right:100px; top:60px; z-index:9999;
                background:#444;color:white;padding:8px 14px;border:none;
                border-radius:6px;cursor:pointer;">
   Login
 </button>
-
 <button id="logoutBtn"
         onclick="logoutUser()" 
         style="position:absolute; right:58px; top:60px; z-index:9999;
@@ -837,7 +819,6 @@ style="
     <p>Delicious meals delivered fast!</p>
     
   </header>
-
 
 
 <!-- LEFT NAVIGATION PANEL -->
@@ -1262,76 +1243,72 @@ style="
      class="fixed inset-0 bg-black bg-opacity-40 hidden z-[10000]
             flex items-center justify-center">
 
-  <!-- WHITE CARD -->
   <div class="bg-white w-full max-w-[380px]
               rounded-2xl shadow-xl p-4 relative">
 
-    <!-- Title -->
-    <h3 class="text-lg font-semibold mb-2">Add New Address</h3>
+    <!-- Placeholder (STEP-2A only) -->
+   <h3 class="text-lg font-semibold mb-2">Add New Address</h3>
 
-    <!-- FORM WRAPPER -->
-    <div id="newAddressForm" class="mt-4 hidden border p-3 rounded bg-gray-50">
+<div id="newAddressForm" class="mt-4 hidden border p-3 rounded bg-gray-50">
 
-      <label class="text-sm font-medium">Mobile</label>
-      <input id="newAddressMobile"
-             class="w-full border px-2 py-2 rounded bg-gray-200 text-gray-700"
-             readonly />
+  <label class="text-sm font-medium">Mobile</label>
+  <input id="newAddressMobile"
+         class="w-full border px-2 py-2 rounded bg-gray-200 text-gray-700"
+         readonly />
 
-      <label class="text-sm font-medium mt-3">Address</label>
-      <textarea id="newAddressField"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="off"
-        spellcheck="false"
-        name="new-address-never"
-        class="w-full border px-2 py-2 rounded"
-        placeholder="Enter full address"></textarea>
+  <label class="text-sm font-medium mt-3">Address</label>
+  <textarea id="newAddressField"
+  autocomplete="off"
+  autocorrect="off"
+  autocapitalize="off"
+  spellcheck="false"
+  name="new-address-never"
+  class="w-full border px-2 py-2 rounded"
+  placeholder="Enter full address">
+</textarea>
 
-      <label class="text-sm font-medium mt-3">Pincode</label>
-      <input id="newPincode"
-             maxlength="6"
-             oninput="onNewPincodeChange()"
-             class="w-full border px-2 py-2 rounded"
-             placeholder="Enter pincode" />
 
-      <p id="pincodeStatus"
-         class="text-xs text-gray-500 mt-1 hidden">
-        Checking pincode…
-      </p>
+  <label class="text-sm font-medium mt-3">Pincode</label>
+  <input id="newPincode"
+       maxlength="6"
+       oninput="onNewPincodeChange()"
+       class="w-full border px-2 py-2 rounded"
+       placeholder="Enter pincode" />
+<p id="pincodeStatus"
+   class="text-xs text-gray-500 mt-1 hidden">
+  Checking pincode…
+</p>
 
-      <label class="text-sm font-medium mt-3">City</label>
-      <input id="newCity"
-             class="w-full border px-2 py-2 rounded"
-             placeholder="Enter city" />
 
-      <label class="text-sm font-medium mt-3">State</label>
-      <input id="newState"
-             class="w-full border px-2 py-2 rounded"
-             placeholder="Enter state" />
 
-      <button id="saveNewAddressBtn"
-              onclick="saveNewAddress()"
-              class="mt-4 w-full bg-green-600 text-white py-2 rounded">
-        Save Address
-      </button>
+  <label class="text-sm font-medium mt-3">City</label>
+  <input id="newCity"
+         class="w-full border px-2 py-2 rounded"
+         placeholder="Enter city" />
 
-      <button type="button"
-              onclick="closeNewAddressModal()"
-              class="mt-2 w-full bg-gray-200 text-gray-700 py-2 rounded">
-        Cancel
-      </button>
+  <label class="text-sm font-medium mt-3">State</label>
+  <input id="newState"
+         class="w-full border px-2 py-2 rounded"
+         placeholder="Enter state" />
 
-      <button type="button"
-              onclick="closeNewAddressModal()"
-              class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-xl font-bold">
-        ✕
-      </button>
+  <button id="saveNewAddressBtn"
+          onclick="saveNewAddress()"
+          class="mt-4 w-full bg-green-600 text-white py-2 rounded">
+    Save Address
+  </button>
+  <button type="button"
+        onclick="closeNewAddressModal()"
+        class="mt-2 w-full bg-gray-200 text-gray-700 py-2 rounded">
+  Cancel
+</button>
+<button type="button"
+        onclick="closeNewAddressModal()"
+        class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-xl font-bold">
+  ✕
+</button>
 
-    </div> <!-- ✅ close newAddressForm -->
 
-  </div> <!-- ✅ close white card -->
-
-</div> <!-- ✅ close newAddressModal -->
+</div>
 
 
 
@@ -3186,11 +3163,10 @@ function filterMenu() {
 
 <!-- LOGIN OVERLAY (NEW TAILWIND VERSION) -->
 <div id="loginModal"
-   class="fixed inset-0 bg-black bg-opacity-50 hidden
-         flex items-center justify-center z-[999999]">
+  class="fixed inset-0 bg-black bg-opacity-50 z-[9999] hidden flex items-center justify-center">
 
- <div class="bg-white w-full max-w-[380px]
-              rounded-2xl shadow-xl p-4 relative">
+    <div class="bg-white w-11/12 max-w-sm rounded-xl p-6 shadow-xl relative 
+              flex flex-col gap-4">
 
 
     <!-- Close -->
@@ -3394,60 +3370,45 @@ function filterMenu() {
 
 <script>
 
+//open login
 function openLogin() {
   const modal = document.getElementById("loginModal");
-  if (!modal) return;
-
   modal.style.display = "flex";
+modal.classList.remove("hidden");
+  document.getElementById("signupLabelBox").style.display = "none";
 
-  // ✅ scroll lock ONLY if modal is visible
-  if (getComputedStyle(modal).display !== "none") {
-    document.body.style.overflow = "hidden";
-  }
 }
 
-
-
-
-
-
 function closeLogin() {
-  window.__AUTH_MODAL_OPEN = false;
-
   const modal = document.getElementById("loginModal");
-  if (modal) {
-    modal.style.display = "none";
-    modal.classList.add("hidden");
-  }
 
-  document.body.style.overflow = "auto";
+  // FULL HARD CLOSE
+  modal.style.display = "none";
+  modal.classList.add("hidden");
 
+  // REMOVE ANY POSSIBLE OVERLAY FREEZE
   unlockLoginForm();
 
+  // Force hide all overlays inside login
   const overlay = document.getElementById("loginProgressOverlay");
   if (overlay) overlay.classList.add("hidden");
 
-  const mob = document.getElementById("loginMobile");
-  const pass = document.getElementById("loginPassword");
-  if (mob) mob.value = "";
-  if (pass) pass.value = "";
+  // Clear fields (safety)
+  document.getElementById("loginMobile").value = "";
+  document.getElementById("loginPassword").value = "";
 
+  // ⭐ IMPORTANT FIX: Show signup label again
   const label = document.getElementById("signupLabelBox");
   if (label) label.style.display = "block";
 }
-
 
 function logoutUser() {
   // UI resets
   document.getElementById("userInfoBox").style.display = "none";
   document.getElementById("loggedEmail").innerText = "";
 
-  const loginBtn  = document.getElementById("loginBtn");
-const signupBtn = document.getElementById("signupBtn");
-
-if (loginBtn)  loginBtn.style.display = "inline-block";
-if (signupBtn) signupBtn.style.display = "inline-block";
-
+  document.querySelector("button[onclick='openLogin()']").style.display = "inline-block";
+  document.querySelector("button[onclick='openSignup()']").style.display = "inline-block";
 
   document.getElementById("logoutBtn").style.display = "none";
   document.getElementById("signupLabelBox").style.display = "block";
@@ -3499,26 +3460,24 @@ if (signupBtn) signupBtn.style.display = "inline-block";
     alert("Logged out successfully.");
   }, 50);
 }
+
+  
 function forceClearOverlays() {
-
-  ["loadingOverlay","cartOverlay","newAddressModal","couponOverlayBG"]
-    .forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
+  [
+    "loadingOverlay",
+    "cartBackdrop",
+    "cartOverlay",
+    "newAddressModal",
+    "couponOverlayBG"
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
       el.style.display = "none";
-      el.classList.add("hidden");
-    });
-
-  const backdrop = document.getElementById("cartBackdrop");
-  if (backdrop) {
-    backdrop.classList.remove("active");
-    backdrop.style.display = "none";
-    backdrop.style.pointerEvents = "none";
-  }
-
+      el.classList.remove("active","flex","show");
+    }
+  });
   document.body.style.overflow = "auto";
 }
-
 
 
 </script>
@@ -3754,25 +3713,20 @@ function updateSignupOverlayMessage(msg) {
 
 // === FINAL STABLE LOAD HANDLER ===
 window.addEventListener("load", async () => {
-
-  // 🔒 AUTH MODAL GUARD (must be first)
-  if (window.__AUTH_MODAL_OPEN === true) {
-    console.log("⛔ Load UI reset skipped (auth modal open)");
-    return;
-  }
-
   await loadRestaurantSettings();
 
-  // clear login fields (AFTER declare)
-  const loginMobile   = document.getElementById("loginMobile");
+  // clear login fields
+  const loginMobile = document.getElementById("loginMobile");
   const loginPassword = document.getElementById("loginPassword");
   if (loginMobile) loginMobile.value = "";
   if (loginPassword) loginPassword.value = "";
 
   const mobile = localStorage.getItem("userMobile");
   const email  = localStorage.getItem("userEmail");
+  //  LOAD USER CART FROM BACKEND IF LOGGED IN
 
-  // ---------------- UI RESET ----------------
+
+  // Always reset full UI first
   document.getElementById("menuWrapper").style.display = "block";
   document.getElementById("pageWrapper").style.display = "none";
 
@@ -3788,48 +3742,48 @@ window.addEventListener("load", async () => {
   document.getElementById("logoutBtn").style.display = "none";
   document.getElementById("userInfoBox").style.display = "none";
 
-  const loginBtn  = document.getElementById("loginBtn");
-  const signupBtn = document.getElementById("signupBtn");
-
-  if (loginBtn)  loginBtn.style.display = "inline-block";
-  if (signupBtn) signupBtn.style.display = "inline-block";
+  document.querySelector("button[onclick='openLogin()']").style.display = "inline-block";
+  document.querySelector("button[onclick='openSignup()']").style.display = "inline-block";
   document.getElementById("signupLabelBox").style.display = "block";
 
-  // ---------------- LOGGED IN CASE ----------------
+  // ----- if logged in -----
   if (mobile) {
 
+    // Show user info
     document.getElementById("loggedEmail").innerText = email || "";
     document.getElementById("userInfoBox").style.display = "block";
 
-    if (loginBtn)  loginBtn.style.display = "none";
-    if (signupBtn) signupBtn.style.display = "none";
+    // Hide login/signup
+    document.querySelector("button[onclick='openLogin()']").style.display = "none";
+    document.querySelector("button[onclick='openSignup()']").style.display = "none";
     document.getElementById("signupLabelBox").style.display = "none";
 
+    // Show nav + hamburger
     document.getElementById("leftNav").style.display = "block";
     document.getElementById("hamburgerBtn").style.display = "block";
     document.getElementById("logoutBtn").style.display = "inline-block";
 
+    // Always show menu page after refresh
     showPage("menuPage");
 
+    // highlight first item
     const firstMenu = document.querySelector("#premiumMenu li");
     if (firstMenu) firstMenu.classList.add("active");
   }
-
-  // ---------------- CART RESTORE ----------------
-  loadCartOnStart();
-
+   loadCartOnStart();
   if (!isLoggedIn()) {
-    const guest = JSON.parse(localStorage.getItem("guestCart") || "[]");
-    if (Array.isArray(guest) && guest.length > 0) {
-      cart = guest;
-      window.cart = guest;
-      renderCart();
-      document.getElementById("cartToggleBar")?.classList.add("active-cart");
-    }
+  const guest = JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+  // Render only if actually a valid array
+  if (Array.isArray(guest) && guest.length > 0) {
+    cart = guest;
+    window.cart = guest;
+    renderCart();
+   
+     document.getElementById("cartToggleBar")?.classList.add("active-cart");
   }
+}
 });
-
-
 
 function validateLoginMobile() {
   const input = document.getElementById("loginMobile");
@@ -6907,6 +6861,22 @@ function onNewPincodeChange() {
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
