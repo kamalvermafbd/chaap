@@ -5484,7 +5484,9 @@ async function openCheckout() {
   // ✅ LAST — open checkout modal
   const modal = document.getElementById("checkoutModal");
   modal.style.display = "flex";
-
+  setTimeout(() => {
+    updateGuestFieldsVisibility();
+  }, 0);
   // 🔁 RE-APPLY UI if order type already selected
 setTimeout(() => {
   const orderType = document.getElementById("orderType")?.value;
@@ -7145,6 +7147,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
