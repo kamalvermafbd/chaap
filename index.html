@@ -2802,6 +2802,8 @@ console.log("overlay about to show");   //
   // ==========================================================
   //                GUEST USER LOGIC (UNTOUCHED)
   // ==========================================================
+let guestPincodeEdited = false;
+let guestAutoFilling  = false;
 
   nameField.readOnly = false;
   emailField.readOnly = false;
@@ -2895,21 +2897,35 @@ if (type === "home delivery" && hd !== "") {
 console.log("🏠 Latest Home Delivery Address =", latestHD);
 
       // ----- Show/hide based on order type -----
-      if (orderType === "Home Delivery") {
-        addressWrapper.style.display = "block";
-        addressField.required = true;
-        addressField.readOnly = false;
-     addressField.value = latestHD || "";
-pincodeField.value = latestPin || "";
-cityField.value    = latestCity || "";
-stateField.value   = latestState || "";
+     if (orderType === "Home Delivery") {
+  addressWrapper.style.display = "block";
+  pincodeWrapper.style.display = "block";
+  cityWrapper.style.display    = "block";
+  stateWrapper.style.display   = "block";
 
+  addressField.required = true;
+  addressField.readOnly = false;
 
-      } else {
-        addressWrapper.style.display = "none";
-        addressField.value = "";
-        addressField.required = false;
-      }
+  guestAutoFilling = true;
+  addressField.value = latestHD || "";
+  pincodeField.value = latestPin || "";
+  cityField.value    = latestCity || "";
+  stateField.value   = latestState || "";
+  guestAutoFilling = false;
+  guestPincodeEdited = false;
+} else {
+  addressWrapper.style.display = "none";
+  pincodeWrapper.style.display = "none";
+  cityWrapper.style.display    = "none";
+  stateWrapper.style.display   = "none";
+
+  addressField.value = "";
+  pincodeField.value = "";
+  cityField.value    = "";
+  stateField.value   = "";
+
+  addressField.required = false;
+}
 
     })
     .catch(err => {
@@ -2924,6 +2940,17 @@ stateField.value   = latestState || "";
 
 }
 
+pincodeField.addEventListener("input", () => {
+  if (guestAutoFilling) return;     // autofill ignore
+  if (isLoggedIn()) return;          // safety: login ignore
+
+  guestPincodeEdited = true;
+
+  const pin = pincodeField.value.trim();
+  if (pin.length === 6) {
+    lookupGuestCityStateByPincode(pin);
+  }
+});
 
     
 function normalizeCartForOrder(cart) {
@@ -7189,6 +7216,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
