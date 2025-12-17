@@ -2657,6 +2657,18 @@ updateCartBadge();
 
 }
 
+function onMobileChanged() {
+  // 🔥 HARD RESET
+  document.getElementById("orderType").value = "";
+
+  document.getElementById("addressWrapper").style.display = "none";
+  document.getElementById("pincodeWrapper").style.display = "none";
+  document.getElementById("cityWrapper").style.display    = "none";
+  document.getElementById("stateWrapper").style.display   = "none";
+
+  guestPincodeEdited = false;
+  guestAutoFilling   = false;
+}
 
 function checkCustomerByMobile() {
   if (isLoggedIn()) {
@@ -2703,7 +2715,6 @@ console.log("toggleAddressField fired");
   const mobile = document.getElementById("mobile").value.trim();
   const orderType = document.getElementById("orderType").value;
 
-  if (!orderType) return;
 
   // --- 1) Validate mobile ---
   if (!/^[0-9]{10}$/.test(mobile)) {
@@ -7246,6 +7257,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
