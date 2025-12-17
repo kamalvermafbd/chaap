@@ -2839,6 +2839,7 @@ if (orderType === "Home Delivery") {
 
   addressField.required = true;
   addressField.readOnly = false;
+  
 } else {
   addressWrapper.style.display = "none";
   pincodeWrapper.style.display = "none";
@@ -2905,7 +2906,10 @@ console.log("🏠 Latest Home Delivery Address =", latestHD);
 
   addressField.required = true;
   addressField.readOnly = false;
-
+pincodeField.readOnly = false;
+  cityField.readOnly    = false;
+  stateField.readOnly   = false;
+       
   guestAutoFilling = true;
   addressField.value = latestHD || "";
   pincodeField.value = latestPin || "";
@@ -7216,6 +7220,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
