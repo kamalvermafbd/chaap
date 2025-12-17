@@ -1336,9 +1336,6 @@ style="
 
 
   <script>
-    window._customerLookupDone = false;
-window._lastLookupMobile = "";
-
 document.querySelectorAll(".payment-btn").forEach(btn => {
   btn.addEventListener("click", () => {
 
@@ -2960,7 +2957,7 @@ console.log("🔒 orderLock before:", window._orderLock);
 // STEP-2A: Ensure guest fields visibility before validation
   console.log("📦 orderType:", orderType);
 
-
+updateGuestFieldsVisibility();
 
   // ----------------------------------
 // AUTO CUSTOMER LOOKUP (ONCE)
@@ -3194,9 +3191,7 @@ renderCart();
 }
     // STEP-1B: Order type change → show/hide fields
 document.getElementById("orderType")?.addEventListener("change", () => {
-  
-  // ✅ ADD THIS LINE
-  maybeRunCustomerLookup("orderType-change");
+  updateGuestFieldsVisibility();
 });
 
 // -----------------------------
@@ -3206,25 +3201,32 @@ const mobileInput = document.getElementById("mobile");
 
 if (mobileInput) {
   mobileInput.addEventListener("input", () => {
-
+    // allow only digits
     let val = mobileInput.value.replace(/\D/g, "");
-    if (val.length > 10) val = val.slice(0, 10);
+
+    // remove starting zeros
+    val = val.replace(/^0+/, "");
+
+    // limit to 10 digits
+    if (val.length > 10) {
+      val = val.slice(0, 10);
+    }
 
     mobileInput.value = val;
-
+     // STEP 1a: hide mobile error while typing
     const mobileError = document.getElementById("mobileError");
     if (mobileError) {
       mobileError.innerText = "";
       mobileError.classList.add("hidden");
     }
+      // ✅ IMPORTANT: re-trigger logic after auto-fix
+    if (mobileInput._internalTrigger) return;
+mobileInput._internalTrigger = true;
+mobileInput.dispatchEvent(new Event("input"));
+mobileInput._internalTrigger = false;
 
-    // ❌ NOTHING ELSE HERE
-    // ❌ no lookup
-    // ❌ no updateGuestFieldsVisibility
   });
 }
-
-
 
 // -----------------------------
 // NAME INPUT – STEP 1b
@@ -3257,29 +3259,6 @@ if (emailInput) {
     }
   });
 }
-function maybeRunCustomerLookup(source = "") {
-
-  if (isLoggedIn && isLoggedIn()) return;
-
-  const mobile = document.getElementById("mobile")?.value.trim();
-  const orderType = document.getElementById("orderType")?.value;
-
-  // ❌ guard
-  if (!/^[0-9]{10}$/.test(mobile)) return;
-  if (!orderType) return;
-
-  // 🔒 repeat lookup guard
-  if (
-    window._lastLookupMobile === mobile &&
-    window._lastLookupOrderType === orderType
-  ) return;
-
-  window._lastLookupMobile = mobile;
-  window._lastLookupOrderType = orderType;
-
-  // ✅ NOW run overlay + lookup
-}
-
 
 
 function filterMenu() {
@@ -5494,6 +5473,9 @@ async function openCheckout() {
   // Autofill + UI setup
   autofillMobileForLoggedIn();
   resetCheckoutFieldsDefault();
+  // 🔑 FORCE restore guest fields immediately
+updateGuestFieldsVisibility();
+
   setupAddressUIVisibility();
   loadPrimaryAddress();
 
@@ -5506,8 +5488,7 @@ async function openCheckout() {
   const modal = document.getElementById("checkoutModal");
   modal.style.display = "flex";
   setTimeout(() => {
-    
-  maybeRunCustomerLookup("checkout-open");
+    updateGuestFieldsVisibility();
   }, 0);
   // 🔁 RE-APPLY UI if order type already selected
 setTimeout(() => {
@@ -7143,17 +7124,20 @@ function updateGuestFieldsVisibility() {
   const emailRow = document.getElementById("email")?.parentElement;
   const addressRow = document.getElementById("addressWrapper");
 
+  // pehle sab hide
   if (nameRow) nameRow.style.display = "none";
   if (emailRow) emailRow.style.display = "none";
   if (addressRow) addressRow.style.display = "none";
 
   if (!orderType) return;
 
+  // Dine In / Take Away
   if (orderType === "Dine In" || orderType === "Take Away") {
     if (nameRow) nameRow.style.display = "block";
     if (emailRow) emailRow.style.display = "block";
   }
 
+  // Home Delivery
   if (orderType === "Home Delivery") {
     if (nameRow) nameRow.style.display = "block";
     if (emailRow) emailRow.style.display = "block";
@@ -7162,16 +7146,10 @@ function updateGuestFieldsVisibility() {
 }
 
 
+
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
 
 
 
