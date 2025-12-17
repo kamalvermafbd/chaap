@@ -2948,7 +2948,7 @@ stateField.classList.remove("cursor-not-allowed", "bg-gray-100");
     });
 
 }
-
+const pincodeField = document.getElementById("pincode");
 pincodeField.addEventListener("input", () => {
   console.log("✅ PINCODE INPUT EVENT FIRED");
   if (guestAutoFilling) return;     // autofill ignore
@@ -7226,6 +7226,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
