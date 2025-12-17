@@ -2699,16 +2699,23 @@ function checkCustomerByMobile() {
   const cityField    = document.getElementById("city");
   const stateField   = document.getElementById("state");
 
-  // ❌ Mobile NOT valid
+  const nameWrapper  = nameField.parentElement;
+  const emailWrapper = emailField.parentElement;
+
+  // ❌ CASE 1: Mobile NOT valid (<10)
   if (!/^[0-9]{10}$/.test(mobile)) {
 
     mobileError.classList.remove("hidden");
 
-    // reset orderType
+    // hide name + email
+    nameWrapper.style.display  = "none";
+    emailWrapper.style.display = "none";
+
+    // hide orderType + reset
     if (orderTypeBox) orderTypeBox.style.display = "none";
     orderType.value = "";
 
-    // hide all dependent fields
+    // hide address related
     addressWrapper.style.display = "none";
     pincodeWrapper.style.display = "none";
     cityWrapper.style.display    = "none";
@@ -2722,18 +2729,23 @@ function checkCustomerByMobile() {
     cityField.value = "";
     stateField.value = "";
 
-    return; // ⛔ STOP HERE
+    return;
   }
 
-  // ✅ Mobile valid (10 digit)
+  // ✅ CASE 2: Mobile valid (10 digit)
   mobileError.classList.add("hidden");
 
+  // show name + email
+  nameWrapper.style.display  = "block";
+  emailWrapper.style.display = "block";
+
+  // show orderType
   if (orderTypeBox) {
     orderTypeBox.style.display = "block";
   }
 
-  // ⛔ IMPORTANT: yahin STOP
-  // ❌ toggleAddressField yahan se CALL NAHI karna
+  // ⛔ STOP — yahin se aage kuch nahi
+  // toggleAddressField sirf orderType change pe chalega
 }
 
 
@@ -7289,6 +7301,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
