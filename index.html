@@ -2957,7 +2957,7 @@ console.log("🔒 orderLock before:", window._orderLock);
 // STEP-2A: Ensure guest fields visibility before validation
   console.log("📦 orderType:", orderType);
 
-updateGuestFieldsVisibility();
+
 
   // ----------------------------------
 // AUTO CUSTOMER LOOKUP (ONCE)
@@ -3189,10 +3189,7 @@ renderCart();
       window._orderLock = false;
     });
 }
-    // STEP-1B: Order type change → show/hide fields
-document.getElementById("orderType")?.addEventListener("change", () => {
-  updateGuestFieldsVisibility();
-});
+  
 
 // -----------------------------
 // MOBILE INPUT CONTROL (10 digit, no starting 0)
@@ -7151,6 +7148,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
