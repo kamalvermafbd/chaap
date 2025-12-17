@@ -2959,7 +2959,8 @@ if (pincodeField.readOnly) return;
 
   const pin = pincodeField.value.trim();
   if (pin.length === 6) {
-    onNewPincodeChange();
+    onCheckoutPincodeChange();
+
   }
 });
 
@@ -7245,6 +7246,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
