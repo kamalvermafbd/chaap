@@ -2817,10 +2817,12 @@ addressLookupRunning = true;
 
 
   apiGet("getCustomerDetailsByMobile", { mobile })
+    console.log("📞 Guest lookup API CALL, mobile =", mobile);
+
     .then(rows => {
-
+ console.log("📦 Guest lookup RAW rows =", rows);
       let orders = Array.isArray(rows) ? rows : [];
-
+console.log("🧾 Orders array length =", orders.length, orders);
       if (orders.length === 0) {
         nameField.value = "";
         emailField.value = "";
@@ -2862,6 +2864,7 @@ addressLookupRunning = true;
           break;
         }
       }
+console.log("🏠 Latest Home Delivery Address =", latestHD);
 
       // ----- Show/hide based on order type -----
       if (orderType === "Home Delivery") {
@@ -7154,6 +7157,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
