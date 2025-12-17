@@ -2807,10 +2807,6 @@ console.log("overlay about to show");   //
   emailField.readOnly = false;
   addressField.readOnly = false;
 
-  // Hide pincode/city/state for guest always
-  pincodeWrapper.style.display = "none";
-  cityWrapper.style.display    = "none";
-  stateWrapper.style.display   = "none";
 
   if (addressLookupRunning) return;
 addressLookupRunning = true;
@@ -2824,21 +2820,40 @@ apiGet("getCustomerDetailsByMobile", { mobile })
     let orders = Array.isArray(rows) ? rows : [];
     console.log("🧾 Orders array length =", orders.length, orders);
 
-      if (orders.length === 0) {
-        nameField.value = "";
-        emailField.value = "";
-        addressField.value = "";
+     if (orders.length === 0) {
+  nameField.value = "";
+  emailField.value = "";
 
-        if (orderType === "Home Delivery") {
-          addressWrapper.style.display = "block";
- addressField.required = true;
-    addressField.readOnly = false;
-    } else {
-    addressWrapper.style.display = "none";
-    addressField.required = false;
-        }
-        return;
-      }
+  addressField.value = "";
+  pincodeField.value = "";
+  cityField.value    = "";
+  stateField.value   = "";
+
+if (orderType === "Home Delivery") {
+  addressWrapper.style.display = "block";
+  pincodeWrapper.style.display = "block";
+  cityWrapper.style.display    = "block";
+  stateWrapper.style.display   = "block";
+
+  addressField.required = true;
+  addressField.readOnly = false;
+} else {
+  addressWrapper.style.display = "none";
+  pincodeWrapper.style.display = "none";
+  cityWrapper.style.display    = "none";
+  stateWrapper.style.display   = "none";
+
+  addressField.value = "";
+  pincodeField.value = "";
+  cityField.value    = "";
+  stateField.value   = "";
+
+  addressField.required = false;
+}
+
+  return;
+}
+
 
       // ----- Pick latest row -----
       let latest = orders.reduce((max, row) =>
@@ -2851,6 +2866,11 @@ apiGet("getCustomerDetailsByMobile", { mobile })
 
       // ----- Latest HD Address -----
       let latestHD = "";
+let latestPin = "";
+let latestCity = "";
+let latestState = "";
+
+    
       for (let i = orders.length - 1; i >= 0; i--) {
         const row = orders[i];
         const hd =
@@ -2863,9 +2883,13 @@ apiGet("getCustomerDetailsByMobile", { mobile })
         const type = String(row.orderType || "").trim().toLowerCase();
 
 if (type === "home delivery" && hd !== "") {
-  latestHD = hd;
+  latestHD    = hd;
+  latestPin   = row.pincode || "";
+  latestCity  = row.city || "";
+  latestState = row.state || "";
   break;
 }
+
 
       }
 console.log("🏠 Latest Home Delivery Address =", latestHD);
@@ -2875,7 +2899,11 @@ console.log("🏠 Latest Home Delivery Address =", latestHD);
         addressWrapper.style.display = "block";
         addressField.required = true;
         addressField.readOnly = false;
-        addressField.value = latestHD || "";
+     addressField.value = latestHD || "";
+pincodeField.value = latestPin || "";
+cityField.value    = latestCity || "";
+stateField.value   = latestState || "";
+
 
       } else {
         addressWrapper.style.display = "none";
@@ -7161,6 +7189,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
