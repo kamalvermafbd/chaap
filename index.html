@@ -2909,6 +2909,11 @@ console.log("🏠 Latest Home Delivery Address =", latestHD);
 pincodeField.readOnly = false;
   cityField.readOnly    = false;
   stateField.readOnly   = false;
+       addressField.classList.remove("cursor-not-allowed", "bg-gray-100");
+pincodeField.classList.remove("cursor-not-allowed", "bg-gray-100");
+cityField.classList.remove("cursor-not-allowed", "bg-gray-100");
+stateField.classList.remove("cursor-not-allowed", "bg-gray-100");
+
        
   guestAutoFilling = true;
   addressField.value = latestHD || "";
@@ -7220,6 +7225,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
