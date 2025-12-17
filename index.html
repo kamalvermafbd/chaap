@@ -2957,7 +2957,7 @@ pincodeField.addEventListener("input", () => {
 
   const pin = pincodeField.value.trim();
   if (pin.length === 6) {
-    lookupGuestCityStateByPincode(pin);
+    onNewPincodeChange();
   }
 });
 
@@ -7225,6 +7225,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
