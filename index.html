@@ -7191,6 +7191,24 @@ function onNewPincodeChange() {
       stateInput.disabled = false;
     });
 }
+// 🔁 Reuse existing pincode lookup for checkout
+function onCheckoutPincodeChange() {
+  const checkoutPin   = document.getElementById("pincode");
+  const checkoutCity  = document.getElementById("city");
+  const checkoutState = document.getElementById("state");
+
+  // temporarily map checkout fields to newAddress IDs
+  checkoutPin.id   = "newPincode";
+  checkoutCity.id  = "newCity";
+  checkoutState.id = "newState";
+
+  onNewPincodeChange(); // 🔁 existing tested logic
+
+  // restore original IDs
+  checkoutPin.id   = "pincode";
+  checkoutCity.id  = "city";
+  checkoutState.id = "state";
+}
 
 
 
@@ -7227,6 +7245,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
