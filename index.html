@@ -2950,6 +2950,7 @@ stateField.classList.remove("cursor-not-allowed", "bg-gray-100");
 }
 
 pincodeField.addEventListener("input", () => {
+  console.log("✅ PINCODE INPUT EVENT FIRED");
   if (guestAutoFilling) return;     // autofill ignore
   if (isLoggedIn()) return;          // safety: login ignore
 
@@ -7225,6 +7226,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
