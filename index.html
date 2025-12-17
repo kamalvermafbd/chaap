@@ -2694,6 +2694,8 @@ let lastLookupOrderType = "";
 
 let addressLookupRunning = false;
 
+let guestPincodeEdited = false;
+let guestAutoFilling  = false;
     
 function toggleAddressField() {
 console.log("toggleAddressField fired");
@@ -2802,8 +2804,7 @@ console.log("overlay about to show");   //
   // ==========================================================
   //                GUEST USER LOGIC (UNTOUCHED)
   // ==========================================================
-let guestPincodeEdited = false;
-let guestAutoFilling  = false;
+
 
   nameField.readOnly = false;
   emailField.readOnly = false;
@@ -2953,7 +2954,7 @@ pincodeField.addEventListener("input", () => {
   console.log("✅ PINCODE INPUT EVENT FIRED");
   if (guestAutoFilling) return;     // autofill ignore
   if (isLoggedIn()) return;          // safety: login ignore
-
+if (pincodeField.readOnly) return;
   guestPincodeEdited = true;
 
   const pin = pincodeField.value.trim();
@@ -7226,6 +7227,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
