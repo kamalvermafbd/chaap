@@ -2692,6 +2692,7 @@ const orderTypeBox = document.getElementById("orderTypeWrapper");
 let lastLookupMobile = "";
 let lastLookupOrderType = "";
 
+let addressLookupRunning = false;
 
     
 function toggleAddressField() {
@@ -2811,6 +2812,10 @@ console.log("overlay about to show");   //
   cityWrapper.style.display    = "none";
   stateWrapper.style.display   = "none";
 
+  if (addressLookupRunning) return;
+addressLookupRunning = true;
+
+
   apiGet("getCustomerDetailsByMobile", { mobile })
     .then(rows => {
 
@@ -2877,6 +2882,7 @@ console.log("overlay about to show");   //
       alert("Error loading customer details.");
     })
     .finally(() => {
+      addressLookupRunning = false;
       overlay.style.display = "none";
       orderSelect.disabled = false;
     });
@@ -7148,6 +7154,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
