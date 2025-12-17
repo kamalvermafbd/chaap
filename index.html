@@ -2676,7 +2676,6 @@ function onMobileChanged() {
 
 function checkCustomerByMobile() {
 
-  // 🔒 logged-in user → mobile locked
   if (isLoggedIn()) {
     document.getElementById("mobile").readOnly = true;
     return;
@@ -2686,6 +2685,8 @@ function checkCustomerByMobile() {
   const mobileError = document.getElementById("mobileError");
 
   const orderTypeBox = document.getElementById("orderTypeWrapper");
+  const orderType = document.getElementById("orderType");
+
   const addressWrapper = document.getElementById("addressWrapper");
   const pincodeWrapper = document.getElementById("pincodeWrapper");
   const cityWrapper    = document.getElementById("cityWrapper");
@@ -2698,22 +2699,22 @@ function checkCustomerByMobile() {
   const cityField    = document.getElementById("city");
   const stateField   = document.getElementById("state");
 
-  // ❌ NOT exactly 10 digits
+  // ❌ Mobile NOT valid
   if (!/^[0-9]{10}$/.test(mobile)) {
 
-    // show red error
     mobileError.classList.remove("hidden");
 
-    // hide order type
+    // reset orderType
     if (orderTypeBox) orderTypeBox.style.display = "none";
+    orderType.value = "";
 
-    // hide ALL dependent fields
+    // hide all dependent fields
     addressWrapper.style.display = "none";
     pincodeWrapper.style.display = "none";
     cityWrapper.style.display    = "none";
     stateWrapper.style.display   = "none";
 
-    // clear all values
+    // clear values
     nameField.value = "";
     emailField.value = "";
     addressField.value = "";
@@ -2724,16 +2725,16 @@ function checkCustomerByMobile() {
     return; // ⛔ STOP HERE
   }
 
-  // ✅ EXACT 10 digits
+  // ✅ Mobile valid (10 digit)
   mobileError.classList.add("hidden");
 
-  // show order type (blank)
   if (orderTypeBox) {
     orderTypeBox.style.display = "block";
-    document.getElementById("orderType").value = "";
   }
-}
 
+  // ⛔ IMPORTANT: yahin STOP
+  // ❌ toggleAddressField yahan se CALL NAHI karna
+}
 
 
 let lastLookupMobile = "";
@@ -2750,17 +2751,10 @@ console.log("toggleAddressField fired");
   const mobile = document.getElementById("mobile").value.trim();
   const orderType = document.getElementById("orderType").value;
 
+if (!/^[0-9]{10}$/.test(mobile)) return;
+if (!orderType) return;
 
-  // --- 1) Validate mobile ---
-  if (!/^[0-9]{10}$/.test(mobile)) {
-      console.log("mobile invalid, returning");   
-    return;
-  }
-// ⛔ HARD STOP if orderType empty
-  if (!orderType) {
-    console.log("⛔ toggleAddressField blocked: orderType empty");
-    return;
-  }
+ 
   // --- 2) Base references ---
   const nameField = document.getElementById("customerName");
   const emailField = document.getElementById("email");
@@ -7295,6 +7289,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
