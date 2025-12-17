@@ -2816,13 +2816,14 @@ console.log("overlay about to show");   //
 addressLookupRunning = true;
 
   console.log("📞 Guest lookup API CALL, mobile =", mobile);
-  apiGet("getCustomerDetailsByMobile", { mobile })
-  
 
-    .then(rows => {
- console.log("📦 Guest lookup RAW rows =", rows);
-      let orders = Array.isArray(rows) ? rows : [];
-console.log("🧾 Orders array length =", orders.length, orders);
+apiGet("getCustomerDetailsByMobile", { mobile })
+  .then(rows => {
+    console.log("📦 Guest lookup RAW rows =", rows);
+
+    let orders = Array.isArray(rows) ? rows : [];
+    console.log("🧾 Orders array length =", orders.length, orders);
+
       if (orders.length === 0) {
         nameField.value = "";
         emailField.value = "";
@@ -7157,6 +7158,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
