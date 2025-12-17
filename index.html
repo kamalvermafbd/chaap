@@ -2960,7 +2960,7 @@ console.log("🔒 orderLock before:", window._orderLock);
 // STEP-2A: Ensure guest fields visibility before validation
   console.log("📦 orderType:", orderType);
 
-updateGuestFieldsVisibility();
+
 
   // ----------------------------------
 // AUTO CUSTOMER LOOKUP (ONCE)
@@ -3194,7 +3194,7 @@ renderCart();
 }
     // STEP-1B: Order type change → show/hide fields
 document.getElementById("orderType")?.addEventListener("change", () => {
-  updateGuestFieldsVisibility();
+  
   // ✅ ADD THIS LINE
   maybeRunCustomerLookup("orderType-change");
 });
@@ -3208,7 +3208,6 @@ if (mobileInput) {
   mobileInput.addEventListener("input", () => {
 
     let val = mobileInput.value.replace(/\D/g, "");
-    val = val.replace(/^0+/, "");
     if (val.length > 10) val = val.slice(0, 10);
 
     mobileInput.value = val;
@@ -3219,9 +3218,12 @@ if (mobileInput) {
       mobileError.classList.add("hidden");
     }
 
-    // ❌ NO lookup here
+    // ❌ NOTHING ELSE HERE
+    // ❌ no lookup
+    // ❌ no updateGuestFieldsVisibility
   });
 }
+
 
 
 // -----------------------------
@@ -5504,7 +5506,7 @@ async function openCheckout() {
   const modal = document.getElementById("checkoutModal");
   modal.style.display = "flex";
   setTimeout(() => {
-    updateGuestFieldsVisibility();
+    
   maybeRunCustomerLookup("checkout-open");
   }, 0);
   // 🔁 RE-APPLY UI if order type already selected
@@ -7141,20 +7143,17 @@ function updateGuestFieldsVisibility() {
   const emailRow = document.getElementById("email")?.parentElement;
   const addressRow = document.getElementById("addressWrapper");
 
-  // pehle sab hide
   if (nameRow) nameRow.style.display = "none";
   if (emailRow) emailRow.style.display = "none";
   if (addressRow) addressRow.style.display = "none";
 
   if (!orderType) return;
 
-  // Dine In / Take Away
   if (orderType === "Dine In" || orderType === "Take Away") {
     if (nameRow) nameRow.style.display = "block";
     if (emailRow) emailRow.style.display = "block";
   }
 
-  // Home Delivery
   if (orderType === "Home Delivery") {
     if (nameRow) nameRow.style.display = "block";
     if (emailRow) emailRow.style.display = "block";
@@ -7163,10 +7162,10 @@ function updateGuestFieldsVisibility() {
 }
 
 
-
 </script>
 </body>
 </html>
+
 
 
 
