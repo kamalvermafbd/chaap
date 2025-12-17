@@ -3207,37 +3207,22 @@ const mobileInput = document.getElementById("mobile");
 if (mobileInput) {
   mobileInput.addEventListener("input", () => {
 
-    // allow only digits
     let val = mobileInput.value.replace(/\D/g, "");
-
-    // remove starting zeros
     val = val.replace(/^0+/, "");
-
-    // limit to 10 digits
-    if (val.length > 10) {
-      val = val.slice(0, 10);
-    }
+    if (val.length > 10) val = val.slice(0, 10);
 
     mobileInput.value = val;
 
-    // hide mobile error while typing
     const mobileError = document.getElementById("mobileError");
     if (mobileError) {
       mobileError.innerText = "";
       mobileError.classList.add("hidden");
     }
 
-    // 🔒 prevent recursion
-    if (mobileInput._internalTrigger) return;
-    mobileInput._internalTrigger = true;
-
-    // 🔁 UI + lookup
- 
-  maybeRunCustomerLookup("mobile-input");
-
-    mobileInput._internalTrigger = false;
+    // ❌ NO lookup here
   });
 }
+
 
 // -----------------------------
 // NAME INPUT – STEP 1b
@@ -3272,13 +3257,27 @@ if (emailInput) {
 }
 function maybeRunCustomerLookup(source = "") {
 
-  // 🔒 Logged-in users → NO guest lookup
   if (isLoggedIn && isLoggedIn()) return;
 
   const mobile = document.getElementById("mobile")?.value.trim();
   const orderType = document.getElementById("orderType")?.value;
-  
+
+  // ❌ guard
+  if (!/^[0-9]{10}$/.test(mobile)) return;
+  if (!orderType) return;
+
+  // 🔒 repeat lookup guard
+  if (
+    window._lastLookupMobile === mobile &&
+    window._lastLookupOrderType === orderType
+  ) return;
+
+  window._lastLookupMobile = mobile;
+  window._lastLookupOrderType = orderType;
+
+  // ✅ NOW run overlay + lookup
 }
+
 
 
 function filterMenu() {
@@ -7168,6 +7167,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
