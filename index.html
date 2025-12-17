@@ -2815,9 +2815,9 @@ console.log("overlay about to show");   //
   if (addressLookupRunning) return;
 addressLookupRunning = true;
 
-
+  console.log("📞 Guest lookup API CALL, mobile =", mobile);
   apiGet("getCustomerDetailsByMobile", { mobile })
-    console.log("📞 Guest lookup API CALL, mobile =", mobile);
+  
 
     .then(rows => {
  console.log("📦 Guest lookup RAW rows =", rows);
@@ -7157,6 +7157,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
