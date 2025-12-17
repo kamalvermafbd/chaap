@@ -2860,10 +2860,13 @@ apiGet("getCustomerDetailsByMobile", { mobile })
           row.Address2?.trim() ||
           "";
 
-        if (row.orderType === "Home Delivery" && hd !== "") {
-          latestHD = hd;
-          break;
-        }
+        const type = String(row.orderType || "").trim().toLowerCase();
+
+if (type === "home delivery" && hd !== "") {
+  latestHD = hd;
+  break;
+}
+
       }
 console.log("🏠 Latest Home Delivery Address =", latestHD);
 
@@ -7158,6 +7161,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
