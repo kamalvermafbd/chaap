@@ -1057,10 +1057,11 @@ style="
 
     <form id="checkoutForm" class="space-y-1.5">
 
-    
-     <!-- MOBILE -->
-<div id="mobileWrapper">
-  <label class="block text-sm font-medium text-gray-700 mb-1">Mobile</label>
+    <!-- MOBILE -->
+<div id="mobileWrapper" class="flex flex-col">
+  <label class="block text-sm font-medium text-gray-700 mb-1">
+    Mobile
+  </label>
 
   <input
     id="mobile"
@@ -1074,15 +1075,14 @@ style="
            focus:outline-none focus:ring-2 focus:ring-orange-500"
   />
 
-  <!-- 🔴 MOBILE ERROR (UX SAFE) -->
-  <div id="mobileError"
-       class="hidden mt-2 text-red-600 font-bold text-base">
+  <!-- 🔴 MOBILE ERROR (VISIBLE EVEN WITH overflow-hidden) -->
+  <span
+    id="mobileError"
+    class="hidden mt-1 text-red-600 font-semibold text-sm leading-tight">
     Please enter 10 digit mobile number
-  </div>
+  </span>
 </div>
 
-
-      </div>
       <!-- Order Type -->
       <div id="orderTypeWrapper">
         <label class="block text-sm font-medium text-gray-700 mb-1">Order Type</label>
@@ -2690,30 +2690,21 @@ function onMobileChanged() {
 }
 
 function checkCustomerByMobile() {
-  console.log("📱 checkCustomerByMobile fired");
-
   const mobile = document.getElementById("mobile").value.trim();
-  const mobileError = document.getElementById("mobileError");
+  const err = document.getElementById("mobileError");
 
-  // 🔐 Logged-in user → no validation / no hide
+  // logged-in user safe
   if (typeof isLoggedIn === "function" && isLoggedIn()) {
-    mobileError.classList.add("hidden");
+    err.classList.add("hidden");
     return;
   }
 
-  // 🔴 Guest UX: 1–9 digits → show red error
   if (mobile.length > 0 && mobile.length < 10) {
-    mobileError.classList.remove("hidden");
-    return;
+    err.classList.remove("hidden");
+  } else {
+    err.classList.add("hidden");
   }
-
-  // ✅ Empty or exactly 10 digits → hide error
-  mobileError.classList.add("hidden");
 }
-
-
-
-
 
 
 
@@ -7270,6 +7261,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
