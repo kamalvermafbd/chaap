@@ -2704,9 +2704,10 @@ function checkCustomerByMobile() {
 
   // ❌ CASE 1: Mobile NOT valid (<10)
   // ❌ Mobile < 10 digit (1–9)
-if (mobile.length > 0 && mobile.length < 10) {
+if (mobile.length < 10) {
 
-  mobileError.classList.remove("hidden");
+  mobileError.style.display = "block";
+
 
   nameWrapper.style.display  = "none";
   emailWrapper.style.display = "none";
@@ -2724,7 +2725,8 @@ if (mobile.length > 0 && mobile.length < 10) {
 
 
   // ✅ CASE 2: Mobile valid (10 digit)
-  mobileError.classList.add("hidden");
+  mobileError.style.display = "none";
+
 
   // show name + email
   nameWrapper.style.display  = "block";
@@ -7292,6 +7294,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
