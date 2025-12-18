@@ -2707,7 +2707,8 @@ console.log("📱 checkCustomerByMobile fired");
 
   /* 🔴 CASE 1: EMPTY */
   if (mobile.length === 0) {
-    mobileError.style.display = "none";
+    mobileError.style.setProperty("display", "none", "important");
+
     return;
   }
 
@@ -2715,7 +2716,11 @@ console.log("📱 checkCustomerByMobile fired");
   
 if (mobile.length > 0 && mobile.length < 10) {
 
-  mobileError.style.display = "block";
+ mobileError.style.setProperty("display", "block", "important");
+console.log(
+  "❗ ERROR FORCED SHOW, computed display =",
+  getComputedStyle(mobileError).display
+);
 
 
   nameWrapper.style.display  = "none";
@@ -7303,6 +7308,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
