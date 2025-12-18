@@ -2694,10 +2694,11 @@ function onMobileChanged() {
   guestAutoFilling   = false;
 }
 
+    
 function checkCustomerByMobile() {
   console.log("📱 checkCustomerByMobile fired");
 
-  const mobile = document.getElementById("mobile").value;
+  const mobile = document.getElementById("mobile").value.trim();
   const mobileError = document.getElementById("mobileError");
 
   const orderTypeBox = document.getElementById("orderTypeWrapper");
@@ -2713,7 +2714,7 @@ function checkCustomerByMobile() {
   /* ❌ NOT EXACT 10 DIGIT */
   if (mobile.length !== 10) {
 
-    // 🔴 red line always visible
+    // 🔴 red error always visible
     mobileError.style.display = "block";
 
     // hide everything else
@@ -2738,8 +2739,6 @@ function checkCustomerByMobile() {
 
   if (orderTypeBox) orderTypeBox.style.display = "block";
 }
-
-
 
 
 let lastLookupMobile = "";
@@ -7294,6 +7293,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
