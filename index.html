@@ -2677,82 +2677,52 @@ function onMobileChanged() {
 }
 
 function checkCustomerByMobile() {
-console.log("📱 checkCustomerByMobile fired");
-  if (isLoggedIn()) {
-      console.log("🔒 User is logged in → skip mobile check");
-    document.getElementById("mobile").readOnly = true;
-    return;
-  }
+  console.log("📱 checkCustomerByMobile fired");
 
-  const mobile = document.getElementById("mobile").value.trim();
+  const mobile = document.getElementById("mobile").value;
   const mobileError = document.getElementById("mobileError");
 
   const orderTypeBox = document.getElementById("orderTypeWrapper");
   const orderType = document.getElementById("orderType");
+
+  const nameWrapper  = document.getElementById("customerName").parentElement;
+  const emailWrapper = document.getElementById("email").parentElement;
 
   const addressWrapper = document.getElementById("addressWrapper");
   const pincodeWrapper = document.getElementById("pincodeWrapper");
   const cityWrapper    = document.getElementById("cityWrapper");
   const stateWrapper   = document.getElementById("stateWrapper");
 
-  const nameField    = document.getElementById("customerName");
-  const emailField   = document.getElementById("email");
-  const addressField = document.getElementById("address");
-  const pincodeField = document.getElementById("pincode");
-  const cityField    = document.getElementById("city");
-  const stateField   = document.getElementById("state");
+  /* 🔴 CASE A: 0–9 digit */
+  if (mobile.length < 10) {
 
-  const nameWrapper  = nameField.parentElement;
-  const emailWrapper = emailField.parentElement;
+    mobileError.style.display = "block";
+    console.log("❌ mobile < 10 → ERROR SHOWN");
 
-  /* 🔴 CASE 1: EMPTY */
-  if (mobile.length === 0) {
-    mobileError.style.setProperty("display", "none", "important");
+    nameWrapper.style.display  = "none";
+    emailWrapper.style.display = "none";
 
-    return;
+    if (orderTypeBox) orderTypeBox.style.display = "none";
+    orderType.value = "";
+
+    addressWrapper.style.display = "none";
+    pincodeWrapper.style.display = "none";
+    cityWrapper.style.display    = "none";
+    stateWrapper.style.display   = "none";
+
+    return; // ⛔ STOP
   }
 
-  /* 🔴 CASE 2: 1–9 digit */
-  
-if (mobile.length > 0 && mobile.length < 10) {
-
- mobileError.style.setProperty("display", "block", "important");
-console.log(
-  "❗ ERROR FORCED SHOW, computed display =",
-  getComputedStyle(mobileError).display
-);
-
-
-  nameWrapper.style.display  = "none";
-  emailWrapper.style.display = "none";
-
-  if (orderTypeBox) orderTypeBox.style.display = "none";
-  orderType.value = "";
-
-  addressWrapper.style.display = "none";
-  pincodeWrapper.style.display = "none";
-  cityWrapper.style.display    = "none";
-  stateWrapper.style.display   = "none";
-
-  return; // ⛔ STOP
-}
-
-
-  // ✅ CASE 2: Mobile valid (10 digit)
+  /* ✅ CASE B: EXACT 10 digit */
   mobileError.style.display = "none";
+  console.log("✅ mobile = 10 → ERROR HIDDEN");
 
-
-  // show name + email
   nameWrapper.style.display  = "block";
   emailWrapper.style.display = "block";
 
-  // show orderType
-  if (orderTypeBox) {
-    orderTypeBox.style.display = "block";
-  }
+  if (orderTypeBox) orderTypeBox.style.display = "block";
 
-  // ⛔ STOP — yahin se aage kuch nahi
-  // toggleAddressField sirf orderType change pe chalega
+  // ⛔ yahin stop
 }
 
 
@@ -7308,6 +7278,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
