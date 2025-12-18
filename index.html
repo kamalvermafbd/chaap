@@ -2703,34 +2703,25 @@ function checkCustomerByMobile() {
   const emailWrapper = emailField.parentElement;
 
   // ❌ CASE 1: Mobile NOT valid (<10)
-  if (!/^[0-9]{10}$/.test(mobile)) {
+  // ❌ Mobile < 10 digit (1–9)
+if (mobile.length > 0 && mobile.length < 10) {
 
-    mobileError.classList.remove("hidden");
+  mobileError.classList.remove("hidden");
 
-    // hide name + email
-    nameWrapper.style.display  = "none";
-    emailWrapper.style.display = "none";
+  nameWrapper.style.display  = "none";
+  emailWrapper.style.display = "none";
 
-    // hide orderType + reset
-    if (orderTypeBox) orderTypeBox.style.display = "none";
-    orderType.value = "";
+  if (orderTypeBox) orderTypeBox.style.display = "none";
+  orderType.value = "";
 
-    // hide address related
-    addressWrapper.style.display = "none";
-    pincodeWrapper.style.display = "none";
-    cityWrapper.style.display    = "none";
-    stateWrapper.style.display   = "none";
+  addressWrapper.style.display = "none";
+  pincodeWrapper.style.display = "none";
+  cityWrapper.style.display    = "none";
+  stateWrapper.style.display   = "none";
 
-    // clear values
-    nameField.value = "";
-    emailField.value = "";
-    addressField.value = "";
-    pincodeField.value = "";
-    cityField.value = "";
-    stateField.value = "";
+  return; // ⛔ STOP
+}
 
-    return;
-  }
 
   // ✅ CASE 2: Mobile valid (10 digit)
   mobileError.classList.add("hidden");
@@ -7301,6 +7292,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
