@@ -1073,8 +1073,8 @@ style="
 />
 
 <p id="mobileError"
-   class="text-red-600 text-sm mt-1"
-   style="display:none">
+   class="text-red-600 text-sm mt-1">
+   
   Please enter 10 digit mobile number
 </p>
 
@@ -2690,11 +2690,12 @@ function checkCustomerByMobile() {
   const mobileError = document.getElementById("mobileError");
 
   if (mobile.length > 0 && mobile.length < 10) {
-    mobileError.style.display = "block";
+    mobileError.classList.remove("hidden");
   } else {
-    mobileError.style.display = "none";
+    mobileError.classList.add("hidden");
   }
 }
+
 
 
 
@@ -7252,6 +7253,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
