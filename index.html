@@ -1058,10 +1058,8 @@ style="
     <form id="checkoutForm" class="space-y-1.5">
 
     <!-- MOBILE -->
-<div id="mobileWrapper" style="position:relative;">
-  <label class="block text-sm font-medium text-gray-700 mb-1">
-    Mobile
-  </label>
+<div id="mobileWrapper">
+  <label class="block text-sm font-medium text-gray-700 mb-1">Mobile</label>
 
   <input
     id="mobile"
@@ -1069,30 +1067,17 @@ style="
     inputmode="numeric"
     maxlength="10"
     placeholder="Enter 10-digit Mobile"
-    required
     oninput="checkCustomerByMobile()"
-    class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
-           focus:outline-none focus:ring-2 focus:ring-orange-500"
+    class="w-full border border-gray-300 rounded-lg p-2.5
+           focus:ring-2 focus:ring-orange-500"
   />
 
-  <!-- 🔴 MOBILE ERROR (ABSOLUTE – CANNOT BE HIDDEN BY MODAL) -->
-  <div
-    id="mobileError"
-    style="
-      display:none;
-      position:absolute;
-      top:100%;
-      left:0;
-      width:100%;
-      color:#dc2626;
-      font-weight:700;
-      font-size:14px;
-      margin-top:4px;
-      z-index:99999;
-    ">
+  <div id="mobileError"
+       class="hidden mt-2 text-red-600 font-bold text-base">
     Please enter 10 digit mobile number
   </div>
 </div>
+
 
 
       <!-- Order Type -->
@@ -2703,22 +2688,15 @@ function onMobileChanged() {
 
 function checkCustomerByMobile() {
   const mobile = document.getElementById("mobile").value.trim();
-  const err = document.getElementById("mobileError");
+  const mobileError = document.getElementById("mobileError");
 
-  // logged-in user safe
-  if (typeof isLoggedIn === "function" && isLoggedIn()) {
-    err.classList.add("hidden");
-    return;
-  }
-
+  // show error only when typing but < 10 digit
   if (mobile.length > 0 && mobile.length < 10) {
-    err.classList.remove("hidden");
+    mobileError.classList.remove("hidden");
   } else {
-    err.classList.add("hidden");
+    mobileError.classList.add("hidden");
   }
 }
-
-
 
 
 let lastLookupMobile = "";
@@ -7273,6 +7251,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
