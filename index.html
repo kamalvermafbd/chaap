@@ -2703,9 +2703,9 @@ function checkCustomerByMobile() {
   const stateWrapper   = document.getElementById("stateWrapper");
 
   /* ❌ NOT EXACT 10 DIGIT */
-  if (mobile.length !== 10) {
+  if (mobile.length > 0 && mobile.length < 10) {
 
-    // 🔴 red error always visible
+  
     mobileError.style.display = "block";
 
     // hide everything else
@@ -2722,15 +2722,15 @@ function checkCustomerByMobile() {
     return;
   }
 
-  /* ✅ EXACT 10 DIGIT */
-  mobileError.style.display = "none";
+  if (mobile.length === 10) {
+    mobileError.style.display = "none";
 
-  nameWrapper.style.display  = "block";
-  emailWrapper.style.display = "block";
+    nameWrapper.style.display  = "block";
+    emailWrapper.style.display = "block";
 
-  if (orderTypeBox) orderTypeBox.style.display = "block";
+    if (orderTypeBox) orderTypeBox.style.display = "block";
+  }
 }
-
 
 
 
@@ -7287,6 +7287,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
