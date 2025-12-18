@@ -2689,47 +2689,8 @@ function onMobileChanged() {
 function checkCustomerByMobile() {
   console.log("📱 checkCustomerByMobile fired");
 
-  const mobile = document.getElementById("mobile").value.trim();
-  const mobileError = document.getElementById("mobileError");
-
-  const orderTypeBox = document.getElementById("orderTypeWrapper");
-
-  const nameWrapper  = document.getElementById("customerName").parentElement;
-  const emailWrapper = document.getElementById("email").parentElement;
-
-  const addressWrapper = document.getElementById("addressWrapper");
-  const pincodeWrapper = document.getElementById("pincodeWrapper");
-  const cityWrapper    = document.getElementById("cityWrapper");
-  const stateWrapper   = document.getElementById("stateWrapper");
-
-  /* ❌ NOT EXACT 10 DIGIT */
-  if (mobile.length > 0 && mobile.length < 10) {
-
-  
-    mobileError.style.display = "block";
-
-    // hide everything else
-    nameWrapper.style.display  = "none";
-    emailWrapper.style.display = "none";
-
-    if (orderTypeBox) orderTypeBox.style.display = "none";
-
-    addressWrapper.style.display = "none";
-    pincodeWrapper.style.display = "none";
-    cityWrapper.style.display    = "none";
-    stateWrapper.style.display   = "none";
-
-    return;
-  }
-
-  if (mobile.length === 10) {
-    mobileError.style.display = "none";
-
-    nameWrapper.style.display  = "block";
-    emailWrapper.style.display = "block";
-
-    if (orderTypeBox) orderTypeBox.style.display = "block";
-  }
+   if (mobile.length > 0 && mobile.length < 10) {
+alert ("plz enter 10 digit")
 }
 
 
@@ -7287,6 +7248,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
