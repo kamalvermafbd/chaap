@@ -2685,12 +2685,14 @@ function onMobileChanged() {
   guestAutoFilling   = false;
 }
 
-    
-function checkCustomerByMobile() {
+  function checkCustomerByMobile() {
   console.log("📱 checkCustomerByMobile fired");
 
-   if (mobile.length > 0 && mobile.length < 10) {
-alert ("plz enter 10 digit")
+  const mobile = document.getElementById("mobile").value.trim();
+
+  if (mobile.length > 0 && mobile.length < 10) {
+    alert("Please enter 10 digit mobile number");
+  }
 }
 
 
@@ -7248,6 +7250,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
