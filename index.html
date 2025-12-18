@@ -2677,8 +2677,9 @@ function onMobileChanged() {
 }
 
 function checkCustomerByMobile() {
-
+console.log("📱 checkCustomerByMobile fired");
   if (isLoggedIn()) {
+      console.log("🔒 User is logged in → skip mobile check");
     document.getElementById("mobile").readOnly = true;
     return;
   }
@@ -2704,8 +2705,14 @@ function checkCustomerByMobile() {
   const nameWrapper  = nameField.parentElement;
   const emailWrapper = emailField.parentElement;
 
-  // ❌ CASE 1: Mobile NOT valid (<10)
-  // ❌ Mobile < 10 digit (1–9)
+  /* 🔴 CASE 1: EMPTY */
+  if (mobile.length === 0) {
+    mobileError.style.display = "none";
+    return;
+  }
+
+  /* 🔴 CASE 2: 1–9 digit */
+  
 if (mobile.length > 0 && mobile.length < 10) {
 
   mobileError.style.display = "block";
@@ -7296,6 +7303,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
