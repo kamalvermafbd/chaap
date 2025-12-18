@@ -2690,7 +2690,7 @@ function checkCustomerByMobile() {
   const mobile = document.getElementById("mobile").value.trim();
   const mobileError = document.getElementById("mobileError");
 
-  // show error only when typing but < 10 digit
+  // 🔴 show error only while typing but < 10 digits
   if (mobile.length > 0 && mobile.length < 10) {
     mobileError.classList.remove("hidden");
   } else {
@@ -7251,6 +7251,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
