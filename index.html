@@ -647,7 +647,9 @@ body::before {
 #mobile:focus:invalid ~ .mobile-error {
   display: block;
 }
-
+ #mobile.valid + #mobileError {
+    display: none;
+ }
   </style>
 </head>
 <body>
@@ -2693,50 +2695,16 @@ function onMobileChanged() {
 }
 
 function checkCustomerByMobile() {
-  console.log("📱 checkCustomerByMobile fired");
+  const mobileInput = document.getElementById("mobile");
+  const mobile = mobileInput.value.trim();
 
-  const mobile = document.getElementById("mobile").value;
-  const mobileError = document.getElementById("mobileError");
-
-  const orderTypeBox = document.getElementById("orderTypeWrapper");
-
-  const nameWrapper  = document.getElementById("customerName").parentElement;
-  const emailWrapper = document.getElementById("email").parentElement;
-
-  const addressWrapper = document.getElementById("addressWrapper");
-  const pincodeWrapper = document.getElementById("pincodeWrapper");
-  const cityWrapper    = document.getElementById("cityWrapper");
-  const stateWrapper   = document.getElementById("stateWrapper");
-
-  /* ❌ NOT EXACT 10 DIGIT */
-  if (mobile.length !== 10) {
-
-    // 🔴 red line always visible
-    mobileError.style.display = "block";
-
-    // hide everything else
-    nameWrapper.style.display  = "none";
-    emailWrapper.style.display = "none";
-
-    if (orderTypeBox) orderTypeBox.style.display = "none";
-
-    addressWrapper.style.display = "none";
-    pincodeWrapper.style.display = "none";
-    cityWrapper.style.display    = "none";
-    stateWrapper.style.display   = "none";
-
-    return;
+  // sirf class toggle
+  if (mobile.length === 10) {
+    mobileInput.classList.add("valid");
+  } else {
+    mobileInput.classList.remove("valid");
   }
-
-  /* ✅ EXACT 10 DIGIT */
-  mobileError.style.display = "none";
-
-  nameWrapper.style.display  = "block";
-  emailWrapper.style.display = "block";
-
-  if (orderTypeBox) orderTypeBox.style.display = "block";
 }
-
 
 
 let lastLookupMobile = "";
@@ -7291,6 +7259,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
