@@ -2691,14 +2691,19 @@ function checkCustomerByMobile() {
   const mobile = document.getElementById("mobile").value.trim();
   const mobileError = document.getElementById("mobileError");
 
-  // 1–9 digit → show red message
-  if (mobile.length > 0 && mobile.length < 10) {
-    mobileError.classList.remove("hidden");
+  if (!mobileError) {
+    console.error("❌ mobileError element not found");
     return;
   }
 
-  // empty OR exactly 10 digit → hide message
-  mobileError.classList.add("hidden");
+  // 1–9 digit → show red message
+  if (mobile.length > 0 && mobile.length < 10) {
+    mobileError.style.display = "block";   // 🔥 FORCE SHOW
+    return;
+  }
+
+  // empty OR exactly 10 digit → hide
+  mobileError.style.display = "none";
 }
 
 
@@ -7256,6 +7261,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
