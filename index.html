@@ -1074,7 +1074,7 @@ style="
 
 <p id="mobileError"
    class="text-red-600 text-sm mt-1"
-   style="display:block">
+   style="display:none">
   Please enter 10 digit mobile number
 </p>
 
@@ -2686,25 +2686,16 @@ function onMobileChanged() {
 }
 
 function checkCustomerByMobile() {
-  console.log("📱 checkCustomerByMobile fired");
-
   const mobile = document.getElementById("mobile").value.trim();
   const mobileError = document.getElementById("mobileError");
 
-  if (!mobileError) {
-    console.error("❌ mobileError element not found");
-    return;
-  }
-
-  // 1–9 digit → show red message
   if (mobile.length > 0 && mobile.length < 10) {
-    mobileError.style.display = "block";   // 🔥 FORCE SHOW
-    return;
+    mobileError.style.display = "block";
+  } else {
+    mobileError.style.display = "none";
   }
-
-  // empty OR exactly 10 digit → hide
-  mobileError.style.display = "none";
 }
+
 
 
 
@@ -7261,6 +7252,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
