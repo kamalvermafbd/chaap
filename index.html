@@ -1064,18 +1064,20 @@ style="
   <input
     id="mobile"
     type="tel"
-    inputmode="numeric"
     maxlength="10"
     placeholder="Enter 10-digit Mobile"
     oninput="checkCustomerByMobile()"
     class="w-full border border-gray-300 rounded-lg p-2.5
            focus:ring-2 focus:ring-orange-500"
   />
+</div>
 
-  <div id="mobileError"
-       class="hidden mt-2 text-red-600 font-bold text-base">
-    Please enter 10 digit mobile number
-  </div>
+<!-- ✅ ERROR MUST BE OUTSIDE wrapper -->
+<div
+  id="mobileError"
+  class="hidden mt-2 text-red-600 font-bold text-base"
+>
+  Please enter 10 digit mobile number
 </div>
 
 
@@ -2688,15 +2690,15 @@ function onMobileChanged() {
 
 function checkCustomerByMobile() {
   const mobile = document.getElementById("mobile").value.trim();
-  const mobileError = document.getElementById("mobileError");
+  const err = document.getElementById("mobileError");
 
-  // 🔴 show error only while typing but < 10 digits
   if (mobile.length > 0 && mobile.length < 10) {
-    mobileError.classList.remove("hidden");
+    err.classList.remove("hidden");
   } else {
-    mobileError.classList.add("hidden");
+    err.classList.add("hidden");
   }
 }
+
 
 
 let lastLookupMobile = "";
@@ -7251,6 +7253,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
