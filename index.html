@@ -2689,12 +2689,17 @@ function checkCustomerByMobile() {
   console.log("📱 checkCustomerByMobile fired");
 
   const mobile = document.getElementById("mobile").value.trim();
+  const mobileError = document.getElementById("mobileError");
 
+  // 1–9 digit → show red message
   if (mobile.length > 0 && mobile.length < 10) {
-    alert("Please enter 10 digit mobile number");
+    mobileError.classList.remove("hidden");
+    return;
   }
-}
 
+  // empty OR exactly 10 digit → hide message
+  mobileError.classList.add("hidden");
+}
 
 
 
@@ -7251,6 +7256,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
