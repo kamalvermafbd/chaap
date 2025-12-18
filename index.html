@@ -642,14 +642,6 @@ body::before {
   margin-top: 4px;
 }
 
-/* show error ONLY when invalid AND user typed */
-#mobile:not(:focus):invalid ~ .mobile-error,
-#mobile:focus:invalid ~ .mobile-error {
-  display: block;
-}
- #mobile.valid + #mobileError {
-    display: none;
- }
   </style>
 </head>
 <body>
@@ -1073,7 +1065,6 @@ style="
   type="tel"
   inputmode="numeric"
   maxlength="10"
-  pattern="[0-9]{10}"
   placeholder="Enter 10-digit Mobile"
   required
   oninput="checkCustomerByMobile()"
@@ -2696,9 +2687,7 @@ function onMobileChanged() {
 
     
 function checkCustomerByMobile() {
-  console.log("📱 checkCustomerByMobile fired");
-
-  const mobile = document.getElementById("mobile").value.trim();
+  const mobile = document.getElementById("mobile").value;
   const mobileError = document.getElementById("mobileError");
 
   const orderTypeBox = document.getElementById("orderTypeWrapper");
@@ -2711,13 +2700,10 @@ function checkCustomerByMobile() {
   const cityWrapper    = document.getElementById("cityWrapper");
   const stateWrapper   = document.getElementById("stateWrapper");
 
-  /* ❌ NOT EXACT 10 DIGIT */
+  // ❌ NOT EXACT 10 DIGIT
   if (mobile.length !== 10) {
-
-    // 🔴 red error always visible
     mobileError.style.display = "block";
 
-    // hide everything else
     nameWrapper.style.display  = "none";
     emailWrapper.style.display = "none";
 
@@ -2731,7 +2717,7 @@ function checkCustomerByMobile() {
     return;
   }
 
-  /* ✅ EXACT 10 DIGIT */
+  // ✅ EXACT 10 DIGIT
   mobileError.style.display = "none";
 
   nameWrapper.style.display  = "block";
@@ -2739,6 +2725,7 @@ function checkCustomerByMobile() {
 
   if (orderTypeBox) orderTypeBox.style.display = "block";
 }
+
 
 
 let lastLookupMobile = "";
@@ -7293,6 +7280,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
