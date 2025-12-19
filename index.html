@@ -1074,7 +1074,14 @@ style="
 
 <!-- ⬅️ MOBILE ERROR MUST BE OUTSIDE mobileWrapper -->
 <div id="mobileError"
-     class="hidden mt-2 text-red-600 font-bold text-base">
+     style="
+       display:none;
+       color:#dc2626;
+       font-size:14px;
+       font-weight:700;
+       margin-top:6px;
+       line-height:1.4;
+     ">
   Please enter 10 digit mobile number
 </div>
 
@@ -2692,11 +2699,12 @@ function checkCustomerByMobile() {
   const err = document.getElementById("mobileError");
 
   if (mobile.length > 0 && mobile.length < 10) {
-    err.classList.remove("hidden");
+    err.style.display = "block";
   } else {
-    err.classList.add("hidden");
+    err.style.display = "none";
   }
 }
+
 
 
 
@@ -7252,6 +7260,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
