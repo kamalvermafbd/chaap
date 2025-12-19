@@ -3136,11 +3136,21 @@ if (paymentError) {
 
 
 
-  if (!/^[0-9]{10}$/.test(mobile)) {
-    alert("Enter a valid 10-digit mobile number");
-    window._orderLock = false;
-    return;
+  // ❌ BLOCK ORDER IF MOBILE INVALID (NO ALERT)
+if (!/^[0-9]{10}$/.test(mobile)) {
+  const hint = document.getElementById("mobileHint");
+  if (hint) {
+    hint.style.display = "block";
   }
+
+  // also hide dependent fields safely
+  const orderTypeBox = document.getElementById("orderTypeWrapper");
+  if (orderTypeBox) orderTypeBox.style.display = "none";
+
+  window._orderLock = false;
+  return;
+}
+
 
   // -----------------------------
 // FINAL GUEST VALIDATION (ORDER FLOW BASED)
@@ -3354,11 +3364,7 @@ if (mobileInput) {
 
     mobileInput.value = val;
      // STEP 1a: hide mobile error while typing
-    const mobileError = document.getElementById("mobileError");
-    if (mobileError) {
-      mobileError.innerText = "";
-      mobileError.classList.add("hidden");
-    }
+    
       // ✅ IMPORTANT: re-trigger logic after auto-fix
     if (mobileInput._internalTrigger) return;
 mobileInput._internalTrigger = true;
@@ -7309,6 +7315,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
