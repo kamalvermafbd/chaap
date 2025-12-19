@@ -5783,18 +5783,19 @@ function addFromMenu(itemId) {
   itemId = String(itemId);
 
   const addBtn  = document.getElementById("addBtn-" + itemId);
-  const qtyBox  = document.getElementById("qtyBox-" + itemId);
-  const qtyText = document.getElementById("qtyText-" + itemId);
+  const qtyBox  = document.getElementById("qtyBox-" + itemId + "_");
+  const qtyText = document.getElementById("qtyText-" + itemId + "_");
 
   if (addBtn) addBtn.classList.add("hidden");
   if (qtyBox) qtyBox.classList.remove("hidden");
   if (qtyText) qtyText.innerText = "1";
 
-  try { animateQty("qtyText-" + itemId); } catch(e){}
+  try { animateQty("qtyText-" + itemId + "_"); } catch(e){}
 
-  // MASTER ENGINE
+  // MASTER ENGINE (UNCHANGED)
   updateCart(itemId, "", "add");
 }
+
 
 function menuPlus(itemId) {
 
@@ -7336,6 +7337,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 </body>
 </html>
+
 
 
 
