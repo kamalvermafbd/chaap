@@ -2698,7 +2698,7 @@ function checkCustomerByMobile() {
   console.log("📱 checkCustomerByMobile fired");
 
   const mobile = document.getElementById("mobile").value.trim();
-  const mobileError = document.getElementById("mobileError");
+  const hint = document.getElementById("mobilehint");
 
   const orderTypeBox = document.getElementById("orderTypeWrapper");
 
@@ -2731,7 +2731,7 @@ function checkCustomerByMobile() {
   }
 
   /* ✅ EXACT 10 DIGIT */
-  mobileError.style.display = "none";
+ hint.style.display = "none";
 
   nameWrapper.style.display  = "block";
   emailWrapper.style.display = "block";
@@ -7292,6 +7292,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
