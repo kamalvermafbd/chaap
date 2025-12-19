@@ -669,6 +669,33 @@ body::before {
 .payment-btn:not(.active):hover {
   background-color: #fff7ed;
 }
+/* Drawer collapsed state */
+#cartDrawer.collapsed {
+  transform: translateX(92%);
+  transition: transform 0.3s ease;
+}
+/* Cart drawer handle */
+#cartHandle {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 70px;
+  background: #ff6f00;
+  color: #fff;
+  border-radius: 6px 0 0 6px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 99999;
+  box-shadow: -2px 0 6px rgba(0,0,0,0.2);
+}
+
+#cartHandle:hover {
+  background: #e65f00;
+}
 
   </style>
 </head>
@@ -5731,7 +5758,47 @@ function closeCartDrawer() {
 }
 
 
+window._drawerCollapsed = false;
+  
+function collapseDrawerCart() {
+  const drawer = document.getElementById("cartDrawer");
+  if (!drawer) return;
 
+  drawer.classList.add("collapsed");
+  document.body.style.overflow = "auto";
+
+  window._drawerCollapsed = true;
+}
+  
+function expandDrawerCart() {
+  const drawer = document.getElementById("cartDrawer");
+  if (!drawer) return;
+
+  drawer.classList.remove("collapsed");
+  document.body.style.overflow = "hidden";
+
+  window._drawerCollapsed = false;
+}
+
+function updateCartHandle() {
+  const handle = document.getElementById("cartHandle");
+  if (!handle) return;
+
+  handle.style.display = window._drawerCollapsed ? "flex" : "none";
+}
+
+// hook into existing functions
+const _collapseDrawerCart = collapseDrawerCart;
+collapseDrawerCart = function () {
+  _collapseDrawerCart();
+  updateCartHandle();
+};
+
+const _expandDrawerCart = expandDrawerCart;
+expandDrawerCart = function () {
+  _expandDrawerCart();
+  updateCartHandle();
+};
 
 function toggleCartDrawer() {
   const drawer = document.getElementById("cartDrawer");
@@ -7329,8 +7396,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 </script>
+
+  <div id="cartHandle" onclick="expandDrawerCart()">
+  ›
+</div>
+
+  
 </body>
 </html>
+
 
 
 
