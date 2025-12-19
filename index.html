@@ -5800,6 +5800,18 @@ expandDrawerCart = function () {
   updateCartHandle();
 };
 
+function isDrawerOpen() {
+  const drawer = document.getElementById("cartDrawer");
+  return drawer && !window._drawerCollapsed && drawer.classList.contains("active");
+}
+
+  function autoCollapseDrawerOnMenuInteraction() {
+  if (isDrawerOpen()) {
+    collapseDrawerCart();
+  }
+}
+
+  
 function toggleCartDrawer() {
   const drawer = document.getElementById("cartDrawer");
   if (drawer.classList.contains("active")) {
@@ -5845,7 +5857,7 @@ document.addEventListener("keydown", function(e) {
 });
 
 function addFromMenu(itemId, idx) {
-
+autoCollapseDrawerOnMenuInteraction();
   itemId = String(itemId);
 
   const addBtn  = document.getElementById(`addBtn-${itemId}-${idx}`);
@@ -5864,7 +5876,7 @@ function addFromMenu(itemId, idx) {
 
 
 function menuPlus(itemId, idx) {
-
+autoCollapseDrawerOnMenuInteraction();
   itemId = String(itemId);
 
   const qtyText = document.getElementById(`qtyText-${itemId}-${idx}`);
@@ -5880,7 +5892,7 @@ function menuPlus(itemId, idx) {
 
 
 function menuMinus(itemId, idx) {
-
+autoCollapseDrawerOnMenuInteraction();
   itemId = String(itemId);
 
   const qtyText = document.getElementById(`qtyText-${itemId}-${idx}`);
@@ -6183,7 +6195,7 @@ function hideCartOverlay() {
 
 
   function activateVariantSelector(itemId, variantId, unit, price, disc, idx) {
-
+autoCollapseDrawerOnMenuInteraction();
   itemId = String(itemId);
   variantId = String(variantId);
 
@@ -7404,6 +7416,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
 </body>
 </html>
+
 
 
 
