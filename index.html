@@ -4887,20 +4887,19 @@ item.itemId = String(
         ADD
       </button>
 
-     <!-- QTY BOX (Single only) -->
-<div id="qtyBox-${item.itemId}_" 
-     class="qtyBox hidden flex items-center justify-center gap-3 mt-2">
+      <!-- QTY BOX (Single only) -->
+      <div id="qtyBox-${item.itemId}" 
+           class="qtyBox hidden flex items-center justify-center gap-3 mt-2">
 
-  <button class="px-2 py-1 bg-gray-300 rounded text-lg"
-          onclick="menuMinus('${item.itemId}')">−</button>
+        <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+                onclick="menuMinus('${item.itemId}')">−</button>
 
-  <span id="qtyText-${item.itemId}_" class="font-semibold">1</span>
+        <span id="qtyText-${item.itemId}" class="font-semibold">1</span>
 
-  <button class="px-2 py-1 bg-gray-300 rounded text-lg"
-          onclick="menuPlus('${item.itemId}')">+</button>
+        <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+                onclick="menuPlus('${item.itemId}')">+</button>
 
-</div>
-
+      </div>
     `;
   } else {
     // Multi item → NO global ADD, only variant-wise qty using activateVariantSelector
@@ -5783,19 +5782,18 @@ function addFromMenu(itemId) {
   itemId = String(itemId);
 
   const addBtn  = document.getElementById("addBtn-" + itemId);
-  const qtyBox  = document.getElementById("qtyBox-" + itemId + "_");
-  const qtyText = document.getElementById("qtyText-" + itemId + "_");
+  const qtyBox  = document.getElementById("qtyBox-" + itemId);
+  const qtyText = document.getElementById("qtyText-" + itemId);
 
   if (addBtn) addBtn.classList.add("hidden");
   if (qtyBox) qtyBox.classList.remove("hidden");
   if (qtyText) qtyText.innerText = "1";
 
-  try { animateQty("qtyText-" + itemId + "_"); } catch(e){}
+  try { animateQty("qtyText-" + itemId); } catch(e){}
 
-  // 🔑 SINGLE ITEM → normalized variantId
-  updateCart(itemId, "_", "add");
+  // MASTER ENGINE
+  updateCart(itemId, "", "add");
 }
-
 
 function menuPlus(itemId) {
 
@@ -6700,19 +6698,18 @@ function variantMinus(itemId, variantId, idx) {
     // -------------------------
     // SINGLE ITEMS
     // -------------------------
-  if (!variantId) {
-  const addBtn  = document.getElementById("addBtn-" + itemId);
-  const qtyBox  = document.getElementById("qtyBox-" + itemId + "_");
-  const qtyText = document.getElementById("qtyText-" + itemId + "_");
+    if (!variantId) {
+      const addBtn  = document.getElementById("addBtn-" + itemId);
+      const qtyBox  = document.getElementById("qtyBox-" + itemId);
+      const qtyText = document.getElementById("qtyText-" + itemId);
 
-  if (addBtn && qtyBox && qtyText) {
-    addBtn.classList.add("hidden");
-    qtyBox.classList.remove("hidden");
-    qtyText.textContent = qty;
-  }
-  return;
-}
-
+      if (addBtn && qtyBox && qtyText) {
+        addBtn.classList.add("hidden");
+        qtyBox.classList.remove("hidden");
+        qtyText.textContent = qty;
+      }
+      return;
+    }
 
     // -------------------------
     // MULTI VARIANT ITEMS
@@ -7338,10 +7335,6 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 </body>
 </html>
-
-
-
-
 
 
 
