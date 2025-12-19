@@ -5763,6 +5763,14 @@ if (selectedCoupon && selectedCoupon.type === "onetime") {
   // 4) Update totals + badge
   try { updateDrawerTotals(); } catch(e){}
   try { updateCartBadge(); } catch(e){}
+
+   // ✅ Drawer state: OPEN
+  window._drawerCollapsed = false;
+
+  // hide arrow handle
+  const handle = document.getElementById("cartHandle");
+  if (handle) handle.style.display = "none";
+  
 }
 
 
@@ -5779,6 +5787,12 @@ function closeCartDrawer() {
   }
 
   document.body.style.overflow = "auto";
+    // ✅ Drawer state: COLLAPSED
+  window._drawerCollapsed = true;
+
+  // show arrow handle
+  const handle = document.getElementById("cartHandle");
+  if (handle) handle.style.display = "flex";
 }
 
 
@@ -7440,6 +7454,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
 </body>
 </html>
+
 
 
 
