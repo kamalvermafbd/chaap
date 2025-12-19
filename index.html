@@ -1449,6 +1449,22 @@ document.addEventListener("DOMContentLoaded", function() {
     setTimeout(clearNow, 100);
     setTimeout(clearNow, 300);
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  const menuWrapper = document.getElementById("menuWrapper");
+  if (!menuWrapper) return;
+
+  menuWrapper.addEventListener("click", function (e) {
+
+    // cart drawer already open hai?
+    if (isDrawerOpen()) {
+      collapseDrawerCart();
+    }
+
+  }, true); // capture phase = safe
+});
+
 document.addEventListener("DOMContentLoaded", function() {
     const s = document.getElementById("menuSearch");
     if (!s) return;
@@ -7416,6 +7432,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
 </body>
 </html>
+
 
 
 
