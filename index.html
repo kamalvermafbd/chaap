@@ -5792,8 +5792,8 @@ function addFromMenu(itemId) {
 
   try { animateQty("qtyText-" + itemId + "_"); } catch(e){}
 
-  // MASTER ENGINE (UNCHANGED)
-  updateCart(itemId, "", "add");
+  // 🔑 SINGLE ITEM → normalized variantId
+  updateCart(itemId, "_", "add");
 }
 
 
@@ -7337,6 +7337,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 </body>
 </html>
+
 
 
 
