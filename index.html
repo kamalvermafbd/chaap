@@ -1081,11 +1081,10 @@ style="
          focus:outline-none focus:ring-2 focus:ring-orange-500"
 />
 
-<p id="mobileError"
-   class="text-red-600 text-sm mt-1"
-   style="display:block">
-  Please enter 10 digit mobile number
-</p>
+<label id="mobileHint"
+       style="display:block; color:red; font-size:14px; margin-top:4px;">
+  Please enter 10 digit Mobile Number
+</label>
 
       </div>
       <!-- Order Type -->
@@ -2715,7 +2714,7 @@ function checkCustomerByMobile() {
   if (mobile.length !== 10) {
 
     // 🔴 red error always visible
-    mobileError.style.display = "block";
+    hint.style.display = "block";
 
     // hide everything else
     nameWrapper.style.display  = "none";
@@ -7293,6 +7292,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
