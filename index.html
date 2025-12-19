@@ -4881,25 +4881,25 @@ item.itemId = String(
   if (item.cat2 === "Single") {
     menuControls = `
       <!-- ADD BUTTON (Single only) -->
-      <button id="addBtn-${item.itemId}"
-              class="addBtn bg-[#ff6f00] text-white px-3 py-1 rounded font-semibold mt-2"
-              onclick="addFromMenu('${item.itemId}')">
-        ADD
-      </button>
+      <button id="addBtn-${item.itemId}-${idx}"
+        class="addBtn bg-[#ff6f00] text-white px-3 py-1 rounded font-semibold mt-2"
+        onclick="addFromMenu('${item.itemId}', ${idx})">
+  ADD
+</button>
 
-      <!-- QTY BOX (Single only) -->
-      <div id="qtyBox-${item.itemId}" 
-           class="qtyBox hidden flex items-center justify-center gap-3 mt-2">
+<div id="qtyBox-${item.itemId}-${idx}" 
+     class="qtyBox hidden flex items-center justify-center gap-3 mt-2">
 
-        <button class="px-2 py-1 bg-gray-300 rounded text-lg"
-                onclick="menuMinus('${item.itemId}')">−</button>
+  <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+          onclick="menuMinus('${item.itemId}', ${idx})">−</button>
 
-        <span id="qtyText-${item.itemId}" class="font-semibold">1</span>
+  <span id="qtyText-${item.itemId}-${idx}" class="font-semibold">1</span>
 
-        <button class="px-2 py-1 bg-gray-300 rounded text-lg"
-                onclick="menuPlus('${item.itemId}')">+</button>
+  <button class="px-2 py-1 bg-gray-300 rounded text-lg"
+          onclick="menuPlus('${item.itemId}', ${idx})">+</button>
 
-      </div>
+</div>
+
     `;
   } else {
     // Multi item → NO global ADD, only variant-wise qty using activateVariantSelector
@@ -5777,75 +5777,69 @@ document.addEventListener("keydown", function(e) {
   }
 });
 
-function addFromMenu(itemId) {
+function addFromMenu(itemId, idx) {
 
   itemId = String(itemId);
 
-  const addBtn  = document.getElementById("addBtn-" + itemId);
-  const qtyBox  = document.getElementById("qtyBox-" + itemId);
-  const qtyText = document.getElementById("qtyText-" + itemId);
+  const addBtn  = document.getElementById(`addBtn-${itemId}-${idx}`);
+  const qtyBox  = document.getElementById(`qtyBox-${itemId}-${idx}`);
+  const qtyText = document.getElementById(`qtyText-${itemId}-${idx}`);
 
   if (addBtn) addBtn.classList.add("hidden");
   if (qtyBox) qtyBox.classList.remove("hidden");
   if (qtyText) qtyText.innerText = "1";
 
-  try { animateQty("qtyText-" + itemId); } catch(e){}
+  try { animateQty(`qtyText-${itemId}-${idx}`); } catch(e){}
 
-  // MASTER ENGINE
+  // MASTER ENGINE (UNCHANGED)
   updateCart(itemId, "", "add");
 }
 
-function menuPlus(itemId) {
+
+function menuPlus(itemId, idx) {
 
   itemId = String(itemId);
 
-  const qtyText = document.getElementById("qtyText-" + itemId);
+  const qtyText = document.getElementById(`qtyText-${itemId}-${idx}`);
   if (!qtyText) return;
 
   let q = Number(qtyText.innerText) + 1;
   qtyText.innerText = q;
 
-  try { animateQty("qtyText-" + itemId); } catch(e){}
+  try { animateQty(`qtyText-${itemId}-${idx}`); } catch(e){}
 
-  // MASTER ENGINE
   updateCart(itemId, "", "add");
 }
 
-function menuMinus(itemId) {
+
+function menuMinus(itemId, idx) {
 
   itemId = String(itemId);
 
-  const qtyText = document.getElementById("qtyText-" + itemId);
-  const qtyBox  = document.getElementById("qtyBox-" + itemId);
-  const addBtn  = document.getElementById("addBtn-" + itemId);
+  const qtyText = document.getElementById(`qtyText-${itemId}-${idx}`);
+  const qtyBox  = document.getElementById(`qtyBox-${itemId}-${idx}`);
+  const addBtn  = document.getElementById(`addBtn-${itemId}-${idx}`);
 
   if (!qtyText) return;
 
   let q = Number(qtyText.innerText);
 
-  // If qty is 1 → this press means remove
   if (q === 1) {
-
     qtyText.innerText = "0";
-
     if (qtyBox) qtyBox.classList.add("hidden");
     if (addBtn) addBtn.classList.remove("hidden");
-
-    // MASTER ENGINE remove
     updateCart(itemId, "", "dec");
-
     return;
   }
 
-  // Normal decrement
   q--;
   qtyText.innerText = q;
 
-  try { animateQty("qtyText-" + itemId); } catch(e){}
+  try { animateQty(`qtyText-${itemId}-${idx}`); } catch(e){}
 
-  // MASTER ENGINE
   updateCart(itemId, "", "dec");
 }
+
 
 
 function menuMinus_multi(id) {
@@ -7335,6 +7329,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 </body>
 </html>
+
 
 
 
