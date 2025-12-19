@@ -3348,6 +3348,8 @@ console.log("🚀 ORDER PAYLOAD TO BACKEND:", JSON.stringify(orderData, null, 2)
   apiPost("placeOrder", orderData)
     .then(res => {
       if (res.success) {
+           overlay.style.display = "none";
+    window._orderLock = false;
         alert(
           `Order placed successfully!\nYour Order Number: ${res.orderNumber}\n\n${res.message}`
         );
@@ -7438,6 +7440,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
 </body>
 </html>
+
 
 
 
