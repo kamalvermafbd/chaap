@@ -2700,32 +2700,45 @@ function onMobileChanged() {
   guestAutoFilling   = false;
 }
 
-    
-function checkCustomerByMobile() {
-  console.log("📱 checkCustomerByMobile fired");
-
+ function checkCustomerByMobile() {
   const mobile = document.getElementById("mobile").value.trim();
-  const hint = document.getElementById("mobileHint"); // ✅ correct id
+  const hint = document.getElementById("mobileHint");
 
+  const orderType = document.getElementById("orderType");
   const orderTypeBox = document.getElementById("orderTypeWrapper");
 
-  const nameWrapper  = document.getElementById("customerName").parentElement;
-  const emailWrapper = document.getElementById("email").parentElement;
+  const nameInput  = document.getElementById("customerName");
+  const emailInput = document.getElementById("email");
+
+  const nameWrapper  = nameInput.parentElement;
+  const emailWrapper = emailInput.parentElement;
 
   const addressWrapper = document.getElementById("addressWrapper");
   const pincodeWrapper = document.getElementById("pincodeWrapper");
   const cityWrapper    = document.getElementById("cityWrapper");
   const stateWrapper   = document.getElementById("stateWrapper");
 
-  // 🔴 0–9 digits → show hint + hide rest
-  if (mobile.length > 0 && mobile.length < 10) {
+  /* ❌ MOBILE < 10 DIGITS */
+  if (mobile.length < 10) {
 
-    if (hint) hint.style.display = "block";
+    // 🔴 hint show
+    hint.style.display = "block";
+
+    // ⛔ RESET ORDER TYPE
+    if (orderType) orderType.value = "";
+    if (orderTypeBox) orderTypeBox.style.display = "none";
+
+    // ⛔ CLEAR + HIDE OTHER FIELDS
+    nameInput.value  = "";
+    emailInput.value = "";
 
     nameWrapper.style.display  = "none";
     emailWrapper.style.display = "none";
 
-    if (orderTypeBox) orderTypeBox.style.display = "none";
+    document.getElementById("address").value = "";
+    document.getElementById("pincode").value = "";
+    document.getElementById("city").value    = "";
+    document.getElementById("state").value   = "";
 
     addressWrapper.style.display = "none";
     pincodeWrapper.style.display = "none";
@@ -2735,22 +2748,15 @@ function checkCustomerByMobile() {
     return;
   }
 
-  // 🟢 exactly 10 digits → hide hint + show flow
-  if (mobile.length === 10) {
+  /* ✅ MOBILE = 10 DIGITS */
+  hint.style.display = "none";
 
-    if (hint) hint.style.display = "none";
+  // show order type only
+  if (orderTypeBox) orderTypeBox.style.display = "block";
 
-    nameWrapper.style.display  = "block";
-    emailWrapper.style.display = "block";
-
-    if (orderTypeBox) orderTypeBox.style.display = "block";
-  }
-
-  // 🧊 empty input → just show hint, nothing else
-  if (mobile.length === 0) {
-    if (hint) hint.style.display = "block";
-  }
+  // name/email will appear AFTER orderType selection
 }
+
 
 let lastLookupMobile = "";
 let lastLookupOrderType = "";
@@ -7304,6 +7310,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
