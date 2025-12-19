@@ -6700,18 +6700,19 @@ function variantMinus(itemId, variantId, idx) {
     // -------------------------
     // SINGLE ITEMS
     // -------------------------
-    if (!variantId) {
-      const addBtn  = document.getElementById("addBtn-" + itemId);
-      const qtyBox  = document.getElementById("qtyBox-" + itemId);
-      const qtyText = document.getElementById("qtyText-" + itemId);
+  if (!variantId) {
+  const addBtn  = document.getElementById("addBtn-" + itemId);
+  const qtyBox  = document.getElementById("qtyBox-" + itemId + "_");
+  const qtyText = document.getElementById("qtyText-" + itemId + "_");
 
-      if (addBtn && qtyBox && qtyText) {
-        addBtn.classList.add("hidden");
-        qtyBox.classList.remove("hidden");
-        qtyText.textContent = qty;
-      }
-      return;
-    }
+  if (addBtn && qtyBox && qtyText) {
+    addBtn.classList.add("hidden");
+    qtyBox.classList.remove("hidden");
+    qtyText.textContent = qty;
+  }
+  return;
+}
+
 
     // -------------------------
     // MULTI VARIANT ITEMS
@@ -7337,6 +7338,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 </body>
 </html>
+
 
 
 
