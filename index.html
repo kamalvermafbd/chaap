@@ -834,11 +834,13 @@ style="
   
 <button onclick="openCheckout()" class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg"> Checkout </button> </div> 
 
-<button onclick="openCartDrawer(); event.stopPropagation();" 
-  style="position:absolute; right:160px; top:60px; background:#ff6347; color:white;
-  padding:8px 12px; border-radius:6px; border:none;">
+<button id="viewCartBtn"
+        onclick="openCartDrawer()"
+        style="position:absolute; right:160px; top:60px; background:#ff6347; color:white;
+               padding:8px 12px; border-radius:6px; border:none;">
   View Cart (<span id="cartCount">0</span>)
 </button>
+
 
   
 
@@ -1464,14 +1466,19 @@ document.addEventListener("DOMContentLoaded", function () {
   const menuWrapper = document.getElementById("menuWrapper");
   if (!menuWrapper) return;
 
-  menuWrapper.addEventListener("click", function (e) {
+ menuWrapper.addEventListener("click", function (e) {
 
-    // cart drawer already open hai?
-    if (isDrawerOpen()) {
-      collapseDrawerCart();
-    }
+  // 🚫 View Cart pe drawer collapse mat karo
+  if (e.target.closest("#viewCartBtn")) {
+    return;
+  }
 
-  }, true); // capture phase = safe
+  if (isDrawerOpen()) {
+    collapseDrawerCart();
+  }
+
+}, true);
+
 });
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -7427,24 +7434,23 @@ function updateGuestFieldsVisibility() {
 
 document.addEventListener("DOMContentLoaded", function () {
 
-  const buttons = document.querySelectorAll(".payment-btn");
+  const menuWrapper = document.getElementById("menuWrapper");
+  if (!menuWrapper) return;
 
-  buttons.forEach(btn => {
-    btn.addEventListener("click", function () {
+  menuWrapper.addEventListener("click", function (e) {
 
-      // sab se active hatao
-      buttons.forEach(b => b.classList.remove("active"));
+    // 🚫 View Cart pe drawer collapse mat karo
+    if (e.target.closest("#viewCartBtn")) {
+      return;
+    }
 
-      // jispe click hua usko active banao
-      this.classList.add("active");
+    if (isDrawerOpen()) {
+      collapseDrawerCart();
+    }
 
-      // hidden input set (placeOrder safe)
-      document.getElementById("paymentMethod").value = this.dataset.value;
-
-    });
-  });
-
+  }, true); // capture phase
 });
+
 
 
 
@@ -7457,6 +7463,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
 </body>
 </html>
+
 
 
 
