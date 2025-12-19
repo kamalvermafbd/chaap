@@ -2710,8 +2710,8 @@ function onMobileChanged() {
   const nameInput  = document.getElementById("customerName");
   const emailInput = document.getElementById("email");
 
-  const nameWrapper  = nameInput.parentElement;
-  const emailWrapper = emailInput.parentElement;
+  const nameWrapper  = nameInput.closest("div");
+  const emailWrapper = emailInput.closest("div");
 
   const addressWrapper = document.getElementById("addressWrapper");
   const pincodeWrapper = document.getElementById("pincodeWrapper");
@@ -2728,13 +2728,14 @@ function onMobileChanged() {
     if (orderType) orderType.value = "";
     if (orderTypeBox) orderTypeBox.style.display = "none";
 
-    // ⛔ CLEAR + HIDE OTHER FIELDS
+    // ⛔ CLEAR + HIDE NAME / EMAIL
     nameInput.value  = "";
     emailInput.value = "";
 
     nameWrapper.style.display  = "none";
     emailWrapper.style.display = "none";
 
+    // ⛔ CLEAR + HIDE ADDRESS BLOCK
     document.getElementById("address").value = "";
     document.getElementById("pincode").value = "";
     document.getElementById("city").value    = "";
@@ -2751,10 +2752,8 @@ function onMobileChanged() {
   /* ✅ MOBILE = 10 DIGITS */
   hint.style.display = "none";
 
-  // show order type only
+  // show only order type
   if (orderTypeBox) orderTypeBox.style.display = "block";
-
-  // name/email will appear AFTER orderType selection
 }
 
 
@@ -7310,6 +7309,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
