@@ -642,6 +642,14 @@ body::before {
   margin-top: 4px;
 }
 
+/* show error ONLY when invalid AND user typed */
+#mobile:not(:focus):invalid ~ .mobile-error,
+#mobile:focus:invalid ~ .mobile-error {
+  display: block;
+}
+ #mobile.valid + #mobileError {
+    display: none;
+ }
   </style>
 </head>
 <body>
@@ -1057,41 +1065,29 @@ style="
 
     <form id="checkoutForm" class="space-y-1.5">
 
-    <div id="mobileWrapper" class="w-full">
+      <!-- Mobile -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Mobile</label>
+      <input
+  id="mobile"
+  type="tel"
+  inputmode="numeric"
+  maxlength="10"
+  pattern="[0-9]{10}"
+  placeholder="Enter 10-digit Mobile"
+  required
+  oninput="checkCustomerByMobile()"
+  class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
+         focus:outline-none focus:ring-2 focus:ring-orange-500"
+/>
 
-  <label class="block text-sm font-medium text-gray-700 mb-1">Mobile</label>
-
-  <input
-    id="mobile"
-    type="tel"
-    maxlength="10"
-    placeholder="Enter 10-digit Mobile"
-    oninput="checkCustomerByMobile()"
-    class="w-full border border-gray-300 rounded-lg p-2.5"
-  />
-
-</div>
-<label id="mobileHint"
-       style="display:block; color:red; font-size:14px; margin-top:4px;">
+<p id="mobileError"
+   class="text-red-600 text-sm mt-1"
+   style="display:block">
   Please enter 10 digit mobile number
-</label>
+</p>
 
-<!-- ⬅️ MOBILE ERROR MUST BE OUTSIDE mobileWrapper -->
-<div id="mobileError"
-     style="
-       display:none;
-       color:#dc2626;
-       font-size:14px;
-       font-weight:700;
-       margin-top:6px;
-       line-height:1.4;
-     ">
-  Please enter 10 digit mobile number
-</div>
-
-
-
-
+      </div>
       <!-- Order Type -->
       <div id="orderTypeWrapper">
         <label class="block text-sm font-medium text-gray-700 mb-1">Order Type</label>
@@ -2698,18 +2694,51 @@ function onMobileChanged() {
   guestAutoFilling   = false;
 }
 
+    
 function checkCustomerByMobile() {
+  console.log("📱 checkCustomerByMobile fired");
+
   const mobile = document.getElementById("mobile").value.trim();
-  const hint = document.getElementById("mobileHint");
+  const mobileError = document.getElementById("mobileError");
 
-  if (mobile.length === 10) {
-    hint.style.display = "none";
-  } else {
-    hint.style.display = "block";
+  const orderTypeBox = document.getElementById("orderTypeWrapper");
+
+  const nameWrapper  = document.getElementById("customerName").parentElement;
+  const emailWrapper = document.getElementById("email").parentElement;
+
+  const addressWrapper = document.getElementById("addressWrapper");
+  const pincodeWrapper = document.getElementById("pincodeWrapper");
+  const cityWrapper    = document.getElementById("cityWrapper");
+  const stateWrapper   = document.getElementById("stateWrapper");
+
+  /* ❌ NOT EXACT 10 DIGIT */
+  if (mobile.length !== 10) {
+
+    // 🔴 red error always visible
+    mobileError.style.display = "block";
+
+    // hide everything else
+    nameWrapper.style.display  = "none";
+    emailWrapper.style.display = "none";
+
+    if (orderTypeBox) orderTypeBox.style.display = "none";
+
+    addressWrapper.style.display = "none";
+    pincodeWrapper.style.display = "none";
+    cityWrapper.style.display    = "none";
+    stateWrapper.style.display   = "none";
+
+    return;
   }
+
+  /* ✅ EXACT 10 DIGIT */
+  mobileError.style.display = "none";
+
+  nameWrapper.style.display  = "block";
+  emailWrapper.style.display = "block";
+
+  if (orderTypeBox) orderTypeBox.style.display = "block";
 }
-
-
 
 
 let lastLookupMobile = "";
@@ -7264,68 +7293,6 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
