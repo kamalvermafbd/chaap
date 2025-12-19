@@ -3117,8 +3117,10 @@ console.log("🔒 orderLock before:", window._orderLock);
   const orderType = document.getElementById('orderType').value;
   const address = document.getElementById('address').value.trim();
   const paymentMethod = document.getElementById('paymentMethod').value;
-// STEP-2A: Ensure guest fields visibility before validation
-  console.log("📦 orderType:", orderType);
+
+  const pincode = document.getElementById("pincode")?.value.trim() || "";
+  const city    = document.getElementById("city")?.value.trim() || "";
+  const state   = document.getElementById("state")?.value.trim() || "";
 
 
 
@@ -3279,7 +3281,10 @@ if (orderType === "Home Delivery" && !address) {
       ? (selectedCoupon.flat
           ? selectedCoupon.flat
           : ((selectedCoupon.discount / 100) * Number(dt.baseTotal || 0)))
-      : 0
+      : 0,
+    pincode,
+  city,
+  state
   };
 console.log("🚀 ORDER PAYLOAD TO BACKEND:", JSON.stringify(orderData, null, 2));
 
@@ -7330,6 +7335,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 </body>
 </html>
+
 
 
 
