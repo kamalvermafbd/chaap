@@ -5651,51 +5651,51 @@ async function openCheckout() {
   // ✅ 0️⃣ FIRST — close drawer cart
   closeCartDrawer();
 
-  // 🔒 ADD THIS (VERY IMPORTANT)
+  // 🔒 Lock background scroll
   document.body.style.overflow = "hidden";
 
-  // Always use master cart (NO backend calls)
   const freshCart = getCart();
-
   cart = freshCart;
   window.cart = freshCart;
 
   if (freshCart.length === 0) {
     alert("Your cart is empty!");
-    document.body.style.overflow = ""; // safety
+    document.body.style.overflow = "";
     return;
   }
 
-  // Autofill + UI setup
+  // Autofill + reset
   autofillMobileForLoggedIn();
   resetCheckoutFieldsDefault();
   document.getElementById("orderType").value = "";
-  // 🔑 FORCE restore guest fields immediately
-
 
   setupAddressUIVisibility();
   loadPrimaryAddress();
 
-  // Build checkout items
   refreshCheckout();
-  // 🔴 IMPORTANT: hide Change Address by default
   document.getElementById("changeAddressBtn")?.classList.add("hidden");
 
-  // ✅ LAST — open checkout modal
+  // ✅ Open modal
   const modal = document.getElementById("checkoutModal");
   modal.style.display = "flex";
+
+  // 🔒 FIX: Logged-in user → hide mobile hint
+  if (isLoggedIn()) {
+    const hint = document.getElementById("mobileHint");
+    if (hint) hint.style.display = "none";
+  }
+
+  // 🔁 Restore correct UI AFTER modal open
   setTimeout(() => {
     updateGuestFieldsVisibility();
-  }, 0);
-  // 🔁 RE-APPLY UI if order type already selected
-setTimeout(() => {
-  const orderType = document.getElementById("orderType")?.value;
-  if (orderType) {
-    toggleAddressField();
-  }
-}, 0);
 
+    const orderType = document.getElementById("orderType")?.value;
+    if (orderType) {
+      toggleAddressField();
+    }
+  }, 0);
 }
+
 
 
 
@@ -7440,6 +7440,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
 </body>
 </html>
+
 
 
 
