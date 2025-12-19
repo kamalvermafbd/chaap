@@ -7304,11 +7304,33 @@ function updateGuestFieldsVisibility() {
   }
 }
 
+document.addEventListener("DOMContentLoaded", function () {
+
+  const buttons = document.querySelectorAll(".payment-btn");
+
+  buttons.forEach(btn => {
+    btn.addEventListener("click", function () {
+
+      // sab se active hatao
+      buttons.forEach(b => b.classList.remove("active"));
+
+      // jispe click hua usko active banao
+      this.classList.add("active");
+
+      // hidden input set (placeOrder safe)
+      document.getElementById("paymentMethod").value = this.dataset.value;
+
+    });
+  });
+
+});
+
 
 
 </script>
 </body>
 </html>
+
 
 
 
