@@ -6689,21 +6689,23 @@ function variantMinus(itemId, variantId, idx) {
     const variantId = String(ci.variantId || "");
     const qty = Number(ci.qty || 1);
 
-    // -------------------------
-    // SINGLE ITEMS
-    // -------------------------
-    if (!variantId) {
-      const addBtn  = document.getElementById("addBtn-" + itemId);
-      const qtyBox  = document.getElementById("qtyBox-" + itemId);
-      const qtyText = document.getElementById("qtyText-" + itemId);
+// SINGLE ITEMS (FIXED)
+// -------------------------
+if (!variantId) {
 
-      if (addBtn && qtyBox && qtyText) {
-        addBtn.classList.add("hidden");
-        qtyBox.classList.remove("hidden");
-        qtyText.textContent = qty;
-      }
-      return;
-    }
+  const boxes = document.querySelectorAll(`div[id^="qtyBox-${itemId}-"]`);
+  const texts = document.querySelectorAll(`span[id^="qtyText-${itemId}-"]`);
+  const btns  = document.querySelectorAll(`button[id^="addBtn-${itemId}-"]`);
+
+  boxes.forEach(b => b.classList.remove("hidden"));
+  btns.forEach(b => b.classList.add("hidden"));
+
+  texts.forEach(t => {
+    t.textContent = qty;
+  });
+
+  return;
+}
 
     // -------------------------
     // MULTI VARIANT ITEMS
@@ -7329,6 +7331,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 </body>
 </html>
+
 
 
 
