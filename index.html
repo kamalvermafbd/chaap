@@ -650,6 +650,26 @@ body::before {
  #mobile.valid + #mobileError {
     display: none;
  }
+
+    /* Payment buttons base fix */
+.payment-btn {
+  background-color: #ffffff;
+  color: #111827;
+  font-weight: 600;
+}
+
+/* ✅ THIS IS THE MAIN FIX */
+.payment-btn.active {
+  background-color: #f97316;   /* Place Order orange */
+  color: #ffffff;
+  border-color: #f97316;
+}
+
+/* Optional hover (non-selected only) */
+.payment-btn:not(.active):hover {
+  background-color: #fff7ed;
+}
+
   </style>
 </head>
 <body>
@@ -7289,6 +7309,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
