@@ -834,12 +834,12 @@ style="
   
 <button onclick="openCheckout()" class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg"> Checkout </button> </div> 
 
-<button id="viewCartBtn"
-        onclick="openCartDrawer()"
+<button onclick="openCartDrawer()"
         style="position:absolute; right:160px; top:60px; background:#ff6347; color:white;
                padding:8px 12px; border-radius:6px; border:none;">
   View Cart (<span id="cartCount">0</span>)
 </button>
+
 
 
   
@@ -1468,8 +1468,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
  menuWrapper.addEventListener("click", function (e) {
 
-  // 🚫 View Cart pe drawer collapse mat karo
-  if (e.target.closest("#viewCartBtn")) {
+  // ✅ sirf menu item card pe click pe collapse
+  if (!e.target.closest(".menu-card")) {
     return;
   }
 
@@ -1477,7 +1477,8 @@ document.addEventListener("DOMContentLoaded", function () {
     collapseDrawerCart();
   }
 
-}, true);
+}, false); // 🔥 BUBBLE PHASE ONLY
+
 
 });
 
@@ -7463,6 +7464,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
 </body>
 </html>
+
 
 
 
