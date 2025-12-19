@@ -1071,6 +1071,10 @@ style="
   />
 
 </div>
+<label id="mobileHint"
+       style="display:block; color:red; font-size:14px; margin-top:4px;">
+  Please enter 10 digit mobile number
+</label>
 
 <!-- ⬅️ MOBILE ERROR MUST BE OUTSIDE mobileWrapper -->
 <div id="mobileError"
@@ -2696,12 +2700,12 @@ function onMobileChanged() {
 
 function checkCustomerByMobile() {
   const mobile = document.getElementById("mobile").value.trim();
-  const err = document.getElementById("mobileError");
+  const hint = document.getElementById("mobileHint");
 
-  if (mobile.length > 0 && mobile.length < 10) {
-    err.style.display = "block";
+  if (mobile.length === 10) {
+    hint.style.display = "none";
   } else {
-    err.style.display = "none";
+    hint.style.display = "block";
   }
 }
 
@@ -7260,6 +7264,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
