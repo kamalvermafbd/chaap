@@ -2698,7 +2698,7 @@ function checkCustomerByMobile() {
   console.log("📱 checkCustomerByMobile fired");
 
   const mobile = document.getElementById("mobile").value.trim();
-  const hint = document.getElementById("mobilehint");
+  const hint = document.getElementById("mobileHint"); // ✅ correct id
 
   const orderTypeBox = document.getElementById("orderTypeWrapper");
 
@@ -2710,13 +2710,11 @@ function checkCustomerByMobile() {
   const cityWrapper    = document.getElementById("cityWrapper");
   const stateWrapper   = document.getElementById("stateWrapper");
 
-  /* ❌ NOT EXACT 10 DIGIT */
-  if (mobile.length !== 10) {
+  // 🔴 0–9 digits → show hint + hide rest
+  if (mobile.length > 0 && mobile.length < 10) {
 
-    // 🔴 red error always visible
-    hint.style.display = "block";
+    if (hint) hint.style.display = "block";
 
-    // hide everything else
     nameWrapper.style.display  = "none";
     emailWrapper.style.display = "none";
 
@@ -2730,15 +2728,22 @@ function checkCustomerByMobile() {
     return;
   }
 
-  /* ✅ EXACT 10 DIGIT */
- hint.style.display = "none";
+  // 🟢 exactly 10 digits → hide hint + show flow
+  if (mobile.length === 10) {
 
-  nameWrapper.style.display  = "block";
-  emailWrapper.style.display = "block";
+    if (hint) hint.style.display = "none";
 
-  if (orderTypeBox) orderTypeBox.style.display = "block";
+    nameWrapper.style.display  = "block";
+    emailWrapper.style.display = "block";
+
+    if (orderTypeBox) orderTypeBox.style.display = "block";
+  }
+
+  // 🧊 empty input → just show hint, nothing else
+  if (mobile.length === 0) {
+    if (hint) hint.style.display = "block";
+  }
 }
-
 
 let lastLookupMobile = "";
 let lastLookupOrderType = "";
@@ -7292,6 +7297,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
