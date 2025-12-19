@@ -3222,32 +3222,6 @@ if (orderType === "Home Delivery" && !address) {
   addressError.classList.add("hidden");
 }
 
-  if (
-  /^[0-9]{10}$/.test(mobile) &&
-  paymentMethod &&
-    customerName &&          
-  email &&    
-  !window._customerLookupDone &&
-  (
-    orderType !== "Home Delivery" ||
-    address
-  )
-) {
-
-  const lookupOverlay = document.getElementById("loadingOverlay");
-  lookupOverlay.innerText = "Fetching your details...";
-  lookupOverlay.style.display = "flex";
-
-  window._customerLookupDone = true; // 🔒 run only once
-
-  lookupCustomerByMobile(mobile)
-  .finally(() => {
-    if (!window._orderSubmitting) {
-      lookupOverlay.style.display = "none";
-    }
-  });
-
-}
 
 // clear error if valid
 
@@ -7315,6 +7289,7 @@ function updateGuestFieldsVisibility() {
 </script>
 </body>
 </html>
+
 
 
 
