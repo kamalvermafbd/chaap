@@ -6590,16 +6590,20 @@ async function applyCoupon(couponId) {
 
   // 🔄 SHOW COUPON PROCESSING
   const loadingText = document.getElementById("offerLoadingText");
+  const offerList = document.getElementById("offerList");
   if (loadingText) {
     loadingText.innerText = "Applying coupon… please wait";
     loadingText.style.display = "block";
+     loadingText.style.color = "#dc2626";       // 🔴 red
+  loadingText.style.fontSize = "16px";        // bigger
+  loadingText.style.fontWeight = "600";       // bold
   }
-
+if (offerList) {
+  offerList.style.display = "none";           // 👈 hide list while applying
+}
   // 🔑 1️⃣ Fresh backend truth
   await fetchOffersFromBackend();
 
-  // 🔑 1️⃣ Fresh backend truth
-  await fetchOffersFromBackend();
 
   const offers = window.liveOffers || [];
 
@@ -7566,6 +7570,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
