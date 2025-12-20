@@ -6548,7 +6548,10 @@ async function applyCoupon(couponId) {
 // 🔒 ONETIME COUPON CHECK (minimal)
 if (o.type === "onetime") {
 
-  const mobile = document.getElementById("mobile")?.value || "";
+ const mobile =
+  localStorage.getItem("userMobile") ||
+  document.getElementById("mobile")?.value ||
+  "";
 
   // backend se check: is user ne ye coupon pehle use kiya?
   const used = await apiGet("hasUsedCoupon", {
@@ -7495,6 +7498,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
