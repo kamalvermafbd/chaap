@@ -6588,12 +6588,17 @@ let alreadyAppliedCouponId = "";  // coupon ID (restore + protection)
 
 async function applyCoupon(couponId) {
 
+async function applyCoupon(couponId) {
+
   // 🔄 SHOW COUPON PROCESSING
-const couponStatus = document.getElementById("couponStatus");
-if (couponStatus) {
-  couponStatus.innerText = "Applying coupon… please wait";
-  couponStatus.classList.remove("hidden");
-}
+  const loadingText = document.getElementById("offerLoadingText");
+  if (loadingText) {
+    loadingText.innerText = "Applying coupon… please wait";
+    loadingText.style.display = "block";
+  }
+
+  // 🔑 1️⃣ Fresh backend truth
+  await fetchOffersFromBackend();
 
   // 🔑 1️⃣ Fresh backend truth
   await fetchOffersFromBackend();
@@ -7563,6 +7568,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
