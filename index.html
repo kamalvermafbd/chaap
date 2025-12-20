@@ -6545,6 +6545,22 @@ async function applyCoupon(couponId) {
     showCouponError("This promotional offer is no longer available.");
     return;
   }
+// 🔒 ONETIME COUPON CHECK (minimal)
+if (o.type === "onetime") {
+
+  const mobile = document.getElementById("mobile")?.value || "";
+
+  // backend se check: is user ne ye coupon pehle use kiya?
+  const used = await apiGet("hasUsedCoupon", {
+    mobile,
+    couponId
+  });
+
+  if (used === true) {
+    showCouponError("This promotional offer has already been used.");
+    return;
+  }
+}
 
   // calculate subtotal
   const subtotal = getCart().reduce((sum, ci) => {
@@ -7479,6 +7495,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
