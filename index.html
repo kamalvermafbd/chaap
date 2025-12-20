@@ -3236,7 +3236,10 @@ if (selectedCoupon && selectedCoupon.type === "onetime") {
 
   // ❗ ONLY THIS CONDITION MATTERS
   if (check && check.success === true) {
-    alert("❌ This coupon has already been used.");
+    alert(
+  `❌ The coupon "${couponLabel}" has already been used.\n\n` +
+  `Please go back and remove this coupon to continue.`
+);
     window._orderLock = false;
     return; // ⛔ HARD STOP
   }
@@ -7518,6 +7521,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
