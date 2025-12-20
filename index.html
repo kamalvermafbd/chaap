@@ -834,11 +834,12 @@ style="
   
 <button onclick="openCheckout()" class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg"> Checkout </button> </div> 
 
-<button onclick="openCartDrawer()"
+<button onclick="onViewCartClick()"
         style="position:absolute; right:160px; top:60px; background:#ff6347; color:white;
                padding:8px 12px; border-radius:6px; border:none;">
   View Cart (<span id="cartCount">0</span>)
 </button>
+
 
 
 
@@ -5783,6 +5784,15 @@ if (selectedCoupon && selectedCoupon.type === "onetime") {
   if (handle) handle.style.display = "none";
   
 }
+function onViewCartClick() {
+  const drawer = document.getElementById("cartDrawer");
+
+  // agar already open hai → kuch mat karo
+  if (drawer && drawer.classList.contains("active")) return;
+
+  // warna purana trusted open call
+  openCartDrawer();
+}
 
 
 function closeCartDrawer() {
@@ -7464,6 +7474,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
 </body>
 </html>
+
 
 
 
