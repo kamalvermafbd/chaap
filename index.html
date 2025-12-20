@@ -6598,6 +6598,9 @@ async function applyCoupon(couponId) {
   loadingText.style.fontSize = "16px";        // bigger
   loadingText.style.fontWeight = "600";       // bold
   }
+  if (loadingText) {
+  loadingText.style.display = "none";
+}
 if (offerList) {
   offerList.style.pointerEvents = "none"; // disable clicks
   offerList.style.opacity = "0.6";        // visual feedback
@@ -7572,6 +7575,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
