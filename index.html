@@ -834,15 +834,9 @@ style="
   
 <button onclick="openCheckout()" class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg"> Checkout </button> </div> 
 
-<button onclick="onViewCartClick()"
-        style="position:absolute; right:160px; top:60px; background:#ff6347; color:white;
-               padding:8px 12px; border-radius:6px; border:none;">
-  View Cart (<span id="cartCount">0</span>)
-</button>
-
-
-
-
+<button onclick="openCartDrawer()" 
+  style="position:absolute; right:160px; top:60px; background:#ff6347; color:white;
+  padding:8px 12px; border-radius:6px; border:none;"> View Cart (<span id="cartCount">0</span>) </button>
   
 
  <!-- HAMBURGER BUTTON (appears only after login) -->
@@ -1467,20 +1461,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const menuWrapper = document.getElementById("menuWrapper");
   if (!menuWrapper) return;
 
- menuWrapper.addEventListener("click", function (e) {
+  menuWrapper.addEventListener("click", function (e) {
 
-  // ✅ sirf menu item card pe click pe collapse
-  if (!e.target.closest(".menu-card")) {
-    return;
-  }
+    // cart drawer already open hai?
+    if (isDrawerOpen()) {
+      collapseDrawerCart();
+    }
 
-  if (isDrawerOpen()) {
-    collapseDrawerCart();
-  }
-
-}, false); // 🔥 BUBBLE PHASE ONLY
-
-
+  }, true); // capture phase = safe
 });
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -5712,7 +5700,7 @@ async function openCheckout() {
 
 
 async function openCartDrawer() {
- 
+ closeCheckout();
   //  OPEN DRAWER INSTANTLY (NO DELAY)
   document.getElementById("cartBackdrop").classList.add("active");
   document.getElementById("cartDrawer").classList.add("active");
@@ -5775,23 +5763,6 @@ if (selectedCoupon && selectedCoupon.type === "onetime") {
   // 4) Update totals + badge
   try { updateDrawerTotals(); } catch(e){}
   try { updateCartBadge(); } catch(e){}
-
-   // ✅ Drawer state: OPEN
-  window._drawerCollapsed = false;
-
-  // hide arrow handle
-  const handle = document.getElementById("cartHandle");
-  if (handle) handle.style.display = "none";
-  
-}
-function onViewCartClick() {
-  const drawer = document.getElementById("cartDrawer");
-
-  // agar already open hai → kuch mat karo
-  if (drawer && drawer.classList.contains("active")) return;
-
-  // warna purana trusted open call
-  openCartDrawer();
 }
 
 
@@ -5808,12 +5779,6 @@ function closeCartDrawer() {
   }
 
   document.body.style.overflow = "auto";
-    // ✅ Drawer state: COLLAPSED
-  window._drawerCollapsed = true;
-
-  // show arrow handle
-  const handle = document.getElementById("cartHandle");
-  if (handle) handle.style.display = "flex";
 }
 
 
@@ -5829,7 +5794,15 @@ function collapseDrawerCart() {
   window._drawerCollapsed = true;
 }
   
+function expandDrawerCart() {
+  const drawer = document.getElementById("cartDrawer");
+  if (!drawer) return;
 
+  drawer.classList.remove("collapsed");
+  document.body.style.overflow = "hidden";
+
+  window._drawerCollapsed = false;
+}
 
 function updateCartHandle() {
   const handle = document.getElementById("cartHandle");
@@ -7437,68 +7410,36 @@ function updateGuestFieldsVisibility() {
 
 document.addEventListener("DOMContentLoaded", function () {
 
-  const menuWrapper = document.getElementById("menuWrapper");
-  if (!menuWrapper) return;
+  const buttons = document.querySelectorAll(".payment-btn");
 
-  menuWrapper.addEventListener("click", function (e) {
+  buttons.forEach(btn => {
+    btn.addEventListener("click", function () {
 
-    // 🚫 View Cart pe drawer collapse mat karo
-    if (e.target.closest("#viewCartBtn")) {
-      return;
-    }
+      // sab se active hatao
+      buttons.forEach(b => b.classList.remove("active"));
 
-    if (isDrawerOpen()) {
-      collapseDrawerCart();
-    }
+      // jispe click hua usko active banao
+      this.classList.add("active");
 
-  }, true); // capture phase
+      // hidden input set (placeOrder safe)
+      document.getElementById("paymentMethod").value = this.dataset.value;
+
+    });
+  });
+
 });
 
 
 
-function onArrowClick() {
-  const drawer = document.getElementById("cartDrawer");
-
-  // already open → kuch nahi
-  if (drawer && drawer.classList.contains("active")) return;
-
-  // hidden / collapsed / closed → normal open
-  openCartDrawer();
-}
 </script>
 
-  <div id="cartHandle" onclick="onArrowClick()">
+  <div id="cartHandle" onclick="expandDrawerCart()">
   ›
 </div>
 
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
