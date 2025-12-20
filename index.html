@@ -3172,6 +3172,18 @@ console.log("🔒 orderLock before:", window._orderLock);
   console.log("global cart variable:", cart);
 
   if (window._orderLock) return;
+// 🔒 STEP-1: lock + show processing immediately
+window._orderLock = true;
+
+const placeOrderBtn = document.querySelector(
+  '#checkoutForm button[onclick="placeOrder()"]'
+);
+
+if (placeOrderBtn) {
+  placeOrderBtn.disabled = true;
+  placeOrderBtn.dataset.originalText = placeOrderBtn.innerText;
+  placeOrderBtn.innerText = "Processing...";
+}
   
 
 
@@ -3200,7 +3212,8 @@ const finalAddress =
 
   if (!orderType) {
   alert("Please select Order Type");
-  window._orderLock = false;
+  resetPlaceOrderBtn();
+
   return;
 }
 const paymentError = document.getElementById("paymentError");
@@ -3392,7 +3405,7 @@ console.log("🚀 ORDER PAYLOAD TO BACKEND:", JSON.stringify(orderData, null, 2)
     .then(res => {
       if (res.success) {
            overlay.style.display = "none";
-    window._orderLock = false;
+
         alert(
           `Order placed successfully!\nYour Order Number: ${res.orderNumber}\n\n${res.message}`
         );
@@ -7543,6 +7556,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
