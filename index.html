@@ -3149,6 +3149,18 @@ function resetMenuCartUI() {
   });
 }
 
+function resetPlaceOrderBtn() {
+  const btn = document.querySelector(
+    '#checkoutForm button[onclick="placeOrder()"]'
+  );
+
+  if (btn) {
+    btn.disabled = false;
+    btn.innerText = btn.dataset.originalText || "Place Order";
+  }
+
+  window._orderLock = false;
+}
 
     
 async function placeOrder() {
@@ -3160,11 +3172,7 @@ console.log("🔒 orderLock before:", window._orderLock);
   console.log("global cart variable:", cart);
 
   if (window._orderLock) return;
-  window._orderLock = true;
-    const overlay = document.getElementById('loadingOverlay');
-  window._orderSubmitting = true; // ✅ ADD THIS
-  overlay.innerText = "Processing your order... Please wait...";
-  overlay.style.display = "flex";
+  
 
 
   const customerName = document.getElementById('customerName').value.trim();
@@ -3202,7 +3210,8 @@ if (!paymentMethod) {
     paymentError.innerText = "⚠️ Please select a payment method";
     paymentError.classList.remove("hidden");
   }
-  window._orderLock = false; // ✅ ADD THIS
+  resetPlaceOrderBtn();
+
   return;
 }
 
@@ -3225,7 +3234,7 @@ if (!/^[0-9]{10}$/.test(mobile)) {
   const orderTypeBox = document.getElementById("orderTypeWrapper");
   if (orderTypeBox) orderTypeBox.style.display = "none";
 
-  window._orderLock = false;
+  resetPlaceOrderBtn();
   return;
 }
 
@@ -3249,7 +3258,7 @@ if (selectedCoupon && selectedCoupon.type === "onetime") {
   `❌ The coupon "${couponLabel}" has already been used.\n\n` +
   `Please go back and remove this coupon to continue.`
 );
-    window._orderLock = false;
+   resetPlaceOrderBtn();
     return; // ⛔ HARD STOP
   }
 }
@@ -3276,7 +3285,7 @@ if (orderType) {
     nameError.classList.remove("hidden");
   }
 
-  window._orderLock = false;
+  resetPlaceOrderBtn();
   return;
 }
 
@@ -3287,7 +3296,7 @@ if (orderType) {
       emailError.innerText = "⚠️ Email is required";
       emailError.classList.remove("hidden");
     }
-    window._orderLock = false;
+    resetPlaceOrderBtn();
     return;
   }
 
@@ -3298,7 +3307,7 @@ if (orderType) {
       emailError.innerText = "⚠️ Enter a valid email address";
       emailError.classList.remove("hidden");
     }
-    window._orderLock = false;
+    resetPlaceOrderBtn();
     console.log("↩️ returning due to name validation");
 
     return;
@@ -3317,13 +3326,19 @@ if (orderType === "Home Delivery" && !address) {
     addressError.innerText = "⚠️ Please enter delivery address";
     addressError.classList.remove("hidden");
   }
-  window._orderLock = false;
+ resetPlaceOrderBtn();
+
   return;
 } else if (addressError) {
   addressError.innerText = "";
   addressError.classList.add("hidden");
 }
+  
 
+    const overlay = document.getElementById('loadingOverlay');
+  window._orderSubmitting = true; // ✅ ADD THIS
+  overlay.innerText = "Processing your order... Please wait...";
+  overlay.style.display = "flex";
 
 // clear error if valid
 
@@ -3417,7 +3432,8 @@ renderCart();
       document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
         .forEach(el => el.disabled = false);
   window._orderSubmitting = false; // 
-      window._orderLock = false;
+      resetPlaceOrderBtn();
+
     });
 }
   
@@ -7527,6 +7543,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
