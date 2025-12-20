@@ -834,10 +834,12 @@ style="
   
 <button onclick="openCheckout()" class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg"> Checkout </button> </div> 
 
-<button onclick="openCartDrawer()" 
-  style="position:absolute; right:160px; top:60px; background:#ff6347; color:white;
-  padding:8px 12px; border-radius:6px; border:none;"> View Cart (<span id="cartCount">0</span>) </button>
-  
+<button onclick="onViewCartClick()"
+        style="position:absolute; right:160px; top:60px; background:#ff6347; color:white;
+               padding:8px 12px; border-radius:6px; border:none;">
+  View Cart (<span id="cartCount">0</span>)
+</button>
+
 
  <!-- HAMBURGER BUTTON (appears only after login) -->
 <button id="hamburgerBtn"
@@ -7430,6 +7432,31 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+function onViewCartClick() {
+  const drawer = document.getElementById("cartDrawer");
+  if (!drawer) return;
+
+  // CASE 1: drawer collapsed / hidden → just expand it
+  if (drawer.classList.contains("collapsed")) {
+    drawer.classList.remove("collapsed");
+    document.body.style.overflow = "hidden";
+
+    // hide arrow
+    const handle = document.getElementById("cartHandle");
+    if (handle) handle.style.display = "none";
+
+    window._drawerCollapsed = false;
+    return;
+  }
+
+  // CASE 2: drawer not active at all → normal open (full logic runs)
+  if (!drawer.classList.contains("active")) {
+    openCartDrawer();
+    return;
+  }
+
+  // CASE 3: already open & visible → do nothing
+}
 
 </script>
 
@@ -7440,6 +7467,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
 </body>
 </html>
+
 
 
 
