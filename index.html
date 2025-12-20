@@ -6482,11 +6482,13 @@ async function openCouponList() {
       loader.style.display  = "block";
 
       // ⭐ 2. Fetch latest offers
-      if (!window.liveOffers || window.liveOffers.length === 0) {
+     
           await fetchOffersFromBackend();
-      }
+    
 
       const offers = window.liveOffers || [];
+    const activeOffers = offers.filter(o => o.active === true);
+
 
       // ⭐ 3. Clear list but keep loader in top
       listBox.innerHTML = "";
@@ -6494,7 +6496,8 @@ async function openCouponList() {
       loader.style.display = "none";
 
       // ⭐ 4. No offers
-      if (offers.length === 0) {
+     if (activeOffers.length === 0) {
+
           listBox.innerHTML += `
               <div class="p-2 text-gray-500 text-center">
                 No offers available
@@ -6503,7 +6506,8 @@ async function openCouponList() {
       }
 
       // ⭐ 5. Show offers
-      listBox.innerHTML += offers.map(o => `
+     listBox.innerHTML += activeOffers.map(o => `
+
         <div class="p-2 border-b cursor-pointer hover:bg-gray-100"
              onclick="applyCoupon('${o.id}')">
           <div class="font-semibold">${o.text}</div>
@@ -7467,6 +7471,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
