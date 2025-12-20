@@ -3161,6 +3161,11 @@ console.log("🔒 orderLock before:", window._orderLock);
 
   if (window._orderLock) return;
   window._orderLock = true;
+    const overlay = document.getElementById('loadingOverlay');
+  window._orderSubmitting = true; // ✅ ADD THIS
+  overlay.innerText = "Processing your order... Please wait...";
+  overlay.style.display = "flex";
+
 
   const customerName = document.getElementById('customerName').value.trim();
   const email = document.getElementById('email').value.trim();
@@ -3363,10 +3368,7 @@ if (orderType === "Home Delivery" && !address) {
   };
 console.log("🚀 ORDER PAYLOAD TO BACKEND:", JSON.stringify(orderData, null, 2));
 
-  const overlay = document.getElementById('loadingOverlay');
-  window._orderSubmitting = true; // ✅ ADD THIS
-  overlay.innerText = "Processing your order... Please wait...";
-  overlay.style.display = "flex";
+
 
   document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
     .forEach(el => el.disabled = true);
@@ -7525,6 +7527,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
