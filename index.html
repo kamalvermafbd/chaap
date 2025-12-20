@@ -5829,15 +5829,7 @@ function collapseDrawerCart() {
   window._drawerCollapsed = true;
 }
   
-function expandDrawerCart() {
-  const drawer = document.getElementById("cartDrawer");
-  if (!drawer) return;
 
-  drawer.classList.remove("collapsed");
-  document.body.style.overflow = "hidden";
-
-  window._drawerCollapsed = false;
-}
 
 function updateCartHandle() {
   const handle = document.getElementById("cartHandle");
@@ -7482,6 +7474,7 @@ function onArrowClick() {
   
 </body>
 </html>
+
 
 
 
