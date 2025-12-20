@@ -6531,12 +6531,20 @@ function closeCouponList() {
 let selectedCoupon = null;        // coupon object (UI + totals)
 let alreadyAppliedCouponId = "";  // coupon ID (restore + protection)
 
-function applyCoupon(couponId) {
+async function applyCoupon(couponId) {
+
+  // 🔑 1️⃣ Fresh backend truth
+  await fetchOffersFromBackend();
 
   const offers = window.liveOffers || [];
-  const o = offers.find(x => x.id === couponId);
 
-  if (!o) return;
+  // 🔑 2️⃣ Coupon still active?
+  const o = offers.find(x => x.id === couponId && x.active === true);
+
+  if (!o) {
+    showCouponError("This promotional offer is no longer available.");
+    return;
+  }
 
   // calculate subtotal
   const subtotal = getCart().reduce((sum, ci) => {
@@ -7471,6 +7479,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
