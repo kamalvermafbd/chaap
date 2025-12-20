@@ -7464,10 +7464,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+function onArrowClick() {
+  const drawer = document.getElementById("cartDrawer");
 
+  // already open → kuch nahi
+  if (drawer && drawer.classList.contains("active")) return;
+
+  // hidden / collapsed / closed → normal open
+  openCartDrawer();
+}
 </script>
 
-  <div id="cartHandle" onclick="expandDrawerCart()">
+  <div id="cartHandle" onclick="onArrowClick()">
   ›
 </div>
 
