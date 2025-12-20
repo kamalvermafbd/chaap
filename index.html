@@ -3236,6 +3236,10 @@ if (selectedCoupon && selectedCoupon.type === "onetime") {
 
   // ❗ ONLY THIS CONDITION MATTERS
   if (check && check.success === true) {
+    const couponLabel =
+  selectedCoupon.text
+    ? `${selectedCoupon.text} (${selectedCoupon.id})`
+    : selectedCoupon.id;
     alert(
   `❌ The coupon "${couponLabel}" has already been used.\n\n` +
   `Please go back and remove this coupon to continue.`
@@ -7521,6 +7525,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
