@@ -6599,8 +6599,10 @@ async function applyCoupon(couponId) {
   loadingText.style.fontWeight = "600";       // bold
   }
 if (offerList) {
-  offerList.style.display = "none";           // 👈 hide list while applying
+  offerList.style.pointerEvents = "none"; // disable clicks
+  offerList.style.opacity = "0.6";        // visual feedback
 }
+
   // 🔑 1️⃣ Fresh backend truth
   await fetchOffersFromBackend();
 
@@ -7570,6 +7572,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
