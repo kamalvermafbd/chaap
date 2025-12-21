@@ -6589,8 +6589,17 @@ function cleanupCouponUI(loadingText, offerList) {
     offerList.style.pointerEvents = "auto";
     offerList.style.opacity = "1";
     offerList.style.visibility = "visible";
+
+    // 👇 RESTORE coupon items
+    const couponItems = offerList.querySelectorAll(
+      ':scope > div:not(#offerLoadingText)'
+    );
+    couponItems.forEach(el => {
+      el.style.display = "";
+    });
   }
 }
+
 
 let selectedCoupon = null;        // coupon object (UI + totals)
 let alreadyAppliedCouponId = "";  // coupon ID (restore + protection)
@@ -6612,7 +6621,13 @@ async function applyCoupon(couponId) {
 if (offerList) {
   offerList.style.pointerEvents = "none"; // disable clicks
   offerList.style.opacity = "1";        // visual feedback
-   offerList.style.visibility = "hidden";   
+   const couponItems = offerList.querySelectorAll(
+  ':scope > div:not(#offerLoadingText)'
+);
+
+couponItems.forEach(el => {
+  el.style.display = "none";
+});
 }
 
   // 🔑 1️⃣ Fresh backend truth
@@ -7592,6 +7607,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
