@@ -6582,6 +6582,13 @@ function closeCouponList() {
   if (list) list.style.display = "none";
   if (loader) loader.style.display = "none";
 }
+function cleanupCouponUI(loadingText, offerList) {
+  if (loadingText) loadingText.style.display = "none";
+  if (offerList) {
+    offerList.style.pointerEvents = "auto";
+    offerList.style.opacity = "1";
+  }
+}
 
 let selectedCoupon = null;        // coupon object (UI + totals)
 let alreadyAppliedCouponId = "";  // coupon ID (restore + protection)
@@ -6598,9 +6605,8 @@ async function applyCoupon(couponId) {
   loadingText.style.fontSize = "16px";        // bigger
   loadingText.style.fontWeight = "600";       // bold
   }
-  if (loadingText) {
-  loadingText.style.display = "none";
-}
+ 
+
 if (offerList) {
   offerList.style.pointerEvents = "none"; // disable clicks
   offerList.style.opacity = "0.6";        // visual feedback
@@ -6617,6 +6623,8 @@ if (offerList) {
 
   if (!o) {
     showCouponError("This promotional offer is no longer available.");
+    cleanupCouponUI(loadingText, offerList);
+
     return;
   }
 // 🔒 ONETIME COUPON CHECK (minimal)
@@ -6637,6 +6645,9 @@ if (o.type === "onetime") {
 
   if (used && used.success === true) {
   showCouponError("This promotional offer has already been used.");
+      // 🧹 cleanup coupon UI
+ cleanupCouponUI(loadingText, offerList);
+
   return; // ⛔ YAHI SE COUPON STOP
 }
 
@@ -6658,6 +6669,7 @@ if (o.type === "onetime") {
        Minimum required: ${fmt(o.min)}<br>
        Your subtotal: ${fmt(subtotal)}`
     );
+cleanupCouponUI(loadingText, offerList);
 
     return;
   }
@@ -6681,6 +6693,8 @@ if (o.type === "onetime") {
   }
 
   updateDrawerTotals();
+// 🧹 FINAL CLEANUP AFTER COUPON RESULT
+cleanupCouponUI(loadingText, offerList);
 
   // close list fully
   closeCouponList();
@@ -7575,6 +7589,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
