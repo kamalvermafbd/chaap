@@ -6488,7 +6488,14 @@ async function fetchOffersFromBackend() {
         // signup coupons untouched
         if (o.type === "signup") return true;
 
-        const ua = (o["User applicable"] || "All user").toLowerCase();
+     const ua = (
+  o.userApplicable ||
+  o.user_applicable ||
+  o.UserApplicable ||
+  o.userapplicable ||
+  "All user"
+).toLowerCase();
+;
 
         // All user → always visible
         if (ua === "all user") return true;
@@ -7676,6 +7683,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
