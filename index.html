@@ -702,6 +702,18 @@ body::before {
   opacity: 1;
   transform: translateY(-50%) scale(1.05);
 }
+@keyframes dots {
+  0%   { content: ""; }
+  25%  { content: "."; }
+  50%  { content: ".."; }
+  75%  { content: "..."; }
+  100% { content: ""; }
+}
+
+.coupon-loading::after {
+  content: "";
+  animation: dots 1.2s infinite;
+}
 
   </style>
 </head>
@@ -6584,13 +6596,16 @@ function closeCouponList() {
 }
   
 function cleanupCouponUI(loadingText, offerList) {
-  if (loadingText) loadingText.style.display = "none";
+  if (loadingText) {
+    loadingText.style.display = "none";
+    loadingText.classList.remove("coupon-loading");
+  }
+
   if (offerList) {
     offerList.style.pointerEvents = "auto";
     offerList.style.opacity = "1";
     offerList.style.visibility = "visible";
 
-    // 👇 RESTORE coupon items
     const couponItems = offerList.querySelectorAll(
       ':scope > div:not(#offerLoadingText)'
     );
@@ -6599,6 +6614,7 @@ function cleanupCouponUI(loadingText, offerList) {
     });
   }
 }
+
 
 
 let selectedCoupon = null;        // coupon object (UI + totals)
@@ -6610,7 +6626,8 @@ async function applyCoupon(couponId) {
   const loadingText = document.getElementById("offerLoadingText");
   const offerList = document.getElementById("offerList");
   if (loadingText) {
-    loadingText.innerText = "Applying coupon… please wait";
+    loadingText.innerText = "Applying coupon";
+    loadingText.classList.add("coupon-loading");
     loadingText.style.display = "block";
      loadingText.style.color = "#dc2626";       // 🔴 red
   loadingText.style.fontSize = "16px";        // bigger
@@ -7607,6 +7624,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
