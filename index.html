@@ -6582,6 +6582,7 @@ function closeCouponList() {
   if (list) list.style.display = "none";
   if (loader) loader.style.display = "none";
 }
+  
 function cleanupCouponUI(loadingText, offerList) {
   if (loadingText) loadingText.style.display = "none";
   if (offerList) {
@@ -6610,7 +6611,8 @@ async function applyCoupon(couponId) {
 
 if (offerList) {
   offerList.style.pointerEvents = "none"; // disable clicks
-  offerList.style.opacity = "0.6";        // visual feedback
+  offerList.style.opacity = "1";        // visual feedback
+   offerList.style.visibility = "hidden";   
 }
 
   // 🔑 1️⃣ Fresh backend truth
@@ -7590,6 +7592,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
