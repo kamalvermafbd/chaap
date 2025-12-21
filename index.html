@@ -1440,6 +1440,10 @@ style="
 
 
   <script>
+    function isUserLoggedIn() {
+  return !!localStorage.getItem("userMobile");
+}
+
 document.querySelectorAll(".payment-btn").forEach(btn => {
   btn.addEventListener("click", () => {
 
@@ -6461,19 +6465,44 @@ function getCartSubtotal() {
   });
   return subtotal;
 }
-
 async function fetchOffersFromBackend() {
   try {
     const mobile = isLoggedIn() ? getUserMobile() : "";
-    const cartTotal = getCartSubtotal();  // ⭐ MIN is checked on backend also
+    const cartTotal = getCartSubtotal(); //  MIN is checked on backend also
 
-    const res = await fetch(API_BASE + "?api=getOffers&mobile=" + mobile + "&cartTotal=" + cartTotal);
+    const res = await fetch(
+      API_BASE + "?api=getOffers&mobile=" + mobile + "&cartTotal=" + cartTotal
+    );
 
     const data = await res.json();
 
     if (data.success && Array.isArray(data.offers)) {
       window.liveOffers = data.offers;
-      return data.offers;
+
+      // ===============================
+      // STEP 1b: User applicable filter
+      // ===============================
+      const loggedIn = isUserLoggedIn();
+
+      window.liveOffers = window.liveOffers.filter(o => {
+        // signup coupons untouched
+        if (o.type === "signup") return true;
+
+        const ua = (o["User applicable"] || "All user").toLowerCase();
+
+        // All user → always visible
+        if (ua === "all user") return true;
+
+        // Registered user → only logged-in users
+        if (ua === "registered user") {
+          return loggedIn;
+        }
+
+        // safety fallback
+        return true;
+      });
+
+      return window.liveOffers;
     }
   } catch (err) {
     console.error("Offer load error:", err);
@@ -6482,6 +6511,8 @@ async function fetchOffersFromBackend() {
   window.liveOffers = [];
   return [];
 }
+
+  
 function getCart() {
 
   // Guest user
@@ -6628,6 +6659,20 @@ let selectedCoupon = null;        // coupon object (UI + totals)
 let alreadyAppliedCouponId = "";  // coupon ID (restore + protection)
 
 async function applyCoupon(couponId) {
+// ===============================
+// STEP 1c: Defensive apply-time guard
+// ===============================
+const offer = (window.liveOffers || []).find(o => o.id === couponId);
+
+if (offer) {
+  const ua = (offer["User applicable"] || "All user").toLowerCase();
+
+  // Guest trying to apply Registered user coupon
+  if (ua === "registered user" && !isUserLoggedIn()) {
+    showCouponError("Please login to use this offer.");
+    return; // ⛔ HARD STOP
+  }
+}
 
   // 🔄 SHOW COUPON PROCESSING
   const loadingText = document.getElementById("offerLoadingText");
@@ -7631,6 +7676,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
