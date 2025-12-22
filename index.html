@@ -6450,81 +6450,56 @@ function finalizeCartUpdate(cartArr) {
   itemId = String(itemId);
   variantId = String(variantId);
 
-  // Read correct storage
-  let cartArr = getCart();  // master engine safe getter
+  let cartArr = getCart();
 
-  // Find match
   let existing = cartArr.find(c =>
     String(c.itemId) === itemId &&
     String(c.variantId || "") === variantId
   );
 
-  // ---------------------
-  // ACTION: ADD / INC
-  // ---------------------
+  let cartChanged = false;
+
+  // ---------- ADD ----------
   if (action === "add") {
 
-    // If exists → increase qty
     if (existing) {
       existing.qty++;
-      setCart(cartArr);
-      try {
-        updateDrawerTotals();
-        refreshCouponMotivationHint();
-      } catch (e) {}
-      return;
+    } else {
+      const newObj = buildCartObject(itemId, variantId, meta);
+      cartArr.push(newObj);
     }
 
-    // If not exists → build & push
-    const newObj = buildCartObject(itemId, variantId, meta);
-    cartArr.push(newObj);
-    setCart(cartArr);
-    try {
-      updateDrawerTotals();
-      refreshCouponMotivationHint();
-    } catch (e) {}
-    return;
+    cartChanged = true;
   }
 
-  // ---------------------
-  // ACTION: DEC
-  // ---------------------
+  // ---------- DEC ----------
   if (action === "dec") {
 
-    if (!existing) {
-      setCart(cartArr);
-      try {
-        updateDrawerTotals();
-        refreshCouponMotivationHint();
-      } catch (e) {}
-      return;
-    }
+    if (!existing) return;
 
-    // If qty > 1 → decrement
     if (existing.qty > 1) {
       existing.qty--;
-      setCart(cartArr);
-      try {
-        updateDrawerTotals();
-        refreshCouponMotivationHint();
-      } catch (e) {}
-      return;
+      cartChanged = true;
+    } else {
+      cartArr = cartArr.filter(c =>
+        !(String(c.itemId) === itemId &&
+          String(c.variantId || "") === variantId)
+      );
+      cartChanged = true;
     }
+  }
 
-    // If qty == 1 → delete item
-    cartArr = cartArr.filter(c =>
-      !(String(c.itemId) === itemId &&
-        String(c.variantId || "") === variantId)
-    );
-
+  // 🔥 SINGLE FINAL UPDATE (MOST IMPORTANT)
+  if (cartChanged) {
     setCart(cartArr);
+
     try {
       updateDrawerTotals();
       refreshCouponMotivationHint();
     } catch (e) {}
-    return;
   }
 }
+
 
   
 function cleanCartInvalidItems(arr) {
@@ -7899,6 +7874,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
