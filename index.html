@@ -6434,6 +6434,16 @@ function buildCartObject(itemId, variantId, meta = {}) {
   };
 }
 
+function finalizeCartUpdate(cartArr) {
+  setCart(cartArr);
+
+  try {
+    updateDrawerTotals();
+    refreshCouponMotivationHint();
+  } catch (e) {}
+
+  return;
+}
 
   function updateCart(itemId, variantId = "", action, meta = {}) {
 
@@ -6441,8 +6451,7 @@ function buildCartObject(itemId, variantId, meta = {}) {
   variantId = String(variantId);
 
   // Read correct storage
-let cartArr = getCart();  // master engine safe getter
-
+  let cartArr = getCart();  // master engine safe getter
 
   // Find match
   let existing = cartArr.find(c =>
@@ -6453,45 +6462,70 @@ let cartArr = getCart();  // master engine safe getter
   // ---------------------
   // ACTION: ADD / INC
   // ---------------------
- // ADD FLOW (Master Engine)
-if (action === "add") {
+  if (action === "add") {
 
-  // If exists → increase qty
-  if (existing) {
-    existing.qty++;
-    return setCart(cartArr);
+    // If exists → increase qty
+    if (existing) {
+      existing.qty++;
+      setCart(cartArr);
+      try {
+        updateDrawerTotals();
+        refreshCouponMotivationHint();
+      } catch (e) {}
+      return;
+    }
+
+    // If not exists → build & push
+    const newObj = buildCartObject(itemId, variantId, meta);
+    cartArr.push(newObj);
+    setCart(cartArr);
+    try {
+      updateDrawerTotals();
+      refreshCouponMotivationHint();
+    } catch (e) {}
+    return;
   }
-
-  // If not exists → build & push
-  const newObj = buildCartObject(itemId, variantId, meta);
-  cartArr.push(newObj);
-
-  return setCart(cartArr);
-}
 
   // ---------------------
   // ACTION: DEC
   // ---------------------
- // DEC FLOW (Master Engine)
-if (action === "dec") {
+  if (action === "dec") {
 
-  if (!existing) return setCart(cartArr);
+    if (!existing) {
+      setCart(cartArr);
+      try {
+        updateDrawerTotals();
+        refreshCouponMotivationHint();
+      } catch (e) {}
+      return;
+    }
 
-  // If qty > 1 → decrement
-  if (existing.qty > 1) {
-    existing.qty--;
-    return setCart(cartArr);
+    // If qty > 1 → decrement
+    if (existing.qty > 1) {
+      existing.qty--;
+      setCart(cartArr);
+      try {
+        updateDrawerTotals();
+        refreshCouponMotivationHint();
+      } catch (e) {}
+      return;
+    }
+
+    // If qty == 1 → delete item
+    cartArr = cartArr.filter(c =>
+      !(String(c.itemId) === itemId &&
+        String(c.variantId || "") === variantId)
+    );
+
+    setCart(cartArr);
+    try {
+      updateDrawerTotals();
+      refreshCouponMotivationHint();
+    } catch (e) {}
+    return;
   }
-
-  // If qty == 1 → delete item
-  cartArr = cartArr.filter(c =>
-    !(String(c.itemId) === itemId &&
-      String(c.variantId || "") === variantId)
-  );
-
-  return setCart(cartArr);
 }
-}
+
   
 function cleanCartInvalidItems(arr) {
   return arr.filter(i =>
@@ -7865,6 +7899,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
