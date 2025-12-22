@@ -840,8 +840,10 @@ style="
 
 <!-- Coupon eligibility message -->
 <div id="couponHintBox"
-     class="hidden mt-2 text-center text-red-600 font-semibold text-sm">
+     class="mt-2 text-red-600 text-sm font-semibold animate-pulse"
+     style="display:none;">
 </div>
+
 
   
 <div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold">
@@ -6475,6 +6477,7 @@ if (action === "dec") {
   return setCart(cartArr);
 }
 }
+  
 function cleanCartInvalidItems(arr) {
   return arr.filter(i =>
     i &&
@@ -6499,6 +6502,81 @@ function getCartSubtotal() {
   });
   return subtotal;
 }
+
+function getCouponMotivationMessage() {
+  const cartTotal = getCartSubtotal();
+  const loggedIn = isUserLoggedIn();
+  const offers = window._allOffersRaw || [];
+
+  for (const o of offers) {
+    // signup coupons ignore
+    if (o.type === "signup") continue;
+
+    // onetime already used → ignore fully
+    if (o.type === "onetime" && o._usedOnce === true) continue;
+
+    // min not reached → candidate
+    if (cartTotal < Number(o.min || 0)) {
+      let msg = `Add items worth ₹${Number(o.min) - cartTotal} more to unlock this offer.`;
+
+      // registered-only coupon + guest user
+      if (
+        String(o.userApplicable || "").toLowerCase() === "registered user" &&
+        !loggedIn
+      ) {
+        msg += " Sign up / login to avail this offer.";
+      }
+
+      return msg; // 🔴 ONLY FIRST VALID MESSAGE
+    }
+  }
+
+  return ""; // nothing to show
+}
+
+function refreshCouponMotivationHint() {
+
+  const hintBox = document.getElementById("couponMotivationHint");
+  if (!hintBox) return;
+
+  const subtotal = Number(window._drawerTotals?.baseTotal || 0);
+  const loggedIn = isUserLoggedIn();
+
+  const allOffers = window._allOffersRaw || [];
+
+  // Safety reset
+  hintBox.style.display = "none";
+  hintBox.innerHTML = "";
+
+  if (subtotal <= 0 || allOffers.length === 0) return;
+
+  // 🔍 find best future coupon (min > subtotal)
+  const future = allOffers
+    .filter(o => o.active === true)
+    .filter(o => Number(o.min || 0) > subtotal)
+    .sort((a, b) => a.min - b.min)[0];
+
+  if (!future) return;
+
+  // ❌ One-time already used → no message
+  if (future.type === "onetime" && future._usedOnce === true) {
+    return;
+  }
+
+  let message = `Add items worth <b>${fmt(future.min - subtotal)}</b> more to unlock <b>${future.text}</b>`;
+
+  // 🔐 Registered user only logic
+  const ua = String(future.userApplicable || "All user").toLowerCase();
+  if (ua === "registered user" && !loggedIn) {
+    message += `<br><span class="text-sm">Login / Signup to avail this offer</span>`;
+  }
+
+  // ✅ show hint
+  hintBox.innerHTML = message;
+  hintBox.style.display = "block";
+}
+
+
 async function fetchOffersFromBackend() {
   try {
     const mobile = isLoggedIn() ? getUserMobile() : "";
@@ -6511,7 +6589,12 @@ async function fetchOffersFromBackend() {
     const data = await res.json();
 
     if (data.success && Array.isArray(data.offers)) {
-      window.liveOffers = data.offers;
+     
+  window._allOffersRaw = Array.isArray(data.allOffersRaw)
+    ? data.allOffersRaw
+    : [];
+
+  window.liveOffers = data.offers;
 
       // ===============================
       // STEP 1b: User applicable filter
@@ -6590,6 +6673,54 @@ function getMenuImage(itemId, variantId) {
 // ---------- STEP 1B: Offers data + best-offer calculation ----------
 
 
+function evaluateCouponHint() {
+  const cartTotal = getCartSubtotal();
+  const loggedIn = isUserLoggedIn();
+
+  // container
+  const hintBox = document.getElementById("couponHintBox");
+  if (!hintBox) return;
+
+  hintBox.style.display = "none";
+  hintBox.innerHTML = "";
+
+  // safety
+  const offers = window.liveOffers || [];
+  if (offers.length > 0) return; // coupons already visible → no hint
+
+  // ---- read ALL offers (raw, without min filter) ----
+  const allOffers = window._allOffersRaw || [];
+  if (!allOffers.length) return;
+
+  // find best eligible-but-blocked offer
+  for (const o of allOffers) {
+
+    // ❌ never show for signup
+    if (o.type === "signup") continue;
+
+    // ❌ onetime already used → NO MESSAGE
+    if (o.type === "onetime" && o._usedOnce === true) continue;
+
+    const min = Number(o.min || 0);
+    const ua = (o.userApplicable || "All user").toLowerCase();
+
+    // 🟥 CASE-1: cart total less than min
+    if (cartTotal < min) {
+      const diff = min - cartTotal;
+
+      let msg = `Please add items worth ₹${diff} more to unlock this offer`;
+
+      // 🟥 CASE-2: registered-only + guest
+      if (ua === "registered user" && !loggedIn) {
+        msg += `<br><span style="font-weight:600;">Signup / Login to avail this offer</span>`;
+      }
+
+      hintBox.innerHTML = "🔴 " + msg;
+      hintBox.style.display = "block";
+      return;
+    }
+  }
+}
 
 function getBestOffer(total) {
   const offers = window.liveOffers || [];
@@ -6630,7 +6761,8 @@ async function openCouponList() {
       // ⭐ 2. Fetch latest offers
      
           await fetchOffersFromBackend();
-    
+    showCouponHint(getCouponMotivationMessage());
+
 
       const offers = window.liveOffers || [];
     const activeOffers = offers.filter(o => o.active === true);
@@ -7484,6 +7616,7 @@ window._drawerTotals = {
   };
 
   try { updateCartBadge(); } catch(e){}
+   refreshCouponMotivationHint();
 
 }
 
@@ -7717,6 +7850,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
