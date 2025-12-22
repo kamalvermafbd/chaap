@@ -4587,11 +4587,23 @@ function loadUserOrders() {
 }
 
 function showCouponHint(msg) {
+  if (!msg) return;
+
   const box = document.getElementById("couponHintBox");
-  if (!box) return;
+  if (!box) {
+    console.warn("couponHintBox not found in DOM");
+    return;
+  }
 
   box.innerHTML = msg;
+
+  // 🔥 FORCE VISIBILITY (important)
   box.classList.remove("hidden");
+  box.style.display = "block";
+
+  // 🔁 restart blink animation cleanly
+  box.classList.remove("coupon-blink");
+  void box.offsetWidth; // reflow trick
   box.classList.add("coupon-blink");
 }
 
@@ -7850,6 +7862,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
