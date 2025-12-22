@@ -5894,6 +5894,9 @@ if (selectedCoupon && selectedCoupon.type === "onetime") {
   // 4) Update totals + badge
   try { updateDrawerTotals(); } catch(e){}
   try { updateCartBadge(); } catch(e){}
+   try {
+    refreshCouponMotivationHint();
+  } catch (e) {}
 }
 
 
@@ -7874,6 +7877,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
