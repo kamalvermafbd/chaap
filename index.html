@@ -6572,12 +6572,48 @@ function refreshCouponMotivationHint() {
   const loggedIn = isUserLoggedIn();
 
   const allOffers = window._allOffersRaw || [];
+// ===============================
+// STEP-A: Guest same-range registered offers
+// ===============================
+let sameRangeRegistered = [];
+
+if (!loggedIn) {
+  sameRangeRegistered = allOffers
+    .filter(o => o.active === true)
+    .filter(o => String(o.userApplicable || "all user").toLowerCase() === "registered user")
+    .filter(o => Number(o.min || 0) <= subtotal)
+    .filter(o => !(o.type === "onetime" && o._usedOnce === true));
+}
 
   // Safety reset
   hintBox.style.display = "none";
   hintBox.innerHTML = "";
 
   if (subtotal <= 0 || allOffers.length === 0) return;
+// ===============================
+// STEP-B: Prefer same-range registered offer for guest
+// ===============================
+if (!loggedIn && sameRangeRegistered.length > 0) {
+
+  // 🔥 pick best benefit offer
+  const best = sameRangeRegistered.sort((a, b) => {
+    const valA = a.flat > 0 ? a.flat : (subtotal * a.discount / 100);
+    const valB = b.flat > 0 ? b.flat : (subtotal * b.discount / 100);
+    return valB - valA;
+  })[0];
+
+  let message = "";
+
+if (!loggedIn && best.min <= subtotal) {
+  message = `Signup now to unlock <b>${best.text}</b>`;
+} else {
+  message = `Add items worth <b>${fmt(best.min - subtotal)}</b> more to unlock <b>${best.text}</b>`;
+}
+
+hintBox.innerHTML = message;
+hintBox.style.display = "block";
+return;
+}
 
   // 🔍 find best future coupon (min > subtotal)
   const future = allOffers
@@ -7884,6 +7920,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
