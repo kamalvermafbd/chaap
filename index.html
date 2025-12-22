@@ -720,6 +720,16 @@ body::before {
   content: "";
   animation: dots 1.4s infinite;
 }
+    
+@keyframes blink {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+.coupon-blink {
+  animation: blink 1.2s infinite;
+}
 
   </style>
 </head>
@@ -828,6 +838,10 @@ style="
   </div>
 </div>
 
+<!-- Coupon eligibility message -->
+<div id="couponHintBox"
+     class="hidden mt-2 text-center text-red-600 font-semibold text-sm">
+</div>
 
   
 <div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold">
@@ -4569,6 +4583,26 @@ function loadUserOrders() {
       alert("Failed: " + err.message);
     });
 }
+
+function showCouponHint(msg) {
+  const box = document.getElementById("couponHintBox");
+  if (!box) return;
+
+  box.innerHTML = msg;
+  box.classList.remove("hidden");
+  box.classList.add("coupon-blink");
+}
+
+function hideCouponHint() {
+  const box = document.getElementById("couponHintBox");
+  if (!box) return;
+
+  box.classList.add("hidden");
+  box.classList.remove("coupon-blink");
+  box.innerHTML = "";
+}
+
+  
 function loadOffers() {
   // ? SHOW SIMPLE LOADING TEXT
   document.getElementById("offersLoading").style.display = "block";
@@ -7683,6 +7717,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
