@@ -6653,6 +6653,11 @@ async function fetchOffersFromBackend() {
         // safety fallback
         return true;
       });
+  setTimeout(() => {
+        try {
+          refreshCouponMotivationHint();
+        } catch (e) {}
+      }, 0);
 
       return window.liveOffers;
     }
@@ -7878,6 +7883,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
