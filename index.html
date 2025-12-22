@@ -803,7 +803,11 @@ style="
   </button>
 <h2 class="text-xl font-semibold mb-3">Your Cart</h2> 
 <div id="drawerItemsList"></div>
-
+  
+<div id="couponHintBox"
+     class="mt-2 text-red-600 text-sm font-semibold animate-pulse"
+     style="display:none;">
+</div>
 <!-- OFFER SECTION (BOTTOM OF DRAWER) -->
   
 <div id="offerSection" class="p-3 border-t mt-3" style="background:#fff;">
@@ -815,10 +819,7 @@ style="
     💝 Apply Coupon
   </button>
   
-  <div id="couponHintBox"
-     class="mt-2 text-red-600 text-sm font-semibold animate-pulse"
-     style="display:none;">
-</div>
+  
  <!-- 🔥 Alert message goes HERE -->
   
   <div id="bestOfferApplied" class="mt-2 text-green-600 font-medium" style="display:none;"></div>
@@ -7864,6 +7865,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
