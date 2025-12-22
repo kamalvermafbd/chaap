@@ -6564,7 +6564,8 @@ function getCouponMotivationMessage() {
 
 function refreshCouponMotivationHint() {
 
-  const hintBox = document.getElementById("couponMotivationHint");
+  const hintBox = document.getElementById("couponHintBox");
+
   if (!hintBox) return;
 
   const subtotal = Number(window._drawerTotals?.baseTotal || 0);
@@ -7883,6 +7884,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
