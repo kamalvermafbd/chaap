@@ -808,6 +808,12 @@ style="
      class="mt-2 text-red-600 text-sm font-semibold animate-pulse"
      style="display:none;">
 </div>
+  <div id="couponHintBox"
+     class="text-sm text-gray-600"
+     style="display:none;">
+  Checking best offers for you…
+</div>
+
 <!-- OFFER SECTION (BOTTOM OF DRAWER) -->
   
 <div id="offerSection" class="p-3 border-t mt-3" style="background:#fff;">
@@ -5852,7 +5858,9 @@ async function openCheckout() {
 
 
 async function openCartDrawer() {
+
  closeCheckout();
+  showCouponHintPlaceholder(); // 👈 STEP-1 placeholder
   //  OPEN DRAWER INSTANTLY (NO DELAY)
   document.getElementById("cartBackdrop").classList.add("active");
   document.getElementById("cartDrawer").classList.add("active");
@@ -6584,6 +6592,15 @@ function getCouponMotivationMessage() {
   return ""; // nothing to show
 }
 
+function showCouponHintPlaceholder() {
+  const hintBox = document.getElementById("couponHintBox");
+  if (!hintBox) return;
+
+  hintBox.innerText = "Checking best offers for you…";
+  hintBox.style.display = "block";
+}
+
+  
 function refreshCouponMotivationHint() {
 
   const hintBox = document.getElementById("couponHintBox");
@@ -7932,6 +7949,8 @@ function onViewCartClick() {
 
   // CASE 3: already open & visible → do nothing
 }
+
+  
 function showRewardBox(data, alreadyClaimed) {
   const box = document.getElementById("rewardBox");
   const text = document.getElementById("rewardText");
@@ -8065,6 +8084,7 @@ async function checkAndShowMonthlyReward() {
   
 </body>
 </html>
+
 
 
 
