@@ -6600,13 +6600,7 @@ function showCouponHintPlaceholder() {
 
   
 function refreshCouponMotivationHint() {
-  if (window._couponHintLocked) {
-  setTimeout(() => {
-    window._couponHintLocked = false;
-    refreshCouponMotivationHint();
-  }, 400); // 👈 400ms visible guarantee
-  return;
-}
+  if (window._couponHintLocked) return;
 
   const hintBox = document.getElementById("couponHintBox");
 
@@ -8095,6 +8089,7 @@ async function checkAndShowMonthlyReward() {
   
 </body>
 </html>
+
 
 
 
