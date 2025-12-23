@@ -6595,10 +6595,18 @@ function showCouponHintPlaceholder() {
 
   hintBox.innerText = "Checking best offers for you…";
   hintBox.style.display = "block";
+   window._couponHintLocked = true;
 }
 
   
 function refreshCouponMotivationHint() {
+  if (window._couponHintLocked) {
+  setTimeout(() => {
+    window._couponHintLocked = false;
+    refreshCouponMotivationHint();
+  }, 400); // 👈 400ms visible guarantee
+  return;
+}
 
   const hintBox = document.getElementById("couponHintBox");
 
@@ -6622,8 +6630,10 @@ if (!loggedIn) {
 }
 
   // Safety reset
+  if (!window._couponHintLocked) {
   hintBox.style.display = "none";
   hintBox.innerHTML = "";
+}
 
   if (subtotal <= 0 || allOffers.length === 0) return;
 // ===============================
@@ -8082,6 +8092,7 @@ async function checkAndShowMonthlyReward() {
   
 </body>
 </html>
+
 
 
 
