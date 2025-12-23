@@ -846,7 +846,24 @@ style="
 
 <!-- Coupon eligibility message -->
 
+<!-- Reward Claim Box -->
+<div id="rewardBox"
+     class="hidden mt-4 p-4 rounded-lg border border-green-300 bg-green-50">
 
+  <div id="rewardText"
+       class="text-green-800 font-semibold mb-2">
+  </div>
+
+  <button id="claimRewardBtn"
+          onclick="onClaimRewardClick()"
+          class="px-4 py-2 rounded-md bg-green-600 text-white font-medium hover:bg-green-700">
+    Claim Reward
+  </button>
+
+  <div id="rewardStatus"
+       class="hidden mt-2 text-sm text-gray-700">
+  </div>
+</div>
 
   
 <div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold">
@@ -7914,6 +7931,82 @@ function onViewCartClick() {
 
   // CASE 3: already open & visible → do nothing
 }
+function showRewardBox(data, alreadyClaimed) {
+  const box = document.getElementById("rewardBox");
+  const text = document.getElementById("rewardText");
+  const btn = document.getElementById("claimRewardBtn");
+  const status = document.getElementById("rewardStatus");
+
+  if (!data) {
+    box.classList.add("hidden");
+    return;
+  }
+
+  box.classList.remove("hidden");
+
+  if (alreadyClaimed) {
+    text.innerText = `🎁 Reward already claimed for ${data.rewardMonth}`;
+    btn.style.display = "none";
+
+    status.classList.remove("hidden");
+    status.innerText = "You can use the coupon in checkout";
+  } else {
+    text.innerText =
+      `🎉 You are eligible for ₹${data.rewardAmount} reward (${data.slabName})`;
+
+    btn.style.display = "inline-block";
+    status.classList.add("hidden");
+  }
+}
+
+  function onClaimRewardClick() {
+  const btn = document.getElementById("claimRewardBtn");
+  const status = document.getElementById("rewardStatus");
+
+  const mobile =
+    localStorage.getItem("mobile") ||
+    localStorage.getItem("userMobile");
+
+  if (!mobile) {
+    alert("Please login to claim reward");
+    return;
+  }
+
+  // UI lock
+  btn.disabled = true;
+  btn.innerText = "Claiming reward…";
+
+  status.classList.remove("hidden");
+  status.style.color = "#374151";
+  status.innerText = "Please wait, generating your reward…";
+
+  // 🔥 BACKEND CALL
+  google.script.run
+    .withSuccessHandler(res => {
+      if (!res || !res.ok) {
+        status.style.color = "#b91c1c";
+        status.innerText = res?.reason || "Failed to claim reward";
+        btn.disabled = false;
+        btn.innerText = "Claim Reward";
+        return;
+      }
+
+      // ✅ SUCCESS
+      status.style.color = "#166534";
+      status.innerText =
+        `🎉 Reward claimed! Coupon ${res.couponCode} added to your account`;
+
+      btn.style.display = "none";
+    })
+    .withFailureHandler(err => {
+      console.error(err);
+      status.style.color = "#b91c1c";
+      status.innerText = "Server error. Please try again.";
+      btn.disabled = false;
+      btn.innerText = "Claim Reward";
+    })
+    .insertRewardCouponForUser(mobile);
+}
 
 </script>
 
@@ -7924,61 +8017,4 @@ function onViewCartClick() {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
