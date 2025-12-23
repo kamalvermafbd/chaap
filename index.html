@@ -7977,7 +7977,7 @@ function showRewardBox(data, alreadyClaimed) {
     btn.disabled = true;
     btn.innerText = "Claiming...";
 
-    const res = await fetch(API_URL + "?api=claimReward", {
+    const res = await fetch(API_BASE + "?api=claimReward", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mobile })
@@ -8016,7 +8016,7 @@ async function checkMonthlyRewardStatus() {
 
   try {
     const res = await fetch(
-      API_URL + "?api=checkMonthlyReward&mobile=" + mobile
+      API_BASE + "?api=checkMonthlyReward&mobile=" + mobile
     );
     const data = await res.json();
 
@@ -8040,7 +8040,7 @@ async function checkAndShowMonthlyReward() {
     if (!mobile) return;
 
     const res = await fetch(
-      API_URL +
+      API_BASE +
         "?api=checkMonthlyReward&mobile=" +
         mobile
     );
@@ -8066,6 +8066,7 @@ async function checkAndShowMonthlyReward() {
   
 </body>
 </html>
+
 
 
 
