@@ -1724,7 +1724,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbxLHR-e4ArspKrrcO8OQ-RmMdlpY6GLc2Rancp2JyRzmVgqr_3uz1GIfZuvVU3WhZwiRg/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbxsUdqVh_2ZCJ6fM7x61cAUv0UeR3q4bNd4VoXtNJssDWZT8oFtToH5mG9B1xjvd2Hmcw/exec";
 
 function apiGet(api, params = {}) {
   const url = new URL(API_BASE);
@@ -3240,6 +3240,7 @@ if (placeOrderBtn) {
   const city    = document.getElementById("city")?.value.trim() || "";
   const state   = document.getElementById("state")?.value.trim() || "";
 
+const userType = isUserLoggedIn() ? "logged" : "guest";
 
 
   // ----------------------------------
@@ -3434,8 +3435,11 @@ if (orderType === "Home Delivery" && !address) {
       : 0,
     pincode,
   city,
-  state
+  state,
+    userType
   };
+  console.log("👤 userType:", userType);
+
 console.log("🚀 ORDER PAYLOAD TO BACKEND:", JSON.stringify(orderData, null, 2));
 
 
@@ -7920,6 +7924,7 @@ function onViewCartClick() {
   
 </body>
 </html>
+
 
 
 
