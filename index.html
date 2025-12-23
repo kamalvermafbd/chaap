@@ -6630,12 +6630,13 @@ if (!loggedIn) {
 }
 
   // Safety reset
-  if (!window._couponHintLocked) {
-  hintBox.style.display = "none";
-  hintBox.innerHTML = "";
-}
 
-  if (subtotal <= 0 || allOffers.length === 0) return;
+
+if (subtotal <= 0 || allOffers.length === 0) {
+  hintBox.style.display = "none";
+  window._couponHintLocked = false;
+  return;
+}
 // ===============================
 // STEP-B: Prefer same-range registered offer for guest
 // ===============================
@@ -6658,6 +6659,7 @@ if (!loggedIn && best.min <= subtotal) {
 
 hintBox.innerHTML = message;
 hintBox.style.display = "block";
+  window._couponHintLocked = false;
 return;
 }
 
@@ -6685,6 +6687,7 @@ return;
   // ✅ show hint
   hintBox.innerHTML = message;
   hintBox.style.display = "block";
+  window._couponHintLocked = false;
 }
 
 
@@ -8092,6 +8095,7 @@ async function checkAndShowMonthlyReward() {
   
 </body>
 </html>
+
 
 
 
