@@ -7922,6 +7922,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 function onViewCartClick() {
+   showCouponHintPlaceholder(); // 🔥 FIX: always fires
   const drawer = document.getElementById("cartDrawer");
   if (!drawer) return;
 
@@ -8081,6 +8082,7 @@ async function checkAndShowMonthlyReward() {
   
 </body>
 </html>
+
 
 
 
