@@ -1741,7 +1741,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbzb0RTbnnuFwtshiqLX7T9sdQgbps07PztzQCwFl6hBsQirHVVQyFf4ul6y8B5aBIldMQ/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbwpHL5GPKx6gb7zINy0N7qr7JwdW6S0r98GiORzmroofBDucxXWWRgqTq6rDbAuF1gdIg/exec";
 
 function apiGet(api, params = {}) {
   const url = new URL(API_BASE);
@@ -7959,55 +7959,79 @@ function showRewardBox(data, alreadyClaimed) {
   }
 }
 
-  function onClaimRewardClick() {
-  const btn = document.getElementById("claimRewardBtn");
-  const status = document.getElementById("rewardStatus");
+  async function onClaimRewardClick() {
+  try {
+    const mobile =
+      localStorage.getItem("userMobile") ||
+      localStorage.getItem("mobile");
 
-  const mobile =
-    localStorage.getItem("mobile") ||
-    localStorage.getItem("userMobile");
+    if (!mobile) {
+      alert("Please login first");
+      return;
+    }
 
-  if (!mobile) {
-    alert("Please login to claim reward");
-    return;
-  }
+    const btn = document.getElementById("claimRewardBtn");
+    const status = document.getElementById("rewardStatus");
 
-  // UI lock
-  btn.disabled = true;
-  btn.innerText = "Claiming reward…";
+    btn.disabled = true;
+    btn.innerText = "Claiming...";
 
-  status.classList.remove("hidden");
-  status.style.color = "#374151";
-  status.innerText = "Please wait, generating your reward…";
+    const res = await fetch(API_URL + "?api=claimReward", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mobile })
+    });
 
-  // 🔥 BACKEND CALL
-  google.script.run
-    .withSuccessHandler(res => {
-      if (!res || !res.ok) {
-        status.style.color = "#b91c1c";
-        status.innerText = res?.reason || "Failed to claim reward";
-        btn.disabled = false;
-        btn.innerText = "Claim Reward";
-        return;
-      }
+    const data = await res.json();
 
-      // ✅ SUCCESS
-      status.style.color = "#166534";
-      status.innerText =
-        `🎉 Reward claimed! Coupon ${res.couponCode} added to your account`;
-
-      btn.style.display = "none";
-    })
-    .withFailureHandler(err => {
-      console.error(err);
-      status.style.color = "#b91c1c";
-      status.innerText = "Server error. Please try again.";
+    if (!data.ok) {
+      status.classList.remove("hidden");
+      status.innerText = data.reason || "Unable to claim reward";
       btn.disabled = false;
       btn.innerText = "Claim Reward";
-    })
-    .insertRewardCouponForUser(mobile);
+      return;
+    }
+
+    // ✅ SUCCESS
+    status.classList.remove("hidden");
+    status.innerHTML =
+      `🎉 Coupon <b>${data.couponCode}</b> of ₹${data.rewardAmount} generated.<br>
+       Valid till ${new Date(data.expiry).toLocaleDateString()}`;
+
+    btn.innerText = "Claimed";
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong");
+  }
 }
 
+
+async function checkMonthlyRewardStatus() {
+  const mobile =
+    localStorage.getItem("userMobile") ||
+    localStorage.getItem("mobile");
+
+  if (!mobile) return;
+
+  try {
+    const res = await fetch(
+      API_URL + "?api=checkMonthlyReward&mobile=" + mobile
+    );
+    const data = await res.json();
+
+    if (!data.ok) {
+      document.getElementById("rewardBox").classList.add("hidden");
+      return;
+    }
+
+    showRewardBox(data.data, data.alreadyClaimed);
+
+  } catch (e) {
+    console.error("Reward check failed", e);
+  }
+}
+
+  
 </script>
 
   <div id="cartHandle" onclick="expandDrawerCart()">
@@ -8017,4 +8041,5 @@ function showRewardBox(data, alreadyClaimed) {
   
 </body>
 </html>
+
 
