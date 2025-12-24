@@ -6593,18 +6593,22 @@ function isRewardAlreadyClaimed() {
   return window._rewardAlreadyClaimed === true;
 }
 
-  function toggleClaimRewardOnCart() {
+function toggleClaimRewardOnCart() {
   const rewardBox = document.getElementById("claimRewardBox");
   if (!rewardBox) return;
 
-  const subtotal = Number(window._drawerTotals?.baseTotal || 0);
+  const cartArr = getCart(); // 🔥 source of truth
 
-  if (subtotal <= 0) {
+  // ✅ Cart empty → NEVER show
+  if (!cartArr || cartArr.length === 0) {
     rewardBox.style.display = "none";
-  } else {
-    rewardBox.style.display = "block";
+    return;
   }
+
+  // Otherwise show (for now)
+  rewardBox.style.display = "block";
 }
+
 
 function showCouponHintPlaceholder() {
   const hintBox = document.getElementById("couponHintBox");
@@ -8093,6 +8097,7 @@ async function checkAndShowMonthlyReward() {
   
 </body>
 </html>
+
 
 
 
