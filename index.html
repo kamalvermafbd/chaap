@@ -8086,6 +8086,13 @@ async function checkAndShowMonthlyReward() {
     console.error("Reward check failed", err);
   }
 }
+  
+document.addEventListener("DOMContentLoaded", () => {
+  const rewardBox = document.getElementById("rewardBox");
+  if (rewardBox) {
+    rewardBox.style.display = "none";
+  }
+});
 
   
 </script>
@@ -8097,30 +8104,6 @@ async function checkAndShowMonthlyReward() {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
