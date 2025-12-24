@@ -2135,6 +2135,7 @@ function openCartPanel(cartArr = []) {
       </div>
     `;
     try { updateDrawerTotals(); } catch(e){}
+     toggleClaimRewardOnCart(); 
     return;
   }
 
@@ -8097,6 +8098,7 @@ async function checkAndShowMonthlyReward() {
   
 </body>
 </html>
+
 
 
 
