@@ -6598,92 +6598,98 @@ function showCouponHintPlaceholder() {
    window._couponHintLocked = true;
 }
 
-  
-function refreshCouponMotivationHint() {
+  function refreshCouponMotivationHint() {
+  // 🔒 HARD LOCK (real lock)
   if (window._couponHintLocked) return;
+  window._couponHintLocked = true;
 
   const hintBox = document.getElementById("couponHintBox");
-
-  if (!hintBox) return;
+  if (!hintBox) {
+    window._couponHintLocked = false;
+    return;
+  }
 
   const subtotal = Number(window._drawerTotals?.baseTotal || 0);
   const loggedIn = isUserLoggedIn();
-
   const allOffers = window._allOffersRaw || [];
-// ===============================
-// STEP-A: Guest same-range registered offers
-// ===============================
-let sameRangeRegistered = [];
 
-if (!loggedIn) {
-  sameRangeRegistered = allOffers
-    .filter(o => o.active === true)
-    .filter(o => String(o.userApplicable || "all user").toLowerCase() === "registered user")
-    .filter(o => Number(o.min || 0) <= subtotal)
-    .filter(o => !(o.type === "onetime" && o._usedOnce === true));
-}
+  // ❌ Nothing to show
+  if (subtotal <= 0 || allOffers.length === 0) {
+    hintBox.style.display = "none";
+    setTimeout(() => window._couponHintLocked = false, 100);
+    return;
+  }
 
-  // Safety reset
+  // ===============================
+  // STEP-A: Guest same-range registered offers
+  // ===============================
+  let sameRangeRegistered = [];
 
+  if (!loggedIn) {
+    sameRangeRegistered = allOffers
+      .filter(o => o.active === true)
+      .filter(o => String(o.userApplicable || "all user").toLowerCase() === "registered user")
+      .filter(o => Number(o.min || 0) <= subtotal)
+      .filter(o => !(o.type === "onetime" && o._usedOnce === true));
+  }
 
-if (subtotal <= 0 || allOffers.length === 0) {
-  hintBox.style.display = "none";
-  window._couponHintLocked = false;
-  return;
-}
-// ===============================
-// STEP-B: Prefer same-range registered offer for guest
-// ===============================
-if (!loggedIn && sameRangeRegistered.length > 0) {
+  // ===============================
+  // STEP-B: Prefer same-range registered offer for guest
+  // ===============================
+  if (!loggedIn && sameRangeRegistered.length > 0) {
 
-  // 🔥 pick best benefit offer
-  const best = sameRangeRegistered.sort((a, b) => {
-    const valA = a.flat > 0 ? a.flat : (subtotal * a.discount / 100);
-    const valB = b.flat > 0 ? b.flat : (subtotal * b.discount / 100);
-    return valB - valA;
-  })[0];
+    const best = sameRangeRegistered.sort((a, b) => {
+      const valA = a.flat > 0 ? a.flat : (subtotal * a.discount / 100);
+      const valB = b.flat > 0 ? b.flat : (subtotal * b.discount / 100);
+      return valB - valA;
+    })[0];
 
-  let message = "";
+    let message = "";
 
-if (!loggedIn && best.min <= subtotal) {
-  message = `Signup now to unlock <b>${best.text}</b>`;
-} else {
-  message = `Add items worth <b>${fmt(best.min - subtotal)}</b> more to unlock <b>${best.text}</b>`;
-}
+    if (best.min <= subtotal) {
+      message = `Signup now to unlock <b>${best.text}</b>`;
+    } else {
+      message = `Add items worth <b>${fmt(best.min - subtotal)}</b> more to unlock <b>${best.text}</b>`;
+    }
 
-hintBox.innerHTML = message;
-hintBox.style.display = "block";
-  window._couponHintLocked = false;
-return;
-}
+    hintBox.innerHTML = message;
+    hintBox.style.display = "block";
 
-  // 🔍 find best future coupon (min > subtotal)
+    setTimeout(() => window._couponHintLocked = false, 300);
+    return;
+  }
+
+  // ===============================
+  // STEP-C: Best future offer
+  // ===============================
   const future = allOffers
     .filter(o => o.active === true)
     .filter(o => Number(o.min || 0) > subtotal)
     .sort((a, b) => a.min - b.min)[0];
 
-  if (!future) return;
+  if (!future) {
+    setTimeout(() => window._couponHintLocked = false, 100);
+    return;
+  }
 
-  // ❌ One-time already used → no message
+  // ❌ One-time already used
   if (future.type === "onetime" && future._usedOnce === true) {
+    setTimeout(() => window._couponHintLocked = false, 100);
     return;
   }
 
   let message = `Add items worth <b>${fmt(future.min - subtotal)}</b> more to unlock <b>${future.text}</b>`;
 
-  // 🔐 Registered user only logic
-  const ua = String(future.userApplicable || "All user").toLowerCase();
+  const ua = String(future.userApplicable || "all user").toLowerCase();
   if (ua === "registered user" && !loggedIn) {
     message += `<br><span class="text-sm">Login / Signup to avail this offer</span>`;
   }
 
-  // ✅ show hint
   hintBox.innerHTML = message;
   hintBox.style.display = "block";
-  window._couponHintLocked = false;
-}
 
+  setTimeout(() => window._couponHintLocked = false, 300);
+}
 
 async function fetchOffersFromBackend() {
   try {
@@ -8089,6 +8095,7 @@ async function checkAndShowMonthlyReward() {
   
 </body>
 </html>
+
 
 
 
