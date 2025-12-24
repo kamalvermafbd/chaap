@@ -6527,6 +6527,7 @@ function finalizeCartUpdate(cartArr) {
     try {
       updateDrawerTotals();
       refreshCouponMotivationHint();
+       toggleClaimRewardOnCart();
     } catch (e) {}
   }
 }
@@ -6587,6 +6588,22 @@ function getCouponMotivationMessage() {
   }
 
   return ""; // nothing to show
+}
+function isRewardAlreadyClaimed() {
+  return window._rewardAlreadyClaimed === true;
+}
+
+  function toggleClaimRewardOnCart() {
+  const rewardBox = document.getElementById("claimRewardBox");
+  if (!rewardBox) return;
+
+  const subtotal = Number(window._drawerTotals?.baseTotal || 0);
+
+  if (subtotal <= 0) {
+    rewardBox.style.display = "none";
+  } else {
+    rewardBox.style.display = "block";
+  }
 }
 
 function showCouponHintPlaceholder() {
@@ -8076,6 +8093,7 @@ async function checkAndShowMonthlyReward() {
   
 </body>
 </html>
+
 
 
 
