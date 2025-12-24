@@ -6611,7 +6611,11 @@ function toggleClaimRewardOnCart(cartList) {
     rewardBox.style.display = "none";
     return;
   }
-
+ 
+  if (window._rewardAlreadyClaimed === true) {
+    rewardBox.style.display = "none";
+    return;
+  }
   // 3️⃣ Ab safe hai → show
   rewardBox.style.display = "block";
 }
@@ -7975,6 +7979,8 @@ function onViewCartClick() {
   window._rewardTextReady = false;
 
 function showRewardBox(data, alreadyClaimed) {
+  window._rewardAlreadyClaimed = alreadyClaimed === true;
+
   const box = document.getElementById("rewardBox");
   const text = document.getElementById("rewardText");
   const btn = document.getElementById("claimRewardBtn");
@@ -8125,6 +8131,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
