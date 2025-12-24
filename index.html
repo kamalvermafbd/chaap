@@ -6602,16 +6602,18 @@ function showCouponHintPlaceholder() {
 window._couponHintDebounceTimer = null;
 window._couponHintCoreTimer = null;
 window._couponCheckingStart = 0;
-
-  
+window._couponHintCycleActive = false; // ⭐ NEW
 function refreshCouponMotivationHint() {
   const hintBox = document.getElementById("couponHintBox");
   if (!hintBox) return;
 
-  hintBox.innerHTML = "Checking best offers for you…";
-  hintBox.style.display = "block";
-
-  window._couponCheckingStart = Date.now();
+  // ⭐ checking sirf ek cycle me ek baar
+  if (!window._couponHintCycleActive) {
+    hintBox.innerHTML = "Checking best offers for you…";
+    hintBox.style.display = "block";
+    window._couponCheckingStart = Date.now();
+    window._couponHintCycleActive = true;
+  }
 
   clearTimeout(window._couponHintDebounceTimer);
   window._couponHintDebounceTimer = setTimeout(() => {
@@ -6626,7 +6628,6 @@ function refreshCouponMotivationHintCore() {
   const loggedIn = isUserLoggedIn();
   const allOffers = window._allOffersRaw || [];
 
-  // ❌ clear previous core timer (VERY IMPORTANT)
   clearTimeout(window._couponHintCoreTimer);
 
   const elapsed = Date.now() - window._couponCheckingStart;
@@ -6636,12 +6637,10 @@ function refreshCouponMotivationHintCore() {
 
     if (subtotal <= 0 || allOffers.length === 0) {
       hintBox.style.display = "none";
+      window._couponHintCycleActive = false;
       return;
     }
 
-    // ===============================
-    // Guest same-range registered
-    // ===============================
     let sameRangeRegistered = [];
 
     if (!loggedIn) {
@@ -6665,12 +6664,10 @@ function refreshCouponMotivationHintCore() {
           : `Add items worth <b>${fmt(best.min - subtotal)}</b> more to unlock <b>${best.text}</b>`;
 
       hintBox.style.display = "block";
+      window._couponHintCycleActive = false;
       return;
     }
 
-    // ===============================
-    // Future offer
-    // ===============================
     const future = allOffers
       .filter(o => o.active === true)
       .filter(o => Number(o.min || 0) > subtotal)
@@ -6678,6 +6675,7 @@ function refreshCouponMotivationHintCore() {
 
     if (!future || (future.type === "onetime" && future._usedOnce === true)) {
       hintBox.style.display = "none";
+      window._couponHintCycleActive = false;
       return;
     }
 
@@ -6690,6 +6688,7 @@ function refreshCouponMotivationHintCore() {
 
     hintBox.innerHTML = msg;
     hintBox.style.display = "block";
+    window._couponHintCycleActive = false;
 
   }, waitMore);
 }
@@ -8098,6 +8097,7 @@ async function checkAndShowMonthlyReward() {
   
 </body>
 </html>
+
 
 
 
