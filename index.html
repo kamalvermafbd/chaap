@@ -6600,16 +6600,25 @@ function showCouponHintPlaceholder() {
 
 // Debounce holder
 window._couponHintDebounceTimer = null;
+window._couponHintCoreTimer = null;
+window._couponCheckingStart = 0;
 
+  
 function refreshCouponMotivationHint() {
-  clearTimeout(window._couponHintDebounceTimer);
+  const hintBox = document.getElementById("couponHintBox");
+  if (!hintBox) return;
 
+  hintBox.innerHTML = "Checking best offers for you…";
+  hintBox.style.display = "block";
+
+  window._couponCheckingStart = Date.now();
+
+  clearTimeout(window._couponHintDebounceTimer);
   window._couponHintDebounceTimer = setTimeout(() => {
     refreshCouponMotivationHintCore();
-  }, 250);
+  }, 120);
 }
-
-  function refreshCouponMotivationHintCore() {
+function refreshCouponMotivationHintCore() {
   const hintBox = document.getElementById("couponHintBox");
   if (!hintBox) return;
 
@@ -6617,63 +6626,74 @@ function refreshCouponMotivationHint() {
   const loggedIn = isUserLoggedIn();
   const allOffers = window._allOffersRaw || [];
 
-  if (subtotal <= 0 || allOffers.length === 0) {
-    hintBox.style.display = "none";
-    return;
-  }
+  // ❌ clear previous core timer (VERY IMPORTANT)
+  clearTimeout(window._couponHintCoreTimer);
 
-  // ===============================
-  // STEP-A: Guest same-range registered offers
-  // ===============================
-  let sameRangeRegistered = [];
+  const elapsed = Date.now() - window._couponCheckingStart;
+  const waitMore = Math.max(0, 300 - elapsed);
 
-  if (!loggedIn) {
-    sameRangeRegistered = allOffers
+  window._couponHintCoreTimer = setTimeout(() => {
+
+    if (subtotal <= 0 || allOffers.length === 0) {
+      hintBox.style.display = "none";
+      return;
+    }
+
+    // ===============================
+    // Guest same-range registered
+    // ===============================
+    let sameRangeRegistered = [];
+
+    if (!loggedIn) {
+      sameRangeRegistered = allOffers
+        .filter(o => o.active === true)
+        .filter(o => String(o.userApplicable || "all user").toLowerCase() === "registered user")
+        .filter(o => Number(o.min || 0) <= subtotal)
+        .filter(o => !(o.type === "onetime" && o._usedOnce === true));
+    }
+
+    if (!loggedIn && sameRangeRegistered.length > 0) {
+      const best = sameRangeRegistered.sort((a, b) => {
+        const valA = a.flat > 0 ? a.flat : (subtotal * a.discount / 100);
+        const valB = b.flat > 0 ? b.flat : (subtotal * b.discount / 100);
+        return valB - valA;
+      })[0];
+
+      hintBox.innerHTML =
+        best.min <= subtotal
+          ? `Signup now to unlock <b>${best.text}</b>`
+          : `Add items worth <b>${fmt(best.min - subtotal)}</b> more to unlock <b>${best.text}</b>`;
+
+      hintBox.style.display = "block";
+      return;
+    }
+
+    // ===============================
+    // Future offer
+    // ===============================
+    const future = allOffers
       .filter(o => o.active === true)
-      .filter(o => String(o.userApplicable || "all user").toLowerCase() === "registered user")
-      .filter(o => Number(o.min || 0) <= subtotal)
-      .filter(o => !(o.type === "onetime" && o._usedOnce === true));
-  }
+      .filter(o => Number(o.min || 0) > subtotal)
+      .sort((a, b) => a.min - b.min)[0];
 
-  if (!loggedIn && sameRangeRegistered.length > 0) {
-    const best = sameRangeRegistered.sort((a, b) => {
-      const valA = a.flat > 0 ? a.flat : (subtotal * a.discount / 100);
-      const valB = b.flat > 0 ? b.flat : (subtotal * b.discount / 100);
-      return valB - valA;
-    })[0];
+    if (!future || (future.type === "onetime" && future._usedOnce === true)) {
+      hintBox.style.display = "none";
+      return;
+    }
 
-    let message = best.min <= subtotal
-      ? `Signup now to unlock <b>${best.text}</b>`
-      : `Add items worth <b>${fmt(best.min - subtotal)}</b> more to unlock <b>${best.text}</b>`;
+    let msg = `Add items worth <b>${fmt(future.min - subtotal)}</b> more to unlock <b>${future.text}</b>`;
+    const ua = String(future.userApplicable || "all user").toLowerCase();
 
-    hintBox.innerHTML = message;
+    if (ua === "registered user" && !loggedIn) {
+      msg += `<br><span class="text-sm">Login / Signup to avail this offer</span>`;
+    }
+
+    hintBox.innerHTML = msg;
     hintBox.style.display = "block";
-    return;
-  }
 
-  // ===============================
-  // STEP-B: Future offer
-  // ===============================
-  const future = allOffers
-    .filter(o => o.active === true)
-    .filter(o => Number(o.min || 0) > subtotal)
-    .sort((a, b) => a.min - b.min)[0];
-
-  if (!future) return;
-  if (future.type === "onetime" && future._usedOnce === true) return;
-
-  let message = `Add items worth <b>${fmt(future.min - subtotal)}</b> more to unlock <b>${future.text}</b>`;
-
-  const ua = String(future.userApplicable || "all user").toLowerCase();
-  if (ua === "registered user" && !loggedIn) {
-    message += `<br><span class="text-sm">Login / Signup to avail this offer</span>`;
-  }
-
-  hintBox.innerHTML = message;
-  hintBox.style.display = "block";
+  }, waitMore);
 }
 
-  
 async function fetchOffersFromBackend() {
   try {
     const mobile = isLoggedIn() ? getUserMobile() : "";
@@ -8078,6 +8098,7 @@ async function checkAndShowMonthlyReward() {
   
 </body>
 </html>
+
 
 
 
