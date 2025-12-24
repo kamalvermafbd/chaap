@@ -6599,6 +6599,9 @@ function showCouponHintPlaceholder() {
 }
 
   function refreshCouponMotivationHint() {
+    console.count("🔥 refreshCouponMotivationHint CALLED");
+console.trace("📍 called from");
+
   // 🔒 HARD LOCK (real lock)
   if (window._couponHintLocked) return;
   window._couponHintLocked = true;
@@ -8095,6 +8098,7 @@ async function checkAndShowMonthlyReward() {
   
 </body>
 </html>
+
 
 
 
