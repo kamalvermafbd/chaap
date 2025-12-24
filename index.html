@@ -8056,7 +8056,8 @@ function showRewardBox(data, alreadyClaimed) {
     status.innerHTML =
       `🎉 Coupon <b>${data.couponCode}</b> of ₹${data.rewardAmount} generated.<br>
        Valid till ${new Date(data.expiry).toLocaleDateString()}`;
-
+window._rewardAlreadyClaimed = true;
+    toggleClaimRewardOnCart(getCart());
     btn.innerText = "Claimed";
   } catch (err) {
     console.error(err);
@@ -8107,19 +8108,17 @@ async function checkAndShowMonthlyReward() {
 
     if (!data.ok) return;
 
-    showRewardBox(data.data, data.alreadyClaimed);
+    // 🔥🔥 MAIN MISSING LINE (THIS FIXES EVERYTHING)
+    window._rewardAlreadyClaimed = data.alreadyClaimed === true;
+
+    console.log("rewardAlreadyClaimed =", window._rewardAlreadyClaimed);
+
+    showRewardBox(data.data, window._rewardAlreadyClaimed);
 
   } catch (err) {
     console.error("Reward check failed", err);
   }
 }
-  
-document.addEventListener("DOMContentLoaded", () => {
-  const rewardBox = document.getElementById("rewardBox");
-  if (rewardBox) {
-    rewardBox.style.display = "none";
-  }
-});
 
   
 </script>
@@ -8131,6 +8130,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
