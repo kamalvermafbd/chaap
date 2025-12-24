@@ -6600,13 +6600,22 @@ function toggleClaimRewardOnCart(cartList) {
   const rewardBox = document.getElementById("rewardBox");
   if (!rewardBox) return;
 
-  // UI list hi final truth hai
+  // 1️⃣ Cart empty → hide
   if (!cartList || cartList.length === 0) {
     rewardBox.style.display = "none";
-  } else {
-    rewardBox.style.display = "block";
+    return;
   }
+
+  // 2️⃣ Reward text abhi ready nahi → hide
+  if (window._rewardTextReady !== true) {
+    rewardBox.style.display = "none";
+    return;
+  }
+
+  // 3️⃣ Ab safe hai → show
+  rewardBox.style.display = "block";
 }
+
 
 
 
@@ -7963,19 +7972,21 @@ function onViewCartClick() {
   // CASE 3: already open & visible → do nothing
 }
 
-  
+  window._rewardTextReady = false;
+
 function showRewardBox(data, alreadyClaimed) {
   const box = document.getElementById("rewardBox");
   const text = document.getElementById("rewardText");
   const btn = document.getElementById("claimRewardBtn");
   const status = document.getElementById("rewardStatus");
 
+  // 🔒 default hide + reset
+  window._rewardTextReady = false;
+  box.classList.add("hidden");
+
   if (!data) {
-    box.classList.add("hidden");
     return;
   }
-
-  box.classList.remove("hidden");
 
   if (alreadyClaimed) {
     text.innerText = `🎁 Reward already claimed for ${data.rewardMonth}`;
@@ -7990,7 +8001,17 @@ function showRewardBox(data, alreadyClaimed) {
     btn.style.display = "inline-block";
     status.classList.add("hidden");
   }
+
+  // ✅ text READY now
+  window._rewardTextReady = true;
+
+  // ✅ ab box show karo
+  box.classList.remove("hidden");
+
+  // 🔁 cart ke hisaab se final decision
+  toggleClaimRewardOnCart(getCart());
 }
+
 
   async function onClaimRewardClick() {
   try {
@@ -8104,6 +8125,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
