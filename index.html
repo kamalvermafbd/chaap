@@ -7117,7 +7117,24 @@ cleanupCouponUI(loadingText, offerList);
   // close list fully
   closeCouponList();
 }
-  
+
+function applyUserCouponFromList(couponCode, couponType = "") {
+  // 🔒 If already locked, stop
+  if (window._couponLocked === true) {
+    alert("Only one coupon can be applied per order");
+    return;
+  }
+
+  // 🔐 Mark coupon type (reward / promo / paid)
+  if (couponType) {
+    window._appliedCouponType = couponType;
+  }
+
+  // 🔁 Forward to existing engine
+  applyCoupon(couponCode);
+}
+
+
 function renderAvailableUserCoupons(coupons = []) {
   const box = document.getElementById("availableCouponsBox");
   const list = document.getElementById("availableCouponsList");
@@ -8317,6 +8334,7 @@ console.log("🟡 getUserCoupons response =", res);
   
 </body>
 </html>
+
 
 
 
