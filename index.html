@@ -7205,25 +7205,49 @@ function removeCouponIfNeeded() {
 
   const type = (selectedCoupon.type || "").toLowerCase();
 
-  // ONLY onetime coupon should be removed
+  // ONLY onetime coupon should be auto-removed
   if (type === "onetime") {
 
-    // Clear coupon
+    // 🔁 RESET COUPON STATE
     selectedCoupon = null;
     alreadyAppliedCouponId = "";
+    window._couponLocked = false;
+    window._appliedCouponType = "";
 
-    // Hide applied coupon UI
+    // 🔁 UI RESET
     const appliedBox = document.getElementById("bestOfferApplied");
     if (appliedBox) appliedBox.style.display = "none";
 
-    // Show removal message (Message B)
+    // 🔁 RESTORE AVAILABLE COUPONS
+    fetchAndRenderUserCouponsForCart();
+
+    // 🔁 MESSAGE
     showCouponError(
-      "Your applied coupon is no longer valid after quantity change. Please apply again."
+      "Your applied coupon is no longer valid after cart change. Please apply again."
     );
 
-    // Recalculate totals
+    // 🔁 TOTALS + HINT
     updateDrawerTotals();
+    refreshCouponMotivationHint();
   }
+}
+function removeAppliedCoupon() {
+  // 1️⃣ reset coupon state
+  selectedCoupon = null;
+  alreadyAppliedCouponId = "";
+  window._couponLocked = false;
+  window._appliedCouponType = "";
+
+  // 2️⃣ UI reset
+  const appliedBox = document.getElementById("bestOfferApplied");
+  if (appliedBox) appliedBox.style.display = "none";
+
+  // 3️⃣ restore available coupons
+  fetchAndRenderUserCouponsForCart();
+
+  // 4️⃣ totals + hint refresh
+  try { updateDrawerTotals(); } catch(e){}
+  try { refreshCouponMotivationHint(); } catch(e){}
 }
 
 
@@ -8289,6 +8313,7 @@ console.log("🟡 getUserCoupons response =", res);
   
 </body>
 </html>
+
 
 
 
