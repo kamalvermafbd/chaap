@@ -6973,6 +6973,11 @@ let selectedCoupon = null;        // coupon object (UI + totals)
 let alreadyAppliedCouponId = "";  // coupon ID (restore + protection)
 
 async function applyCoupon(couponId) {
+
+    if (window._appliedCouponType === "reward") {
+    alert("Only one coupon can be applied per order");
+    return;
+  }
 // ===============================
 // STEP 1c: Defensive apply-time guard
 // ===============================
@@ -7082,6 +7087,9 @@ cleanupCouponUI(loadingText, offerList);
   selectedCoupon = o;
   showCouponSuccess(`🎉 ${o.text} applied successfully!`);
 
+  window._appliedCouponType = "reward";
+window._rewardAlreadyClaimed = true;
+  
   // hide offer list
   const listBox = document.getElementById("offerList");
   if (listBox) listBox.style.display = "none";
@@ -8137,6 +8145,7 @@ async function checkAndShowMonthlyReward() {
   
 </body>
 </html>
+
 
 
 
