@@ -6644,10 +6644,7 @@ function refreshCouponMotivationHint() {
   window._couponHintTimer = setTimeout(() => {
     const hintBox = document.getElementById("couponHintBox");
     if (!hintBox) return;
- if (window._rewardAlreadyClaimed === true) {
-    hintBox.style.display = "none";
-    return;
-  }
+ 
     const subtotal = Number(window._drawerTotals?.baseTotal || 0);
     const loggedIn = isUserLoggedIn();
     const allOffers = window._allOffersRaw || [];
@@ -8146,6 +8143,7 @@ async function checkAndShowMonthlyReward() {
   
 </body>
 </html>
+
 
 
 
