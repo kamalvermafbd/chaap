@@ -8158,7 +8158,7 @@ async function loadAvailableCoupons() {
 
   try {
     const res = await apiGet("getUserCoupons", { mobile });
-
+console.log("🟡 getUserCoupons response =", res);
     if (!res || !res.success || !Array.isArray(res.coupons) || res.coupons.length === 0) {
       box.classList.add("hidden");
       return;
@@ -8203,6 +8203,7 @@ async function loadAvailableCoupons() {
   
 </body>
 </html>
+
 
 
 
