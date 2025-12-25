@@ -7123,7 +7123,11 @@ function renderAvailableUserCoupons(coupons = []) {
   const list = document.getElementById("availableCouponsList");
 
   if (!box || !list) return;
-
+  // 🔒 STEP-6 SAFETY: coupon already applied → hide list
+  if (window._couponLocked === true) {
+    box.classList.add("hidden");
+    return;
+  }
   // reset
   list.innerHTML = "";
 
@@ -8313,6 +8317,7 @@ console.log("🟡 getUserCoupons response =", res);
   
 </body>
 </html>
+
 
 
 
