@@ -825,21 +825,26 @@ style="
   
  <!-- 🔥 Alert message goes HERE -->
   
-  <div id="bestOfferApplied"
-     class="mt-3 p-3 border rounded-lg bg-green-50 flex justify-between items-center"
-     style="display:none;">
-  
+<!-- ✅ APPLIED COUPON BOX -->
+<div id="bestOfferApplied"
+     class="hidden mt-2 p-3 rounded-lg border border-green-300 bg-green-50
+            flex justify-between items-center">
+
   <div>
-    <div class="font-semibold text-green-800" id="appliedCouponText"></div>
-    <div class="text-sm text-green-700" id="appliedCouponSubText"></div>
+    <div id="appliedCouponText"
+         class="font-semibold text-green-800"></div>
+
+    <div id="appliedCouponSubText"
+         class="text-sm text-green-700"></div>
   </div>
 
   <button
     onclick="removeAppliedCoupon()"
-    class="text-sm text-red-600 font-semibold hover:underline">
+    class="text-sm text-red-600 font-semibold">
     Remove
   </button>
 </div>
+
 
 
   <div id="offerList"
@@ -8354,6 +8359,7 @@ console.log("🟡 getUserCoupons response =", res);
   
 </body>
 </html>
+
 
 
 
