@@ -7111,6 +7111,51 @@ cleanupCouponUI(loadingText, offerList);
   // close list fully
   closeCouponList();
 }
+function renderAvailableUserCoupons(coupons = []) {
+  const box = document.getElementById("availableCouponsBox");
+  const list = document.getElementById("availableCouponsList");
+
+  if (!box || !list) return;
+
+  // reset
+  list.innerHTML = "";
+
+  if (!Array.isArray(coupons) || coupons.length === 0) {
+    box.classList.add("hidden");
+    return;
+  }
+
+  coupons.forEach(c => {
+    const div = document.createElement("div");
+    div.className =
+      "flex justify-between items-center p-2 border rounded bg-white";
+
+    const label =
+      c.couponType === "reward"
+        ? "🎁 Reward Coupon"
+        : "🏷 Coupon";
+
+    div.innerHTML = `
+      <div>
+        <div class="font-semibold">${label}</div>
+        <div class="text-sm text-gray-600">
+          ₹${c.flat} OFF · Code: <b>${c.couponcode}</b>
+        </div>
+      </div>
+
+      <button
+        class="px-3 py-1 text-sm bg-green-600 text-white rounded"
+        onclick="applyCoupon('${c.couponcode}')"
+      >
+        Apply
+      </button>
+    `;
+
+    list.appendChild(div);
+  });
+
+  box.classList.remove("hidden");
+}
 
 // =====================================================
 // G3: Remove ONETIME coupon automatically on qty change
@@ -8203,6 +8248,7 @@ console.log("🟡 getUserCoupons response =", res);
   
 </body>
 </html>
+
 
 
 
