@@ -7119,11 +7119,16 @@ if (availBox) availBox.classList.add("hidden");
   if (listBox) listBox.style.display = "none";
 
   // show applied message
-  const appliedBox = document.getElementById("bestOfferApplied");
-  if (appliedBox) {
-    appliedBox.style.display = "block";
-    appliedBox.innerHTML = `🎉 ${o.text} applied`;
-  }
+ const appliedBox = document.getElementById("bestOfferApplied");
+const appliedText = document.getElementById("appliedCouponText");
+const appliedSub = document.getElementById("appliedCouponSubText");
+
+if (appliedBox && appliedText && appliedSub) {
+  appliedText.innerText = o.text;
+  appliedSub.innerText = `Coupon code: ${couponId}`;
+  appliedBox.style.display = "flex";
+}
+
 
   updateDrawerTotals();
 // 🧹 FINAL CLEANUP AFTER COUPON RESULT
@@ -8349,6 +8354,7 @@ console.log("🟡 getUserCoupons response =", res);
   
 </body>
 </html>
+
 
 
 
