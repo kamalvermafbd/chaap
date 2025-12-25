@@ -7087,8 +7087,9 @@ cleanupCouponUI(loadingText, offerList);
   selectedCoupon = o;
   showCouponSuccess(`🎉 ${o.text} applied successfully!`);
 
+ if (String(couponId).startsWith("RW-")) {
   window._appliedCouponType = "reward";
-window._rewardAlreadyClaimed = true;
+}
   
   // hide offer list
   const listBox = document.getElementById("offerList");
@@ -8145,6 +8146,7 @@ async function checkAndShowMonthlyReward() {
   
 </body>
 </html>
+
 
 
 
