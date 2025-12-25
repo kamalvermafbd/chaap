@@ -5932,7 +5932,7 @@ if (selectedCoupon && selectedCoupon.type === "onetime") {
   try { updateDrawerTotals(); } catch(e){}
   try { updateCartBadge(); } catch(e){}
   checkAndShowMonthlyReward();
-
+ fetchAndRenderUserCouponsForCart();
 }
 
 
@@ -7092,7 +7092,13 @@ cleanupCouponUI(loadingText, offerList);
  if (String(couponId).startsWith("RW-")) {
   window._appliedCouponType = "reward";
 }
-  
+  // 🔒 STEP-4: lock single coupon & hide available list
+window._couponLocked = true;
+
+// hide available coupons UI
+const availBox = document.getElementById("availableCouponsBox");
+if (availBox) availBox.classList.add("hidden");
+
   // hide offer list
   const listBox = document.getElementById("offerList");
   if (listBox) listBox.style.display = "none";
@@ -7111,6 +7117,7 @@ cleanupCouponUI(loadingText, offerList);
   // close list fully
   closeCouponList();
 }
+  
 function renderAvailableUserCoupons(coupons = []) {
   const box = document.getElementById("availableCouponsBox");
   const list = document.getElementById("availableCouponsList");
@@ -7157,6 +7164,39 @@ function renderAvailableUserCoupons(coupons = []) {
   box.classList.remove("hidden");
 }
 
+async function fetchAndRenderUserCouponsForCart() {
+  try {
+    const mobile =
+      localStorage.getItem("userMobile") ||
+      localStorage.getItem("mobile");
+
+    // ❌ not logged in → hide box
+    if (!mobile) {
+      renderAvailableUserCoupons([]);
+      return;
+    }
+
+    const res = await fetch(
+      API_BASE +
+        "?api=getUserCoupons&mobile=" +
+        encodeURIComponent(mobile)
+    );
+
+    const data = await res.json();
+
+    if (!data || data.success !== true) {
+      renderAvailableUserCoupons([]);
+      return;
+    }
+
+    renderAvailableUserCoupons(data.coupons || []);
+  } catch (err) {
+    console.error("Failed to load user coupons", err);
+    renderAvailableUserCoupons([]);
+  }
+}
+
+  
 // =====================================================
 // G3: Remove ONETIME coupon automatically on qty change
 // =====================================================
@@ -8182,6 +8222,7 @@ async function checkAndShowMonthlyReward() {
     console.error("Reward check failed", err);
   }
 }
+  
 async function loadAvailableCoupons() {
   const box = document.getElementById("availableCouponsBox");
   const list = document.getElementById("availableCouponsList");
@@ -8248,6 +8289,7 @@ console.log("🟡 getUserCoupons response =", res);
   
 </body>
 </html>
+
 
 
 
