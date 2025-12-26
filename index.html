@@ -7231,11 +7231,12 @@ function renderAvailableUserCoupons(coupons = []) {
     div.innerHTML = `
       <div>
         <div class="font-semibold">${label}</div>
-        <div class="text-sm text-gray-600">
+       <div class="text-sm text-gray-600 block leading-relaxed">
   ${c.text}<br/>
   Min: ₹${Number(c.min || 0).toFixed(2)}<br/>
   Code: <b>${c.id}</b>
 </div>
+
 
       </div>
 
@@ -8517,6 +8518,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
