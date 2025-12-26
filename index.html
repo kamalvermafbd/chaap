@@ -8374,6 +8374,33 @@ console.log("🟡 getUserCoupons response =", res);
     box.classList.add("hidden");
   }
 }
+function applyRewardCoupon(couponCode, rewardAmount) {
+  // 🔒 lock other coupons
+  window._couponLocked = true;
+
+  // ✅ mark as applied
+  selectedCoupon = {
+    id: couponCode,
+    type: "reward",
+    flat: Number(rewardAmount),
+    min: 0,
+    text: `Reward ₹${rewardAmount} OFF`
+  };
+
+  alreadyAppliedCouponId = couponCode;
+  window._appliedCouponType = "reward";
+
+  // 🔄 recalc totals
+  try {
+    updateDrawerTotals();
+  } catch (e) {}
+
+  // 🔁 refresh UI
+  toggleClaimRewardOnCart(getCart());
+
+  // 🧾 small feedback
+  showCouponSuccess(`Coupon applied: ${couponCode}`);
+}
 
   
 </script>
@@ -8385,6 +8412,7 @@ console.log("🟡 getUserCoupons response =", res);
   
 </body>
 </html>
+
 
 
 
