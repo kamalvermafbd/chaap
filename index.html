@@ -7779,11 +7779,24 @@ if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type 
   // =====================================================
   let offerDiscount = 0;
   let appliedOfferText = "";
-
+let rewardHint = "";
   const mode = (window.couponMode || "").toLowerCase();
 
   // ------------ MANUAL MODE ---------------
   if (mode === "manualcoupon") {
+// ⭐ STEP-3B: Reward partial usage hint
+
+
+if (selectedCoupon && selectedCoupon.type === "reward") {
+  const rewardValue = Number(selectedCoupon.flat || 0);
+
+  if (subtotal < rewardValue) {
+    const diff = rewardValue - subtotal;
+    rewardHint = `₹${diff} aur add karo to full reward use ho`;
+  } else {
+    rewardHint = `Reward coupon fully applied`;
+  }
+}
 
     if (selectedCoupon) {
       const o = selectedCoupon;
@@ -7828,14 +7841,23 @@ if (o.flat) {
 
   // Update Offer Message Box
   const appliedBox = document.getElementById("bestOfferApplied");
-  if (appliedBox) {
-    if (offerDiscount > 0) {
-      appliedBox.style.display = "block";
-      appliedBox.innerHTML = appliedOfferText;
-    } else {
-      appliedBox.style.display = "none";
-    }
+ if (appliedBox) {
+  if (offerDiscount > 0) {
+    appliedBox.style.display = "block";
+
+    appliedBox.innerHTML = `
+      <div>${appliedOfferText}</div>
+      ${
+        rewardHint
+          ? `<div class="text-sm text-red-600 mt-1">${rewardHint}</div>`
+          : ``
+      }
+    `;
+  } else {
+    appliedBox.style.display = "none";
   }
+}
+
 
 
   // ========== Subtotal after offer ==========
@@ -8457,6 +8479,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
