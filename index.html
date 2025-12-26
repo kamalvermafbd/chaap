@@ -7201,12 +7201,17 @@ function renderAvailableUserCoupons(coupons = []) {
         </div>
       </div>
 
-      <button
-        class="px-3 py-1 text-sm bg-green-600 text-white rounded"
-        onclick="applyCoupon('${c.couponcode}')"
-      >
-        Apply
-      </button>
+     <button
+  class="px-3 py-1 text-sm bg-green-600 text-white rounded"
+  onclick="${
+    c.couponType === 'reward'
+      ? `applyRewardCoupon('${c.couponcode}', ${Number(c.flat || 0)})`
+      : `applyCoupon('${c.couponcode}')`
+  }"
+>
+  Apply
+</button>
+
     `;
 
     list.appendChild(div);
@@ -8412,6 +8417,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
