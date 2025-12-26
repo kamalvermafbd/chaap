@@ -3528,6 +3528,8 @@ window._drawerTotals = null;
 renderCart();
 try { refreshCouponMotivationHint(); } catch(e){}
         closeCheckout();
+        renderMenu(window.menuItems || []);
+
       setTimeout(async () => {
   await fetchOffersFromBackend();
 
@@ -8491,6 +8493,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
