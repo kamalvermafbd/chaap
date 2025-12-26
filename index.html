@@ -3476,11 +3476,12 @@ if (orderType === "Home Delivery" && !address) {
 
     couponId: selectedCoupon ? selectedCoupon.id : "",
     couponType: selectedCoupon ? selectedCoupon.type : "",
-    couponDiscount: selectedCoupon
-      ? (selectedCoupon.flat
-          ? selectedCoupon.flat
-          : ((selectedCoupon.discount / 100) * Number(dt.baseTotal || 0)))
-      : 0,
+
+couponDiscount: selectedCoupon
+  ? Number(selectedCoupon.flat || 0)
+  : 0,
+
+    
     pincode,
   city,
   state,
@@ -3498,6 +3499,14 @@ console.log("🚀 ORDER PAYLOAD TO BACKEND:", JSON.stringify(orderData, null, 2)
   apiPost("placeOrder", orderData)
     .then(res => {
       if (res.success) {
+
+        // 🔑 STEP-1: RESET COUPON STATE AFTER SUCCESS
+selectedCoupon = null;
+window._couponLocked = false;
+window._appliedCouponId = null;
+window._appliedCouponType = null;
+window._appliedCouponDiscount = 0;
+
            overlay.style.display = "none";
 
         alert(
@@ -8480,6 +8489,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
