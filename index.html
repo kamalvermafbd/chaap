@@ -7207,10 +7207,17 @@ function renderAvailableUserCoupons(coupons = []) {
 
   // reset
   list.innerHTML = "";
-  coupons = coupons.filter(c => {
+  // ❌ reward / user coupon ko yahan mat dikhao
+coupons = coupons.filter(c => {
+  // ❌ reward / user coupon yahan nahi aayega
+  if (c.couponType === "reward") return false;
+
+  // ❌ one-time coupon already used
   if (c.type === "onetime" && c.usedOnce === true) return false;
-  return true;
+
+  return true; // ✅ valid normal coupon
 });
+
 
   if (!Array.isArray(coupons) || coupons.length === 0) {
     box.classList.add("hidden");
@@ -7259,6 +7266,52 @@ function renderAvailableUserCoupons(coupons = []) {
 
   box.classList.remove("hidden");
 }
+function renderRewardCoupons(coupons = []) {
+  const box = document.getElementById("rewardBox");
+  const text = document.getElementById("rewardText");
+  const status = document.getElementById("rewardStatus");
+
+  if (!box || !text) return;
+
+  // reset UI
+  text.innerHTML = "";
+  status?.classList.add("hidden");
+
+  // 🔒 if reward already applied, just show applied state
+  if (window._rewardApplied === true) {
+    box.classList.remove("hidden");
+    status?.classList.remove("hidden");
+    return;
+  }
+
+  // 🎯 filter ONLY reward coupons
+  const rewardCoupons = (coupons || []).filter(c => c.couponType === "reward");
+
+  if (rewardCoupons.length === 0) {
+    box.classList.add("hidden");
+    return;
+  }
+
+  const r = rewardCoupons[0]; // only ONE reward coupon allowed
+
+  text.innerHTML = `
+    <div class="flex justify-between items-start gap-3">
+      <div class="text-sm text-gray-700">
+        <div class="font-semibold">🎁 Reward Coupon</div>
+        <div>${r.text || "Reward available"}</div>
+      </div>
+
+      <button
+        class="px-3 py-1 text-sm bg-purple-600 text-white rounded"
+        onclick="applyRewardCoupon('${r.id}', ${Number(r.flat || 0)})"
+      >
+        Apply
+      </button>
+    </div>
+  `;
+
+  box.classList.remove("hidden");
+}
 
 async function fetchAndRenderUserCouponsForCart() {
   try {
@@ -7268,7 +7321,8 @@ async function fetchAndRenderUserCouponsForCart() {
 
     // ❌ not logged in → hide box
     if (!mobile) {
-      renderAvailableUserCoupons([]);
+      //renderAvailableUserCoupons([]);
+      renderRewardCoupons(data.coupons || []);
       return;
     }
 
@@ -7285,7 +7339,7 @@ async function fetchAndRenderUserCouponsForCart() {
       return;
     }
 
-    renderAvailableUserCoupons(data.coupons || []);
+    renderRewardUserCoupons(data.coupons || []);
   } catch (err) {
     console.error("Failed to load user coupons", err);
     renderAvailableUserCoupons([]);
@@ -7340,6 +7394,8 @@ function removeAppliedCoupon() {
 
   // 3️⃣ restore available coupons
   fetchAndRenderUserCouponsForCart();
+  renderRewardCoupons(window.liveOffers || []);
+
 
   // 4️⃣ totals + hint refresh
   try { updateDrawerTotals(); } catch(e){}
@@ -8518,6 +8574,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
