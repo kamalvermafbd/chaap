@@ -7793,9 +7793,18 @@ if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type 
         if (o.discount) {
           offerDiscount = subtotal * (o.discount / 100);
         }
-        if (o.flat) {
-          offerDiscount = Number(o.flat);
-        }
+
+if (o.flat) {
+
+  // ⭐ STEP-3A: CAP reward discount to cart subtotal
+  if (o.type === "reward") {
+    offerDiscount = Math.min(Number(o.flat), subtotal);
+  } else {
+    offerDiscount = Number(o.flat);
+  }
+
+}
+
 
         offerDiscount = Number(offerDiscount.toFixed(2));
         appliedOfferText = `🎁 ${o.text} applied`;
@@ -8448,6 +8457,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
