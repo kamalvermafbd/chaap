@@ -3528,12 +3528,14 @@ window._drawerTotals = null;
 
 // 4️⃣ UI refresh
 renderCart();
+try { refreshCouponMotivationHint(); } catch(e){}
 
 
         closeCheckout();
 
          setTimeout(() => {
-    location.reload();
+   fetchOffersFromBackend();
+
   }, 300);
       } else {
         alert(res.message || "Order failed.");
@@ -3544,6 +3546,8 @@ renderCart();
       alert("Error placing order. Please try again.");
     })
     .finally(() => {
+      window._orderLock = false;
+
       overlay.style.display = "none";
       document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
         .forEach(el => el.disabled = false);
@@ -8489,6 +8493,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
