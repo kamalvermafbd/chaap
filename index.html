@@ -1749,7 +1749,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbxntglODamAnkw7X5T7qSOT9xpFs_EPLoAmQnZ9GAq39k1SoYLsXrlejrQcHROrPF-Xeg/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbzI4KwSc7QWTtjOhPEU8BSYeXIQeK2-dysap2skisDQJCQzG7HXAuuAc4QP47g_wCFLAQ/exec";
 
 function apiGet(api, params = {}) {
   const url = new URL(API_BASE);
@@ -8158,7 +8158,7 @@ async function loadAvailableCoupons() {
 
   try {
     const res = await apiGet("getUserCoupons", { mobile });
-console.log("🟡 getUserCoupons response =", res);
+
     if (!res || !res.success || !Array.isArray(res.coupons) || res.coupons.length === 0) {
       box.classList.add("hidden");
       return;
@@ -8203,8 +8203,6 @@ console.log("🟡 getUserCoupons response =", res);
   
 </body>
 </html>
-
-
 
 
 
