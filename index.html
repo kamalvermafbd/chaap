@@ -6625,25 +6625,30 @@ function toggleClaimRewardOnCart(cartList) {
   const rewardBox = document.getElementById("rewardBox");
   if (!rewardBox) return;
 
-  // 1️⃣ Cart empty → hide
-  if (!cartList || cartList.length === 0) {
-    rewardBox.style.display = "none";
-    return;
+  // default hide
+  rewardBox.style.display = "none";
+
+  if (!cartList || cartList.length === 0) return;
+  if (window._rewardTextReady !== true) return;
+  if (window._rewardAlreadyClaimed === true) return;
+
+  // ✅ show reward
+  rewardBox.style.display = "block";
+
+  // 🔒 STEP-8 PRIORITY LOCK (missing part)
+  const hintBox = document.getElementById("couponHintBox");
+  if (hintBox) {
+    hintBox.style.display = "none";
+    hintBox.innerHTML = "";
   }
 
-  // 2️⃣ Reward text abhi ready nahi → hide
-  if (window._rewardTextReady !== true) {
-    rewardBox.style.display = "none";
-    return;
+  const couponsBox = document.getElementById("availableCouponsBox");
+  if (couponsBox) {
+    couponsBox.style.pointerEvents = "none";
+    couponsBox.style.opacity = "0.5";
   }
- 
-  if (window._rewardAlreadyClaimed === true) {
-    rewardBox.style.display = "none";
-    return;
-  }
-  // 3️⃣ Ab safe hai → show
-  rewardBox.style.display = "block";
 }
+
 
 
 
@@ -8232,6 +8237,27 @@ function showRewardBox(data, alreadyClaimed) {
 window._rewardAlreadyClaimed = true;
     toggleClaimRewardOnCart(getCart());
     btn.innerText = "Claimed";
+
+    // ===============================
+// STEP-9B: Apply reward as coupon
+// ===============================
+selectedCoupon = {
+  id: data.couponCode,
+  type: "reward",
+  flat: Number(data.rewardAmount),
+  min: 0,
+  text: `Reward ₹${data.rewardAmount} OFF`,
+  active: true
+};
+
+alreadyAppliedCouponId = data.couponCode;
+window._appliedCouponType = "reward";
+
+// 🔄 Recalculate totals
+try {
+  updateDrawerTotals();
+} catch (e) {}
+
   } catch (err) {
     console.error(err);
     alert("Something went wrong");
@@ -8359,6 +8385,7 @@ console.log("🟡 getUserCoupons response =", res);
   
 </body>
 </html>
+
 
 
 
