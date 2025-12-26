@@ -8383,12 +8383,12 @@ console.log("🟡 getUserCoupons response =", res);
 }
 
 
- function applyRewardCoupon(couponCode, rewardAmount) {
+function applyRewardCoupon(couponCode, rewardAmount) {
   // 🔒 lock coupons (reward wins)
   window._couponLocked = true;
   window._appliedCouponType = "reward";
 
-  // ❌ REMOVE any previously applied coupon (normal / signup / etc)
+  // ❌ REMOVE any previously applied coupon
   selectedCoupon = null;
   alreadyAppliedCouponId = "";
 
@@ -8408,18 +8408,29 @@ console.log("🟡 getUserCoupons response =", res);
     updateDrawerTotals();
   } catch (e) {}
 
-  // 🔁 refresh reward UI (hide reward box etc.)
+  // 🔁 refresh reward UI
   toggleClaimRewardOnCart(getCart());
 
-  // 🚫 DISABLE normal coupon list (IMPORTANT MISSING PART)
+  // 🚫 DISABLE normal coupon list
   const offerList = document.getElementById("offerList");
   if (offerList) {
     offerList.style.pointerEvents = "none";
     offerList.style.opacity = "0.5";
   }
 
-  // 🧾 feedback
-  showCouponSuccess(`Coupon applied: ${couponCode}`);
+  // 🔴 SHOW RED INFO MESSAGE (NEW PART)
+  const offerLoadingText = document.getElementById("offerLoadingText");
+  if (offerLoadingText) {
+    offerLoadingText.innerText =
+      "Reward coupon already applied. Promotional offers cannot be used together.";
+    offerLoadingText.style.display = "block";
+    offerLoadingText.style.color = "#dc2626"; // red
+    offerLoadingText.style.fontSize = "14px";
+    offerLoadingText.style.fontWeight = "600";
+  }
+
+  // 🧾 success feedback
+  showCouponSuccess(`🎁 Reward ₹${rewardAmount} OFF applied`);
 }
 
 
@@ -8432,6 +8443,7 @@ console.log("🟡 getUserCoupons response =", res);
   
 </body>
 </html>
+
 
 
 
