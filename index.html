@@ -8382,8 +8382,16 @@ console.log("🟡 getUserCoupons response =", res);
   }
 }
 
-
 function applyRewardCoupon(couponCode, rewardAmount) {
+
+  // 🛑 already applied → do nothing
+  if (
+    window._appliedCouponType === "reward" &&
+    alreadyAppliedCouponId === couponCode
+  ) {
+    return;
+  }
+
   // 🔒 lock coupons (reward wins)
   window._couponLocked = true;
   window._appliedCouponType = "reward";
@@ -8418,19 +8426,16 @@ function applyRewardCoupon(couponCode, rewardAmount) {
     offerList.style.opacity = "0.5";
   }
 
-  // 🔴 SHOW RED INFO MESSAGE (NEW PART)
+  // 🔴 SHOW RED INFO MESSAGE
   const offerLoadingText = document.getElementById("offerLoadingText");
   if (offerLoadingText) {
     offerLoadingText.innerText =
       "Reward coupon already applied. Promotional offers cannot be used together.";
     offerLoadingText.style.display = "block";
-    offerLoadingText.style.color = "#dc2626"; // red
+    offerLoadingText.style.color = "#dc2626";
     offerLoadingText.style.fontSize = "14px";
     offerLoadingText.style.fontWeight = "600";
   }
-
-  // 🧾 success feedback
-  showCouponSuccess(`🎁 Reward ₹${rewardAmount} OFF applied`);
 }
 
 
@@ -8443,6 +8448,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
