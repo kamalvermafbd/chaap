@@ -7229,7 +7229,7 @@ async function fetchAndRenderUserCouponsForCart() {
 
     const res = await fetch(
       API_BASE +
-        "?api=getUserCoupons&mobile=" +
+        "?api=getUserCouponsForCart&mobile=" +
         encodeURIComponent(mobile)
     );
 
@@ -8385,6 +8385,7 @@ console.log("🟡 getUserCoupons response =", res);
   
 </body>
 </html>
+
 
 
 
