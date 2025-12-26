@@ -7792,7 +7792,8 @@ if (selectedCoupon && selectedCoupon.type === "reward") {
 
   if (subtotal < rewardValue) {
     const diff = rewardValue - subtotal;
-    rewardHint = `₹${diff} aur add karo to full reward use ho`;
+    rewardHint = `Add ₹${diff} more to use the full reward`;
+
   } else {
     rewardHint = `Reward coupon fully applied`;
   }
@@ -8479,6 +8480,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
