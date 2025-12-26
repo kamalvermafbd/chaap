@@ -825,27 +825,7 @@ style="
   
  <!-- 🔥 Alert message goes HERE -->
   
-<!-- ✅ APPLIED COUPON BOX -->
-<div id="bestOfferApplied"
-     class="hidden mt-2 p-3 rounded-lg border border-green-300 bg-green-50
-            flex justify-between items-center">
-
-  <div>
-    <div id="appliedCouponText"
-         class="font-semibold text-green-800"></div>
-
-    <div id="appliedCouponSubText"
-         class="text-sm text-green-700"></div>
-  </div>
-
-  <button
-    onclick="removeAppliedCoupon()"
-    class="text-sm text-red-600 font-semibold">
-    Remove
-  </button>
-</div>
-
-
+  <div id="bestOfferApplied" class="mt-2 text-green-600 font-medium" style="display:none;"></div>
 
   <div id="offerList"
     onclick="event.stopPropagation()"
@@ -886,11 +866,6 @@ style="
   <div id="rewardStatus"
        class="hidden mt-2 text-sm text-gray-700">
   </div>
-</div>
-
-  <div id="availableCouponsBox" class="mt-3 hidden">
-  <div class="font-semibold mb-2">🎟 Available Coupons</div>
-  <div id="availableCouponsList" class="space-y-2"></div>
 </div>
 
   
@@ -1769,7 +1744,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbxntglODamAnkw7X5T7qSOT9xpFs_EPLoAmQnZ9GAq39k1SoYLsXrlejrQcHROrPF-Xeg/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbzI4KwSc7QWTtjOhPEU8BSYeXIQeK2-dysap2skisDQJCQzG7HXAuuAc4QP47g_wCFLAQ/exec";
 
 function apiGet(api, params = {}) {
   const url = new URL(API_BASE);
@@ -5952,7 +5927,7 @@ if (selectedCoupon && selectedCoupon.type === "onetime") {
   try { updateDrawerTotals(); } catch(e){}
   try { updateCartBadge(); } catch(e){}
   checkAndShowMonthlyReward();
- fetchAndRenderUserCouponsForCart();
+
 }
 
 
@@ -6625,29 +6600,25 @@ function toggleClaimRewardOnCart(cartList) {
   const rewardBox = document.getElementById("rewardBox");
   if (!rewardBox) return;
 
-  // default hide
-  rewardBox.style.display = "none";
+  // 1️⃣ Cart empty → hide
+  if (!cartList || cartList.length === 0) {
+    rewardBox.style.display = "none";
+    return;
+  }
 
-  if (!cartList || cartList.length === 0) return;
-  if (window._rewardAlreadyClaimed === true) return;
-
-  // ✅ show reward
+  // 2️⃣ Reward text abhi ready nahi → hide
+  if (window._rewardTextReady !== true) {
+    rewardBox.style.display = "none";
+    return;
+  }
+ 
+  if (window._rewardAlreadyClaimed === true) {
+    rewardBox.style.display = "none";
+    return;
+  }
+  // 3️⃣ Ab safe hai → show
   rewardBox.style.display = "block";
-
-  // 🔒 STEP-8 PRIORITY LOCK (missing part)
-  const hintBox = document.getElementById("couponHintBox");
-  if (hintBox) {
-    hintBox.style.display = "none";
-    hintBox.innerHTML = "";
-  }
-
-  const couponsBox = document.getElementById("availableCouponsBox");
-  if (couponsBox) {
-    couponsBox.style.pointerEvents = "none";
-    couponsBox.style.opacity = "0.5";
-  }
 }
-
 
 
 
@@ -7116,28 +7087,17 @@ cleanupCouponUI(loadingText, offerList);
  if (String(couponId).startsWith("RW-")) {
   window._appliedCouponType = "reward";
 }
-  // 🔒 STEP-4: lock single coupon & hide available list
-window._couponLocked = true;
-
-// hide available coupons UI
-const availBox = document.getElementById("availableCouponsBox");
-if (availBox) availBox.classList.add("hidden");
-
+  
   // hide offer list
   const listBox = document.getElementById("offerList");
   if (listBox) listBox.style.display = "none";
 
   // show applied message
- const appliedBox = document.getElementById("bestOfferApplied");
-const appliedText = document.getElementById("appliedCouponText");
-const appliedSub = document.getElementById("appliedCouponSubText");
-
-if (appliedBox && appliedText && appliedSub) {
-  appliedText.innerText = o.text;
-  appliedSub.innerText = `Coupon code: ${couponId}`;
-  appliedBox.style.display = "flex";
-}
-
+  const appliedBox = document.getElementById("bestOfferApplied");
+  if (appliedBox) {
+    appliedBox.style.display = "block";
+    appliedBox.innerHTML = `🎉 ${o.text} applied`;
+  }
 
   updateDrawerTotals();
 // 🧹 FINAL CLEANUP AFTER COUPON RESULT
@@ -7147,106 +7107,6 @@ cleanupCouponUI(loadingText, offerList);
   closeCouponList();
 }
 
-function applyUserCouponFromList(couponCode, couponType = "") {
-  // 🔒 If already locked, stop
-  if (window._couponLocked === true) {
-    alert("Only one coupon can be applied per order");
-    return;
-  }
-
-  // 🔐 Mark coupon type (reward / promo / paid)
-  if (couponType) {
-    window._appliedCouponType = couponType;
-  }
-
-  // 🔁 Forward to existing engine
-  applyCoupon(couponCode);
-}
-
-
-function renderAvailableUserCoupons(coupons = []) {
-  const box = document.getElementById("availableCouponsBox");
-  const list = document.getElementById("availableCouponsList");
-
-  if (!box || !list) return;
-  // 🔒 STEP-6 SAFETY: coupon already applied → hide list
-  if (window._couponLocked === true) {
-    box.classList.add("hidden");
-    return;
-  }
-  // reset
-  list.innerHTML = "";
-
-  if (!Array.isArray(coupons) || coupons.length === 0) {
-    box.classList.add("hidden");
-    return;
-  }
-
-  coupons.forEach(c => {
-    const div = document.createElement("div");
-    div.className =
-      "flex justify-between items-center p-2 border rounded bg-white";
-
-    const label =
-      c.couponType === "reward"
-        ? "🎁 Reward Coupon"
-        : "🏷 Coupon";
-
-    div.innerHTML = `
-      <div>
-        <div class="font-semibold">${label}</div>
-        <div class="text-sm text-gray-600">
-          ₹${c.flat} OFF · Code: <b>${c.couponcode}</b>
-        </div>
-      </div>
-
-      <button
-        class="px-3 py-1 text-sm bg-green-600 text-white rounded"
-        onclick="applyCoupon('${c.couponcode}')"
-      >
-        Apply
-      </button>
-    `;
-
-    list.appendChild(div);
-  });
-
-  box.classList.remove("hidden");
-}
-
-async function fetchAndRenderUserCouponsForCart() {
-  try {
-    const mobile =
-      localStorage.getItem("userMobile") ||
-      localStorage.getItem("mobile");
-
-    // ❌ not logged in → hide box
-    if (!mobile) {
-      renderAvailableUserCoupons([]);
-      return;
-    }
-
-    const res = await fetch(
-      API_BASE +
-        "?api=getUserCoupons&mobile=" +
-        encodeURIComponent(mobile)
-    );
-
-    const data = await res.json();
-
-    if (!data || data.success !== true) {
-      renderAvailableUserCoupons([]);
-      return;
-    }
-
-    renderAvailableUserCoupons(data.coupons || []);
-  } catch (err) {
-    console.error("Failed to load user coupons", err);
-    renderAvailableUserCoupons([]);
-  }
-}
-
-  
 // =====================================================
 // G3: Remove ONETIME coupon automatically on qty change
 // =====================================================
@@ -7255,49 +7115,25 @@ function removeCouponIfNeeded() {
 
   const type = (selectedCoupon.type || "").toLowerCase();
 
-  // ONLY onetime coupon should be auto-removed
+  // ONLY onetime coupon should be removed
   if (type === "onetime") {
 
-    // 🔁 RESET COUPON STATE
+    // Clear coupon
     selectedCoupon = null;
     alreadyAppliedCouponId = "";
-    window._couponLocked = false;
-    window._appliedCouponType = "";
 
-    // 🔁 UI RESET
+    // Hide applied coupon UI
     const appliedBox = document.getElementById("bestOfferApplied");
     if (appliedBox) appliedBox.style.display = "none";
 
-    // 🔁 RESTORE AVAILABLE COUPONS
-    fetchAndRenderUserCouponsForCart();
-
-    // 🔁 MESSAGE
+    // Show removal message (Message B)
     showCouponError(
-      "Your applied coupon is no longer valid after cart change. Please apply again."
+      "Your applied coupon is no longer valid after quantity change. Please apply again."
     );
 
-    // 🔁 TOTALS + HINT
+    // Recalculate totals
     updateDrawerTotals();
-    refreshCouponMotivationHint();
   }
-}
-function removeAppliedCoupon() {
-  // 1️⃣ reset coupon state
-  selectedCoupon = null;
-  alreadyAppliedCouponId = "";
-  window._couponLocked = false;
-  window._appliedCouponType = "";
-
-  // 2️⃣ UI reset
-  const appliedBox = document.getElementById("bestOfferApplied");
-  if (appliedBox) appliedBox.style.display = "none";
-
-  // 3️⃣ restore available coupons
-  fetchAndRenderUserCouponsForCart();
-
-  // 4️⃣ totals + hint refresh
-  try { updateDrawerTotals(); } catch(e){}
-  try { refreshCouponMotivationHint(); } catch(e){}
 }
 
 
@@ -8236,27 +8072,6 @@ function showRewardBox(data, alreadyClaimed) {
 window._rewardAlreadyClaimed = true;
     toggleClaimRewardOnCart(getCart());
     btn.innerText = "Claimed";
-
-    // ===============================
-// STEP-9B: Apply reward as coupon
-// ===============================
-selectedCoupon = {
-  id: data.couponCode,
-  type: "reward",
-  flat: Number(data.rewardAmount),
-  min: 0,
-  text: `Reward ₹${data.rewardAmount} OFF`,
-  active: true
-};
-
-alreadyAppliedCouponId = data.couponCode;
-window._appliedCouponType = "reward";
-
-// 🔄 Recalculate totals
-try {
-  updateDrawerTotals();
-} catch (e) {}
-
   } catch (err) {
     console.error(err);
     alert("Something went wrong");
@@ -8317,62 +8132,6 @@ async function checkAndShowMonthlyReward() {
     console.error("Reward check failed", err);
   }
 }
-  
-async function loadAvailableCoupons() {
-  const box = document.getElementById("availableCouponsBox");
-  const list = document.getElementById("availableCouponsList");
-
-  if (!box || !list) return;
-
-  const mobile =
-    localStorage.getItem("userMobile") ||
-    document.getElementById("mobile")?.value ||
-    "";
-
-  if (!mobile) {
-    box.classList.add("hidden");
-    return;
-  }
-
-  list.innerHTML = "Loading coupons…";
-  box.classList.remove("hidden");
-
-  try {
-    const res = await apiGet("getUserCoupons", { mobile });
-console.log("🟡 getUserCoupons response =", res);
-    if (!res || !res.success || !Array.isArray(res.coupons) || res.coupons.length === 0) {
-      box.classList.add("hidden");
-      return;
-    }
-
-    list.innerHTML = "";
-
-    res.coupons.forEach(c => {
-      const div = document.createElement("div");
-      div.className =
-        "p-2 border rounded bg-white flex justify-between items-center";
-
-      div.innerHTML = `
-        <div>
-          <div class="font-semibold">${c.couponcode}</div>
-          <div class="text-sm text-gray-600">
-            ₹${c.flat} OFF
-          </div>
-        </div>
-        <button class="text-sm text-green-600 font-medium"
-                onclick="applyCoupon('${c.couponcode}')">
-          Apply
-        </button>
-      `;
-
-      list.appendChild(div);
-    });
-
-  } catch (e) {
-    console.error("loadAvailableCoupons error", e);
-    box.classList.add("hidden");
-  }
-}
 
   
 </script>
@@ -8384,21 +8143,6 @@ console.log("🟡 getUserCoupons response =", res);
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
