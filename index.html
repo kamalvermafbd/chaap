@@ -6629,7 +6629,6 @@ function toggleClaimRewardOnCart(cartList) {
   rewardBox.style.display = "none";
 
   if (!cartList || cartList.length === 0) return;
-  if (window._rewardTextReady !== true) return;
   if (window._rewardAlreadyClaimed === true) return;
 
   // ✅ show reward
@@ -8385,6 +8384,7 @@ console.log("🟡 getUserCoupons response =", res);
   
 </body>
 </html>
+
 
 
 
