@@ -7207,6 +7207,10 @@ function renderAvailableUserCoupons(coupons = []) {
 
   // reset
   list.innerHTML = "";
+  coupons = coupons.filter(c => {
+  if (c.type === "onetime" && c.usedOnce === true) return false;
+  return true;
+});
 
   if (!Array.isArray(coupons) || coupons.length === 0) {
     box.classList.add("hidden");
@@ -8508,6 +8512,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
