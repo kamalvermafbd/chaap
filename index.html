@@ -7000,11 +7000,9 @@ let selectedCoupon = null;        // coupon object (UI + totals)
 let alreadyAppliedCouponId = "";  // coupon ID (restore + protection)
 
 async function applyCoupon(couponId) {
+  window._appliedCouponType = "normal";
+window._couponLocked = false;
 
-    if (window._appliedCouponType === "reward") {
-    alert("Only one coupon can be applied per order");
-    return;
-  }
 // ===============================
 // STEP 1c: Defensive apply-time guard
 // ===============================
@@ -7117,12 +7115,15 @@ cleanupCouponUI(loadingText, offerList);
  if (String(couponId).startsWith("RW-")) {
   window._appliedCouponType = "reward";
 }
-  // 🔒 STEP-4: lock single coupon & hide available list
-window._couponLocked = true;
+ 
+// 🔒 Lock ONLY if reward coupon (extra safety)
+if (String(couponId).startsWith("RW-")) {
+  window._couponLocked = true;
 
-// hide available coupons UI
-const availBox = document.getElementById("availableCouponsBox");
-if (availBox) availBox.classList.add("hidden");
+  const availBox = document.getElementById("availableCouponsBox");
+  if (availBox) availBox.classList.add("hidden");
+}
+
 
   // hide offer list
   const listBox = document.getElementById("offerList");
@@ -8423,5 +8424,6 @@ console.log("🟡 getUserCoupons response =", res);
   
 </body>
 </html>
+
 
 
