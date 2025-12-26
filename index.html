@@ -3538,10 +3538,6 @@ renderCart();
 try { refreshCouponMotivationHint(); } catch(e){}
         closeCheckout();
         renderMenu(window.menuItems || []);
-// 🔴 FULL RESET CART DRAWER (SAFE & FINAL)
-cart = [];
-window.cart = [];
-closeCartDrawer?.();
 
 
       setTimeout(async () => {
@@ -3552,6 +3548,11 @@ closeCartDrawer?.();
     renderAvailableUserCoupons(window.liveOffers || []);
   } catch (e) {}
 }, 0);
+
+        // ✅ FINAL HARD RESET – MUST BE LAST
+setTimeout(() => {
+  window.location.reload(true);
+}, 300);
 
       } else {
         alert(res.message || "Order failed.");
@@ -8507,6 +8508,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
