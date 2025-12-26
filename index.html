@@ -3538,6 +3538,10 @@ renderCart();
 try { refreshCouponMotivationHint(); } catch(e){}
         closeCheckout();
         renderMenu(window.menuItems || []);
+// 🔴 HARD RESET CART DRAWER UI (CRITICAL)
+openCartPanel([]);          // empty drawer
+updateDrawerTotals?.();     // totals = 0
+toggleClaimRewardOnCart?.([]); // reward logic reset
 
       setTimeout(async () => {
   await fetchOffersFromBackend();
@@ -8502,6 +8506,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
