@@ -3251,7 +3251,6 @@ function resetPlaceOrderBtn() {
 
   window._orderLock = false;
 }
-
     
 async function placeOrder() {
   console.log("🟢 placeOrder() called");
@@ -3274,8 +3273,6 @@ if (placeOrderBtn) {
   placeOrderBtn.dataset.originalText = placeOrderBtn.innerText;
   placeOrderBtn.innerText = "Processing...";
 }
-  
-
 
   const customerName = document.getElementById('customerName').value.trim();
   const email = document.getElementById('email').value.trim();
@@ -3502,10 +3499,11 @@ console.log("🚀 ORDER PAYLOAD TO BACKEND:", JSON.stringify(orderData, null, 2)
 
         // 🔑 STEP-1: RESET COUPON STATE AFTER SUCCESS
 selectedCoupon = null;
+alreadyAppliedCouponId = "";
 window._couponLocked = false;
-window._appliedCouponId = null;
 window._appliedCouponType = null;
-window._appliedCouponDiscount = 0;
+window._appliedCouponId = null;
+window._appliedCouponDiscount = 0;        
 
            overlay.style.display = "none";
 
@@ -3529,14 +3527,16 @@ window._drawerTotals = null;
 // 4️⃣ UI refresh
 renderCart();
 try { refreshCouponMotivationHint(); } catch(e){}
-
-
         closeCheckout();
+      setTimeout(async () => {
+  await fetchOffersFromBackend();
 
-         setTimeout(() => {
-   fetchOffersFromBackend();
+  // 🔑 FORCE coupon UI refresh AFTER unlock
+  try {
+    renderAvailableUserCoupons(window.liveOffers || []);
+  } catch (e) {}
+}, 0);
 
-  }, 300);
       } else {
         alert(res.message || "Order failed.");
       }
@@ -3547,13 +3547,11 @@ try { refreshCouponMotivationHint(); } catch(e){}
     })
     .finally(() => {
       window._orderLock = false;
-
       overlay.style.display = "none";
       document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
         .forEach(el => el.disabled = false);
   window._orderSubmitting = false; // 
       resetPlaceOrderBtn();
-
     });
 }
   
@@ -8493,6 +8491,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
