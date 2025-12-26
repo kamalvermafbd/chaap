@@ -8379,11 +8379,17 @@ console.log("🟡 getUserCoupons response =", res);
     box.classList.add("hidden");
   }
 }
-function applyRewardCoupon(couponCode, rewardAmount) {
+
+
+  function applyRewardCoupon(couponCode, rewardAmount) {
   // 🔒 lock other coupons
   window._couponLocked = true;
 
-  // ✅ mark as applied
+  // ❌ REMOVE any previously applied coupon (normal / signup / etc)
+  selectedCoupon = null;
+  alreadyAppliedCouponId = "";
+
+  // ✅ APPLY reward coupon
   selectedCoupon = {
     id: couponCode,
     type: "reward",
@@ -8403,11 +8409,10 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   // 🔁 refresh UI
   toggleClaimRewardOnCart(getCart());
 
-  // 🧾 small feedback
+  // 🧾 feedback
   showCouponSuccess(`Coupon applied: ${couponCode}`);
 }
 
-  
 </script>
 
   <div id="cartHandle" onclick="expandDrawerCart()">
@@ -8417,33 +8422,4 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
