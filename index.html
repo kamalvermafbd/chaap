@@ -3551,7 +3551,7 @@ try { refreshCouponMotivationHint(); } catch(e){}
 
         // ✅ FINAL HARD RESET – MUST BE LAST
 setTimeout(() => {
-  window.location.reload(true);
+  window.location.href = window.location.pathname + "?r=" + Date.now();
 }, 300);
 
       } else {
@@ -8508,6 +8508,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
