@@ -8383,9 +8383,10 @@ console.log("🟡 getUserCoupons response =", res);
 }
 
 
-  function applyRewardCoupon(couponCode, rewardAmount) {
-  // 🔒 lock other coupons
+ function applyRewardCoupon(couponCode, rewardAmount) {
+  // 🔒 lock coupons (reward wins)
   window._couponLocked = true;
+  window._appliedCouponType = "reward";
 
   // ❌ REMOVE any previously applied coupon (normal / signup / etc)
   selectedCoupon = null;
@@ -8401,19 +8402,26 @@ console.log("🟡 getUserCoupons response =", res);
   };
 
   alreadyAppliedCouponId = couponCode;
-  window._appliedCouponType = "reward";
 
   // 🔄 recalc totals
   try {
     updateDrawerTotals();
   } catch (e) {}
 
-  // 🔁 refresh UI
+  // 🔁 refresh reward UI (hide reward box etc.)
   toggleClaimRewardOnCart(getCart());
+
+  // 🚫 DISABLE normal coupon list (IMPORTANT MISSING PART)
+  const offerList = document.getElementById("offerList");
+  if (offerList) {
+    offerList.style.pointerEvents = "none";
+    offerList.style.opacity = "0.5";
+  }
 
   // 🧾 feedback
   showCouponSuccess(`Coupon applied: ${couponCode}`);
 }
+
 
 </script>
 
@@ -8424,6 +8432,7 @@ console.log("🟡 getUserCoupons response =", res);
   
 </body>
 </html>
+
 
 
 
