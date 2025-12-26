@@ -7231,20 +7231,24 @@ function renderAvailableUserCoupons(coupons = []) {
       <div>
         <div class="font-semibold">${label}</div>
         <div class="text-sm text-gray-600">
-          ₹${c.flat} OFF · Code: <b>${c.couponcode}</b>
-        </div>
+  ${c.text}<br/>
+  Min: ₹${Number(c.min || 0).toFixed(2)}<br/>
+  Code: <b>${c.id}</b>
+</div>
+
       </div>
 
      <button
   class="px-3 py-1 text-sm bg-green-600 text-white rounded"
   onclick="${
     c.couponType === 'reward'
-      ? `applyRewardCoupon('${c.couponcode}', ${Number(c.flat || 0)})`
-      : `applyCoupon('${c.couponcode}')`
+      ? `applyRewardCoupon('${c.id}', ${Number(c.flat || 0)})`
+      : `applyCoupon('${c.id}')`
   }"
 >
   Apply
 </button>
+
 
     `;
 
@@ -8512,6 +8516,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
