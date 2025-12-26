@@ -7219,8 +7219,9 @@ function renderAvailableUserCoupons(coupons = []) {
 
   coupons.forEach(c => {
     const div = document.createElement("div");
-    div.className =
-      "flex justify-between items-center p-2 border rounded bg-white";
+   div.className =
+  "flex justify-between items-start p-2 border rounded bg-white";
+
 
     const label =
       c.couponType === "reward"
@@ -8516,6 +8517,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
