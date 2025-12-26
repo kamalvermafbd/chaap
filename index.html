@@ -3504,6 +3504,15 @@ window._couponLocked = false;
 window._appliedCouponType = null;
 window._appliedCouponId = null;
 window._appliedCouponDiscount = 0;        
+// 🔴 RESET REWARD STATE (IMPORTANT)
+window._rewardApplied = false;
+window._rewardDiscount = 0;
+window._rewardId = null;
+
+// Hide reward UI
+document.getElementById("rewardBox")?.classList.add("hidden");
+document.getElementById("rewardText") && (document.getElementById("rewardText").innerText = "");
+document.getElementById("rewardStatus")?.classList.add("hidden");
 
            overlay.style.display = "none";
 
@@ -8493,6 +8502,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
