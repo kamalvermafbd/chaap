@@ -7320,10 +7320,12 @@ async function fetchAndRenderUserCouponsForCart() {
       localStorage.getItem("mobile");
 
     // ❌ Not logged in → no user/reward coupons
-    if (!mobile) {
-      renderRewardCoupons([]); // just hide reward UI
-      return;
-    }
+  if (!mobile) {
+  // ✅ guest → show normal coupons only
+  renderAvailableUserCoupons(window.liveOffers || window._allOffersRaw || []);
+  return;
+}
+
 
     const res = await fetch(
       API_BASE +
@@ -8575,6 +8577,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
