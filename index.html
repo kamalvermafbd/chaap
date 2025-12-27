@@ -6984,8 +6984,10 @@ async function openCouponList() {
 
         <div class="p-2 border-b cursor-pointer hover:bg-gray-100"
              onclick="applyCoupon('${o.id}')">
-             <div class="font-bold">${o.id}</div>
-          <div class="font-semibold">${o.text}</div>
+           <div class="font-semibold">
+  <span class="font-bold">${o.id}</span> – ${o.text}
+</div>
+
           <div class="text-sm text-gray-500">Min: ${fmt(o.min)}</div>
         </div>
       `).join("");
@@ -8509,6 +8511,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
