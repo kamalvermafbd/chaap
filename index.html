@@ -6964,7 +6964,10 @@ async function openCouponList() {
     // 3️⃣ FINAL FILTER (ONLY ONE PLACE)
     const loggedIn = isUserLoggedIn();
 
-    const activeOffers = (window.liveOffers || []).filter(o => {
+   const apiOffers =
+  (window._lastOffersResponse && window._lastOffersResponse.offers) || [];
+
+const activeOffers = apiOffers.filter(o => {
 
       // ❌ signup coupon kabhi mat dikhao
       if (o.type === "signup") return false;
@@ -8527,6 +8530,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
