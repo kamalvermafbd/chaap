@@ -6951,71 +6951,65 @@ async function openCouponList() {
   const loader  = document.getElementById("offerLoadingText");
 
   try {
-      if (!listBox || !loader) return;
+    if (!listBox || !loader) return;
 
-      // ⭐ 1. SHOW LIST + LOADER
-      listBox.style.display = "block";
-      loader.style.display  = "block";
+    // 1️⃣ show loader
+    listBox.style.display = "block";
+    loader.style.display  = "block";
 
-      // ⭐ 2. Fetch latest offers
-     
-          await fetchOffersFromBackend();
+    // 2️⃣ fetch offers
+    await fetchOffersFromBackend();
     showCouponHint(getCouponMotivationMessage());
 
+    // 3️⃣ FINAL FILTER (ONLY ONE PLACE)
+    const loggedIn = isUserLoggedIn();
 
-     // ✅ FINAL UI FILTER — yahin OFF20 ko maarna hai
-const activeOffers = (window._allOffersRaw || []).filter(o => {
-  // ❌ signup coupon kabhi mat dikhao
-  if (o.type === "signup") return false;
+    const activeOffers = (window.liveOffers || []).filter(o => {
 
-  // 🔒 ONETIME + already used → kabhi mat dikhao
-  if (o.type === "onetime" && o._usedOnce === true) {
-    return false;
-  }
-  // 👤 user applicable rule
-  const loggedIn = isUserLoggedIn();
-  const ua = (o.userApplicable || "All user").toLowerCase();
-  if (ua === "registered user" && !loggedIn) return false;
+      // ❌ signup coupon kabhi mat dikhao
+      if (o.type === "signup") return false;
 
-  // baaki active coupons dikhao
-  return o.active === true;
-});
-console.log(
-  "FINAL COUPONS SHOWN:",
-  activeOffers.map(o => ({ id: o.id, used: o._usedOnce }))
-);
+      // 🔒 onetime + already used
+      if (o.type === "onetime" && o._usedOnce === true) return false;
 
+      // 👤 registered user rule
+      const ua = (o.userApplicable || "All user").toLowerCase();
+      if (ua === "registered user" && !loggedIn) return false;
 
-      // ⭐ 3. Clear list but keep loader in top
-      listBox.innerHTML = "";
-      listBox.appendChild(loader);
-      loader.style.display = "none";
+      // ✅ finally active
+      return o.active === true;
+    });
 
-      // ⭐ 4. No offers
-     if (activeOffers.length === 0) {
+    console.log(
+      "FINAL COUPONS SHOWN:",
+      activeOffers.map(o => ({ id: o.id, used: o._usedOnce }))
+    );
 
-          listBox.innerHTML += `
-              <div class="p-2 text-gray-500 text-center">
-                No offers available
-              </div>`;
-          return;
-      }
+    // 4️⃣ render
+    listBox.innerHTML = "";
+    listBox.appendChild(loader);
+    loader.style.display = "none";
 
-      // ⭐ 5. Show offers
-     listBox.innerHTML += activeOffers.map(o => `
+    if (activeOffers.length === 0) {
+      listBox.innerHTML = `
+        <div class="p-2 text-gray-500 text-center">
+          No offers available
+        </div>`;
+      return;
+    }
 
-        <div class="p-2 border-b cursor-pointer hover:bg-gray-100"
-             onclick="applyCoupon('${o.id}')">
-           <div class="font-semibold">
-  <span class="font-bold">${o.id}</span> – ${o.text}
-</div>
-
-          <div class="text-sm text-gray-500">Min: ${fmt(o.min)}</div>
+    listBox.innerHTML += activeOffers.map(o => `
+      <div class="p-2 border-b cursor-pointer hover:bg-gray-100"
+           onclick="applyCoupon('${o.id}')">
+        <div class="font-semibold">
+          <span class="font-bold">${o.id}</span> – ${o.text}
         </div>
-      `).join("");
+        <div class="text-sm text-gray-500">Min: ${fmt(o.min)}</div>
+      </div>
+    `).join("");
 
   } catch (err) {
-      console.error("openCouponList ERROR:", err);
+    console.error("openCouponList ERROR:", err);
   }
 }
 
@@ -8533,6 +8527,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
