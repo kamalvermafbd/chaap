@@ -7312,20 +7312,18 @@ function renderRewardCoupons(coupons = []) {
 
   box.classList.remove("hidden");
 }
-
 async function fetchAndRenderUserCouponsForCart() {
   try {
     const mobile =
       localStorage.getItem("userMobile") ||
       localStorage.getItem("mobile");
 
-    // ❌ Not logged in → no user/reward coupons
-  if (!mobile) {
-  // ✅ guest → show normal coupons only
-  renderAvailableUserCoupons(window.liveOffers || window._allOffersRaw || []);
-  return;
-}
-
+    // 🔒 GUEST USER
+    // 👉 yahan se normal coupons ko touch nahi karna
+    // 👉 sirf reward/user coupons skip kar do
+    if (!mobile) {
+      return; // ✅ IMPORTANT
+    }
 
     const res = await fetch(
       API_BASE +
@@ -7336,18 +7334,19 @@ async function fetchAndRenderUserCouponsForCart() {
     const data = await res.json();
 
     if (!data || data.success !== true) {
-      renderRewardCoupons([]);
+      renderRewardCoupons([]); // sirf reward box reset
       return;
     }
 
-    // ✅ ONLY reward/user coupons here
+    // ✅ ONLY reward / user coupons render here
     renderRewardCoupons(data.coupons || []);
 
   } catch (err) {
     console.error("Failed to load user coupons", err);
-    renderRewardCoupons([]);
+    renderRewardCoupons([]); // safety
   }
 }
+
 
   
 // =====================================================
@@ -8577,6 +8576,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
