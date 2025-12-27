@@ -6964,12 +6964,18 @@ async function openCouponList() {
 
 
      // ✅ FINAL UI FILTER — yahin OFF20 ko maarna hai
-const activeOffers = (window.liveOffers || []).filter(o => {
+const activeOffers = (window._allOffersRaw || []).filter(o => {
+  // ❌ signup coupon kabhi mat dikhao
+  if (o.type === "signup") return false;
 
   // 🔒 ONETIME + already used → kabhi mat dikhao
   if (o.type === "onetime" && o._usedOnce === true) {
     return false;
   }
+  // 👤 user applicable rule
+  const loggedIn = isUserLoggedIn();
+  const ua = (o.userApplicable || "All user").toLowerCase();
+  if (ua === "registered user" && !loggedIn) return false;
 
   // baaki active coupons dikhao
   return o.active === true;
@@ -8527,6 +8533,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
