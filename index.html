@@ -6768,7 +6768,7 @@ function refreshCouponMotivationHint() {
 }
 
 
-async function fetchOffersFromBackend() {
+  async function fetchOffersFromBackend() {
   try {
     window.liveOffers = [];
     window._allOffersRaw = [];
@@ -6822,11 +6822,14 @@ async function fetchOffersFromBackend() {
         return true;
       });
 
+      // ❌ TEMPORARILY DISABLED (HINT TRIGGER)
+      /*
       setTimeout(() => {
         try {
           refreshCouponMotivationHint();
         } catch (e) {}
       }, 0);
+      */
 
       return window.liveOffers;
     }
@@ -8534,6 +8537,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
