@@ -6769,12 +6769,12 @@ function refreshCouponMotivationHint() {
 
 
 async function fetchOffersFromBackend() {
-  
   try {
-      window.liveOffers = [];
+    window.liveOffers = [];
     window._allOffersRaw = [];
+
     const mobile = isLoggedIn() ? getUserMobile() : "";
-    const cartTotal = getCartSubtotal(); //  MIN is checked on backend also
+    const cartTotal = getCartSubtotal(); // MIN is checked on backend also
 
     const res = await fetch(
       API_BASE + "?api=getOffers&mobile=" + mobile + "&cartTotal=" + cartTotal
@@ -6782,13 +6782,16 @@ async function fetchOffersFromBackend() {
 
     const data = await res.json();
 
-    if (data.success && Array.isArray(data.offers)) {
-     
-  window._allOffersRaw = Array.isArray(data.allOffersRaw)
-    ? data.allOffersRaw
-    : [];
+    // ✅ ⭐ SINGLE IMPORTANT ADDITION (DO NOT REMOVE)
+    window._lastOffersResponse = data;
 
-  window.liveOffers = data.offers;
+    if (data.success && Array.isArray(data.offers)) {
+
+      window._allOffersRaw = Array.isArray(data.allOffersRaw)
+        ? data.allOffersRaw
+        : [];
+
+      window.liveOffers = data.offers;
 
       // ===============================
       // STEP 1b: User applicable filter
@@ -6799,14 +6802,13 @@ async function fetchOffersFromBackend() {
         // signup coupons untouched
         if (o.type === "signup") return true;
 
-     const ua = (
-  o.userApplicable ||
-  o.user_applicable ||
-  o.UserApplicable ||
-  o.userapplicable ||
-  "All user"
-).toLowerCase();
-;
+        const ua = (
+          o.userApplicable ||
+          o.user_applicable ||
+          o.UserApplicable ||
+          o.userapplicable ||
+          "All user"
+        ).toLowerCase();
 
         // All user → always visible
         if (ua === "all user") return true;
@@ -6819,7 +6821,8 @@ async function fetchOffersFromBackend() {
         // safety fallback
         return true;
       });
-  setTimeout(() => {
+
+      setTimeout(() => {
         try {
           refreshCouponMotivationHint();
         } catch (e) {}
@@ -6827,6 +6830,7 @@ async function fetchOffersFromBackend() {
 
       return window.liveOffers;
     }
+
   } catch (err) {
     console.error("Offer load error:", err);
   }
@@ -8530,6 +8534,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
