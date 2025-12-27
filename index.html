@@ -6769,7 +6769,10 @@ function refreshCouponMotivationHint() {
 
 
 async function fetchOffersFromBackend() {
+  
   try {
+      window.liveOffers = [];
+    window._allOffersRaw = [];
     const mobile = isLoggedIn() ? getUserMobile() : "";
     const cartTotal = getCartSubtotal(); //  MIN is checked on backend also
 
@@ -6960,8 +6963,21 @@ async function openCouponList() {
     showCouponHint(getCouponMotivationMessage());
 
 
-      const offers = window.liveOffers || [];
-    const activeOffers = offers.filter(o => o.active === true);
+     // ✅ FINAL UI FILTER — yahin OFF20 ko maarna hai
+const activeOffers = (window.liveOffers || []).filter(o => {
+
+  // 🔒 ONETIME + already used → kabhi mat dikhao
+  if (o.type === "onetime" && o._usedOnce === true) {
+    return false;
+  }
+
+  // baaki active coupons dikhao
+  return o.active === true;
+});
+console.log(
+  "FINAL COUPONS SHOWN:",
+  activeOffers.map(o => ({ id: o.id, used: o._usedOnce }))
+);
 
 
       // ⭐ 3. Clear list but keep loader in top
@@ -8511,6 +8527,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
