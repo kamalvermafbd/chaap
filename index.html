@@ -7307,6 +7307,15 @@ if (
 
     `;
 
+    // 🔥 FORCE RESET – remove visual disabled state
+const btn = div.querySelector("button");
+if (btn) {
+  btn.classList.remove("disabled-btn");
+  btn.disabled = false;
+  btn.style.pointerEvents = "auto";
+  btn.style.opacity = "1";
+}
+
     list.appendChild(div);
   });
 
@@ -8611,6 +8620,7 @@ function hideClaimRewardBox() {
   
 </body>
 </html>
+
 
 
 
