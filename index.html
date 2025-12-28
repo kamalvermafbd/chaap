@@ -3475,8 +3475,9 @@ if (orderType === "Home Delivery" && !address) {
     couponType: selectedCoupon ? selectedCoupon.type : "",
 
 couponDiscount: selectedCoupon
-  ? Number(selectedCoupon.flat || 0)
+  ? Number(dt.offerDiscount || 0)
   : 0,
+
 
     
     pincode,
@@ -8589,6 +8590,7 @@ async function refreshMonthlySpendAndReward() {
   
 </body>
 </html>
+
 
 
 
