@@ -8332,8 +8332,7 @@ function showRewardBox(data, alreadyClaimed) {
   toggleClaimRewardOnCart(getCart());
 }
 
-
- async function onClaimRewardClick() {
+async function onClaimRewardClick() {
   try {
     const mobile =
       localStorage.getItem("userMobile") ||
@@ -8366,7 +8365,7 @@ function showRewardBox(data, alreadyClaimed) {
       return;
     }
 
-    // ✅ SUCCESS
+    // ✅ SUCCESS UI
     const couponCode = data.couponcode;
     const rewardAmount = Number(data.amount || 0);
     const expiry = data.expiry_date;
@@ -8376,17 +8375,26 @@ function showRewardBox(data, alreadyClaimed) {
       `🎉 Coupon <b>${couponCode}</b> of ₹${rewardAmount} generated.<br>
        Valid till ${new Date(expiry).toLocaleDateString()}`;
 
+    // 🔒 mark reward claimed (UI logic)
     window._rewardAlreadyClaimed = true;
     toggleClaimRewardOnCart(getCart());
     btn.innerText = "Claimed";
 
- 
-openCartDrawer();
+    // 🔥 IMPORTANT: RESET any old coupon-applied state
+    selectedCoupon = null;
+    alreadyAppliedCouponId = "";
+    window._appliedCouponType = "";
+    window._couponLocked = false;
+
+    // 🔄 FULL drawer refresh (cart + coupons + reward)
+    openCartDrawer();
+
   } catch (err) {
     console.error(err);
     alert("Something went wrong");
   }
 }
+
 
 
 async function checkMonthlyRewardStatus() {
@@ -8599,6 +8607,7 @@ async function refreshMonthlySpendAndReward() {
   
 </body>
 </html>
+
 
 
 
