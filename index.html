@@ -6601,8 +6601,13 @@ function cleanCartInvalidItems(arr) {
   );
 }
 function getUserMobile() {
-  return localStorage.getItem("mobile") || "";
+  return (
+    localStorage.getItem("userMobile") ||
+    localStorage.getItem("mobile") ||
+    ""
+  );
 }
+
 
 function getCartSubtotal() {
   let subtotal = 0;
@@ -8537,6 +8542,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
