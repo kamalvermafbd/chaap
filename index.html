@@ -1769,7 +1769,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbxIvwadmANnmvphzNJvgwj_Sriqo2vyf7JUBIRWBBiId-zQVlNvXIE558KzYcLRc03x4Q/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbyGm40FFXaR9B62r8a4rfUOu18XHnn5AVx6jxD44d1EiLoP7Y_m7igCHlu308AXm7_4gw/exec";
 
 function apiGet(api, params = {}) {
   const url = new URL(API_BASE);
@@ -8411,18 +8411,18 @@ async function checkMonthlyRewardStatus() {
     );
     const data = await res.json();
 
-    if (!data.ok) {
+    if (!data || data.eligible !== true) {
       document.getElementById("rewardBox").classList.add("hidden");
       return;
     }
 
-    showRewardBox(data.data, data.alreadyClaimed);
+    showRewardBox(data, false);
 
   } catch (e) {
     console.error("Reward check failed", e);
   }
 }
-  
+
 async function checkAndShowMonthlyReward() {
   try {
     const mobile =
@@ -8608,6 +8608,7 @@ async function refreshMonthlySpendAndReward() {
   
 </body>
 </html>
+
 
 
 
