@@ -8289,19 +8289,25 @@ function showRewardBox(data, alreadyClaimed) {
   window._rewardTextReady = false;
   box.classList.add("hidden");
 
-  if (!data) {
-    return;
-  }
+  if (!data) return;
 
-  if (alreadyClaimed) {
-    text.innerText = `🎁 Reward already claimed for ${data.rewardMonth}`;
+  // ===============================
+  // ✅ ALREADY CLAIMED
+  // ===============================
+  if (alreadyClaimed || Number(data.remainingReward) <= 0) {
+    text.innerText = "🎁 Reward already claimed for this period";
+
     btn.style.display = "none";
 
     status.classList.remove("hidden");
     status.innerText = "You can use the coupon in checkout";
-  } else {
+  }
+  // ===============================
+  // ✅ ELIGIBLE (NOT CLAIMED)
+  // ===============================
+  else {
     text.innerText =
-      `🎉 You are eligible for ₹${data.rewardAmount} reward (${data.slabName})`;
+      `🎉 You are eligible for ₹${data.remainingReward} reward (${data.slabId})`;
 
     btn.style.display = "inline-block";
     status.classList.add("hidden");
@@ -8310,7 +8316,7 @@ function showRewardBox(data, alreadyClaimed) {
   // ✅ text READY now
   window._rewardTextReady = true;
 
-  // ✅ ab box show karo
+  // ✅ show box
   box.classList.remove("hidden");
 
   // 🔁 cart ke hisaab se final decision
@@ -8602,6 +8608,7 @@ async function refreshMonthlySpendAndReward() {
   
 </body>
 </html>
+
 
 
 
