@@ -5998,6 +5998,8 @@ if (selectedCoupon && selectedCoupon.type === "onetime") {
   try { updateCartBadge(); } catch(e){}
   checkAndShowMonthlyReward();
  fetchAndRenderUserCouponsForCart();
+refreshMonthlySpendAndReward();
+
 }
 
 
@@ -8550,6 +8552,34 @@ function applyRewardCoupon(couponCode, rewardAmount) {
 }
 
 
+async function refreshMonthlySpendAndReward() {
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) return; // 👤 guest ignore
+
+  try {
+    // 1️⃣ Backend monthly spend rebuild (status-based, safe)
+    await fetch(API_BASE + "?api=refreshMonthlySpend");
+
+    // 2️⃣ Check reward eligibility for THIS user only
+    const res = await fetch(
+      API_BASE + "?api=checkMonthlyReward&mobile=" + encodeURIComponent(mobile)
+    );
+
+    const data = await res.json();
+
+    if (data.ok && data.alreadyClaimed === false) {
+      // ⚠️ function already exists / we’ll wire later
+      showClaimRewardBox(data.data);
+    } else {
+      hideClaimRewardBox();
+    }
+
+  } catch (err) {
+    console.error("❌ Monthly reward refresh failed:", err);
+  }
+}
+
+
 </script>
 
   <div id="cartHandle" onclick="expandDrawerCart()">
@@ -8559,6 +8589,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
