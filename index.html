@@ -7268,6 +7268,15 @@ function renderAvailableUserCoupons(coupons = []) {
   }
 
   coupons.forEach(c => {
+    // 🚫 skip already-applied reward coupon ONLY
+if (
+  c.couponType === "reward" &&
+  window._appliedCouponType === "reward" &&
+  alreadyAppliedCouponId === c.couponcode
+) {
+  return;
+}
+
     const div = document.createElement("div");
     div.className =
       "flex justify-between items-center p-2 border rounded bg-white";
@@ -8371,33 +8380,7 @@ function showRewardBox(data, alreadyClaimed) {
     toggleClaimRewardOnCart(getCart());
     btn.innerText = "Claimed";
 
-    // ===============================
-    // STEP-9B: Apply reward as coupon
-    // ===============================
-   const cartTotal = window._drawerTotals?.baseTotal || 0;
-
-if (cartTotal >= rewardAmount) {
-  // ✅ Auto-apply ONLY if safe
-  selectedCoupon = {
-    id: couponCode,
-    type: "reward",
-    flat: rewardAmount,
-    min: 0,
-    text: `Reward ₹${rewardAmount} OFF`,
-    active: true
-  };
-
-  alreadyAppliedCouponId = couponCode;
-  window._appliedCouponType = "reward";
-
-  try {
-    updateDrawerTotals();
-  } catch (e) {}
-} else {
-  // ❌ Do NOT auto apply
-  status.innerHTML +=
-    "<br>👉 Coupon saved. Apply it when cart amount is higher.";
-}
+ 
 openCartDrawer();
   } catch (err) {
     console.error(err);
@@ -8616,6 +8599,7 @@ async function refreshMonthlySpendAndReward() {
   
 </body>
 </html>
+
 
 
 
