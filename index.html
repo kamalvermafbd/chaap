@@ -8374,22 +8374,30 @@ function showRewardBox(data, alreadyClaimed) {
     // ===============================
     // STEP-9B: Apply reward as coupon
     // ===============================
-    selectedCoupon = {
-      id: couponCode,
-      type: "reward",
-      flat: rewardAmount,
-      min: 0,
-      text: `Reward ₹${rewardAmount} OFF`,
-      active: true
-    };
+   const cartTotal = window._drawerTotals?.baseTotal || 0;
 
-    alreadyAppliedCouponId = couponCode;
-    window._appliedCouponType = "reward";
+if (cartTotal >= rewardAmount) {
+  // ✅ Auto-apply ONLY if safe
+  selectedCoupon = {
+    id: couponCode,
+    type: "reward",
+    flat: rewardAmount,
+    min: 0,
+    text: `Reward ₹${rewardAmount} OFF`,
+    active: true
+  };
 
-    // 🔄 Recalculate totals
-    try {
-      updateDrawerTotals();
-    } catch (e) {}
+  alreadyAppliedCouponId = couponCode;
+  window._appliedCouponType = "reward";
+
+  try {
+    updateDrawerTotals();
+  } catch (e) {}
+} else {
+  // ❌ Do NOT auto apply
+  status.innerHTML +=
+    "<br>👉 Coupon saved. Apply it when cart amount is higher.";
+}
 
   } catch (err) {
     console.error(err);
@@ -8608,6 +8616,7 @@ async function refreshMonthlySpendAndReward() {
   
 </body>
 </html>
+
 
 
 
