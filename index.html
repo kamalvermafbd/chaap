@@ -8597,6 +8597,10 @@ async function refreshMonthlySpendAndReward() {
   }
 }
 
+function hideClaimRewardBox() {
+  const box = document.getElementById("rewardBox");
+  if (box) box.classList.add("hidden");
+}
 
 </script>
 
@@ -8607,6 +8611,7 @@ async function refreshMonthlySpendAndReward() {
   
 </body>
 </html>
+
 
 
 
