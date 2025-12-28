@@ -7253,6 +7253,12 @@ function renderAvailableUserCoupons(coupons = []) {
   const list = document.getElementById("availableCouponsList");
 
   if (!box || !list) return;
+
+    if (window._appliedCouponType === "reward" && alreadyAppliedCouponId) {
+  box.classList.add("hidden");
+  return;
+}
+
   // 🔒 STEP-6 SAFETY: coupon already applied → hide list
 //  if (window._couponLocked === true && window._appliedCouponType === "reward") {
  // box.classList.add("hidden");
@@ -8634,6 +8640,7 @@ function hideClaimRewardBox() {
   
 </body>
 </html>
+
 
 
 
