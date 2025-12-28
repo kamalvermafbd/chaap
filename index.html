@@ -6773,7 +6773,7 @@ function refreshCouponMotivationHint() {
     window.liveOffers = [];
     window._allOffersRaw = [];
 
-    const mobile = isLoggedIn() ? getUserMobile() : "";
+    const mobile = isUserLoggedIn() ? getUserMobile() : "";
     const cartTotal = getCartSubtotal(); // MIN is checked on backend also
 
     const res = await fetch(
@@ -8537,6 +8537,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   
 </body>
 </html>
+
 
 
 
