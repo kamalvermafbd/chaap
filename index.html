@@ -8763,19 +8763,19 @@ promoIndex = 0;
 const eligible = offers.filter(o => {
 
   // ACTIVE
-  if (String(o.active).toLowerCase() !== "true") return false;
+  if (String(o.active).trim() !== "TRUE") return false;
 
   // DATE
   const start = new Date(o.startDate + "T00:00:00");
   const end   = new Date(o.endDate + "T23:59:59");
   if (today < start || today > end) return false;
 
-  const type = String(o.type || "").toLowerCase();
-  const ua   = String(o["User applicable"] || "").toLowerCase();
+  const type = String(o.type || "").trim();
+  const ua   = String(o["User applicable"] || "").trim();
 
-  // 🎯 FINAL RULES
+  // 🎯 EXACT MATCH RULES
   if (type === "signup" && ua === "new user") return true;
-  if (ua === "registered user") return true;
+  if (ua === "Registered user") return true;
 
   return false;
 });
@@ -8904,6 +8904,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
