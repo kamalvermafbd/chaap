@@ -1832,6 +1832,8 @@ function apiGet(api, params = {}) {
   }).then(res => res.json());
 }
 async function fetchOffersForPromoBanner() {
+  console.log("📡 PROMO API RESPONSE:", res);
+
   try {
     const res = await apiGet("getOffers"); // same Offers sheet
     window._promoOffers = res.offers || [];
@@ -8695,7 +8697,9 @@ function hideClaimRewardBox() {
 }
 
  function showPromoBannerFromSheet() {
-  if (isUserLoggedIn()) return;
+console.log("🚀 PROMO FUNCTION CALLED");
+
+   if (isUserLoggedIn()) return;
 
   const banner = document.getElementById("promoBanner");
   if (!banner) return;
@@ -8748,4 +8752,5 @@ function hideClaimRewardBox() {
   
 </body>
 </html>
+
 
