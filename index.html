@@ -8773,9 +8773,14 @@ promoIndex = 0;
     // signup OR registered user offers
     return type === "signup" || ua === "registered user";
   });
+console.log("ELIGIBLE OFFERS:", eligible);
 
   // ❌ Nothing to show
-  if (eligible.length === 0) return;
+  // ❌ Nothing to show → hide banner safely
+if (eligible.length === 0) {
+  banner.style.display = "none";
+  return;
+}
 
   // 🧱 Build slides
   eligible.forEach(o => {
@@ -8893,6 +8898,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
