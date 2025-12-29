@@ -8727,19 +8727,6 @@ function hideClaimRewardBox() {
   if (box) box.classList.add("hidden");
 }
 
- // ===============================
-// PROMO BANNER – FETCH OFFERS
-// ===============================
-async function fetchOffersForPromoBanner() {
-  try {
-    const res = await apiGet("getOffers");
-    window._promoOffers = res.offers || [];
-    return window._promoOffers;
-  } catch (e) {
-    window._promoOffers = [];
-    return [];
-  }
-}
 
 // ===============================
 // PROMO BANNER – SHOW LOGIC
@@ -8899,6 +8886,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
