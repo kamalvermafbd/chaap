@@ -981,7 +981,9 @@ style="
 <!-- PROMOTION BANNER (ONLY FOR LOGGED-OUT USERS) -->
 <!-- PROMO SLIDER (STEP 1: STRUCTURE ONLY) -->
 <div id="promoBanner"
-     class="mx-4 mt-3 mb-4 rounded-2xl overflow-hidden relative">
+     class="mx-4 mt-4 mb-5 rounded-3xl overflow-hidden relative
+            shadow-2xl border border-white/10">
+
 
   <!-- CLOSE -->
   <button onclick="closePromoBanner()"
@@ -991,7 +993,7 @@ style="
 
   <!-- SLIDER TRACK -->
   <div id="promoSlides"
-       class="flex transition-transform duration-500 ease-out">
+       class="flex transition-transform duration-700 ease-in-out">
 
     <!-- 🔹 SLIDE 1 (TEMP STATIC – next step me dynamic hoga) -->
     <div class="min-w-full p-4
@@ -8814,7 +8816,8 @@ if (eligible.length === 0) {
   slide.style.backgroundPosition = "center";
 
   slide.innerHTML = `
-    <div class="p-6 min-h-[160px] flex items-center gap-6">
+    <div class="p-8 min-h-[200px] flex items-center gap-7">
+
 
       <!-- ICON -->
       <div class="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur
@@ -8832,7 +8835,8 @@ if (eligible.length === 0) {
 
       <!-- TEXT -->
       <div class="flex-1">
-        <div class="text-2xl font-extrabold leading-tight">
+        <div class="text-3xl font-extrabold leading-snug tracking-tight">
+
           ${o.text}
         </div>
 
@@ -8853,9 +8857,11 @@ if (eligible.length === 0) {
             : 'openLogin()'
         }"
         class="bg-white text-orange-600
-               px-5 py-2.5 rounded-xl
-               font-bold text-sm shadow-lg
-               hover:scale-105 transition">
+       px-6 py-3 rounded-2xl
+       font-bold text-sm
+       shadow-xl
+       hover:scale-105 hover:shadow-2xl
+       transition-all duration-200">
         ${
           String(o.type).toLowerCase() === "signup"
             ? "Signup Now"
@@ -8948,6 +8954,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
