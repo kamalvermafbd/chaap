@@ -8761,18 +8761,30 @@ function showPromoBannerFromSheet() {
 promoIndex = 0;
   // 🔍 Filter eligible offers
   const eligible = offers.filter(o => {
-    if (String(o.active).toLowerCase() !== "true") return false;
 
-    const start = new Date(o.startDate + "T00:00:00");
-    const end   = new Date(o.endDate + "T23:59:59");
-    if (today < start || today > end) return false;
+  // ✅ ACTIVE (string / boolean safe)
+  if (!String(o.active).toLowerCase().includes("true")) return false;
 
-    const type = String(o.type || "").toLowerCase();
-    const ua   = String(o["User applicable"] || "").toLowerCase();
+  // ✅ DATE SAFE
+  const start = new Date(o.startDate + "T00:00:00");
+  const end   = new Date(o.endDate + "T23:59:59");
+  if (today < start || today > end) return false;
 
-    // signup OR registered user offers
-    return type === "signup" || ua === "registered user";
-  });
+  // ✅ TYPE SAFE
+  const type = String(o.type || "").toLowerCase();
+
+  // ✅ USER APPLICABLE (ALL POSSIBLE KEYS)
+  const ua =
+    String(
+      o["User applicable"] ||
+      o.userApplicable ||
+      o.UserApplicable ||
+      ""
+    ).toLowerCase();
+
+  return type === "signup" || ua.includes("registered");
+});
+
 console.log("ELIGIBLE OFFERS:", eligible);
 
   // ❌ Nothing to show
@@ -8898,6 +8910,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
