@@ -1569,6 +1569,31 @@ style="
 
 
   <script>
+
+    const PROMO_SVGS = {
+  signup: `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/>
+    </svg>
+  `,
+  flat: `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M8 12h8M12 8v8"/>
+    </svg>
+  `,
+  percent: `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="19" y1="5" x2="5" y2="19"/>
+      <circle cx="6.5" cy="6.5" r="2.5"/>
+      <circle cx="17.5" cy="17.5" r="2.5"/>
+    </svg>
+  `
+};
+
     function isUserLoggedIn() {
   return !!localStorage.getItem("userMobile");
 }
@@ -8753,8 +8778,9 @@ const eligible = offers.filter(o => {
   if (String(o.active).toLowerCase() !== "true") return false;
 
   // DATE check
-  const start = new Date(o.startDate + "T00:00:00");
-  const end   = new Date(o.endDate + "T23:59:59");
+  const start = new Date(o.startDate);
+const end   = new Date(o.endDate);
+
   if (today < start || today > end) return false;
 
   // 🔥 ONLY ONE RULE
@@ -8776,34 +8802,67 @@ if (eligible.length === 0) {
     slide.className =
       "min-w-full p-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white";
 
-    slide.innerHTML = `
-      <div class="flex items-center gap-4">
-        <div class="w-16 h-16 flex-shrink-0 bg-white/20 rounded-xl
-                    flex items-center justify-center text-3xl">
-          🎁
-        </div>
+    const iconSvg =
+  String(o.type).toLowerCase() === "signup"
+    ? PROMO_SVGS.signup
+    : o.flat > 0
+      ? PROMO_SVGS.flat
+      : PROMO_SVGS.percent;
 
-        <div class="flex-1">
-          <div class="text-lg font-extrabold">
-            ${o.text || "Special Offer"}
-          </div>
-          <div class="text-sm opacity-95">
-            ${
-              Number(o.min || 0) > 0
-                ? `On orders above ${fmt(o.min)}`
-                : "Limited time offer"
-            }
-          </div>
-        </div>
+slide.innerHTML = `
+  <div class="flex items-center gap-5">
 
-        <button onclick="openSignup()"
-                class="bg-white text-orange-600
-                       px-4 py-2 rounded-xl
-                       font-bold text-sm">
-          ${String(o.type).toLowerCase() === "signup" ? "Signup" : "Login"}
-        </button>
+    <!-- SVG ICON -->
+    <div class="w-20 h-20 flex-shrink-0 rounded-2xl
+                bg-white/20 backdrop-blur
+                flex items-center justify-center
+                text-white shadow-md">
+      <div class="w-10 h-10">
+        ${iconSvg}
       </div>
-    `;
+    </div>
+
+    <!-- TEXT -->
+    <div class="flex-1">
+      <div class="text-xl font-extrabold leading-snug">
+        ${
+          String(o.type).toLowerCase() === "signup"
+            ? "Signup & Get Instant Reward"
+            : o.flat > 0
+              ? "Flat Discount Applied"
+              : "Limited Time Percentage Deal"
+        }
+      </div>
+
+      <div class="text-base font-semibold mt-1">
+        ${o.text}
+      </div>
+
+      <div class="text-sm opacity-90 mt-1">
+        ${
+          Number(o.min || 0) > 0
+            ? `Valid on orders above ${fmt(o.min)}`
+            : "Limited time offer"
+        }
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <button onclick="openSignup()"
+            class="bg-white text-orange-600
+                   px-5 py-2.5 rounded-xl
+                   font-bold text-sm shadow-md
+                   hover:scale-105 transition">
+      ${
+        String(o.type).toLowerCase() === "signup"
+          ? "Signup Now"
+          : "Login & Save"
+      }
+    </button>
+
+  </div>
+`;
+
 
     slidesWrap.appendChild(slide);
   });
@@ -8886,6 +8945,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
