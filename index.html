@@ -978,6 +978,47 @@ style="
     <p>Delicious meals delivered fast!</p>
     
   </header>
+<!-- PROMOTION BANNER (ONLY FOR LOGGED-OUT USERS) -->
+<div id="promoBanner"
+     class="mx-4 mt-3 mb-4 rounded-2xl p-4
+            bg-gradient-to-r from-orange-500 to-pink-500
+            text-white shadow-lg relative hidden">
+
+  <!-- Close -->
+  <button onclick="closePromoBanner()"
+          class="absolute top-2 right-3 text-white text-xl font-bold">
+    ×
+  </button>
+
+  <div class="flex items-center gap-4">
+
+    <!-- SVG ICON -->
+    <div class="w-12 h-12">
+      <!-- SVG PASTE HERE -->
+    </div>
+
+    <!-- TEXT -->
+    <div class="flex-1">
+      <div id="promoTitle"
+           class="text-lg font-extrabold">
+        Signup & Get ₹101 OFF
+      </div>
+      <div id="promoSubText"
+           class="text-sm opacity-95">
+        First order special discount
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <button onclick="openSignup()"
+            class="bg-white text-orange-600
+                   px-4 py-2 rounded-xl
+                   font-bold text-sm">
+      Signup
+    </button>
+
+  </div>
+</div>
 
 
 <!-- LEFT NAVIGATION PANEL -->
@@ -8638,6 +8679,56 @@ function hideClaimRewardBox() {
   if (box) box.classList.add("hidden");
 }
 
+  function showPromoBannerFromSheet() {
+  // ❌ Logged-in user ko banner nahi
+  if (isUserLoggedIn()) return;
+
+  const banner = document.getElementById("promoBanner");
+  if (!banner) return;
+
+  const titleEl = document.getElementById("promoTitle");
+  const subEl   = document.getElementById("promoSubText");
+
+  const offers = window.liveOffers || [];
+  const today = new Date();
+
+  // 🔍 Find first valid promo offer
+  const offer = offers.find(o => {
+    if (o.active !== true) return false;
+
+    const start = new Date(o.startDate);
+    const end   = new Date(o.endDate);
+    if (today < start || today > end) return false;
+
+    // signup offer
+    if (String(o.type).toLowerCase() === "signup") return true;
+
+    // registered user offer
+    const ua = String(o["User applicable"] || "").toLowerCase();
+    if (ua === "registered user") return true;
+
+    return false;
+  });
+
+  // ❌ No eligible offer → banner hidden
+  if (!offer) return;
+
+  // 📝 Fill banner text from sheet
+  titleEl.innerText =
+    offer.type === "signup"
+      ? offer.text
+      : `Login to unlock ${offer.text}`;
+
+  if (Number(offer.min || 0) > 0) {
+    subEl.innerText = `On orders above ${fmt(offer.min)}`;
+  } else {
+    subEl.innerText = `Limited time offer`;
+  }
+
+  // ✅ Show banner
+  banner.classList.remove("hidden");
+}
+
 </script>
 
   <div id="cartHandle" onclick="expandDrawerCart()">
@@ -8647,6 +8738,7 @@ function hideClaimRewardBox() {
   
 </body>
 </html>
+
 
 
 
