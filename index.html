@@ -8273,6 +8273,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 function onViewCartClick() {
+  showCouponHintPlaceholder(); 
    showCouponHintPlaceholder(); // 🔥 FIX: always fires
   const drawer = document.getElementById("cartDrawer");
   if (!drawer) return;
@@ -8640,6 +8641,7 @@ function hideClaimRewardBox() {
   
 </body>
 </html>
+
 
 
 
