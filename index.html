@@ -8773,8 +8773,7 @@ const eligible = offers.filter(o => {
   // 🔥 ONLY ONE RULE
 return String(o.fill || "").trim().toUpperCase() === "Y";
 });
-
-
+console.log("RAW FILLS:", offers.map(o => `[${o.id}] -> "${o.fill}"`));
 console.log("ELIGIBLE OFFERS:", eligible);
 
   // ❌ Nothing to show
@@ -8900,6 +8899,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
