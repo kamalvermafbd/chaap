@@ -8848,17 +8848,23 @@ slide.innerHTML = `
     </div>
 
     <!-- CTA -->
-    <button onclick="openSignup()"
-            class="bg-white text-orange-600
-                   px-5 py-2.5 rounded-xl
-                   font-bold text-sm shadow-md
-                   hover:scale-105 transition">
-      ${
-        String(o.type).toLowerCase() === "signup"
-          ? "Signup Now"
-          : "Login & Save"
-      }
-    </button>
+   <button
+  onclick="${
+    String(o.type).toLowerCase() === 'signup'
+      ? 'openSignup()'
+      : 'openLogin()'
+  }"
+  class="bg-white text-orange-600
+         px-5 py-2.5 rounded-xl
+         font-bold text-sm shadow-md
+         hover:scale-105 transition">
+  ${
+    String(o.type).toLowerCase() === "signup"
+      ? "Signup Now"
+      : "Login & Save"
+  }
+</button>
+
 
   </div>
 `;
@@ -8945,6 +8951,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
