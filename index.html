@@ -8771,7 +8771,7 @@ const eligible = offers.filter(o => {
   if (today < start || today > end) return false;
 
   // 🔥 ONLY ONE RULE
-  return String(o.fill) === "1";
+  return String(o.fill) === "Y";
 });
 
 
@@ -8900,6 +8900,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
