@@ -8797,81 +8797,78 @@ if (eligible.length === 0) {
 }
 
   // 🧱 Build slides
-  eligible.forEach(o => {
-    const slide = document.createElement("div");
-    slide.className =
-      "min-w-full p-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white";
+ eligible.forEach(o => {
+  const slide = document.createElement("div");
 
-    const iconSvg =
-  String(o.type).toLowerCase() === "signup"
-    ? PROMO_SVGS.signup
-    : o.flat > 0
-      ? PROMO_SVGS.flat
-      : PROMO_SVGS.percent;
+  slide.className =
+    "min-w-full relative text-white";
 
-slide.innerHTML = `
-  <div class="flex items-center gap-5">
+  slide.style.backgroundImage = `
+    linear-gradient(
+      rgba(0,0,0,0.55),
+      rgba(0,0,0,0.65)
+    ),
+    url('${o.imageUrl || ""}')
+  `;
+  slide.style.backgroundSize = "cover";
+  slide.style.backgroundPosition = "center";
 
-    <!-- SVG ICON -->
-    <div class="w-20 h-20 flex-shrink-0 rounded-2xl
-                bg-white/20 backdrop-blur
-                flex items-center justify-center
-                text-white shadow-md">
-      <div class="w-10 h-10">
-        ${iconSvg}
+  slide.innerHTML = `
+    <div class="p-6 min-h-[160px] flex items-center gap-6">
+
+      <!-- ICON -->
+      <div class="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur
+                  flex items-center justify-center shadow-lg">
+        <div class="w-10 h-10">
+          ${
+            String(o.type).toLowerCase() === "signup"
+              ? PROMO_SVGS.signup
+              : o.flat > 0
+                ? PROMO_SVGS.flat
+                : PROMO_SVGS.percent
+          }
+        </div>
       </div>
-    </div>
 
-    <!-- TEXT -->
-    <div class="flex-1">
-      <div class="text-xl font-extrabold leading-snug">
+      <!-- TEXT -->
+      <div class="flex-1">
+        <div class="text-2xl font-extrabold leading-tight">
+          ${o.text}
+        </div>
+
+        <div class="text-sm opacity-90 mt-1">
+          ${
+            Number(o.min || 0) > 0
+              ? `Valid on orders above ${fmt(o.min)}`
+              : "Limited time offer"
+          }
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <button
+        onclick="${
+          String(o.type).toLowerCase() === 'signup'
+            ? 'openSignup()'
+            : 'openLogin()'
+        }"
+        class="bg-white text-orange-600
+               px-5 py-2.5 rounded-xl
+               font-bold text-sm shadow-lg
+               hover:scale-105 transition">
         ${
           String(o.type).toLowerCase() === "signup"
-            ? "Signup & Get Instant Reward"
-            : o.flat > 0
-              ? "Flat Discount Applied"
-              : "Limited Time Percentage Deal"
+            ? "Signup Now"
+            : "Login & Save"
         }
-      </div>
+      </button>
 
-      <div class="text-base font-semibold mt-1">
-        ${o.text}
-      </div>
-
-      <div class="text-sm opacity-90 mt-1">
-        ${
-          Number(o.min || 0) > 0
-            ? `Valid on orders above ${fmt(o.min)}`
-            : "Limited time offer"
-        }
-      </div>
     </div>
+  `;
 
-    <!-- CTA -->
-   <button
-  onclick="${
-    String(o.type).toLowerCase() === 'signup'
-      ? 'openSignup()'
-      : 'openLogin()'
-  }"
-  class="bg-white text-orange-600
-         px-5 py-2.5 rounded-xl
-         font-bold text-sm shadow-md
-         hover:scale-105 transition">
-  ${
-    String(o.type).toLowerCase() === "signup"
-      ? "Signup Now"
-      : "Login & Save"
-  }
-</button>
+  slidesWrap.appendChild(slide);
+});
 
-
-  </div>
-`;
-
-
-    slidesWrap.appendChild(slide);
-  });
 
   // ✅ show banner
   banner.style.display = "block";
@@ -8951,6 +8948,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
