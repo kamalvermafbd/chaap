@@ -1841,6 +1841,7 @@ apiGet("getMenu")
     }));
    window.menuItems = res.menu;
     renderMenu(res.menu);
+    showPromoBannerFromSheet();
   })
   .catch(err => console.error("Menu load error:", err));
 
@@ -8738,6 +8739,7 @@ function hideClaimRewardBox() {
   
 </body>
 </html>
+
 
 
 
