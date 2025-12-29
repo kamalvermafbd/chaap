@@ -8745,16 +8745,22 @@ async function fetchOffersForPromoBanner() {
 // PROMO BANNER – SHOW LOGIC
 // ===============================
 function showPromoBannerFromSheet() {
-  const banner = document.getElementById("promoBanner");
-  if (!banner) return;
+  // ❌ Logged-in users → no banner
+  if (isUserLoggedIn()) return;
 
-  const titleEl = document.getElementById("promoTitle");
-  const subEl   = document.getElementById("promoSubText");
+  const banner = document.getElementById("promoBanner");
+  const slidesWrap = document.getElementById("promoSlides");
+
+  if (!banner || !slidesWrap) return;
 
   const offers = window._promoOffers || [];
   const today = new Date();
 
-  const offer = offers.find(o => {
+  // reset
+  slidesWrap.innerHTML = "";
+promoIndex = 0;
+  // 🔍 Filter eligible offers
+  const eligible = offers.filter(o => {
     if (String(o.active).toLowerCase() !== "true") return false;
 
     const start = new Date(o.startDate + "T00:00:00");
@@ -8762,27 +8768,113 @@ function showPromoBannerFromSheet() {
     if (today < start || today > end) return false;
 
     const type = String(o.type || "").toLowerCase();
-    if (type === "signup") return true;
+    const ua   = String(o["User applicable"] || "").toLowerCase();
 
-    const ua = String(o["User applicable"] || "").toLowerCase();
-    if (ua === "registered user") return true;
-
-    return false;
+    // signup OR registered user offers
+    return type === "signup" || ua === "registered user";
   });
 
-  if (!offer) return;
+  // ❌ Nothing to show
+  if (eligible.length === 0) return;
 
-  titleEl.innerText = offer.text;
-  subEl.innerText =
-    Number(offer.min || 0) > 0
-      ? `On orders above ${fmt(offer.min)}`
-      : "Limited time offer";
+  // 🧱 Build slides
+  eligible.forEach(o => {
+    const slide = document.createElement("div");
+    slide.className =
+      "min-w-full p-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white";
 
-  // 🔥 FORCE VISIBILITY (NO CSS DEPENDENCY)
-  banner.classList.remove("hidden");
+    slide.innerHTML = `
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 flex-shrink-0 bg-white/20 rounded-xl
+                    flex items-center justify-center text-3xl">
+          🎁
+        </div>
+
+        <div class="flex-1">
+          <div class="text-lg font-extrabold">
+            ${o.text || "Special Offer"}
+          </div>
+          <div class="text-sm opacity-95">
+            ${
+              Number(o.min || 0) > 0
+                ? `On orders above ${fmt(o.min)}`
+                : "Limited time offer"
+            }
+          </div>
+        </div>
+
+        <button onclick="openSignup()"
+                class="bg-white text-orange-600
+                       px-4 py-2 rounded-xl
+                       font-bold text-sm">
+          ${String(o.type).toLowerCase() === "signup" ? "Signup" : "Login"}
+        </button>
+      </div>
+    `;
+
+    slidesWrap.appendChild(slide);
+  });
+
+  // ✅ show banner
   banner.style.display = "block";
-  banner.style.visibility = "visible";
-  banner.style.opacity = "1";
+  startPromoSlider();
+
+}
+
+  let promoIndex = 0;
+let promoTimer = null;
+
+function startPromoSlider() {
+  const slides = document.getElementById("promoSlides");
+  const dotsBox = document.getElementById("promoDots");
+
+  if (!slides || slides.children.length <= 1) return;
+if (!dotsBox) return;  
+  const total = slides.children.length;
+  dotsBox.innerHTML = "";
+
+  // 🔵 build dots
+  for (let i = 0; i < total; i++) {
+    const dot = document.createElement("span");
+    dot.className =
+      "w-2.5 h-2.5 rounded-full cursor-pointer bg-white/40";
+    if (i === 0) dot.classList.add("bg-white");
+
+    dot.onclick = () => {
+      promoIndex = i;
+      updatePromoSlide();
+      restartPromoTimer();
+    };
+
+    dotsBox.appendChild(dot);
+  }
+
+  updatePromoSlide();
+  restartPromoTimer();
+  
+}
+
+function updatePromoSlide() {
+  const slides = document.getElementById("promoSlides");
+  const dots = document.querySelectorAll("#promoDots span");
+
+  slides.style.transform = `translateX(-${promoIndex * 100}%)`;
+
+  dots.forEach((d, i) => {
+    d.classList.toggle("bg-white", i === promoIndex);
+    d.classList.toggle("bg-white/40", i !== promoIndex);
+  });
+}
+
+function restartPromoTimer() {
+  clearInterval(promoTimer);
+  promoTimer = setInterval(() => {
+    const slides = document.getElementById("promoSlides");
+    if (!slides) return;
+
+    promoIndex = (promoIndex + 1) % slides.children.length;
+    updatePromoSlide();
+  }, 3500);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -8801,6 +8893,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
