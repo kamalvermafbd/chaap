@@ -8760,32 +8760,25 @@ function showPromoBannerFromSheet() {
   slidesWrap.innerHTML = "";
 promoIndex = 0;
   // 🔍 Filter eligible offers
-  const eligible = offers.filter(o => {
+const eligible = offers.filter(o => {
 
-  // ✅ ACTIVE (string / boolean safe)
-  if (!String(o.active).toLowerCase().includes("true")) return false;
+  // ACTIVE
+  if (String(o.active).toLowerCase() !== "true") return false;
 
-  // ✅ DATE SAFE
+  // DATE
   const start = new Date(o.startDate + "T00:00:00");
   const end   = new Date(o.endDate + "T23:59:59");
   if (today < start || today > end) return false;
 
-  // ✅ TYPE SAFE
-  const type = String(o.type || o.couponType || "").trim().toLowerCase();
+  const type = String(o.type || "").toLowerCase();
+  const ua   = String(o["User applicable"] || "").toLowerCase();
 
+  // 🎯 FINAL RULES
+  if (type === "signup" && ua === "new user") return true;
+  if (ua === "registered user") return true;
 
-  // ✅ USER APPLICABLE (ALL POSSIBLE KEYS)
-  const ua =
-    String(
-      o["User applicable"] ||
-      o.userApplicable ||
-      o.UserApplicable ||
-      ""
-    ).toLowerCase();
-
-  return type === "signup" || ua.includes("registered");
+  return false;
 });
-
 console.log("ELIGIBLE OFFERS:", eligible);
 
   // ❌ Nothing to show
@@ -8911,6 +8904,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
