@@ -8772,114 +8772,107 @@ function showPromoBannerFromSheet() {
 
   // reset
   slidesWrap.innerHTML = "";
-promoIndex = 0;
+  promoIndex = 0;
+
   // 🔍 Filter eligible offers
-const eligible = offers.filter(o => {
+  const eligible = offers.filter(o => {
 
-  // ACTIVE only
-  if (String(o.active).toLowerCase() !== "true") return false;
+    // ACTIVE only
+    if (String(o.active).toLowerCase() !== "true") return false;
 
-  // DATE check
-  const start = new Date(o.startDate);
-const end   = new Date(o.endDate);
+    // DATE check
+    const start = new Date(o.startDate);
+    const end   = new Date(o.endDate);
+    if (today < start || today > end) return false;
 
-  if (today < start || today > end) return false;
+    // ONLY fill = Y
+    return String(o.fill || "").trim().toUpperCase() === "Y";
+  });
 
-  // 🔥 ONLY ONE RULE
-return String(o.fill || "").trim().toUpperCase() === "Y";
-});
-console.log("RAW FILLS:", offers.map(o => `[${o.id}] -> "${o.fill}"`));
-console.log("ELIGIBLE OFFERS:", eligible);
+  console.log("RAW FILLS:", offers.map(o => `[${o.id}] -> "${o.fill}"`));
+  console.log("ELIGIBLE OFFERS:", eligible);
 
   // ❌ Nothing to show
-  // ❌ Nothing to show → hide banner safely
-if (eligible.length === 0) {
-  banner.style.display = "none";
-  return;
-}
+  if (eligible.length === 0) {
+    banner.style.display = "none";
+    return;
+  }
 
   // 🧱 Build slides
- eligible.forEach(o => {
-  const slide = document.createElement("div");
+  eligible.forEach(o => {
+    const slide = document.createElement("div");
 
-  slide.className =
-    "min-w-full relative text-white";
+    // WHITE CARD
+    slide.className = "min-w-full bg-white rounded-3xl shadow-xl";
 
-  slide.style.backgroundImage = `
-    linear-gradient(
-      rgba(0,0,0,0.55),
-      rgba(0,0,0,0.65)
-    ),
-    url('${o.imageUrl || ""}')
-  `;
-  slide.style.backgroundSize = "cover";
-  slide.style.backgroundPosition = "center";
+    slide.innerHTML = `
+      <div class="p-6 min-h-[200px] flex items-center gap-6">
 
-  slide.innerHTML = `
-    <div class="p-8 min-h-[200px] flex items-center gap-7">
-
-
-      <!-- ICON -->
-      <div class="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur
-                  flex items-center justify-center shadow-lg">
-        <div class="w-10 h-10">
-          ${
-            String(o.type).toLowerCase() === "signup"
-              ? PROMO_SVGS.signup
-              : o.flat > 0
-                ? PROMO_SVGS.flat
-                : PROMO_SVGS.percent
-          }
+        <!-- ICON -->
+        <div class="w-16 h-16 rounded-2xl bg-orange-100
+                    flex items-center justify-center
+                    shadow-md flex-shrink-0">
+          <div class="w-8 h-8 text-orange-600">
+            ${
+              String(o.type).toLowerCase() === "signup"
+                ? PROMO_SVGS.signup
+                : o.flat > 0
+                  ? PROMO_SVGS.flat
+                  : PROMO_SVGS.percent
+            }
+          </div>
         </div>
+
+        <!-- TEXT -->
+        <div class="flex-1">
+          <div class="text-xl font-extrabold text-gray-900 leading-snug">
+            ${o.text}
+          </div>
+
+          <div class="text-sm text-gray-600 mt-1">
+            ${
+              Number(o.min || 0) > 0
+                ? `Valid on orders above ${fmt(o.min)}`
+                : "Limited time offer"
+            }
+          </div>
+
+          <!-- CTA -->
+          <button
+            onclick="${
+              String(o.type).toLowerCase() === 'signup'
+                ? 'openSignup()'
+                : 'openLogin()'
+            }"
+            class="mt-4 bg-orange-500 text-white
+                   px-5 py-2.5 rounded-xl
+                   font-bold text-sm
+                   hover:bg-orange-600 transition">
+            ${
+              String(o.type).toLowerCase() === "signup"
+                ? "Signup Now"
+                : "Login & Save"
+            }
+          </button>
+        </div>
+
+        <!-- RIGHT IMAGE -->
+        <div class="w-32 h-32 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-100">
+          <img
+            src="${o.imageUrl || ''}"
+            class="w-full h-full object-cover"
+            alt="Offer Image" />
+        </div>
+
       </div>
+    `;
 
-      <!-- TEXT -->
-      <div class="flex-1">
-        <div class="text-3xl font-extrabold leading-snug tracking-tight">
-
-          ${o.text}
-        </div>
-
-        <div class="text-sm opacity-90 mt-1">
-          ${
-            Number(o.min || 0) > 0
-              ? `Valid on orders above ${fmt(o.min)}`
-              : "Limited time offer"
-          }
-        </div>
-      </div>
-
-      <!-- CTA -->
-      <button
-        onclick="${
-          String(o.type).toLowerCase() === 'signup'
-            ? 'openSignup()'
-            : 'openLogin()'
-        }"
-        class="bg-white text-orange-600
-       px-6 py-3 rounded-2xl
-       font-bold text-sm
-       shadow-xl
-       hover:scale-105 hover:shadow-2xl
-       transition-all duration-200">
-        ${
-          String(o.type).toLowerCase() === "signup"
-            ? "Signup Now"
-            : "Login & Save"
-        }
-      </button>
-
-    </div>
-  `;
-
-  slidesWrap.appendChild(slide);
-});
-
+    slidesWrap.appendChild(slide);
+  });
 
   // ✅ show banner
   banner.style.display = "block";
   startPromoSlider();
-
 }
 
   let promoIndex = 0;
@@ -8954,6 +8947,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
