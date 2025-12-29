@@ -8709,15 +8709,32 @@ function hideClaimRewardBox() {
   if (box) box.classList.add("hidden");
 }
 
- function showPromoBannerFromSheet() {
-console.log("🚀 PROMO FUNCTION CALLED");
-console.log("🧾 PROMO OFFERS:", window._promoOffers);
-   if (isUserLoggedIn()) return;
+ // ===============================
+// PROMO BANNER – FETCH OFFERS
+// ===============================
+async function fetchOffersForPromoBanner() {
+  try {
+    const res = await apiGet("getOffers");
+    window._promoOffers = res.offers || [];
+    return window._promoOffers;
+  } catch (e) {
+    window._promoOffers = [];
+    return [];
+  }
+}
 
+// ===============================
+// PROMO BANNER – SHOW LOGIC
+// ===============================
+function showPromoBannerFromSheet() {
   const banner = document.getElementById("promoBanner");
   if (!banner) return;
 
-  banner.classList.add("hidden"); // fail-safe reset
+  // ❌ DO NOT BLOCK WITH isUserLoggedIn (it is wrong in your project)
+  // Promo banner should show for guest always
+  // Logged-in handling baad me karenge
+
+  banner.classList.add("hidden");
 
   const titleEl = document.getElementById("promoTitle");
   const subEl   = document.getElementById("promoSubText");
@@ -8732,7 +8749,8 @@ console.log("🧾 PROMO OFFERS:", window._promoOffers);
     const end   = new Date(o.endDate + "T23:59:59");
     if (today < start || today > end) return false;
 
-    if (String(o.type).toLowerCase() === "signup") return true;
+    const type = String(o.type || "").toLowerCase();
+    if (type === "signup") return true;
 
     const ua = String(o["User applicable"] || "").toLowerCase();
     if (ua === "registered user") return true;
@@ -8750,10 +8768,14 @@ console.log("🧾 PROMO OFFERS:", window._promoOffers);
   subEl.innerText =
     Number(offer.min || 0) > 0
       ? `On orders above ${fmt(offer.min)}`
-      : `Limited time offer`;
+      : "Limited time offer";
 
   banner.classList.remove("hidden");
 }
+
+// ===============================
+// PROMO BANNER – SITE OPEN
+// ===============================
 document.addEventListener("DOMContentLoaded", () => {
   fetchOffersForPromoBanner().then(() => {
     showPromoBannerFromSheet();
@@ -8770,6 +8792,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
