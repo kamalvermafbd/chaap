@@ -8771,7 +8771,8 @@ promoIndex = 0;
   if (today < start || today > end) return false;
 
   // ✅ TYPE SAFE
-  const type = String(o.type || "").toLowerCase();
+  const type = String(o.type || o.couponType || "").trim().toLowerCase();
+
 
   // ✅ USER APPLICABLE (ALL POSSIBLE KEYS)
   const ua =
@@ -8910,6 +8911,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
