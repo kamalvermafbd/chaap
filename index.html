@@ -8730,12 +8730,6 @@ function showPromoBannerFromSheet() {
   const banner = document.getElementById("promoBanner");
   if (!banner) return;
 
-  // ❌ DO NOT BLOCK WITH isUserLoggedIn (it is wrong in your project)
-  // Promo banner should show for guest always
-  // Logged-in handling baad me karenge
-
-  banner.classList.add("hidden");
-
   const titleEl = document.getElementById("promoTitle");
   const subEl   = document.getElementById("promoSubText");
 
@@ -8760,22 +8754,19 @@ function showPromoBannerFromSheet() {
 
   if (!offer) return;
 
-  titleEl.innerText =
-    offer.type === "signup"
-      ? offer.text
-      : `Login to unlock ${offer.text}`;
-
+  titleEl.innerText = offer.text;
   subEl.innerText =
     Number(offer.min || 0) > 0
       ? `On orders above ${fmt(offer.min)}`
       : "Limited time offer";
 
+  // 🔥 FORCE VISIBILITY (NO CSS DEPENDENCY)
   banner.classList.remove("hidden");
+  banner.style.display = "block";
+  banner.style.visibility = "visible";
+  banner.style.opacity = "1";
 }
 
-// ===============================
-// PROMO BANNER – SITE OPEN
-// ===============================
 document.addEventListener("DOMContentLoaded", () => {
   fetchOffersForPromoBanner().then(() => {
     showPromoBannerFromSheet();
@@ -8792,6 +8783,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
