@@ -1818,11 +1818,14 @@ function populateCategoryDropdown(items) {
  
 const API_BASE = "https://script.google.com/macros/s/AKfycbyGm40FFXaR9B62r8a4rfUOu18XHnn5AVx6jxD44d1EiLoP7Y_m7igCHlu308AXm7_4gw/exec";
 
+// ===============================
+// API HELPER
+// ===============================
 function apiGet(api, params = {}) {
   const url = new URL(API_BASE);
   url.searchParams.set("api", api);
 
-  Object.keys(params).forEach(k => 
+  Object.keys(params).forEach(k =>
     url.searchParams.set(k, params[k])
   );
 
@@ -1831,37 +1834,52 @@ function apiGet(api, params = {}) {
     headers: { "Accept": "application/json" }
   }).then(res => res.json());
 }
-async function fetchOffersForPromoBanner() {
-  console.log("📡 PROMO API RESPONSE:", res);
 
+// ===============================
+// PROMO BANNER OFFER FETCH (SAFE)
+// ===============================
+async function fetchOffersForPromoBanner() {
   try {
-    const res = await apiGet("getOffers"); // same Offers sheet
+    const res = await apiGet("getOffers"); // Offers sheet
+    console.log("📡 PROMO API RESPONSE:", res);
+
     window._promoOffers = res.offers || [];
     return window._promoOffers;
+
   } catch (e) {
-    console.error("Promo banner offer fetch failed", e);
+    console.error("❌ Promo banner offer fetch failed", e);
+    window._promoOffers = [];
     return [];
   }
 }
-   fetchOffersForPromoBanner().then(() => {
-  showPromoBannerFromSheet();
+
+// ===============================
+// PROMO BANNER CALL (SITE OPEN)
+// ===============================
+document.addEventListener("DOMContentLoaded", () => {
+  fetchOffersForPromoBanner().then(() => {
+    showPromoBannerFromSheet();
+  });
 });
 
+// ===============================
+// MENU LOAD
+// ===============================
 apiGet("getMenu")
   .then(res => {
-    // ⭐ Add image field to each menu item
     res.menu = (res.menu || []).map(row => ({
       ...row,
       image: row["Image Url"] || row.image || row.Image || row.img || ""
-   // auto-detect column
     }));
-   window.menuItems = res.menu;
+
+    window.menuItems = res.menu;
     renderMenu(res.menu);
-   
   })
   .catch(err => console.error("Menu load error:", err));
 
-// LOAD cat_allocation sheet
+// ===============================
+// CAT ALLOCATION LOAD
+// ===============================
 apiGet("getCatAllocations")
   .then(res => {
     window.cat_allocations = res.cat_allocations || [];
@@ -1869,56 +1887,51 @@ apiGet("getCatAllocations")
   })
   .catch(err => console.error("cat allocation load error:", err));
 
+// ===============================
+// RESTAURANT INFO LOAD
+// ===============================
 apiGet("getRestaurantInfo")
   .then(res => {
 
-    document.getElementById("restaurantName").innerHTML = "&#127860; " + res.name;
-    document.getElementById("restaurantAddress").innerText = res.address;
+    document.getElementById("restaurantName").innerHTML =
+      "&#127860; " + res.name;
+    document.getElementById("restaurantAddress").innerText =
+      res.address;
 
-    // STORE COUPON MODE (manual / auto)
     window.couponMode = (res.coupon || "")
       .toString()
       .trim()
       .toLowerCase()
-      .replace(/[^a-z]/g, "");   // Manual Coupon → manualcoupon
+      .replace(/[^a-z]/g, "");
 
     console.log("Coupon Mode =", window.couponMode);
 
-    // === COUPON UI CONTROL ===
     const couponSection = document.getElementById("offerSection");
     const applyBtn = document.getElementById("applyCouponBtn");
-    
-if (window.couponMode === "manualcoupon") {
 
-      console.log("MODE = Manual Coupon");
-
+    if (window.couponMode === "manualcoupon") {
       if (couponSection) couponSection.style.display = "block";
       if (applyBtn) applyBtn.style.display = "block";
-
     } else {
-
-      console.log("MODE = BEST OFFER");
-
       if (applyBtn) applyBtn.style.display = "none";
       if (couponSection) couponSection.style.display = "block";
     }
 
-    // TAX SETTINGS
-    restaurantTax.taxType        = res.taxType || "";
-    restaurantTax.servicePercent = (res.servicePercent && res.servicePercent !== "NIL") 
-                                   ? Number(res.servicePercent) 
-                                   : 0;
+    restaurantTax.taxType = res.taxType || "";
+    restaurantTax.servicePercent =
+      res.servicePercent && res.servicePercent !== "NIL"
+        ? Number(res.servicePercent)
+        : 0;
 
-    restaurantTax.cgstPercent    = Number(res.cgstPercent) || 0;
-    restaurantTax.sgstPercent    = Number(res.sgstPercent) || 0;
-    restaurantTax.igstPercent    = Number(res.igstPercent) || 0;
+    restaurantTax.cgstPercent = Number(res.cgstPercent) || 0;
+    restaurantTax.sgstPercent = Number(res.sgstPercent) || 0;
+    restaurantTax.igstPercent = Number(res.igstPercent) || 0;
 
     console.log("Restaurant Tax Settings Loaded:", restaurantTax);
   })
   .catch(err => {
     console.error("Restaurant info load error:", err);
   });
-
 
 
     
@@ -8757,6 +8770,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
