@@ -1858,18 +1858,18 @@ function apiGet(api, params = {}) {
 // ===============================
 async function fetchOffersForPromoBanner() {
   try {
-    const res = await apiGet("getOffers"); // Offers sheet
-    console.log("📡 PROMO API RESPONSE:", res);
+    const res = await apiGet("getOffers");
 
-    window._promoOffers = res.offers || [];
+    // 🔥 IMPORTANT FIX
+    window._promoOffers = res.allOffersRaw || [];
+
     return window._promoOffers;
-
   } catch (e) {
-    console.error("❌ Promo banner offer fetch failed", e);
     window._promoOffers = [];
     return [];
   }
 }
+
 
 // ===============================
 // PROMO BANNER CALL (SITE OPEN)
@@ -8899,6 +8899,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
