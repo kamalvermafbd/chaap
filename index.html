@@ -8698,7 +8698,7 @@ function hideClaimRewardBox() {
 
  function showPromoBannerFromSheet() {
 console.log("🚀 PROMO FUNCTION CALLED");
-
+console.log("🧾 PROMO OFFERS:", window._promoOffers);
    if (isUserLoggedIn()) return;
 
   const banner = document.getElementById("promoBanner");
@@ -8741,6 +8741,11 @@ console.log("🚀 PROMO FUNCTION CALLED");
 
   banner.classList.remove("hidden");
 }
+document.addEventListener("DOMContentLoaded", () => {
+  fetchOffersForPromoBanner().then(() => {
+    showPromoBannerFromSheet();
+  });
+});
 
 
 </script>
@@ -8752,5 +8757,6 @@ console.log("🚀 PROMO FUNCTION CALLED");
   
 </body>
 </html>
+
 
 
