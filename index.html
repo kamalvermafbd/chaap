@@ -8760,7 +8760,15 @@ function hideClaimRewardBox() {
 // ===============================
 function showPromoBannerFromSheet() {
   // ❌ Logged-in users → no banner
-  if (isUserLoggedIn()) return;
+if (isUserLoggedIn()) {
+  const banner = document.getElementById("promoBanner");
+  const slidesWrap = document.getElementById("promoSlides");
+
+  if (banner) banner.style.display = "none";
+  if (slidesWrap) slidesWrap.innerHTML = "";
+
+  return;
+}
 
   const banner = document.getElementById("promoBanner");
   const slidesWrap = document.getElementById("promoSlides");
@@ -8948,6 +8956,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
