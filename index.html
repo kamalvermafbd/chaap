@@ -7105,7 +7105,13 @@ function getBestOffer(total) {
 
 // STEP 2A – Apply Coupon button (open offer list)
 async function openCouponList() {
-
+const box = document.getElementById("availableCouponsBox");
+  if (box) {
+    box.classList.remove("hidden");
+    box.style.display = "block";
+    box.style.maxHeight = "none";
+    box.style.overflow = "visible";
+  }
   const listBox = document.getElementById("offerList");
   const loader  = document.getElementById("offerLoadingText");
 
@@ -8969,6 +8975,7 @@ function clearCouponListsOnly() {
   
 </body>
 </html>
+
 
 
 
