@@ -5022,6 +5022,11 @@ if ('serviceWorker' in navigator) {
 </script>
   
 <script>
+  function clearCouponListOnly() {
+  const list = document.getElementById("availableCouponsList");
+  if (list) list.innerHTML = "";
+}
+
 async function loginUser() {
   const mobile = document.getElementById("loginMobile").value.trim();
   const password = document.getElementById("loginPassword").value.trim();
@@ -5057,7 +5062,7 @@ async function loginUser() {
 
       // 4️⃣ Merge guest cart → backend cart
       await onUserLogin(mobile);
-
+clearCouponListOnly();
       // 5️⃣ Recalculate drawer totals so discount shows instantly
       try { updateDrawerTotals(); } catch(e){ console.error(e); }
 
@@ -8948,3 +8953,4 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
