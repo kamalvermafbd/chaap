@@ -5539,7 +5539,7 @@ async function onUserLogin(mobile) {
   // 5) Save local mirror
   // -------------------------------
   localStorage.setItem("cart", JSON.stringify(finalMerged));
-
+  resetCouponUI();
   // -------------------------------
   // 6) Render UI
   // -------------------------------
@@ -8946,6 +8946,15 @@ document.addEventListener("DOMContentLoaded", () => {
     showPromoBannerFromSheet();
   });
 });
+function resetCouponUI() {
+  const list = document.getElementById("availableCouponsList");
+  const box  = document.getElementById("availableCouponsBox");
+  const offerList = document.getElementById("offerList");
+
+  if (list) list.innerHTML = "";
+  if (offerList) offerList.innerHTML = "";
+  if (box) box.classList.add("hidden");
+}
 
 
 </script>
@@ -8957,33 +8966,5 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
