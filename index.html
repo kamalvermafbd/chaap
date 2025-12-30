@@ -816,7 +816,7 @@ style="
 <div id="offerSection" class="p-3 border-t mt-3" style="background:#fff;">
 
   <button id="applyCouponBtn"
-          onclick="openCouponList()"
+          onclick="toggleCouponPanel()"
 
           class="w-full py-2 rounded-lg border
                border-orange-300
@@ -8970,6 +8970,12 @@ function clearCouponListsOnly() {
   if (list) list.innerHTML = "";
   if (offerList) offerList.innerHTML = "";
 }
+function toggleCouponPanel() {
+  const box = document.getElementById("availableCouponsBox");
+  if (!box) return;
+
+  box.classList.toggle("hidden");
+}
 
 
 </script>
@@ -8981,6 +8987,7 @@ function clearCouponListsOnly() {
   
 </body>
 </html>
+
 
 
 
