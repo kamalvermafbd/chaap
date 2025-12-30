@@ -7108,8 +7108,11 @@ window._manualOfferOpen = false;
 async function openCouponList() {
  window._manualOfferOpen = true;
 
-  const box = document.getElementById("availableCouponsBox");
-  if (box) box.classList.remove("hidden");
+  const availBox = document.getElementById("availableCouponsBox");
+  if (availBox) {
+    availBox.classList.remove("hidden");
+  }
+
 
   const listBox = document.getElementById("offerList");
   const loader  = document.getElementById("offerLoadingText");
@@ -7120,6 +7123,7 @@ async function openCouponList() {
     // 1️⃣ show loader
     listBox.style.display = "block";
     loader.style.display  = "block";
+ fetchAndRenderUserCouponsForCart();
 
     // 2️⃣ fetch offers
     await fetchOffersFromBackend();
@@ -8977,6 +8981,7 @@ function clearCouponListsOnly() {
   
 </body>
 </html>
+
 
 
 
