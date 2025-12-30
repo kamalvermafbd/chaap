@@ -5063,6 +5063,7 @@ async function loginUser() {
       // 4️⃣ Merge guest cart → backend cart
       await onUserLogin(mobile);
 clearCouponListOnly();
+      window._allOffersRaw = null;
       // 5️⃣ Recalculate drawer totals so discount shows instantly
       try { updateDrawerTotals(); } catch(e){ console.error(e); }
 
@@ -8953,4 +8954,5 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
