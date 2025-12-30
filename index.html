@@ -7102,16 +7102,15 @@ function getBestOffer(total) {
   return best;
 }
  
+window._manualOfferOpen = false;
 
 // STEP 2A – Apply Coupon button (open offer list)
 async function openCouponList() {
-const box = document.getElementById("availableCouponsBox");
-  if (box) {
-    box.classList.remove("hidden");
-    box.style.display = "block";
-    box.style.maxHeight = "none";
-    box.style.overflow = "visible";
-  }
+ window._manualOfferOpen = true;
+
+  const box = document.getElementById("availableCouponsBox");
+  if (box) box.classList.remove("hidden");
+
   const listBox = document.getElementById("offerList");
   const loader  = document.getElementById("offerLoadingText");
 
@@ -7401,10 +7400,13 @@ function renderAvailableUserCoupons(coupons = []) {
   // reset
   list.innerHTML = "";
 
-  if (!Array.isArray(coupons) || coupons.length === 0) {
+ if (!Array.isArray(coupons) || coupons.length === 0) {
+  if (!window._manualOfferOpen) {
     box.classList.add("hidden");
-    return;
   }
+  return;
+}
+
 
   coupons.forEach(c => {
     // 🚫 skip already-applied reward coupon ONLY
@@ -8975,6 +8977,7 @@ function clearCouponListsOnly() {
   
 </body>
 </html>
+
 
 
 
