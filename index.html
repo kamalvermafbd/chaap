@@ -8815,8 +8815,10 @@ function showPromoBannerFromSheet() {
   eligible.forEach(o => {
     const slide = document.createElement("div");
 
-    // WHITE CARD
-    slide.className = "min-w-full bg-white rounded-3xl shadow-xl";
+   
+   slide.className =
+  "min-w-full bg-gradient-to-r from-orange-50 to-orange-100 rounded-3xl shadow-xl";
+
 
     slide.innerHTML = `
       <div class="p-5 min-h-[180px] flex items-center gap-4">
@@ -8961,6 +8963,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
