@@ -5075,6 +5075,8 @@ async function loginUser() {
       setTimeout(() => {
         closeLogin();
         unlockLoginForm();
+          const box = document.getElementById("availableCouponsBox");
+  if (box) box.classList.add("hidden");
         // window.location.reload(true);
       }, 50);
 
@@ -8967,6 +8969,7 @@ function clearCouponListsOnly() {
   
 </body>
 </html>
+
 
 
 
