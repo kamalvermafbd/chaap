@@ -806,25 +806,35 @@ body::before {
 </button>
 
   
-<div  id="signupLabelBox" 
-style="
-  position:absolute;
-  right:12px;
-  top:100px;
-  width:180px;
-  text-align:right;
-  font-size:13px;
-  color:#FFFFFF; 
-  font-weight:500;
-  font-family:Poppins, sans-serif;
-  line-height:16px;
-">
+<div id="signupLabelBox"
+     style="
+       position:absolute;
+       right:12px;
+       top:100px;
+       width:180px;
+       text-align:right;
+       font-size:13px;
+       color:#EA580C;
+       font-weight:500;
+       font-family:Poppins, sans-serif;
+       line-height:16px;
+     ">
   
-  <span style="color:#FFFFFF; font-weight:600; text-decoration:none; cursor:pointer;"
-        onclick="openSignup()">
-  Are you not registered? <br> Just Sign Up
+  <span
+    style="
+      color:#EA580C;
+      font-weight:600;
+      cursor:pointer;
+      text-decoration:none;
+    "
+    onmouseover="this.style.textDecoration='underline'"
+    onmouseout="this.style.textDecoration='none'"
+    onclick="openSignup()">
+    Are you not registered? Just Sign Up..
   </span>
+
 </div>
+
 
   <div id="cartBackdrop" onclick="closeCartDrawer()"></div> 
 <div id="cartDrawer"> 
@@ -8993,6 +9003,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
