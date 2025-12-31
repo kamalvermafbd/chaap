@@ -986,6 +986,7 @@ style="
   </header>
 <!-- PROMOTION BANNER (ONLY FOR LOGGED-OUT USERS) -->
 <!-- PROMO SLIDER (STEP 1: STRUCTURE ONLY) -->
+<!-- PROMOTION BANNER (ONLY DYNAMIC – NO STATIC SLIDE) -->
 <div id="promoBanner"
   class="mx-4 mt-4 mb-5
          py-2
@@ -995,57 +996,27 @@ style="
          shadow-xl
          border border-white/10
          bg-[#fff7f2]
-         overflow-hidden">
+         overflow-hidden
+         hidden">
 
-
-
-  <!-- CLOSE -->
+  <!-- CLOSE BUTTON -->
   <button onclick="closePromoBanner()"
-          class="absolute top-2 right-3 z-10 text-white text-xl font-bold">
+          class="absolute top-2 right-3 z-10 text-gray-500 text-xl font-bold">
     ×
   </button>
 
-  <!-- SLIDER TRACK -->
+  <!-- SLIDER TRACK (JS will inject slides here) -->
   <div id="promoSlides"
        class="flex transition-transform duration-700 ease-in-out">
-
-    <!-- 🔹 SLIDE 1 (TEMP STATIC – next step me dynamic hoga) -->
-    <div class="min-w-full p-4
-                bg-gradient-to-r from-orange-500 to-pink-500
-                text-white">
-
-      <div class="flex items-center gap-4">
-
-        <!-- ICON / IMAGE AREA -->
-        <div class="w-16 h-16 flex-shrink-0 bg-white/20 rounded-xl
-                    flex items-center justify-center text-3xl">
-          🎁
-        </div>
-
-        <!-- TEXT -->
-        <div class="flex-1">
-          <div id="promoTitle"
-               class="text-lg font-extrabold">
-            Signup & Get ₹101 OFF
-          </div>
-          <div id="promoSubText"
-               class="text-sm opacity-95">
-            First order special discount
-          </div>
-        </div>
-
-        <!-- CTA -->
-        <button onclick="openSignup()"
-                class="bg-white text-orange-600
-                       px-4 py-2 rounded-xl
-                       font-bold text-sm">
-          Signup
-        </button>
-
-      </div>
-    </div>
-
+    <!-- 🔥 NO STATIC SLIDE HERE -->
   </div>
+
+  <!-- DOTS (optional, if used by slider JS) -->
+  <div id="promoDots"
+       class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+  </div>
+
+</div>
 
   <!-- DOTS (STEP 2+) -->
   <div id="promoDots"
@@ -8993,6 +8964,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
