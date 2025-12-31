@@ -7288,7 +7288,7 @@ if (offer) {
   // Guest trying to apply Registered user coupon
   if (ua === "registered user" && !isUserLoggedIn()) {
     showCouponError("Please login to use this offer.");
-    return; // ⛔ HARD STOP
+    return { success: false }; 
   }
 }
 
@@ -7329,8 +7329,7 @@ couponItems.forEach(el => {
   if (!o) {
     showCouponError("This promotional offer is no longer available.");
     cleanupCouponUI(loadingText, offerList);
-
-    return;
+     return { success: false };
   }
 // 🔒 ONETIME COUPON CHECK (minimal)
 if (o.type === "onetime") {
@@ -7352,8 +7351,7 @@ if (o.type === "onetime") {
   showCouponError("This promotional offer has already been used.");
       // 🧹 cleanup coupon UI
  cleanupCouponUI(loadingText, offerList);
-
-  return; // ⛔ YAHI SE COUPON STOP
+ return { success: false };
 }
 
 }
@@ -7375,8 +7373,7 @@ if (o.type === "onetime") {
        Your subtotal: ${fmt(subtotal)}`
     );
 cleanupCouponUI(loadingText, offerList);
-
-    return;
+ return { success: false };
   }
 
   // ⭐ VERY IMPORTANT — Save applied coupon ID for restore
@@ -7421,6 +7418,7 @@ cleanupCouponUI(loadingText, offerList);
 
   // close list fully
   closeCouponList();
+   return { success: false };
 }
 
 function applyUserCouponFromList(couponCode, couponType = "") {
@@ -9039,6 +9037,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
