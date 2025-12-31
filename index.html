@@ -1998,10 +1998,16 @@ apiGet("getCatAllocations")
 apiGet("getRestaurantInfo")
   .then(res => {
 
-    document.getElementById("restaurantName").innerHTML =
-      "&#127860; " + res.name;
-    document.getElementById("restaurantAddress").innerText =
-      res.address;
+    const nameEl = document.getElementById("restaurantName");
+    const addrEl = document.getElementById("restaurantAddress");
+
+    if (nameEl) {
+      nameEl.innerHTML = "&#127860; " + (res.name || "");
+    }
+
+    if (addrEl) {
+      addrEl.innerText = res.address || "";
+    }
 
     window.couponMode = (res.coupon || "")
       .toString()
@@ -2038,8 +2044,6 @@ apiGet("getRestaurantInfo")
     console.error("Restaurant info load error:", err);
   });
 
-
-    
 function slugify(s) {
   return String(s || "")
     .toLowerCase()
@@ -9037,6 +9041,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
