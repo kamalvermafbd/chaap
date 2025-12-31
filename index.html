@@ -8800,9 +8800,11 @@ function showPromoBannerFromSheet() {
     if (String(o.active).toLowerCase() !== "true") return false;
 
     // DATE check
-    const start = new Date(o.startDate);
-    const end   = new Date(o.endDate);
-    if (today < start || today > end) return false;
+   const start = new Date(new Date(o.startDate).toDateString());
+const end   = new Date(new Date(o.endDate).toDateString());
+const today = new Date(new Date().toDateString());
+
+if (today < start || today > end) return false;
 
     // ONLY fill = Y
     return String(o.fill || "").trim().toUpperCase() === "Y";
@@ -8978,6 +8980,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
