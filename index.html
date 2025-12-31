@@ -986,7 +986,7 @@ body::before {
    <button onclick="onViewCartClick()"
         style="
           position:absolute;
-          right:260px;
+          right:12px;
           top:50%;
           transform:translateY(-50%);
           background:#ff6347;
@@ -1004,15 +1004,21 @@ body::before {
 
   
 <button onclick="openLogin()" 
-        style="position:absolute; right:112px; top:60px; z-index:9999;
-               background:#FFEDD5;
-               color:#EA580C;
-               padding:8px 16px;
-               border:none;
-               border-radius:9999px;
-               font-weight:600;
-               cursor:pointer;
-               box-shadow:0 4px 10px rgba(0,0,0,0.08);"
+        style="
+          position:absolute;
+          right:220px;
+          top:50%;
+          transform:translateY(-50%);
+          z-index:9999;
+          background:#FFEDD5;
+          color:#EA580C;
+          padding:8px 16px;
+          border:none;
+          border-radius:9999px;
+          font-weight:600;
+          cursor:pointer;
+          box-shadow:0 4px 10px rgba(0,0,0,0.08);
+        "
         onmouseover="this.style.background='#FED7AA'"
         onmouseout="this.style.background='#FFEDD5'">
   Login
@@ -1021,16 +1027,22 @@ body::before {
 
 <button id="logoutBtn"
         onclick="logoutUser()" 
-        style="position:absolute; right:112px; top:60px; z-index:9999;
-               background:#FFEDD5;
-               color:#EA580C;
-               padding:8px 16px;
-               border:none;
-               border-radius:9999px;
-               font-weight:600;
-               cursor:pointer;
-               box-shadow:0 4px 10px rgba(0,0,0,0.08);
-               display:none;"
+        style="
+          position:absolute;
+          right:220px;
+          top:50%;
+          transform:translateY(-50%);
+          z-index:9999;
+          background:#FFEDD5;
+          color:#EA580C;
+          padding:8px 16px;
+          border:none;
+          border-radius:9999px;
+          font-weight:600;
+          cursor:pointer;
+          box-shadow:0 4px 10px rgba(0,0,0,0.08);
+          display:none;
+        "
         onmouseover="this.style.background='#FED7AA'"
         onmouseout="this.style.background='#FFEDD5'">
   Logout
@@ -1039,19 +1051,26 @@ body::before {
 
 
 <button onclick="openSignup()" 
-        style="position:absolute; right:12px; top:60px; z-index:9999;
-               background:#FFEDD5;
-               color:#EA580C;
-               padding:8px 16px;
-               border:none;
-               border-radius:9999px;
-               font-weight:600;
-               cursor:pointer;
-               box-shadow:0 4px 10px rgba(0,0,0,0.08);"
+        style="
+          position:absolute;
+          right:120px;
+          top:50%;
+          transform:translateY(-50%);
+          z-index:9999;
+          background:#FFEDD5;
+          color:#EA580C;
+          padding:8px 16px;
+          border:none;
+          border-radius:9999px;
+          font-weight:600;
+          cursor:pointer;
+          box-shadow:0 4px 10px rgba(0,0,0,0.08);
+        "
         onmouseover="this.style.background='#FED7AA'"
         onmouseout="this.style.background='#FFEDD5'">
   Signup
 </button>
+
   </header>
 <!-- PROMOTION BANNER (ONLY FOR LOGGED-OUT USERS) -->
 <!-- PROMO SLIDER (STEP 1: STRUCTURE ONLY) -->
@@ -9033,6 +9052,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
