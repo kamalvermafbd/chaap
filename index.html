@@ -920,11 +920,7 @@ body::before {
   
 <button onclick="openCheckout()" class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg"> Checkout </button> </div> 
 
-<button onclick="onViewCartClick()"
-        style="position:absolute; right:160px; top:60px; background:#ff6347; color:white;
-               padding:8px 12px; border-radius:6px; border:none;">
-  View Cart (<span id="cartCount">0</span>)
-</button>
+
 
 
  <!-- HAMBURGER BUTTON (appears only after login) -->
@@ -986,6 +982,12 @@ body::before {
     "
   />
 </div>
+
+    <button onclick="onViewCartClick()"
+        style="position:absolute; right:160px; top:60px; background:#ff6347; color:white;
+               padding:8px 12px; border-radius:6px; border:none;">
+  View Cart (<span id="cartCount">0</span>)
+</button>
 <button onclick="openLogin()" 
         style="position:absolute; right:112px; top:60px; z-index:9999;
                background:#FFEDD5;
@@ -9016,6 +9018,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
