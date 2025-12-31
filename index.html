@@ -68,12 +68,22 @@ button:active::after {
       background: #fffdf7;
       color: #333;
     }
+    
     header {
   text-align: center;
-  background: #ff6347;
-  color: white;
   padding: 20px;
+  color: white;
+
+  background: linear-gradient(
+    90deg,
+    rgba(255,106,61,0.95),
+    rgba(255,77,109,0.95),
+    rgba(196,69,154,0.95)
+  );
+
+  backdrop-filter: blur(4px);
 }
+
 
 
     .menu-container {
@@ -8976,6 +8986,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
