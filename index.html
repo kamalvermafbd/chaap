@@ -8841,20 +8841,20 @@ if (today < start || today > end) return false;
           </div>
 
           <!-- CTA -->
-          <button
+  <button
   onclick="${
     String(o.type).toLowerCase() === 'signup'
       ? 'openSignup()'
       : 'openLogin()'
   }"
   class="mt-4
-         bg-[#f7f7f5]
-         text-[#ff6a3d]
+         bg-orange-100
+         text-orange-600
          px-6 py-2.5
          rounded-full
          font-semibold text-sm
          shadow-md
-         hover:bg-white
+         hover:bg-orange-200
          transition">
   ${
     String(o.type).toLowerCase() === "signup"
@@ -8964,6 +8964,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
