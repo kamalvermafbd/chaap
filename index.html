@@ -8823,8 +8823,10 @@ function showPromoBannerFromSheet() {
 
    
    slide.className =
-  "min-w-full rounded-3xl shadow-xl " +
-  "bg-gradient-to-r from-orange-600 via-red-700 to-purple-700";
+  "min-w-full rounded-3xl shadow-xl bg-white border border-transparent";
+slide.style.borderImage =
+  "linear-gradient(90deg, #ff6a3d, #ff4d6d, #c4459a) 1";
+
 
 
     slide.innerHTML = `
@@ -8976,6 +8978,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
