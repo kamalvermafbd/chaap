@@ -955,7 +955,7 @@ body::before {
   Install App
 </button>
 
-  <header>
+<header style="position:relative;">
     <div id="userInfoBox"
   class="bg-orange-500 text-white
          px-4 py-2
@@ -983,11 +983,26 @@ body::before {
   />
 </div>
 
-    <button onclick="onViewCartClick()"
-        style="position:absolute; right:160px; top:60px; background:#ff6347; color:white;
-               padding:8px 12px; border-radius:6px; border:none;">
+   <button onclick="onViewCartClick()"
+        style="
+          position:absolute;
+          right:260px;
+          top:50%;
+          transform:translateY(-50%);
+          background:#ff6347;
+          color:white;
+          padding:8px 14px;
+          border-radius:9999px;
+          border:none;
+          font-weight:600;
+          cursor:pointer;
+          box-shadow:0 4px 10px rgba(0,0,0,0.08);
+        ">
   View Cart (<span id="cartCount">0</span>)
 </button>
+
+
+  
 <button onclick="openLogin()" 
         style="position:absolute; right:112px; top:60px; z-index:9999;
                background:#FFEDD5;
@@ -9018,6 +9033,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
