@@ -8865,28 +8865,27 @@ slide.style.borderImage =
 
           <!-- CTA -->
           <button
-            onclick="${
-              String(o.type).toLowerCase() === 'signup'
-                ? 'openSignup()'
-                : 'openLogin()'
-            }"
-             class="mt-4
-         bg-white/90
-         text-orange-600
+  onclick="${
+    String(o.type).toLowerCase() === 'signup'
+      ? 'openSignup()'
+      : 'openLogin()'
+  }"
+  class="mt-4
+         bg-[#f7f7f5]
+         text-[#ff6a3d]
          px-6 py-2.5
          rounded-full
-         font-bold text-sm
+         font-semibold text-sm
          shadow-md
          hover:bg-white
-         hover:shadow-lg
          transition">
-            ${
-              String(o.type).toLowerCase() === "signup"
-                ? "Signup Now"
-                : "Login & Save"
-            }
-          </button>
-        </div>
+  ${
+    String(o.type).toLowerCase() === "signup"
+      ? "Signup"
+      : "Login & Save"
+  }
+</button>
+
 
         <!-- RIGHT IMAGE -->
         <div class="w-28 h-28 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-100">
@@ -8980,6 +8979,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
