@@ -759,17 +759,36 @@ body::before {
 
   <button onclick="openLogin()" 
         style="position:absolute; right:100px; top:60px; z-index:9999;
-               background:#444;color:white;padding:8px 14px;border:none;
-               border-radius:6px;cursor:pointer;">
+               background:#FFEDD5;
+               color:#EA580C;
+               padding:8px 16px;
+               border:none;
+               border-radius:9999px;
+               font-weight:600;
+               cursor:pointer;
+               box-shadow:0 4px 10px rgba(0,0,0,0.08);"
+        onmouseover="this.style.background='#FED7AA'"
+        onmouseout="this.style.background='#FFEDD5'">
   Login
 </button>
+
 <button id="logoutBtn"
         onclick="logoutUser()" 
         style="position:absolute; right:58px; top:60px; z-index:9999;
-               background:#444;color:white;padding:8px 14px;border:none;
-               border-radius:6px;cursor:pointer; display:none;">
+               background:#FFEDD5;
+               color:#EA580C;
+               padding:8px 16px;
+               border:none;
+               border-radius:9999px;
+               font-weight:600;
+               cursor:pointer;
+               box-shadow:0 4px 10px rgba(0,0,0,0.08);
+               display:none;"
+        onmouseover="this.style.background='#FED7AA'"
+        onmouseout="this.style.background='#FFEDD5'">
   Logout
 </button>
+
 
 <button onclick="openSignup()" 
         style="position:absolute; right:12px; top:60px; z-index:9999;
@@ -8964,6 +8983,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
