@@ -69,19 +69,25 @@ button:active::after {
       color: #333;
     }
     
-    header {
-  text-align: center;
-  padding: 20px;
-  color: white;
+    /* HEADER – as it is (tumhara gradient rehne do) */
+header {
+  position: relative;
+  z-index: 10;
+}
 
-  background: linear-gradient(
-    90deg,
-    rgba(255,106,61,0.95),
-    rgba(255,77,109,0.95),
-    rgba(196,69,154,0.95)
-  );
+/* PROMO BANNER – visual separation */
+#promoBanner {
+  position: relative;
+  z-index: 5;
 
-  backdrop-filter: blur(4px);
+  /* header se clear separation */
+  margin-top: 24px !important;
+
+  /* contrast layer so it doesn't blend */
+  background: rgba(0, 0, 0, 0.08);
+
+  /* thoda premium feel */
+  backdrop-filter: blur(2px);
 }
 
 
@@ -8986,6 +8992,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
