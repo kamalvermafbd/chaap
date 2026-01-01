@@ -1008,22 +1008,25 @@ body::before {
 
     <!-- LOGIN -->
     <button
-      onclick="openLogin()"
-      style="
-        background:#FFEDD5;
-        color:#EA580C;
-        padding:8px 16px;
-        border:none;
-        border-radius:9999px;
-        font-weight:600;
-        cursor:pointer;
-        box-shadow:0 4px 10px rgba(0,0,0,0.08);
-      "
-      onmouseover="this.style.background='#FED7AA'"
-      onmouseout="this.style.background='#FFEDD5'"
-    >
-      Login
-    </button>
+  id="loginBtn"
+  onclick="openLogin()"
+  style="
+    display:none;
+    background:#FFEDD5;
+    color:#EA580C;
+    padding:8px 16px;
+    border:none;
+    border-radius:9999px;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
+  "
+  onmouseover="this.style.background='#FED7AA'"
+  onmouseout="this.style.background='#FFEDD5'"
+>
+  Login
+</button>
+
 
     <!-- LOGOUT -->
     <button
@@ -1048,22 +1051,25 @@ body::before {
 
     <!-- SIGNUP -->
     <button
-      onclick="openSignup()"
-      style="
-        background:#FFEDD5;
-        color:#EA580C;
-        padding:8px 16px;
-        border:none;
-        border-radius:9999px;
-        font-weight:600;
-        cursor:pointer;
-        box-shadow:0 4px 10px rgba(0,0,0,0.08);
-      "
-      onmouseover="this.style.background='#FED7AA'"
-      onmouseout="this.style.background='#FFEDD5'"
-    >
-      Signup
-    </button>
+  id="signupBtn"
+  onclick="openSignup()"
+  style="
+    display:none;
+    background:#FFEDD5;
+    color:#EA580C;
+    padding:8px 16px;
+    border:none;
+    border-radius:9999px;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
+  "
+  onmouseover="this.style.background='#FED7AA'"
+  onmouseout="this.style.background='#FFEDD5'"
+>
+  Signup
+</button>
+
 
   </div>
 </header>
@@ -9047,6 +9053,26 @@ document.addEventListener("DOMContentLoaded", () => {
     showPromoBannerFromSheet();
   });
 });
+document.addEventListener("DOMContentLoaded", () => {
+  const loginBtn  = document.getElementById("loginBtn");
+  const signupBtn = document.getElementById("signupBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const userBox   = document.getElementById("userInfoBox");
+
+  const loggedIn = isUserLoggedIn();
+
+  if (loggedIn) {
+    if (loginBtn)  loginBtn.style.display = "none";
+    if (signupBtn) signupBtn.style.display = "none";
+    if (logoutBtn) logoutBtn.style.display = "inline-block";
+    if (userBox)   userBox.classList.remove("hidden");
+  } else {
+    if (loginBtn)  loginBtn.style.display = "inline-block";
+    if (signupBtn) signupBtn.style.display = "inline-block";
+    if (logoutBtn) logoutBtn.style.display = "none";
+    if (userBox)   userBox.classList.add("hidden");
+  }
+});
 
 
 </script>
@@ -9058,6 +9084,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
