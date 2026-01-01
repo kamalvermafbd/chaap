@@ -1177,9 +1177,9 @@ body::before {
     My Orders
   </li>
 
- <li onclick="activateMenu(this); showPage('offersPage'); showOffersPageBanner();">
+ <li onclick="activateMenu(this); showPage('offersPage'); onOffersPageOpen();">
     <span class="nav-badge">3</span>
-    Offers
+   My Offers
   </li>
 
 </ul>
@@ -9145,6 +9145,33 @@ function renderCouponsOnOffersPage() {
   oldBox.id = "availableCouponsBox";
   oldList.id = "availableCouponsList";
 }
+
+  function onOffersPageOpen() {
+  window._activePage = "offersPage";
+
+  // SAME SOURCE as View Offers
+  const coupons =
+    window.liveOffers ||
+    window._allOffersRaw ||
+    [];
+
+  // TEMP ID SWAP (safe, tested)
+  const box = document.getElementById("offersCouponsBox");
+  const list = document.getElementById("offersCouponsList");
+
+  if (!box || !list) return;
+
+  box.id = "availableCouponsBox";
+  list.id = "availableCouponsList";
+
+  renderAvailableUserCoupons(coupons);
+
+  box.id = "offersCouponsBox";
+  list.id = "offersCouponsList";
+
+  box.classList.remove("hidden");
+}
+
 function loadUserOrders() {
   console.warn("loadUserOrders not implemented yet");
 }
@@ -9158,6 +9185,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
