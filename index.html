@@ -6913,8 +6913,6 @@ window._couponHintTimer = null;
   
 function refreshCouponMotivationHint() {
 
-
-
   if (typeof window._rewardAlreadyClaimed !== "boolean") {
     window._rewardAlreadyClaimed = false;
   }
@@ -6987,6 +6985,7 @@ function refreshCouponMotivationHint() {
     hintBox.style.display = "block";
   }, 150); // 🔑 debounce ONLY
 }
+
 
 
   async function fetchOffersFromBackend() {
@@ -9041,6 +9040,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
