@@ -4780,6 +4780,7 @@ function updateForgotOverlay(msg) {
   document.getElementById("fpOverlay").textContent = msg;
 }
 function showPage(pageId) {
+   window._activePage = pageId;
   // Always hide both wrappers first
   document.getElementById("menuWrapper").style.display = "none";
   document.getElementById("pageWrapper").style.display = "none";
@@ -9078,6 +9079,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function showOffersPageBanner() {
+  if (window._activePage !== "offersPage") return;
+
   const banner = document.getElementById("promoBanner");
   const slidesWrap = document.getElementById("promoSlides");
 
@@ -9169,6 +9172,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
