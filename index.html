@@ -725,6 +725,12 @@ body::before {
     -webkit-overflow-scrolling: touch;
   }
 }
+/* MOBILE ONLY: allow scroll till checkout */
+@media (max-width: 768px) {
+  #cartDrawer {
+    padding-bottom: 110px; /* 👈 checkout button ki jagah */
+  }
+}
 
   </style>
 </head>
@@ -9033,6 +9039,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
