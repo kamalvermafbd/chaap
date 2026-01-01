@@ -1322,7 +1322,7 @@ body::before {
   <h2>My Offers</h2>
 
   <!-- OFFERS ONLY BANNER -->
-  <div id="offersPromoBanner">
+  <div id="offersPromoBanner" style="display:none">
     <div id="offersPromoSlides"></div>
   </div>
 </div>
@@ -9106,20 +9106,16 @@ document.addEventListener("DOMContentLoaded", () => {
 function showOffersPageBanner() {
   if (window._activePage !== "offersPage") return;
 
-    const banner = document.getElementById("offersPromoBanner");
+  const banner = document.getElementById("offersPromoBanner");
   const slides = document.getElementById("offersPromoSlides");
 
-
-  if (!banner || !slidesWrap) return;
+  if (!banner || !slides) return;
 
   const offers = window._promoOffers || [];
   const today = new Date(new Date().toDateString());
 
-  // reset
-  slidesWrap.innerHTML = "";
-  promoIndex = 0;
+  slides.innerHTML = "";
 
-  // 🔍 Filter eligible offers
   const eligible = offers.filter(o => {
     if (String(o.active).toLowerCase() !== "true") return false;
 
@@ -9142,10 +9138,7 @@ function showOffersPageBanner() {
 
     slide.innerHTML = `
       <div class="p-5 min-h-[180px] flex items-center gap-4">
-
-        <div class="w-16 h-16 rounded-2xl bg-orange-100
-                    flex items-center justify-center
-                    shadow-md flex-shrink-0">
+        <div class="w-16 h-16 rounded-2xl bg-orange-100 flex items-center justify-center shadow-md">
           <div class="w-8 h-8 text-orange-600">
             ${
               String(o.type).toLowerCase() === "signup"
@@ -9158,10 +9151,7 @@ function showOffersPageBanner() {
         </div>
 
         <div class="flex-1">
-          <div class="text-xl font-extrabold text-gray-900">
-            ${o.text}
-          </div>
-
+          <div class="text-xl font-extrabold text-gray-900">${o.text}</div>
           <div class="text-sm text-gray-600 mt-1">
             ${
               Number(o.min || 0) > 0
@@ -9172,17 +9162,15 @@ function showOffersPageBanner() {
         </div>
 
         <div class="w-24 h-24 rounded-2xl overflow-hidden bg-gray-100">
-          <img src="${o.imageUrl || ""}"
-               class="w-full h-full object-cover" />
+          <img src="${o.imageUrl || ""}" class="w-full h-full object-cover" />
         </div>
       </div>
     `;
 
-    slidesWrap.appendChild(slide);
+    slides.appendChild(slide);
   });
 
   banner.style.display = "block";
-  startPromoSlider();
 }
  
 function loadUserOrders() {
@@ -9198,6 +9186,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
