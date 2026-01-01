@@ -9106,8 +9106,9 @@ document.addEventListener("DOMContentLoaded", () => {
 function showOffersPageBanner() {
   if (window._activePage !== "offersPage") return;
 
-  const banner = document.getElementById("promoBanner");
-  const slidesWrap = document.getElementById("promoSlides");
+    const banner = document.getElementById("offersPromoBanner");
+  const slides = document.getElementById("offersPromoSlides");
+
 
   if (!banner || !slidesWrap) return;
 
@@ -9197,6 +9198,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
