@@ -6913,7 +6913,10 @@ window._couponHintTimer = null;
   
 function refreshCouponMotivationHint() {
 // 🚫 If reward coupon already applied, DO NOT show any coupon hint
-if (window._appliedCouponType === "reward") {
+if (
+  window._appliedCouponType === "reward" &&
+  getCart().length > 0
+) {
   const hintBox = document.getElementById("couponHintBox");
   if (hintBox) {
     hintBox.innerHTML = "🎁 Reward coupon applied. Other offers are disabled.";
@@ -6921,6 +6924,7 @@ if (window._appliedCouponType === "reward") {
   }
   return;
 }
+
 
 
   if (typeof window._rewardAlreadyClaimed !== "boolean") {
@@ -9049,6 +9053,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
