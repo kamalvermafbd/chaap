@@ -1147,7 +1147,7 @@ body::before {
     My Orders
   </li>
 
- <li onclick="activateMenu(this); showPage('offersPage'); renderOffersPageBanners();">
+ <li onclick="activateMenu(this); showPage('offersPage'); showPromoBannerFromSheet();">
     <span class="nav-badge">3</span>
     Offers
   </li>
@@ -4797,7 +4797,7 @@ function showPage(pageId) {
     document.getElementById(pageId).style.display = "block";
   }
   if (pageId === "offersPage") {
-  renderOffersPageBanners();
+  showPromoBannerFromSheet();
 }
 
 }
@@ -9170,46 +9170,6 @@ function renderOffersPageBanners() {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
