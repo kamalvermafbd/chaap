@@ -735,6 +735,14 @@ body::before {
   margin-left: 240px;
   width: calc(100% - 240px);
 }
+#pageWrapper {
+  margin-left: 260px;   /* sidebar width */
+  transition: margin-left 0.3s ease;
+}
+
+.menu-active #pageWrapper {
+  margin-left: 0;
+}
 
   </style>
 </head>
@@ -4807,6 +4815,10 @@ function showPage(pageId) {
   if (pageId === "offersPage") {
     showOffersPageBanner();
   }
+   document.body.classList.toggle(
+    "menu-active",
+    pageId === "menuPage" || pageId === "offersPage"
+  );
 }
 
 
@@ -9179,6 +9191,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
