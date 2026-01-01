@@ -953,111 +953,118 @@ body::before {
   Install App
 </button>
 
-<header style="position:relative;">
-    <div id="userInfoBox"
-  class="bg-orange-500 text-white
-         px-4 py-2
-         rounded-lg
-         shadow-md
-         text-sm
-         hidden">
+<header
+  style="
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 10px 14px;
+    gap: 8px;
+  "
+>
 
+  <!-- USER INFO (FIRST LINE, FULL WIDTH) -->
+  <div
+    id="userInfoBox"
+    class="bg-orange-500 text-white px-4 py-2 rounded-lg shadow-md text-sm hidden"
+    style="width:100%; text-align:center;"
+  >
+    Logged in: <span id="loggedEmail"></span>
+  </div>
 
-  Logged in: <span id="loggedEmail"></span><br>
- 
-</div>
-<!-- LOGO ONLY (Restaurant info removed) -->
+  <!-- RIGHT SIDE ACTIONS -->
+  <div
+    class="header-actions"
+    style="
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+    "
+  >
 
+    <!-- VIEW CART -->
+    <button
+      onclick="onViewCartClick()"
+      style="
+        background:#ff6347;
+        color:white;
+        padding:8px 14px;
+        border-radius:9999px;
+        border:none;
+        font-weight:600;
+        cursor:pointer;
+        box-shadow:0 4px 10px rgba(0,0,0,0.08);
+      "
+    >
+      View Cart (<span id="cartCount">0</span>)
+    </button>
 
-   <button onclick="onViewCartClick()"
-        style="
-          position:absolute;
-          right:260px;
-          top:50%;
-          transform:translateY(-50%);
-          background:#ff6347;
-          color:white;
-          padding:8px 14px;
-          border-radius:9999px;
-          border:none;
-          font-weight:600;
-          cursor:pointer;
-          box-shadow:0 4px 10px rgba(0,0,0,0.08);
-        ">
-  View Cart (<span id="cartCount">0</span>)
-</button>
+    <!-- LOGIN -->
+    <button
+      onclick="openLogin()"
+      style="
+        background:#FFEDD5;
+        color:#EA580C;
+        padding:8px 16px;
+        border:none;
+        border-radius:9999px;
+        font-weight:600;
+        cursor:pointer;
+        box-shadow:0 4px 10px rgba(0,0,0,0.08);
+      "
+      onmouseover="this.style.background='#FED7AA'"
+      onmouseout="this.style.background='#FFEDD5'"
+    >
+      Login
+    </button>
 
+    <!-- LOGOUT -->
+    <button
+      id="logoutBtn"
+      onclick="logoutUser()"
+      style="
+        background:#FFEDD5;
+        color:#EA580C;
+        padding:8px 16px;
+        border:none;
+        border-radius:9999px;
+        font-weight:600;
+        cursor:pointer;
+        box-shadow:0 4px 10px rgba(0,0,0,0.08);
+        display:none;
+      "
+      onmouseover="this.style.background='#FED7AA'"
+      onmouseout="this.style.background='#FFEDD5'"
+    >
+      Logout
+    </button>
 
-  
-<button onclick="openLogin()" 
-        style="
-          position:absolute;
-          right:150px;
-          top:50%;
-          transform:translateY(-50%);
-          z-index:9999;
-          background:#FFEDD5;
-          color:#EA580C;
-          padding:8px 16px;
-          border:none;
-          border-radius:9999px;
-          font-weight:600;
-          cursor:pointer;
-          box-shadow:0 4px 10px rgba(0,0,0,0.08);
-        "
-        onmouseover="this.style.background='#FED7AA'"
-        onmouseout="this.style.background='#FFEDD5'">
-  Login
-</button>
+    <!-- SIGNUP -->
+    <button
+      onclick="openSignup()"
+      style="
+        background:#FFEDD5;
+        color:#EA580C;
+        padding:8px 16px;
+        border:none;
+        border-radius:9999px;
+        font-weight:600;
+        cursor:pointer;
+        box-shadow:0 4px 10px rgba(0,0,0,0.08);
+      "
+      onmouseover="this.style.background='#FED7AA'"
+      onmouseout="this.style.background='#FFEDD5'"
+    >
+      Signup
+    </button>
 
+  </div>
+</header>
 
-<button id="logoutBtn"
-        onclick="logoutUser()" 
-        style="
-          position:absolute;
-          right:150px;
-          top:50%;
-          transform:translateY(-50%);
-          z-index:9999;
-          background:#FFEDD5;
-          color:#EA580C;
-          padding:8px 16px;
-          border:none;
-          border-radius:9999px;
-          font-weight:600;
-          cursor:pointer;
-          box-shadow:0 4px 10px rgba(0,0,0,0.08);
-          display:none;
-        "
-        onmouseover="this.style.background='#FED7AA'"
-        onmouseout="this.style.background='#FFEDD5'">
-  Logout
-</button>
-
-
-
-<button onclick="openSignup()" 
-        style="
-          position:absolute;
-          right:20px;
-          top:50%;
-          transform:translateY(-50%);
-          z-index:9999;
-          background:#FFEDD5;
-          color:#EA580C;
-          padding:8px 16px;
-          border:none;
-          border-radius:9999px;
-          font-weight:600;
-          cursor:pointer;
-          box-shadow:0 4px 10px rgba(0,0,0,0.08);
-        "
-        onmouseover="this.style.background='#FED7AA'"
-        onmouseout="this.style.background='#FFEDD5'">
-  Signup
-</button>
-
-  </header>
 
 <!-- PROMOTION BANNER (ONLY DYNAMIC – NO STATIC SLIDE) -->
 <div id="promoBanner"
@@ -9048,6 +9055,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
