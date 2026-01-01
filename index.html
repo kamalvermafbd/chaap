@@ -717,6 +717,14 @@ body::before {
 .coupon-blink {
   animation: blink 1.2s infinite;
 }
+/* ===== MOBILE CART SCROLL FIX (SAFE & MINIMAL) ===== */
+@media (max-width: 768px) {
+  #cartItems {
+    max-height: 65vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
 
   </style>
 </head>
@@ -9025,6 +9033,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
