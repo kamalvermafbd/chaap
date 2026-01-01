@@ -9112,76 +9112,37 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-function showOffersPageBanner() {
-  if (window._activePage !== "offersPage") return;
+function renderCouponsOnOffersPage() {
+  const coupons =
+    window.liveOffers ||
+    window._allOffersRaw ||
+    [];
 
-  const banner = document.getElementById("offersPromoBanner");
-  const slides = document.getElementById("offersPromoSlides");
+  const oldBox = document.getElementById("availableCouponsBox");
+  const oldList = document.getElementById("availableCouponsList");
 
-  if (!banner || !slides) return;
+  const offersBox = document.getElementById("offersCouponsBox");
+  const offersList = document.getElementById("offersCouponsList");
 
-  const offers = window._promoOffers || [];
-  const today = new Date(new Date().toDateString());
+  if (!offersBox || !offersList) return;
 
-  slides.innerHTML = "";
+  // swap ids
+  oldBox.id = "tempBox";
+  oldList.id = "tempList";
 
-  const eligible = offers.filter(o => {
-    if (String(o.active).toLowerCase() !== "true") return false;
+  offersBox.id = "availableCouponsBox";
+  offersList.id = "availableCouponsList";
 
-    const start = new Date(new Date(o.startDate).toDateString());
-    const end   = new Date(new Date(o.endDate).toDateString());
-    if (today < start || today > end) return false;
+  // 🔥 SAME PERFECT LOGIC
+  renderAvailableUserCoupons(coupons);
 
-    return String(o.fill || "").trim().toUpperCase() === "Y";
-  });
+  // restore ids
+  offersBox.id = "offersCouponsBox";
+  offersList.id = "offersCouponsList";
 
-  if (eligible.length === 0) {
-    banner.style.display = "none";
-    return;
-  }
-
-  eligible.forEach(o => {
-    const slide = document.createElement("div");
-    slide.className =
-      "min-w-full rounded-2xl bg-[#fffdfb] border border-transparent";
-
-    slide.innerHTML = `
-      <div class="p-5 min-h-[180px] flex items-center gap-4">
-        <div class="w-16 h-16 rounded-2xl bg-orange-100 flex items-center justify-center shadow-md">
-          <div class="w-8 h-8 text-orange-600">
-            ${
-              String(o.type).toLowerCase() === "signup"
-                ? PROMO_SVGS.signup
-                : o.flat > 0
-                  ? PROMO_SVGS.flat
-                  : PROMO_SVGS.percent
-            }
-          </div>
-        </div>
-
-        <div class="flex-1">
-          <div class="text-xl font-extrabold text-gray-900">${o.text}</div>
-          <div class="text-sm text-gray-600 mt-1">
-            ${
-              Number(o.min || 0) > 0
-                ? `Valid on orders above ${fmt(o.min)}`
-                : "Limited time offer"
-            }
-          </div>
-        </div>
-
-        <div class="w-24 h-24 rounded-2xl overflow-hidden bg-gray-100">
-          <img src="${o.imageUrl || ""}" class="w-full h-full object-cover" />
-        </div>
-      </div>
-    `;
-
-    slides.appendChild(slide);
-  });
-
-  banner.style.display = "block";
+  oldBox.id = "availableCouponsBox";
+  oldList.id = "availableCouponsList";
 }
- 
 function loadUserOrders() {
   console.warn("loadUserOrders not implemented yet");
 }
@@ -9195,30 +9156,6 @@ function loadUserOrders() {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
