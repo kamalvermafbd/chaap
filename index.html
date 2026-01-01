@@ -4779,29 +4779,32 @@ function unlockForgotForm() {
 function updateForgotOverlay(msg) {
   document.getElementById("fpOverlay").textContent = msg;
 }
+  
 function showPage(pageId) {
-   window._activePage = pageId;
-  // Always hide both wrappers first
+  window._activePage = pageId;
+
+  // 🔒 HIDE PROMO BANNER ON EVERY PAGE SWITCH
+  const promo = document.getElementById("promoBanner");
+  if (promo) promo.style.display = "none";
+
   document.getElementById("menuWrapper").style.display = "none";
   document.getElementById("pageWrapper").style.display = "none";
-
-  // Hide all inner pages
   document.getElementById("profilePage").style.display = "none";
   document.getElementById("ordersPage").style.display = "none";
   document.getElementById("offersPage").style.display = "none";
 
-  // Show requested
   if (pageId === "menuPage") {
     document.getElementById("menuWrapper").style.display = "block";
   } else {
     document.getElementById("pageWrapper").style.display = "block";
     document.getElementById(pageId).style.display = "block";
   }
+
   if (pageId === "offersPage") {
-  showOffersPageBanner();
+    showOffersPageBanner();
+  }
 }
 
-}
 
 
 
@@ -9172,6 +9175,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
