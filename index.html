@@ -732,18 +732,24 @@ body::before {
   }
 }
 
-  #offersPromoBanner {
-  margin-left: -20px;
-  margin-right: -20px;
-  width: calc(100% + 40px);
-}
-
 #pageWrapper {
   margin-left: 260px;   /* sidebar width */
   transition: margin-left 0.3s ease;
 }
 
 .menu-active #pageWrapper {
+  margin-left: 0;
+}
+
+    #mainContent {
+  transition: margin-left 0.3s ease;
+}
+    
+#mainContent {
+  margin-left: 260px;
+}
+
+.menu-active #mainContent {
   margin-left: 0;
 }
 
@@ -9191,6 +9197,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
