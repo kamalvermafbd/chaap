@@ -6912,6 +6912,14 @@ function showCouponHintPlaceholder() {
 window._couponHintTimer = null;
   
 function refreshCouponMotivationHint() {
+if (window._appliedCouponType === "reward") {
+  const hintBox = document.getElementById("couponHintBox");
+  if (hintBox) {
+    hintBox.innerHTML = "🎁 Reward coupon applied. Other offers are disabled.";
+    hintBox.style.display = "block";
+  }
+  return;
+}
 
   if (typeof window._rewardAlreadyClaimed !== "boolean") {
     window._rewardAlreadyClaimed = false;
@@ -9040,6 +9048,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
