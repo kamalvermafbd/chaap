@@ -4793,6 +4793,10 @@ function showPage(pageId) {
     document.getElementById("pageWrapper").style.display = "block";
     document.getElementById(pageId).style.display = "block";
   }
+  if (pageId === "offersPage") {
+  renderOffersPageBanners();
+}
+
 }
 
 
@@ -9070,6 +9074,89 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+function renderOffersPageBanners() {
+  const list = document.getElementById("offersBannerList");
+  if (!list) return;
+
+  list.innerHTML = "";
+
+  const offers = window._allOffersRaw || [];
+  const loggedIn = isUserLoggedIn();
+  const today = new Date(new Date().toDateString());
+
+  // ✅ active + valid offers
+  const validOffers = offers.filter(o => {
+    if (o.active !== true) return false;
+
+    const start = new Date(new Date(o.startDate).toDateString());
+    const end   = new Date(new Date(o.endDate).toDateString());
+    if (today < start || today > end) return false;
+
+    // signup coupon only for guest
+    if (o.type === "signup" && loggedIn) return false;
+
+    return true;
+  });
+
+  if (validOffers.length === 0) {
+    list.innerHTML = `<p style="color:#777;">No offers available right now.</p>`;
+    return;
+  }
+
+  validOffers.forEach(o => {
+    const banner = document.createElement("div");
+
+    banner.style.cssText = `
+      background: linear-gradient(135deg, #ff6a3d, #ff4d6d);
+      color: white;
+      border-radius: 20px;
+      padding: 20px;
+      min-height: 180px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    `;
+
+    banner.innerHTML = `
+      <div>
+        <div style="font-size:22px; font-weight:800; line-height:1.2;">
+          ${o.text}
+        </div>
+
+        <div style="margin-top:6px; font-size:14px; opacity:0.95;">
+          ${
+            Number(o.min || 0) > 0
+              ? `Valid on orders above ${fmt(o.min)}`
+              : "Limited time offer"
+          }
+        </div>
+      </div>
+
+      <div style="margin-top:16px; text-align:right;">
+        <button
+          onclick="${
+            loggedIn
+              ? "openMenu()"
+              : "openLogin()"
+          }"
+          style="
+            background: white;
+            color:#ff4d6d;
+            border:none;
+            padding:10px 18px;
+            border-radius:9999px;
+            font-weight:700;
+            cursor:pointer;
+          ">
+          ${loggedIn ? "Order Now" : "Login to Unlock"}
+        </button>
+      </div>
+    `;
+
+    list.appendChild(banner);
+  });
+}
 
 </script>
 
@@ -9080,6 +9167,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
