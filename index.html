@@ -1331,8 +1331,8 @@ body::before {
   <h2>My Offers</h2>
 
   <!-- OFFERS ONLY BANNER -->
-  <div id="offersCouponsBox" style="display:none">
-    <div id="offersCouponsList"></div>
+  <div id="availableCouponsBox" class="hidden">
+    <div id="availableCouponsList" class="space-y-2"></div>
   </div>
 </div>
 
@@ -9146,30 +9146,13 @@ function renderCouponsOnOffersPage() {
   oldList.id = "availableCouponsList";
 }
 
-  function onOffersPageOpen() {
-  window._activePage = "offersPage";
-
-  // SAME SOURCE as View Offers
+function onOffersPageOpen() {
   const coupons =
     window.liveOffers ||
     window._allOffersRaw ||
     [];
 
-  // TEMP ID SWAP (safe, tested)
-  const box = document.getElementById("offersCouponsBox");
-  const list = document.getElementById("offersCouponsList");
-
-  if (!box || !list) return;
-
-  box.id = "availableCouponsBox";
-  list.id = "availableCouponsList";
-
   renderAvailableUserCoupons(coupons);
-
-  box.id = "offersCouponsBox";
-  list.id = "offersCouponsList";
-
-  box.classList.remove("hidden");
 }
 
 function loadUserOrders() {
@@ -9185,6 +9168,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
