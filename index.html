@@ -494,6 +494,7 @@ body::before {
   40%  { transform: scale(1.25); }
   100% { transform: scale(1); }
 }
+    
 #cartDrawer {
   position: fixed;
   top: 0;
@@ -555,6 +556,7 @@ body::before {
   transition: right 0.35s ease-out;
   position: fixed;
 }
+/* ✅ FINAL CART DRAWER (NO SCROLL HERE) */
 #cartDrawer {
   position: fixed;
   top: 0;
@@ -562,18 +564,32 @@ body::before {
   width: 88%;
   max-width: 380px;
   height: 100vh;
+
   background: #ffffff;
   box-shadow: -6px 0 18px rgba(0,0,0,0.18);
-  
   border-top-left-radius: 18px;
   border-bottom-left-radius: 18px;
 
   z-index: 99999;
   padding: 20px;
-  overflow-y: auto;
 
-  transition: right 0.30s cubic-bezier(0.25, 0.8, 0.25, 1); /* premium smooth */
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;               /* 🔑 MOST IMPORTANT */
+  transition: right 0.30s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
+/* ✅ SCROLLABLE CART CONTENT (MOBILE FIX) */
+#cartItems {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* 🔑 mobile smooth scroll */
+  padding-bottom: 90px; /* checkout button ke liye space */
+}
+#cartFooter {
+  flex-shrink: 0;
+}
+
 #cartBackdrop {
   position: fixed;
   inset: 0;
@@ -9041,6 +9057,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
