@@ -9124,8 +9124,10 @@ function renderCouponsOnOffersPage() {
   const offersBox = document.getElementById("offersCouponsBox");
   const offersList = document.getElementById("offersCouponsList");
 
-  if (!offersBox || !offersList) return;
-
+  if (!offersBox || !offersList || !oldBox || !oldList) {
+  console.warn("Coupon containers missing");
+  return;
+}
   // swap ids
   oldBox.id = "tempBox";
   oldList.id = "tempList";
@@ -9156,6 +9158,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
