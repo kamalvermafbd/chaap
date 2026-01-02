@@ -1087,6 +1087,43 @@ body::before {
   height: 100%;
   object-fit: cover;
 }
+/* Grid spacing thoda kam, card bada */
+.offers-poster-grid {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); /* ⬅️ was 220 */
+  gap: 26px;
+}
+
+/* Card overall thoda bada feel */
+.offer-poster {
+  aspect-ratio: 4 / 5;
+  border-radius: 22px;
+}
+
+    /* SHOP NOW – round pill button */
+.offer-cta-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.offer-cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.3);
+}
+
+/* Color match with top blob */
+.offer-blue  .offer-cta-btn { background: linear-gradient(135deg, #4f8cff, #1e40af); }
+.offer-orange.offer-blob ~ .offer-content .offer-cta-btn,
+.offer-orange .offer-cta-btn { background: linear-gradient(135deg, #ff9f43, #f97316); }
+
+.offer-pink  .offer-cta-btn { background: linear-gradient(135deg, #f472b6, #db2777); }
+.offer-green .offer-cta-btn { background: linear-gradient(135deg, #34d399, #059669); }
 
   </style>
 </head>
@@ -9510,7 +9547,8 @@ async function onOffersPageOpen() {
           </div>
         </div>
 
-        <div class="offer-cta">Shop Now</div>
+      <button class="offer-cta-btn">Shop Now</button>
+
       </div>
 
       <div class="offer-img">
@@ -9538,6 +9576,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
