@@ -984,6 +984,101 @@ body::before {
   }
 }
 
+
+    /* ===== OFFER POSTER STYLE ===== */
+
+.offers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  margin-top: 20px;
+}
+
+/* MAIN CARD */
+.offer-banner-card {
+  position: relative;
+  min-height: 180px;
+  border-radius: 28px;
+  padding: 28px 34px;
+  color: #fff;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 20px 45px rgba(0,0,0,0.18);
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+}
+
+/* ANGLED SHAPE */
+.offer-banner-card::after {
+  content: "";
+  position: absolute;
+  right: -40px;
+  top: 0;
+  width: 45%;
+  height: 100%;
+  background: rgba(255,255,255,0.12);
+  transform: skewX(-18deg);
+}
+
+/* SALE TAG */
+.offer-tag {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  opacity: 0.9;
+}
+
+/* BIG TITLE */
+.offer-title {
+  font-size: 30px;
+  font-weight: 800;
+  margin: 8px 0;
+}
+
+/* SUB TEXT */
+.offer-sub {
+  font-size: 15px;
+  opacity: 0.9;
+}
+
+/* APPLY BUTTON */
+.offer-btn {
+  margin-top: 18px;
+  display: inline-block;
+  padding: 10px 22px;
+  background: #fff;
+  color: #1e40af;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* IMAGE */
+.offer-img {
+  position: absolute;
+  right: 26px;
+  bottom: 26px;
+  width: 96px;
+  height: 96px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #000;
+}
+
+.offer-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* COLOR VARIANTS (auto rotate look) */
+.offer-banner-card.flat {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+}
+
+.offer-banner-card.signup {
+  background: linear-gradient(135deg, #9333ea, #6b21a8);
+}
+
   </style>
 </head>
 <body>
@@ -9348,21 +9443,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }));
 }
 
-
 async function onOffersPageOpen() {
   const box  = document.getElementById("offersCouponsBox");
   const list = document.getElementById("offersCouponsList");
 
   if (!box || !list) return;
 
-  // 1️⃣ fetch SAME backend data
   await fetchOffersFromBackend();
 
   const loggedIn = isUserLoggedIn();
   const apiOffers =
     (window._lastOffersResponse && window._lastOffersResponse.offers) || [];
 
-  // 2️⃣ SAME FINAL FILTER (COPY-PASTE SAFE)
   const activeOffers = apiOffers.filter(o => {
     if (o.type === "signup") return false;
     if (o.type === "onetime" && o._usedOnce === true) return false;
@@ -9373,45 +9465,49 @@ async function onOffersPageOpen() {
     return o.active === true;
   });
 
-  // 3️⃣ render (simple list – same as View Offers)
   list.innerHTML = "";
 
-  if (activeOffers.length === 0) {
-    list.innerHTML = `
-      <div class="p-2 text-gray-500 text-center">
-        No offers available
-      </div>`;
+  if (!activeOffers.length) {
+    list.innerHTML = `<div class="text-center text-gray-500">No offers available</div>`;
     box.classList.remove("hidden");
     return;
   }
-list.innerHTML = activeOffers.map(o => `
-  <div class="sale-card"
-       onclick="applyCoupon('${o.id}')">
 
-    <div class="sale-blob"></div>
+  activeOffers.forEach(o => {
+    const card = document.createElement("div");
 
-    <div class="sale-content">
-      <div class="sale-badge">
-        ${o.discount ? `UP TO ${o.discount}% OFF` : `FLAT ₹${o.flat} OFF`}
+    let cls = "offer-banner-card";
+    if (o.flat > 0) cls += " flat";
+    if (o.type === "signup") cls += " signup";
+
+    card.className = cls;
+
+    card.innerHTML = `
+      <div class="offer-tag">
+        ${o.flat > 0 ? "FLAT OFFER" : "UP TO OFFER"}
       </div>
 
-      <div class="sale-title">
-        ${o.text}
+      <div class="offer-title">${o.text}</div>
+
+      <div class="offer-sub">
+        ${o.min ? `Valid on orders above ${fmt(o.min)}` : "Limited time offer"}
       </div>
 
-      <div class="sale-sub">
-        ${o.min ? `Valid on orders above ${fmt(o.min)}` : 'Limited time offer'}
+      <div class="offer-btn">Apply Now</div>
+
+      <div class="offer-img">
+        <img src="${o.imageUrl || ''}">
       </div>
+    `;
 
-      <button class="sale-btn">Apply Now</button>
-    </div>
-  </div>
-`).join("");
+    card.onclick = () => applyCoupon(o.id);
 
-
+    list.appendChild(card);
+  });
 
   box.classList.remove("hidden");
 }
+
 
 
 function loadUserOrders() {
@@ -9427,6 +9523,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
