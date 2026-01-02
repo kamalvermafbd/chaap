@@ -9498,100 +9498,105 @@ async function onOffersPageOpen() {
   const grid = document.getElementById("offersPosterGrid");
   if (!grid) return;
 
-  // 🔑 FETCH BOTH
-  await fetchOffersFromBackend();
-  await fetchPrepaidCoupons();
+  showOffersLoading(); // 🔵 SHOW OVERLAY
 
-  const loggedIn = isUserLoggedIn();
-  const offers =
-    (window._lastOffersResponse && window._lastOffersResponse.offers) || [];
+  try {
+    // 🔑 FETCH BOTH
+    await fetchOffersFromBackend();
+    await fetchPrepaidCoupons();
 
-  // SAME FINAL FILTER (View Offers ke jaisa)
-  const activeOffers = offers.filter(o => {
-    if (o.type === "signup") return false;
-    if (o.type === "onetime" && o._usedOnce === true) return false;
+    const loggedIn = isUserLoggedIn();
+    const offers =
+      (window._lastOffersResponse && window._lastOffersResponse.offers) || [];
 
-    const ua = (o.userApplicable || "All user").toLowerCase();
-    if (ua === "registered user" && !loggedIn) return false;
+    // SAME FINAL FILTER (View Offers ke jaisa)
+    const activeOffers = offers.filter(o => {
+      if (o.type === "signup") return false;
+      if (o.type === "onetime" && o._usedOnce === true) return false;
 
-    return o.active === true;
-  });
+      const ua = (o.userApplicable || "All user").toLowerCase();
+      if (ua === "registered user" && !loggedIn) return false;
 
-  // 🔹 APPEND PREPAID OFFER (CONTINUITY)
-  if (
-    Array.isArray(window._prepaidPackages) &&
-    window._prepaidPackages.length > 0
-  ) {
-    const prepaidOffer = mapPrepaidPackageToOffer(
-      window._prepaidPackages[0]
-    );
+      return o.active === true;
+    });
 
-    if (prepaidOffer) {
-      activeOffers.push(prepaidOffer);
+    // 🔹 APPEND PREPAID OFFER (CONTINUITY)
+    if (
+      Array.isArray(window._prepaidPackages) &&
+      window._prepaidPackages.length > 0
+    ) {
+      const prepaidOffer = mapPrepaidPackageToOffer(
+        window._prepaidPackages[0]
+      );
+      if (prepaidOffer) activeOffers.push(prepaidOffer);
     }
-  }
 
-  grid.innerHTML = "";
+    grid.innerHTML = "";
 
-  if (activeOffers.length === 0) {
-    grid.innerHTML = `<div class="text-gray-500">No offers available</div>`;
-    grid.classList.remove("hidden");
-    return;
-  }
+    if (activeOffers.length === 0) {
+      grid.innerHTML = `<div class="text-gray-500">No offers available</div>`;
+      grid.classList.remove("hidden");
+      return;
+    }
 
-  const colors = ["offer-blue", "offer-orange", "offer-pink", "offer-green"];
+    const colors = ["offer-blue", "offer-orange", "offer-pink", "offer-green"];
 
-  activeOffers.forEach((o, i) => {
-    const colorClass = colors[i % colors.length];
+    activeOffers.forEach((o, i) => {
+      const colorClass = colors[i % colors.length];
 
-    const div = document.createElement("div");
-    div.className = `offer-poster ${colorClass}`;
+      const div = document.createElement("div");
+      div.className = `offer-poster ${colorClass}`;
 
-    // 🔹 CLICK HANDLING
-    div.onclick = () => {
-      if (o.type === "prepaid") {
-        openPrepaidForm();
-      } else {
-        showPage("menuPage");
-      }
-    };
+      div.onclick = () => {
+        if (o.type === "prepaid") {
+          openPrepaidForm();
+        } else {
+          showPage("menuPage");
+        }
+      };
 
-    div.innerHTML = `
-      <div class="offer-blob ${colorClass}"></div>
+      div.innerHTML = `
+        <div class="offer-blob ${colorClass}"></div>
 
-      <div class="offer-content">
-        <div>
-          <div class="offer-top">
-            ${o.discount > 0 ? "UP TO OFFER" : "FLAT OFFER"}
+        <div class="offer-content">
+          <div>
+            <div class="offer-top">
+              ${o.discount > 0 ? "UP TO OFFER" : "FLAT OFFER"}
+            </div>
+
+            <div class="offer-title">
+              ${o.text}
+            </div>
+
+            <div class="offer-sub">
+              ${
+                o.type === "prepaid"
+                  ? o.slabs.map(s => s.display_text).join("<br>")
+                  : (o.min ? `Valid above ${fmt(o.min)}` : "Limited time offer")
+              }
+            </div>
           </div>
 
-          <div class="offer-title">
-            ${o.text}
-          </div>
-
-          <div class="offer-sub">
-            ${
-              o.type === "prepaid"
-                ? o.slabs.map(s => s.display_text).join("<br>")
-                : (o.min ? `Valid above ${fmt(o.min)}` : "Limited time offer")
-            }
-          </div>
+          <button class="offer-cta-btn">Shop Now</button>
         </div>
 
-        <button class="offer-cta-btn">Shop Now</button>
-      </div>
+        <div class="offer-img">
+          <img src="${o.imageUrl || 'images/offer-food.png'}">
+        </div>
+      `;
 
-      <div class="offer-img">
-       <img src="${o.imageUrl || 'images/offer-food.png'}">
+      grid.appendChild(div);
+    });
 
-      </div>
-    `;
+    grid.classList.remove("hidden");
 
-    grid.appendChild(div);
-  });
-
-  grid.classList.remove("hidden");
+  } catch (err) {
+    console.error("Offers page load failed", err);
+  } finally {
+    hideOffersLoading(); // 🔵 ALWAYS HIDE
+  }
 }
+
 
 
 function loadUserOrders() {
@@ -9650,6 +9655,13 @@ async function fetchPrepaidCoupons() {
 
   console.log("✅ Prepaid data structure verified");
 }
+function showOffersLoading() {
+  document.getElementById("offersLoadingOverlay")?.classList.remove("hidden");
+}
+
+function hideOffersLoading() {
+  document.getElementById("offersLoadingOverlay")?.classList.add("hidden");
+}
 
 </script>
 
@@ -9657,9 +9669,18 @@ async function fetchPrepaidCoupons() {
   ›
 </div>
 
-  
+  <!-- Offers Page Loader -->
+<div id="offersLoadingOverlay"
+     class="fixed inset-0 bg-white bg-opacity-80 hidden z-50 flex items-center justify-center">
+  <div class="text-center">
+    <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-500 border-t-transparent mx-auto"></div>
+    <div class="mt-3 text-gray-600 text-sm">Loading offers...</div>
+  </div>
+</div>
+
 </body>
 </html>
+
 
 
 
