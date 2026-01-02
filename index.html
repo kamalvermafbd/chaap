@@ -9487,61 +9487,8 @@ document.addEventListener("DOMContentLoaded", () => {
     text: o.text
   }));
 }
-  
-async function onOffersPageOpen() {
-  const grid = document.getElementById("offersPosterGrid");
-  if (!grid) return;
 
-  await fetchOffersFromBackend();
-
-  const loggedIn = isUserLoggedIn();
-  const offers =
-    (window._lastOffersResponse && window._lastOffersResponse.offers) || [];
-
-  // SAME FINAL FILTER (as View Offers)
-  const activeOffers = offers.filter(o => {
-    if (o.type === "signup") return false;
-    if (o.type === "onetime" && o._usedOnce === true) return false;
-
-    const ua = (o.userApplicable || "All user").toLowerCase();
-    if (ua === "registered user" && !loggedIn) return false;
-
-    return o.active === true;
-  });
-
-  grid.innerHTML = "";
-
-  if (activeOffers.length === 0) {
-    grid.innerHTML = `<div class="text-gray-500">No offers available</div>`;
-    grid.classList.remove("hidden");
-    return;
-  }
-
-  const colors = ["offer-blue", "offer-orange", "offer-pink", "offer-green"];
-
-  activeOffers.forEach((o, i) => {
-    const colorClass = colors[i % colors.length];
-
-    const div = document.createElement("div");
-    div.className = "offer-poster";
-    div.onclick = () => showPage("menuPage"); // 👈 SHOP NOW behaviour
-
-    div.innerHTML = `
-      <div class="offer-blob ${colorClass}"></div>
-
-      <div class="offer-content">
-        <div>
-          <div class="offer-top">
-            ${o.discount > 0 ? "UP TO OFFER" : "FLAT OFFER"}
-          </div>
-
-          <div class="offer-title">
-            ${o.text}
-          </div>
-
-          <div class="offer-sub">
-            ${o.min ? `Valid above ${fmt(o.min)}` : "Limited time offer"}
-          </div>async function onOffersPageOpen() {
+  async function onOffersPageOpen() {
   const grid = document.getElementById("offersPosterGrid");
   if (!grid) return;
 
@@ -9614,22 +9561,6 @@ async function onOffersPageOpen() {
   grid.classList.remove("hidden");
 }
 
-        </div>
-
-        <div class="offer-cta-btn">Shop Now</div>
-      </div>
-
-      <div class="offer-img">
-        <img src="${o.imageUrl || ""}">
-      </div>
-    `;
-
-    grid.appendChild(div);
-  });
-
-  grid.classList.remove("hidden");
-}
-
 
 function loadUserOrders() {
   console.warn("loadUserOrders not implemented yet");
@@ -9644,6 +9575,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
