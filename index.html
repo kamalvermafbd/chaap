@@ -9669,6 +9669,19 @@ function hideOffersLoading() {
   document.getElementById("offersLoadingOverlay")?.classList.add("hidden");
 }
 
+
+  function openPrepaidForm() {
+  const el = document.getElementById("prepaidFormOverlay");
+  if (!el) return;
+  el.classList.remove("hidden");
+}
+
+function closePrepaidForm() {
+  const el = document.getElementById("prepaidFormOverlay");
+  if (!el) return;
+  el.classList.add("hidden");
+}
+
 </script>
 
   <div id="cartHandle" onclick="expandDrawerCart()">
@@ -9688,8 +9701,39 @@ function hideOffersLoading() {
 </div>
 
 
+ <!-- Prepaid Savings Coupon Form (Blank) -->
+<div id="prepaidFormOverlay"
+     class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+
+  <div class="bg-white w-[90%] max-w-md rounded-2xl p-6 relative">
+    
+    <!-- Close -->
+    <button onclick="closePrepaidForm()"
+            class="absolute top-3 right-3 text-gray-500 text-xl">
+      ✕
+    </button>
+
+    <!-- Title -->
+    <h2 class="text-xl font-bold text-gray-800">
+      Prepaid Savings Coupon
+    </h2>
+
+    <!-- Subtitle -->
+    <p class="text-gray-600 text-sm mt-1">
+      Buy coupons & save more
+    </p>
+
+    <!-- Blank content placeholder -->
+    <div class="mt-6 text-gray-400 text-sm text-center">
+      (Prepaid purchase flow will be built here)
+    </div>
+
+  </div>
+</div>
+
 </body>
 </html>
+
 
 
 
