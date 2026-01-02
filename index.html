@@ -9681,14 +9681,119 @@ function closePrepaidForm() {
   if (!el) return;
   el.classList.add("hidden");
 }
+ <!-- Prepaid Savings Coupon Form (script) -->
+function getActivePrepaidSlabs() {
+  const pkgs = window._prepaidPackages || [];
+  if (!pkgs.length) return [];
 
+  // assuming single prepaid package for now
+  return (pkgs[0].slabs || []).filter(
+    s => String(s.active).toLowerCase() === "true"
+  );
+}
+  
+function populateSlabDropdown(selectEl) {
+  const slabs = getActivePrepaidSlabs();
+  if (!selectEl) return;
+
+  selectEl.innerHTML = `<option value="">Select Slab</option>`;
+
+  slabs.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s.slab_id;
+    opt.textContent = s.slab_id;
+    selectEl.appendChild(opt);
+  });
+
+  disableAlreadySelectedSlabs();
+}
+
+  function disableAlreadySelectedSlabs() {
+  const selected = Array.from(
+    document.querySelectorAll("#prepaidSlabRows select")
+  )
+    .map(s => s.value)
+    .filter(Boolean);
+
+  document
+    .querySelectorAll("#prepaidSlabRows select")
+    .forEach(sel => {
+      Array.from(sel.options).forEach(opt => {
+        if (!opt.value) return;
+        opt.disabled = selected.includes(opt.value) && sel.value !== opt.value;
+      });
+    });
+}
+
+  function addPrepaidSlabRow() {
+  const tbody = document.getElementById("prepaidSlabRows");
+  if (!tbody) return;
+
+  const tr = document.createElement("tr");
+  tr.className = "border-t";
+
+  tr.innerHTML = `
+    <td class="p-2">
+      <select class="w-full border rounded px-2 py-1"
+              onchange="disableAlreadySelectedSlabs()">
+        <option value="">Select Slab</option>
+      </select>
+    </td>
+
+    <td class="p-2 text-right text-gray-500">—</td>
+    <td class="p-2 text-right text-gray-500">—</td>
+    <td class="p-2 text-right text-gray-500">—</td>
+    <td class="p-2 text-right text-gray-500">—</td>
+
+    <td class="p-2 text-center">
+      <input type="number"
+             min="1"
+             value="1"
+             class="w-16 border rounded px-2 py-1 text-center" />
+    </td>
+
+    <td class="p-2 text-right text-gray-500">—</td>
+
+    <td class="p-2 text-center">
+      <button onclick="removePrepaidRow(this)" class="text-gray-400">✕</button>
+    </td>
+  `;
+
+  tbody.appendChild(tr);
+
+  const select = tr.querySelector("select");
+  populateSlabDropdown(select);
+}
+
+  function removePrepaidRow(btn) {
+  const row = btn.closest("tr");
+  if (!row) return;
+
+  row.remove();
+  disableAlreadySelectedSlabs();
+}
+
+  function openPrepaidForm() {
+  const el = document.getElementById("prepaidFormOverlay");
+  if (!el) return;
+
+  el.classList.remove("hidden");
+
+  // populate first row slab dropdown
+  const firstSelect = el.querySelector("#prepaidSlabRows select");
+  if (firstSelect) {
+    populateSlabDropdown(firstSelect);
+  }
+}
+
+  
 </script>
 
   <div id="cartHandle" onclick="expandDrawerCart()">
   ›
 </div>
 
-  <!-- Offers Page Loader -->
+
 <!-- Offers Page Loader -->
 <div id="offersLoadingOverlay"
      class="fixed inset-0 bg-white bg-opacity-80 hidden z-50 flex items-center justify-center">
@@ -9701,12 +9806,12 @@ function closePrepaidForm() {
 </div>
 
 
- <!-- Prepaid Savings Coupon Form (Blank) -->
+<!-- Prepaid Savings Coupon Form -->
 <div id="prepaidFormOverlay"
      class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
 
-  <div class="bg-white w-[90%] max-w-md rounded-2xl p-6 relative">
-    
+  <div class="bg-white w-[95%] max-w-3xl rounded-2xl p-6 relative">
+
     <!-- Close -->
     <button onclick="closePrepaidForm()"
             class="absolute top-3 right-3 text-gray-500 text-xl">
@@ -9723,9 +9828,82 @@ function closePrepaidForm() {
       Buy coupons & save more
     </p>
 
-    <!-- Blank content placeholder -->
-    <div class="mt-6 text-gray-400 text-sm text-center">
-      (Prepaid purchase flow will be built here)
+    <!-- Prepaid Coupon Purchase Table -->
+    <div class="mt-6 overflow-x-auto">
+      <table class="w-full border border-gray-200 rounded-lg text-sm">
+        <thead class="bg-gray-100 text-gray-700">
+          <tr>
+            <th class="p-2 text-left">Slab ID</th>
+            <th class="p-2 text-right">Value</th>
+            <th class="p-2 text-right">Discount</th>
+            <th class="p-2 text-right">Disc Amt</th>
+            <th class="p-2 text-right">Net Rate</th>
+            <th class="p-2 text-center">Qty</th>
+            <th class="p-2 text-right">Net Amt</th>
+            <th class="p-2 text-center"></th>
+          </tr>
+        </thead>
+
+        <tbody id="prepaidSlabRows">
+          <!-- Default Row -->
+          <tr class="border-t">
+            <td class="p-2">
+              <select
+                class="w-full border rounded px-2 py-1"
+                onchange="disableAlreadySelectedSlabs()">
+                <option value="">Select Slab</option>
+              </select>
+            </td>
+
+            <td class="p-2 text-right text-gray-500">—</td>
+            <td class="p-2 text-right text-gray-500">—</td>
+            <td class="p-2 text-right text-gray-500">—</td>
+            <td class="p-2 text-right text-gray-500">—</td>
+
+            <td class="p-2 text-center">
+              <input type="number"
+                     min="1"
+                     value="1"
+                     class="w-16 border rounded px-2 py-1 text-center" />
+            </td>
+
+            <td class="p-2 text-right text-gray-500">—</td>
+
+            <td class="p-2 text-center text-gray-300">✕</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Add Slab -->
+      <button
+        type="button"
+        onclick="addPrepaidSlabRow()"
+        class="mt-3 text-orange-600 text-sm font-semibold">
+        + Add another slab
+      </button>
+    </div>
+
+    <!-- Total Payable -->
+    <div class="mt-6 flex justify-end">
+      <div class="text-lg font-bold text-gray-800">
+        Total Payable: ₹0
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-6 flex justify-end gap-3">
+      <button
+        type="button"
+        onclick="closePrepaidForm()"
+        class="px-4 py-2 rounded-lg border border-gray-300 text-gray-600">
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="px-5 py-2 rounded-lg bg-orange-500 text-white font-semibold">
+        Proceed to Pay
+      </button>
     </div>
 
   </div>
@@ -9733,6 +9911,7 @@ function closePrepaidForm() {
 
 </body>
 </html>
+
 
 
 
