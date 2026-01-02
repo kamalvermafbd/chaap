@@ -761,45 +761,57 @@ body::before {
 #offersPromoSlides > div {
   margin-bottom: 12px;   /* pehle zyada hoga */
 }
-/* Offers page = banner mode */
-.offers-banner-mode #offersCouponsList {
+
+
+.offer-banner-card {
   display: flex;
-  flex-direction: column;
-  gap: 18px;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border-radius: 22px;
+  padding: 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+  cursor: pointer;
 }
 
-/* Individual coupon → banner card */
-.offers-banner-mode #offersCouponsList > div {
-  border-radius: 18px;
-  padding: 22px;
-  background: #fffdfb;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-  border: none;
+.offer-left {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
 
+.offer-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: #ffedd5;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 900;
+  color: #f97316;
 }
 
-/* Left text area */
-.offers-banner-mode .font-semibold {
+.offer-title {
   font-size: 20px;
-  font-weight: 800;
+  font-weight: 900;
 }
 
-.offers-banner-mode .text-gray-600 {
-  font-size: 14px;
+.offer-sub {
+  color: #6b7280;
   margin-top: 4px;
 }
 
-/* Apply button → premium */
-.offers-banner-mode button {
-  padding: 8px 18px;
-  font-size: 14px;
-  border-radius: 999px;
-  background: #16a34a;
+.offer-img img {
+  width: 90px;
+  height: 90px;
+  border-radius: 16px;
+  object-fit: cover;
 }
 
+    
   </style>
 </head>
 <body>
@@ -9202,19 +9214,33 @@ async function onOffersPageOpen() {
   }
 
   list.innerHTML = activeOffers.map(o => `
-    <div class="p-2 border-b cursor-pointer hover:bg-gray-100"
-         onclick="applyCoupon('${o.id}')">
-      <div class="font-semibold">
-        <span class="font-bold">${o.id}</span> – ${o.text}
+  <div class="offer-banner-card"
+       onclick="applyCoupon('${o.id}')">
+
+    <div class="offer-left">
+      <div class="offer-icon">
+        ${o.discount > 0 ? '%' : '₹'}
       </div>
-      <div class="text-sm text-gray-500">
-        Min: ${fmt(o.min)}
+
+      <div>
+        <div class="offer-title">${o.text}</div>
+        <div class="offer-sub">
+          ${o.min ? `Valid above ${fmt(o.min)}` : 'Limited time offer'}
+        </div>
       </div>
     </div>
-  `).join("");
+
+    <div class="offer-img">
+      <img src="${o.imageUrl || ''}" />
+    </div>
+
+  </div>
+`).join("");
+
 
   box.classList.remove("hidden");
 }
+
 
 function loadUserOrders() {
   console.warn("loadUserOrders not implemented yet");
@@ -9229,6 +9255,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
