@@ -903,6 +903,86 @@ body::before {
     font-size: 18px;
   }
 }
+/* ===== SALE POSTER STYLE ===== */
+
+.sale-card {
+  position: relative;
+  height: 220px;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.12);
+  overflow: hidden;
+  margin-bottom: 30px;
+  cursor: pointer;
+}
+
+/* abstract blob */
+.sale-blob {
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(circle at 30% 30%,
+    #3b82f6,
+    #2563eb,
+    #1e40af);
+  transform: rotate(-12deg);
+}
+
+/* content */
+.sale-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  padding: 28px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.sale-badge {
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.sale-title {
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+.sale-sub {
+  font-size: 15px;
+  opacity: 0.9;
+  margin-top: 6px;
+}
+
+.sale-btn {
+  margin-top: 18px;
+  align-self: flex-start;
+  background: #ffffff;
+  color: #1e40af;
+  border: none;
+  padding: 8px 18px;
+  font-weight: 700;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.sale-btn:hover {
+  background: #f1f5f9;
+}
+
+/* mobile */
+@media (max-width: 768px) {
+  .sale-card {
+    height: 190px;
+  }
+  .sale-title {
+    font-size: 22px;
+  }
+}
 
   </style>
 </head>
@@ -9304,30 +9384,27 @@ async function onOffersPageOpen() {
     box.classList.remove("hidden");
     return;
   }
-
- list.innerHTML = activeOffers.map(o => `
-  <div class="offer-banner-card"
+list.innerHTML = activeOffers.map(o => `
+  <div class="sale-card"
        onclick="applyCoupon('${o.id}')">
 
-    <div class="offer-left">
-      <div class="offer-icon">
-        ${o.discount > 0 ? '%' : '₹'}
+    <div class="sale-blob"></div>
+
+    <div class="sale-content">
+      <div class="sale-badge">
+        ${o.discount ? `UP TO ${o.discount}% OFF` : `FLAT ₹${o.flat} OFF`}
       </div>
 
-      <div>
-        <div class="offer-title">
-          ${o.text}
-        </div>
-        <div class="offer-sub">
-          ${o.min ? `Valid on orders above ${fmt(o.min)}` : 'Limited time offer'}
-        </div>
+      <div class="sale-title">
+        ${o.text}
       </div>
-    </div>
 
-    <div class="offer-img">
-      <img src="${o.imageUrl || 'https://images.unsplash.com/photo-1604908177522-040aa1e3e4c8'}">
-    </div>
+      <div class="sale-sub">
+        ${o.min ? `Valid on orders above ${fmt(o.min)}` : 'Limited time offer'}
+      </div>
 
+      <button class="sale-btn">Apply Now</button>
+    </div>
   </div>
 `).join("");
 
@@ -9350,6 +9427,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
