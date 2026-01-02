@@ -9550,6 +9550,59 @@ function loadUserOrders() {
   console.warn("loadUserOrders not implemented yet");
 }
 
+async function fetchPrepaidCoupons() {
+  try {
+    console.log("🟡 Fetching prepaid coupons...");
+
+    const res = await fetch(
+      API_BASE + "?api=getprepaidcoupon"
+    );
+
+    const data = await res.json();
+
+    if (!data || data.success !== true) {
+      console.warn("⚠️ Prepaid coupon API failed", data);
+      window._prepaidPackages = [];
+      return;
+    }
+
+    // 🔒 SAFE GLOBAL STORE
+    window._prepaidPackages = data.packages || [];
+
+    console.log(
+      "✅ Prepaid coupons loaded:",
+      window._prepaidPackages
+    );
+
+  } catch (err) {
+    console.error("❌ fetchPrepaidCoupons error", err);
+    window._prepaidPackages = [];
+  }
+}
+
+  function testPrepaidData() {
+  if (!Array.isArray(window._prepaidPackages)) {
+    console.warn("❌ Prepaid packages not loaded");
+    return;
+  }
+
+  console.log("📦 TOTAL PACKAGES:", window._prepaidPackages.length);
+
+  window._prepaidPackages.forEach((pkg, i) => {
+    console.log(`📦 Package ${i + 1}:`, {
+      id: pkg.package_id,
+      title: pkg.title,
+      slabs: pkg.slabs?.length || 0
+    });
+
+    (pkg.slabs || []).forEach(s => {
+      console.log("   ▸ Slab:", s.display_text);
+    });
+  });
+
+  console.log("✅ Prepaid data structure verified");
+}
+
 </script>
 
   <div id="cartHandle" onclick="expandDrawerCart()">
@@ -9559,6 +9612,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
