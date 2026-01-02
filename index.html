@@ -9484,6 +9484,7 @@ function mapPrepaidPackageToOffer(pkg) {
     active: true,
 
     text: pkg.title,        // Prepaid Saving Coupon
+     topText: pkg.description || "",
     min: null,              // 🔑 IMPORTANT
     discount: 1,            // so "UP TO OFFER" shows
 
@@ -9560,9 +9561,14 @@ async function onOffersPageOpen() {
 
         <div class="offer-content">
           <div>
-            <div class="offer-top">
-              ${o.discount > 0 ? "UP TO OFFER" : "FLAT OFFER"}
-            </div>
+          <div class="offer-top">
+  ${
+    o.type === "prepaid"
+      ? o.topText
+      : (o.discount > 0 ? "UP TO OFFER" : "FLAT OFFER")
+  }
+</div>
+
 
             <div class="offer-title">
               ${o.text}
@@ -9680,6 +9686,7 @@ function hideOffersLoading() {
 
 </body>
 </html>
+
 
 
 
