@@ -4810,7 +4810,6 @@ function updateForgotOverlay(msg) {
 function showPage(pageId) {
   window._activePage = pageId;
 
-  // 🔒 HIDE PROMO BANNER ON EVERY PAGE SWITCH
   const promo = document.getElementById("promoBanner");
   if (promo) promo.style.display = "none";
 
@@ -4828,14 +4827,15 @@ function showPage(pageId) {
   }
 
   if (pageId === "offersPage") {
-    onOffersPageOpen();
+    onOffersPageOpen(); // ✅ correct
   }
-   document.body.classList.toggle(
+
+  // ✅ IMPORTANT FIX
+  document.body.classList.toggle(
     "menu-active",
-    pageId === "menuPage"
+    pageId === "menuPage" || pageId === "offersPage"
   );
 }
-
 
 
 
@@ -9127,33 +9127,56 @@ document.addEventListener("DOMContentLoaded", () => {
 }
 
 
-function onOffersPageOpen() {
- const rawOffers =
-    window.liveOffers ||
-    window._promoOffers ||
-    window._allOffersRaw ||
-    [];
-
-  const coupons = mapOffersToCoupons(rawOffers);
-
-  const box = document.getElementById("offersCouponsBox");
+async function onOffersPageOpen() {
+  const box  = document.getElementById("offersCouponsBox");
   const list = document.getElementById("offersCouponsList");
 
   if (!box || !list) return;
 
-  // 🔁 TEMP ID SWAP (important)
-  box.id = "availableCouponsBox";
-  list.id = "availableCouponsList";
+  // 1️⃣ fetch SAME backend data
+  await fetchOffersFromBackend();
 
-  renderAvailableUserCoupons(coupons);
+  const loggedIn = isUserLoggedIn();
+  const apiOffers =
+    (window._lastOffersResponse && window._lastOffersResponse.offers) || [];
 
-  // 🔁 RESTORE
-  box.id = "offersCouponsBox";
-  list.id = "offersCouponsList";
+  // 2️⃣ SAME FINAL FILTER (COPY-PASTE SAFE)
+  const activeOffers = apiOffers.filter(o => {
+    if (o.type === "signup") return false;
+    if (o.type === "onetime" && o._usedOnce === true) return false;
+
+    const ua = (o.userApplicable || "All user").toLowerCase();
+    if (ua === "registered user" && !loggedIn) return false;
+
+    return o.active === true;
+  });
+
+  // 3️⃣ render (simple list – same as View Offers)
+  list.innerHTML = "";
+
+  if (activeOffers.length === 0) {
+    list.innerHTML = `
+      <div class="p-2 text-gray-500 text-center">
+        No offers available
+      </div>`;
+    box.classList.remove("hidden");
+    return;
+  }
+
+  list.innerHTML = activeOffers.map(o => `
+    <div class="p-2 border-b cursor-pointer hover:bg-gray-100"
+         onclick="applyCoupon('${o.id}')">
+      <div class="font-semibold">
+        <span class="font-bold">${o.id}</span> – ${o.text}
+      </div>
+      <div class="text-sm text-gray-500">
+        Min: ${fmt(o.min)}
+      </div>
+    </div>
+  `).join("");
 
   box.classList.remove("hidden");
 }
-
 
 function loadUserOrders() {
   console.warn("loadUserOrders not implemented yet");
@@ -9168,6 +9191,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
