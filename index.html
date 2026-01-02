@@ -985,81 +985,99 @@ body::before {
 }
 
 
-    /* ===== OFFER POSTER STYLE ===== */
+   /* ===== OPTION 2 : VERTICAL OFFER POSTERS (4:5) ===== */
 
-.offers-list {
+.offers-poster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 22px;
+  padding: 10px 0 40px;
+}
+
+/* Card */
+.offer-poster {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.offer-poster:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+}
+
+/* Abstract blob */
+.offer-blob {
+  position: absolute;
+  inset: 14% -20% auto -20%;
+  height: 60%;
+  border-radius: 50%;
+  filter: blur(0.5px);
+}
+
+/* Color variants */
+.offer-blue  { background: radial-gradient(circle at 30% 30%, #4f8cff, #1e40af); }
+.offer-orange{ background: radial-gradient(circle at 30% 30%, #ff9f43, #f97316); }
+.offer-pink  { background: radial-gradient(circle at 30% 30%, #f472b6, #db2777); }
+.offer-green { background: radial-gradient(circle at 30% 30%, #34d399, #059669); }
+
+/* Content */
+.offer-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 26px;
-  margin-top: 20px;
+  justify-content: space-between;
 }
 
-/* MAIN CARD */
-.offer-banner-card {
-  position: relative;
-  min-height: 180px;
-  border-radius: 28px;
-  padding: 28px 34px;
-  color: #fff;
-  cursor: pointer;
-  overflow: hidden;
-  box-shadow: 0 20px 45px rgba(0,0,0,0.18);
-  background: linear-gradient(135deg, #2563eb, #1e40af);
-}
-
-/* ANGLED SHAPE */
-.offer-banner-card::after {
-  content: "";
-  position: absolute;
-  right: -40px;
-  top: 0;
-  width: 45%;
-  height: 100%;
-  background: rgba(255,255,255,0.12);
-  transform: skewX(-18deg);
-}
-
-/* SALE TAG */
-.offer-tag {
-  font-size: 13px;
+.offer-top {
+  font-size: 12px;
   font-weight: 700;
+  color: #ffffffcc;
   letter-spacing: 1px;
-  opacity: 0.9;
 }
 
-/* BIG TITLE */
 .offer-title {
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 800;
-  margin: 8px 0;
+  color: #ffffff;
+  line-height: 1.1;
+  margin-top: 8px;
 }
 
-/* SUB TEXT */
 .offer-sub {
-  font-size: 15px;
-  opacity: 0.9;
+  font-size: 14px;
+  color: #f1f5f9;
+  margin-top: 6px;
 }
 
-/* APPLY BUTTON */
-.offer-btn {
-  margin-top: 18px;
-  display: inline-block;
-  padding: 10px 22px;
-  background: #fff;
-  color: #1e40af;
+/* CTA */
+.offer-cta {
+  margin-top: auto;
+  background: #ffffff;
+  color: #111827;
   border-radius: 999px;
+  padding: 10px 16px;
   font-weight: 700;
   font-size: 14px;
+  width: fit-content;
 }
 
-/* IMAGE */
+/* Image */
 .offer-img {
   position: absolute;
-  right: 26px;
-  bottom: 26px;
-  width: 96px;
-  height: 96px;
-  border-radius: 20px;
+  right: 14px;
+  bottom: 14px;
+  width: 70px;
+  height: 70px;
+  border-radius: 16px;
   overflow: hidden;
   background: #000;
 }
@@ -1068,15 +1086,6 @@ body::before {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-/* COLOR VARIANTS (auto rotate look) */
-.offer-banner-card.flat {
-  background: linear-gradient(135deg, #f97316, #ea580c);
-}
-
-.offer-banner-card.signup {
-  background: linear-gradient(135deg, #9333ea, #6b21a8);
 }
 
   </style>
@@ -1646,6 +1655,8 @@ body::before {
     <!-- OFFERS PAGE -->
 <div id="offersPage" style="display:none;">
   <h2>My Offers</h2>
+<!-- OFFERS POSTER GRID -->
+<div id="offersPosterGrid" class="offers-poster-grid hidden"></div>
 
   <!-- OFFERS ONLY BANNER -->
   <div id="offersCouponsBox" class="hidden">
@@ -9442,20 +9453,19 @@ document.addEventListener("DOMContentLoaded", () => {
     text: o.text
   }));
 }
-
+  
 async function onOffersPageOpen() {
-  const box  = document.getElementById("offersCouponsBox");
-  const list = document.getElementById("offersCouponsList");
-
-  if (!box || !list) return;
+  const grid = document.getElementById("offersPosterGrid");
+  if (!grid) return;
 
   await fetchOffersFromBackend();
 
   const loggedIn = isUserLoggedIn();
-  const apiOffers =
+  const offers =
     (window._lastOffersResponse && window._lastOffersResponse.offers) || [];
 
-  const activeOffers = apiOffers.filter(o => {
+  // SAME FINAL FILTER (as View Offers)
+  const activeOffers = offers.filter(o => {
     if (o.type === "signup") return false;
     if (o.type === "onetime" && o._usedOnce === true) return false;
 
@@ -9465,49 +9475,54 @@ async function onOffersPageOpen() {
     return o.active === true;
   });
 
-  list.innerHTML = "";
+  grid.innerHTML = "";
 
-  if (!activeOffers.length) {
-    list.innerHTML = `<div class="text-center text-gray-500">No offers available</div>`;
-    box.classList.remove("hidden");
+  if (activeOffers.length === 0) {
+    grid.innerHTML = `<div class="text-gray-500">No offers available</div>`;
+    grid.classList.remove("hidden");
     return;
   }
 
-  activeOffers.forEach(o => {
-    const card = document.createElement("div");
+  const colors = ["offer-blue", "offer-orange", "offer-pink", "offer-green"];
 
-    let cls = "offer-banner-card";
-    if (o.flat > 0) cls += " flat";
-    if (o.type === "signup") cls += " signup";
+  activeOffers.forEach((o, i) => {
+    const colorClass = colors[i % colors.length];
 
-    card.className = cls;
+    const div = document.createElement("div");
+    div.className = "offer-poster";
+    div.onclick = () => showPage("menuPage"); // 👈 SHOP NOW behaviour
 
-    card.innerHTML = `
-      <div class="offer-tag">
-        ${o.flat > 0 ? "FLAT OFFER" : "UP TO OFFER"}
+    div.innerHTML = `
+      <div class="offer-blob ${colorClass}"></div>
+
+      <div class="offer-content">
+        <div>
+          <div class="offer-top">
+            ${o.discount > 0 ? "UP TO OFFER" : "FLAT OFFER"}
+          </div>
+
+          <div class="offer-title">
+            ${o.text}
+          </div>
+
+          <div class="offer-sub">
+            ${o.min ? `Valid above ${fmt(o.min)}` : "Limited time offer"}
+          </div>
+        </div>
+
+        <div class="offer-cta">Shop Now</div>
       </div>
-
-      <div class="offer-title">${o.text}</div>
-
-      <div class="offer-sub">
-        ${o.min ? `Valid on orders above ${fmt(o.min)}` : "Limited time offer"}
-      </div>
-
-      <div class="offer-btn">Apply Now</div>
 
       <div class="offer-img">
-        <img src="${o.imageUrl || ''}">
+        <img src="${o.imageUrl || ""}">
       </div>
     `;
 
-    card.onclick = () => applyCoupon(o.id);
-
-    list.appendChild(card);
+    grid.appendChild(div);
   });
 
-  box.classList.remove("hidden");
+  grid.classList.remove("hidden");
 }
-
 
 
 function loadUserOrders() {
@@ -9523,21 +9538,6 @@ function loadUserOrders() {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
