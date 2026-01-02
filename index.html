@@ -9487,7 +9487,7 @@ function mapPrepaidPackageToOffer(pkg) {
     min: null,              // 🔑 IMPORTANT
     discount: 1,            // so "UP TO OFFER" shows
 
-    imageUrl: "",
+  imageUrl: pkg.imageUrl || "",
 
     _prepaid: true,
     slabs: pkg.slabs || []
@@ -9660,6 +9660,7 @@ async function fetchPrepaidCoupons() {
   
 </body>
 </html>
+
 
 
 
