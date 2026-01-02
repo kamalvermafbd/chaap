@@ -1013,8 +1013,6 @@ body::before {
 
 /* Abstract blob */
 .offer-blob {
-  margin top: 12px;
-  top: -22%
   position: absolute;
   inset: 14% -20% auto -20%;
   height: 60%;
@@ -1061,19 +1059,16 @@ body::before {
 }
 
 /* CTA */
-.offer-cta-btn {
-  border: none;
+.offer-cta {
+  margin-top: auto;
+  background: #ffffff;
+  color: #111827;
   border-radius: 999px;
-  padding: 9px 18px;     /* ⬅️ smaller */
-  font-size: 13px;
+  padding: 10px 16px;
   font-weight: 700;
-  min-width: 120px;     /* ⬅️ limit width */
-  max-width: 140px;
-  height: 38px;         /* ⬅️ controlled height */
-  cursor: pointer;
-  color: #fff;
+  font-size: 14px;
+  width: fit-content;
 }
-
 
 /* Image */
 .offer-img {
@@ -1091,71 +1086,6 @@ body::before {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-/* Grid spacing thoda kam, card bada */
-.offers-poster-grid {
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); /* ⬅️ was 220 */
-  gap: 26px;
-}
-
-/* Card overall thoda bada feel */
-.offer-poster {
-  aspect-ratio: 4 / 5;
-  border-radius: 22px;
-}
-
-    /* SHOP NOW – round pill button */
-.offer-cta-btn {
-  border: none;
-  border-radius: 999px;
-  padding: 12px 22px;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  color: #fff;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.offer-cta-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 26px rgba(0,0,0,0.3);
-}
-
-/* Color match with top blob */
-.offer-blue  .offer-cta-btn { background: linear-gradient(135deg, #4f8cff, #1e40af); }
-.offer-orange.offer-blob ~ .offer-content .offer-cta-btn,
-.offer-orange .offer-cta-btn { background: linear-gradient(135deg, #ff9f43, #f97316); }
-
-.offer-pink  .offer-cta-btn { background: linear-gradient(135deg, #f472b6, #db2777); }
-.offer-green .offer-cta-btn { background: linear-gradient(135deg, #34d399, #059669); }
-
-    /* ===== COLOR BASED CTA BUTTON ===== */
-.offer-blue .offer-cta-btn {
-  background: linear-gradient(135deg, #3b82f6, #1e40af);
-  color: #fff;
-}
-
-.offer-orange .offer-cta-btn {
-  background: linear-gradient(135deg, #fb923c, #f97316);
-  color: #fff;
-}
-
-/* CTA button size fix */
-.offer-cta-btn {
-  border: none;
-  border-radius: 999px;
-  padding: 9px 18px;
-  font-size: 13px;
-  font-weight: 700;
-  height: 38px;
-  min-width: 120px;
-  cursor: pointer;
-}
-
-/* Blob thoda niche */
-.offer-blob {
-  top: -22%;
 }
 
   </style>
@@ -9528,14 +9458,13 @@ async function onOffersPageOpen() {
   const grid = document.getElementById("offersPosterGrid");
   if (!grid) return;
 
-  // 🔁 SAME backend call as View Offers
   await fetchOffersFromBackend();
 
   const loggedIn = isUserLoggedIn();
   const offers =
     (window._lastOffersResponse && window._lastOffersResponse.offers) || [];
 
-  // ✅ SAME FINAL FILTER (NO DUPLICATION, NO NEW LOGIC)
+  // SAME FINAL FILTER (as View Offers)
   const activeOffers = offers.filter(o => {
     if (o.type === "signup") return false;
     if (o.type === "onetime" && o._usedOnce === true) return false;
@@ -9549,45 +9478,39 @@ async function onOffersPageOpen() {
   grid.innerHTML = "";
 
   if (activeOffers.length === 0) {
-    grid.innerHTML = `
-      <div class="text-gray-500 text-center p-4">
-        No offers available
-      </div>`;
+    grid.innerHTML = `<div class="text-gray-500">No offers available</div>`;
     grid.classList.remove("hidden");
     return;
   }
 
-  // 🎨 poster colors rotate
   const colors = ["offer-blue", "offer-orange", "offer-pink", "offer-green"];
 
   activeOffers.forEach((o, i) => {
     const colorClass = colors[i % colors.length];
 
-    const card = document.createElement("div");
-    card.className = `offer-poster ${colorClass}`;
+    const div = document.createElement("div");
+    div.className = "offer-poster";
+    div.onclick = () => showPage("menuPage"); // 👈 SHOP NOW behaviour
 
-    // 👉 Shop Now = menu page (NO coupon auto apply)
-    card.onclick = () => showPage("menuPage");
-
-    card.innerHTML = `
-      <div class="offer-blob"></div>
+    div.innerHTML = `
+      <div class="offer-blob ${colorClass}"></div>
 
       <div class="offer-content">
-        <div class="offer-top">
-          ${o.discount > 0 ? "UP TO OFFER" : "FLAT OFFER"}
+        <div>
+          <div class="offer-top">
+            ${o.discount > 0 ? "UP TO OFFER" : "FLAT OFFER"}
+          </div>
+
+          <div class="offer-title">
+            ${o.text}
+          </div>
+
+          <div class="offer-sub">
+            ${o.min ? `Valid above ${fmt(o.min)}` : "Limited time offer"}
+          </div>
         </div>
 
-        <div class="offer-title">
-          ${o.text}
-        </div>
-
-        <div class="offer-sub">
-          ${o.min ? `Valid above ${fmt(o.min)}` : "Limited time offer"}
-        </div>
-
-        <button class="offer-cta-btn">
-          Shop Now
-        </button>
+        <div class="offer-cta">Shop Now</div>
       </div>
 
       <div class="offer-img">
@@ -9595,12 +9518,11 @@ async function onOffersPageOpen() {
       </div>
     `;
 
-    grid.appendChild(card);
+    grid.appendChild(div);
   });
 
   grid.classList.remove("hidden");
 }
-
 
 
 function loadUserOrders() {
@@ -9616,8 +9538,6 @@ function loadUserOrders() {
   
 </body>
 </html>
-
-
 
 
 
