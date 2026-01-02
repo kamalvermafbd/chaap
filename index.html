@@ -9112,14 +9112,29 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-    
+    function mapOffersToCoupons(offers = []) {
+  return offers.map(o => ({
+    couponcode: o.id,              // 🔥 REQUIRED
+    flat: Number(o.flat || 0),
+    discount: Number(o.discount || 0),
+    couponType:
+      o.type === "reward"
+        ? "reward"
+        : "normal",
+    min: Number(o.min || 0),
+    text: o.text
+  }));
+}
+
 
 function onOffersPageOpen() {
-  const coupons =
+ const rawOffers =
     window.liveOffers ||
     window._promoOffers ||
     window._allOffersRaw ||
     [];
+
+  const coupons = mapOffersToCoupons(rawOffers);
 
   const box = document.getElementById("offersCouponsBox");
   const list = document.getElementById("offersCouponsList");
@@ -9153,6 +9168,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
