@@ -9474,12 +9474,33 @@ document.addEventListener("DOMContentLoaded", () => {
     text: o.text
   }));
 }
+  
+function mapPrepaidPackageToOffer(pkg) {
+  if (!pkg) return null;
+
+  return {
+    id: "PREPAID_" + pkg.package_id,
+    type: "prepaid",
+    active: true,
+
+    text: pkg.title,        // Prepaid Saving Coupon
+    min: null,              // 🔑 IMPORTANT
+    discount: 1,            // so "UP TO OFFER" shows
+
+    imageUrl: "",
+
+    _prepaid: true,
+    slabs: pkg.slabs || []
+  };
+}
 
 async function onOffersPageOpen() {
   const grid = document.getElementById("offersPosterGrid");
   if (!grid) return;
 
+  // 🔑 FETCH BOTH
   await fetchOffersFromBackend();
+  await fetchPrepaidCoupons();
 
   const loggedIn = isUserLoggedIn();
   const offers =
@@ -9496,6 +9517,20 @@ async function onOffersPageOpen() {
     return o.active === true;
   });
 
+  // 🔹 APPEND PREPAID OFFER (CONTINUITY)
+  if (
+    Array.isArray(window._prepaidPackages) &&
+    window._prepaidPackages.length > 0
+  ) {
+    const prepaidOffer = mapPrepaidPackageToOffer(
+      window._prepaidPackages[0]
+    );
+
+    if (prepaidOffer) {
+      activeOffers.push(prepaidOffer);
+    }
+  }
+
   grid.innerHTML = "";
 
   if (activeOffers.length === 0) {
@@ -9511,7 +9546,15 @@ async function onOffersPageOpen() {
 
     const div = document.createElement("div");
     div.className = `offer-poster ${colorClass}`;
-    div.onclick = () => showPage("menuPage"); // 👈 Shop Now → Menu
+
+    // 🔹 CLICK HANDLING
+    div.onclick = () => {
+      if (o.type === "prepaid") {
+        openPrepaidForm();
+      } else {
+        showPage("menuPage");
+      }
+    };
 
     div.innerHTML = `
       <div class="offer-blob ${colorClass}"></div>
@@ -9527,7 +9570,11 @@ async function onOffersPageOpen() {
           </div>
 
           <div class="offer-sub">
-            ${o.min ? `Valid above ${fmt(o.min)}` : "Limited time offer"}
+            ${
+              o.type === "prepaid"
+                ? o.slabs.map(s => s.display_text).join("<br>")
+                : (o.min ? `Valid above ${fmt(o.min)}` : "Limited time offer")
+            }
           </div>
         </div>
 
@@ -9612,6 +9659,7 @@ async function fetchPrepaidCoupons() {
   
 </body>
 </html>
+
 
 
 
