@@ -1331,8 +1331,8 @@ body::before {
   <h2>My Offers</h2>
 
   <!-- OFFERS ONLY BANNER -->
-  <div id="availableCouponsBox" class="hidden">
-    <div id="availableCouponsList" class="space-y-2"></div>
+  <div id="offersCouponsBox" class="hidden">
+    <div id="offersCouponsList" class="space-y-2"></div>
   </div>
 </div>
 
@@ -9112,48 +9112,33 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-function renderCouponsOnOffersPage() {
-  const coupons =
-    window.liveOffers ||
-    window._allOffersRaw ||
-    [];
-
-  const oldBox = document.getElementById("availableCouponsBox");
-  const oldList = document.getElementById("availableCouponsList");
-
-  const offersBox = document.getElementById("offersCouponsBox");
-  const offersList = document.getElementById("offersCouponsList");
-
-  if (!offersBox || !offersList || !oldBox || !oldList) {
-  console.warn("Coupon containers missing");
-  return;
-}
-  // swap ids
-  oldBox.id = "tempBox";
-  oldList.id = "tempList";
-
-  offersBox.id = "availableCouponsBox";
-  offersList.id = "availableCouponsList";
-
-  // 🔥 SAME PERFECT LOGIC
-  renderAvailableUserCoupons(coupons);
-
-  // restore ids
-  offersBox.id = "offersCouponsBox";
-  offersList.id = "offersCouponsList";
-
-  oldBox.id = "availableCouponsBox";
-  oldList.id = "availableCouponsList";
-}
+    
 
 function onOffersPageOpen() {
   const coupons =
     window.liveOffers ||
+    window._promoOffers ||
     window._allOffersRaw ||
     [];
 
+  const box = document.getElementById("offersCouponsBox");
+  const list = document.getElementById("offersCouponsList");
+
+  if (!box || !list) return;
+
+  // 🔁 TEMP ID SWAP (important)
+  box.id = "availableCouponsBox";
+  list.id = "availableCouponsList";
+
   renderAvailableUserCoupons(coupons);
+
+  // 🔁 RESTORE
+  box.id = "offersCouponsBox";
+  list.id = "offersCouponsList";
+
+  box.classList.remove("hidden");
 }
+
 
 function loadUserOrders() {
   console.warn("loadUserOrders not implemented yet");
@@ -9168,6 +9153,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
