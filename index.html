@@ -761,6 +761,44 @@ body::before {
 #offersPromoSlides > div {
   margin-bottom: 12px;   /* pehle zyada hoga */
 }
+/* Offers page = banner mode */
+.offers-banner-mode #offersCouponsList {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Individual coupon → banner card */
+.offers-banner-mode #offersCouponsList > div {
+  border-radius: 18px;
+  padding: 22px;
+  background: #fffdfb;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  border: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Left text area */
+.offers-banner-mode .font-semibold {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.offers-banner-mode .text-gray-600 {
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+/* Apply button → premium */
+.offers-banner-mode button {
+  padding: 8px 18px;
+  font-size: 14px;
+  border-radius: 999px;
+  background: #16a34a;
+}
 
   </style>
 </head>
@@ -9191,6 +9229,7 @@ function loadUserOrders() {
   
 </body>
 </html>
+
 
 
 
