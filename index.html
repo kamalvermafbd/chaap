@@ -9963,6 +9963,11 @@ function recalcTotalPayable() {
   }
 }
 
+  function showPrepaidProcessing() {
+  const el = document.getElementById("prepaidProcessingOverlay");
+  if (el) el.classList.remove("hidden");
+}
+
 
 </script>
 
@@ -10087,8 +10092,22 @@ function recalcTotalPayable() {
   </div>
 </div>
 
+  <!-- Prepaid Processing Overlay -->
+<div id="prepaidProcessingOverlay"
+     class="fixed inset-0 bg-black bg-opacity-50 hidden z-[9999] flex items-center justify-center">
+
+  <div class="bg-white rounded-xl px-6 py-5 text-center shadow-lg">
+    <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-500 border-t-transparent mx-auto"></div>
+    <div class="mt-4 text-gray-700 font-semibold">
+      Processing your prepaid order...
+    </div>
+  </div>
+
+</div>
+
 </body>
 </html>
+
 
 
 
