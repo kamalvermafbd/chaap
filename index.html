@@ -9681,6 +9681,7 @@ function closePrepaidForm() {
   if (!el) return;
   el.classList.add("hidden");
 }
+  
  <!-- Prepaid Savings Coupon Form (script) -->
 function getActivePrepaidSlabs() {
   const pkgs = window._prepaidPackages || [];
@@ -9935,9 +9936,11 @@ function recalcTotalPayable() {
   };
 }
 
-  async function submitPrepaidPurchase() {
+ async function submitPrepaidPurchase() {
   const payload = collectPrepaidPayload();
   if (!payload) return;
+
+  showPrepaidProcessing();   // STEP-B
 
   try {
     const url =
@@ -9949,23 +9952,84 @@ function recalcTotalPayable() {
     const res = await fetch(url);
     const data = await res.json();
 
+    hidePrepaidProcessing(); // 👈 STEP-C (success path)
+
     if (!data.success) {
       alert("Failed to save prepaid order");
       return;
     }
 
     alert("Prepaid order saved successfully (Payment pending)");
+
+    resetPrepaidForm();      // message ke baad clean
     closePrepaidForm();
 
   } catch (err) {
     console.error("Prepaid save failed", err);
+
+    hidePrepaidProcessing(); // 👈 STEP-C (error path)
     alert("Something went wrong");
+  }
+}
+
+function resetPrepaidForm() {
+  const tbody = document.getElementById("prepaidSlabRows");
+  if (!tbody) return;
+
+  // 🔥 Remove all existing rows
+  tbody.innerHTML = "";
+
+  // 🔹 Insert fresh empty row
+  const tr = document.createElement("tr");
+  tr.className = "border-t";
+
+  tr.innerHTML = `
+    <td class="p-2">
+      <select
+        class="w-full border rounded px-2 py-1"
+        onchange="onPrepaidSlabChange(this)">
+        <option value="">Select Slab</option>
+      </select>
+    </td>
+
+    <td class="p-2 text-right text-gray-500">—</td>
+    <td class="p-2 text-right text-gray-500">—</td>
+    <td class="p-2 text-right text-gray-500">—</td>
+    <td class="p-2 text-right text-gray-500">—</td>
+
+    <td class="p-2 text-center">
+      <input type="number"
+             min="1"
+             value="1"
+             class="w-16 border rounded px-2 py-1 text-center" />
+    </td>
+
+    <td class="p-2 text-right text-gray-500">—</td>
+
+    <td class="p-2 text-center text-gray-300">✕</td>
+  `;
+
+  tbody.appendChild(tr);
+
+  // 🔹 Populate slab dropdown
+  const select = tr.querySelector("select");
+  populateSlabDropdown(select);
+
+  // 🔹 Reset total payable
+  const totalBox = document.querySelector("#prepaidFormOverlay .text-lg");
+  if (totalBox) {
+    totalBox.innerText = "Total Payable: ₹0";
   }
 }
 
   function showPrepaidProcessing() {
   const el = document.getElementById("prepaidProcessingOverlay");
   if (el) el.classList.remove("hidden");
+}
+  
+function hidePrepaidProcessing() {
+  const el = document.getElementById("prepaidProcessingOverlay");
+  if (el) el.classList.add("hidden");
 }
 
 
@@ -10107,27 +10171,6 @@ function recalcTotalPayable() {
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
