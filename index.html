@@ -9940,7 +9940,8 @@ function recalcTotalPayable() {
   const payload = collectPrepaidPayload();
   if (!payload) return;
 
-  showPrepaidProcessing();   // STEP-B
+  disablePrepaidProceedBtn();   // 👈 STEP-D
+  showPrepaidProcessing();      // already done
 
   try {
     const url =
@@ -9952,7 +9953,8 @@ function recalcTotalPayable() {
     const res = await fetch(url);
     const data = await res.json();
 
-    hidePrepaidProcessing(); // 👈 STEP-C (success path)
+    hidePrepaidProcessing();    // STEP-C
+    enablePrepaidProceedBtn();  // 👈 STEP-D (SUCCESS)
 
     if (!data.success) {
       alert("Failed to save prepaid order");
@@ -9960,14 +9962,14 @@ function recalcTotalPayable() {
     }
 
     alert("Prepaid order saved successfully (Payment pending)");
-
-    resetPrepaidForm();      // message ke baad clean
+    resetPrepaidForm();
     closePrepaidForm();
 
   } catch (err) {
     console.error("Prepaid save failed", err);
 
-    hidePrepaidProcessing(); // 👈 STEP-C (error path)
+    hidePrepaidProcessing();
+    enablePrepaidProceedBtn();  // 👈 STEP-D (ERROR)
     alert("Something went wrong");
   }
 }
@@ -10030,6 +10032,25 @@ function resetPrepaidForm() {
 function hidePrepaidProcessing() {
   const el = document.getElementById("prepaidProcessingOverlay");
   if (el) el.classList.add("hidden");
+}
+
+  function disablePrepaidProceedBtn() {
+  const btn = document.getElementById("prepaidProceedBtn");
+  if (!btn) return;
+
+  btn.disabled = true;
+  btn.dataset.originalText = btn.innerText;
+  btn.innerText = "Processing...";
+  btn.classList.add("opacity-60", "cursor-not-allowed");
+}
+
+  function enablePrepaidProceedBtn() {
+  const btn = document.getElementById("prepaidProceedBtn");
+  if (!btn) return;
+
+  btn.disabled = false;
+  btn.innerText = btn.dataset.originalText || "Proceed to Pay";
+  btn.classList.remove("opacity-60", "cursor-not-allowed");
 }
 
 
@@ -10145,12 +10166,14 @@ function hidePrepaidProcessing() {
         Cancel
       </button>
 
-      <button
-        type="button"
-         onclick="submitPrepaidPurchase()"
-        class="px-5 py-2 rounded-lg bg-orange-500 text-white font-semibold">
-        Proceed to Pay
-      </button>
+     <button
+  id="prepaidProceedBtn"
+  type="button"
+  onclick="submitPrepaidPurchase()"
+  class="px-5 py-2 rounded-lg bg-orange-500 text-white font-semibold">
+  Proceed to Pay
+</button>
+
     </div>
 
   </div>
@@ -10171,6 +10194,7 @@ function hidePrepaidProcessing() {
 
 </body>
 </html>
+
 
 
 
