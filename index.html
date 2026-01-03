@@ -9735,7 +9735,8 @@ function populateSlabDropdown(selectEl) {
   tr.innerHTML = `
     <td class="p-2">
       <select class="w-full border rounded px-2 py-1"
-              onchange="disableAlreadySelectedSlabs()">
+        onchange="onPrepaidSlabChange(this)">
+
         <option value="">Select Slab</option>
       </select>
     </td>
@@ -9783,6 +9784,91 @@ function populateSlabDropdown(selectEl) {
   const firstSelect = el.querySelector("#prepaidSlabRows select");
   if (firstSelect) {
     populateSlabDropdown(firstSelect);
+  }
+}
+  
+function getSlabById(slabId) {
+  const slabs = getActivePrepaidSlabs();
+  return slabs.find(s => s.slab_id === slabId) || null;
+}
+  
+function onPrepaidSlabChange(selectEl) {
+  disableAlreadySelectedSlabs();
+
+  const row = selectEl.closest("tr");
+  if (!row) return;
+
+  const slabId = selectEl.value;
+  if (!slabId) {
+    resetRow(row);
+    recalcTotalPayable();
+    return;
+  }
+
+  const slab = getSlabById(slabId);
+  if (!slab) return;
+
+  const buyAmount = Number(slab.buy_amount || 0);
+  const discType  = slab.discount_type;
+  const discVal   = Number(slab.discount_value || 0);
+
+  let discountAmt = 0;
+  if (discType === "percent") {
+    discountAmt = Math.round((buyAmount * discVal) / 100);
+  } else {
+    discountAmt = discVal;
+  }
+
+  const netRate = buyAmount - discountAmt;
+
+  // fill columns
+  row.cells[1].innerText = buyAmount;
+  row.cells[2].innerText = discType === "percent" ? discVal + "%" : discVal;
+  row.cells[3].innerText = discountAmt;
+  row.cells[4].innerText = netRate;
+
+  // qty change listener
+  const qtyInput = row.querySelector("input[type='number']");
+  qtyInput.oninput = () => recalcRow(row);
+
+  recalcRow(row);
+}
+  
+function recalcRow(row) {
+  const netRate = Number(row.cells[4].innerText || 0);
+  const qtyInput = row.querySelector("input[type='number']");
+  const qty = Math.max(1, Number(qtyInput.value || 1));
+
+  qtyInput.value = qty;
+
+  const netAmt = netRate * qty;
+  row.cells[6].innerText = netAmt;
+
+  recalcTotalPayable();
+}
+  
+function resetRow(row) {
+  row.cells[1].innerText = "—";
+  row.cells[2].innerText = "—";
+  row.cells[3].innerText = "—";
+  row.cells[4].innerText = "—";
+  row.cells[6].innerText = "—";
+
+  const qtyInput = row.querySelector("input[type='number']");
+  qtyInput.value = 1;
+}
+  
+function recalcTotalPayable() {
+  let total = 0;
+
+  document.querySelectorAll("#prepaidSlabRows tr").forEach(row => {
+    const val = Number(row.cells[6].innerText || 0);
+    total += val;
+  });
+
+  const totalBox = document.querySelector("#prepaidFormOverlay .text-lg");
+  if (totalBox) {
+    totalBox.innerText = "Total Payable: ₹" + total;
   }
 }
 
@@ -9911,6 +9997,7 @@ function populateSlabDropdown(selectEl) {
 
 </body>
 </html>
+
 
 
 
