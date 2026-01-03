@@ -9727,9 +9727,17 @@ function populateSlabDropdown(selectEl) {
     });
 }
 
-  function addPrepaidSlabRow() {
+function addPrepaidSlabRow() {
   const tbody = document.getElementById("prepaidSlabRows");
   if (!tbody) return;
+
+  const rows = tbody.querySelectorAll("tr");
+if (rows.length) {
+  const lastSelect = rows[rows.length - 1].querySelector("select");
+  if (lastSelect && !lastSelect.value) {
+    return; // ❌ last row blank → don't add new row
+  }
+}
 
   const tr = document.createElement("tr");
   tr.className = "border-t";
@@ -10195,6 +10203,7 @@ function hidePrepaidProcessing() {
 
 </body>
 </html>
+
 
 
 
