@@ -9872,7 +9872,96 @@ function recalcTotalPayable() {
   }
 }
 
-  
+  function collectPrepaidPayload() {
+  const rows = document.querySelectorAll("#prepaidSlabRows tr");
+  if (!rows.length) return null;
+
+  const mobile =
+    localStorage.getItem("userMobile") ||
+    localStorage.getItem("mobile") ||
+    "";
+
+  if (!mobile) {
+    alert("Please login to continue");
+    return null;
+  }
+
+  const orderGroupId =
+    "PP-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+
+  const pkg = window._prepaidPackages[0];
+  const packageId = pkg.package_id;
+
+  let items = [];
+  let totalPayable = 0;
+
+  rows.forEach(row => {
+    const tds = row.querySelectorAll("td");
+    const slabId = tds[0].querySelector("select").value;
+    if (!slabId) return;
+
+    const buyAmount = Number(tds[1].innerText || 0);
+    const discount = tds[2].innerText;
+    const discountAmt = Number(tds[3].innerText || 0);
+    const netRate = Number(tds[4].innerText || 0);
+    const qty = Number(tds[5].querySelector("input").value || 1);
+    const netAmt = Number(tds[6].innerText || 0);
+
+    totalPayable += netAmt;
+
+    items.push({
+      slab_id: slabId,
+      buy_amount: buyAmount,
+      discount_type: discount.includes("%") ? "percent" : "flat",
+      discount_value: discount.replace("%", ""),
+      discount_amt: discountAmt,
+      net_rate: netRate,
+      qty: qty,
+      net_amount: netAmt
+    });
+  });
+
+  if (!items.length) {
+    alert("Please select at least one slab");
+    return null;
+  }
+
+  return {
+    order_group_id: orderGroupId,
+    mobile,
+    package_id: packageId,
+    total_payable: totalPayable,
+    items
+  };
+}
+
+  async function submitPrepaidPurchase() {
+  const payload = collectPrepaidPayload();
+  if (!payload) return;
+
+  try {
+    const res = await fetch(API_BASE + "?api=savePrepaidPurchase", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      alert("Failed to save prepaid order");
+      return;
+    }
+
+    alert("Prepaid order saved successfully (Payment pending)");
+    closePrepaidForm();
+
+  } catch (err) {
+    console.error("Prepaid save failed", err);
+    alert("Something went wrong");
+  }
+}
+
 </script>
 
   <div id="cartHandle" onclick="expandDrawerCart()">
@@ -9987,6 +10076,7 @@ function recalcTotalPayable() {
 
       <button
         type="button"
+         onclick="submitPrepaidPurchase()"
         class="px-5 py-2 rounded-lg bg-orange-500 text-white font-semibold">
         Proceed to Pay
       </button>
@@ -9997,6 +10087,7 @@ function recalcTotalPayable() {
 
 </body>
 </html>
+
 
 
 
