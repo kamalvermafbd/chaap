@@ -1133,6 +1133,15 @@ body::before {
     .used-coupon {
   opacity: 0.7;
 }
+    
+.used-coupon {
+  border-left: 4px solid #ef4444;   /* red indicator */
+}
+
+.used-coupon .coupon-status,
+.used-coupon .coupon-meta {
+  color: #dc2626; /* red-600 */
+}
 
   </style>
 </head>
@@ -10302,22 +10311,37 @@ function renderUsedCoupons(coupons) {
 
   coupons.forEach(c => {
     list.innerHTML += `
-      <div class="coupon-card mb-3">
-        <div class="font-semibold">
-          ${c.couponType === "paid" ? "💰" : "🎁"} ${c.couponcode}
-        </div>
-        <div class="text-sm">₹${c.flat} OFF</div>
-        <div class="text-xs">
-        Used on: ${formatDateDMY(c.useddate)}
+      <div class="coupon-card used-coupon mb-3">
+        
+        <!-- content wrapper so opacity doesn't kill border -->
+        <div class="coupon-body">
+          
+          <div class="font-semibold coupon-status">
+            ${c.couponType === "paid" ? "💰" : "🎁"} ${c.couponcode}
+          </div>
+
+          <div class="text-sm coupon-status">
+            ₹${c.flat} OFF
+          </div>
+
+          <div class="text-xs coupon-meta">
+            Used on: ${formatDateDMY(c.useddate)}
+          </div>
+
+          ${
+            c.orderId
+              ? `<div class="text-xs coupon-meta">Order: ${c.orderId}</div>`
+              : ""
+          }
 
         </div>
-        ${c.orderId ? `<div class="text-xs">Order: ${c.orderId}</div>` : ""}
       </div>
     `;
   });
 
   block.classList.remove("hidden");
 }
+
 
 function formatDateDMY(dateStr) {
   if (!dateStr) return "-";
@@ -10477,6 +10501,7 @@ function formatDateDMY(dateStr) {
   
 </body>
 </html>
+
 
 
 
