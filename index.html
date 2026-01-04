@@ -1528,7 +1528,11 @@ body::before {
     <span class="nav-badge">3</span>
    My Offers
   </li>
-
+<li onclick="activateMenu(this); showPage('offersPage'); onOffersPageOpen('myCoupons');">
+  <span class="nav-badge">4</span>
+  My Coupons
+</li>
+    
 </ul>
 
 </div>
@@ -2310,7 +2314,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbzgaRYRjlfL2GYS6wvLVmEpAZ0eQDeJ1eb-kt93_VlFgPL6-KWyBcSOvWy6gI7274O8Sg/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbzvdUeBkbqbFfhuOmx2Of5Zx1mTf8Y8bvxtRJn7m67O09dK9-Sa8wPYOUsVY6-sXVnd/exec";
 
 // ===============================
 // API HELPER
@@ -10067,6 +10071,78 @@ function hidePrepaidProcessing() {
 }
 
 
+  async function fetchUserCouponSummary() {
+  try {
+    const mobile =
+      localStorage.getItem("userMobile") ||
+      localStorage.getItem("mobile");
+
+    if (!mobile) {
+      console.warn("⚠️ No logged-in mobile found");
+      return {
+        unused: [],
+        used: []
+      };
+    }
+
+    const res = await fetch(
+      API_BASE +
+        "?api=getusercouponsummary&mobile=" +
+        encodeURIComponent(mobile)
+    );
+
+    const data = await res.json();
+
+    if (!data || data.success !== true) {
+      console.error("❌ Coupon summary API failed", data);
+      return {
+        unused: [],
+        used: []
+      };
+    }
+
+    const allCoupons = Array.isArray(data.coupons)
+      ? data.coupons
+      : [];
+
+    // 🔹 Normalize + split
+    const unused = [];
+    const used = [];
+
+    allCoupons.forEach(c => {
+      const usedFlag = String(c.used || "").toLowerCase();
+
+      // normalize mobile (string safety)
+      c.mobile = String(c.mobile || "");
+
+      if (usedFlag === "no") {
+        unused.push(c);
+      } else if (usedFlag === "yes") {
+        used.push(c);
+      }
+    });
+
+    console.log("🎟️ Coupon summary loaded", {
+      total: allCoupons.length,
+      unused: unused.length,
+      used: used.length
+    });
+
+    return {
+      unused,
+      used
+    };
+
+  } catch (err) {
+    console.error("❌ fetchUserCouponSummary error", err);
+    return {
+      unused: [],
+      used: []
+    };
+  }
+}
+
+
 </script>
 
   <div id="cartHandle" onclick="expandDrawerCart()">
@@ -10208,6 +10284,7 @@ function hidePrepaidProcessing() {
 
 </body>
 </html>
+
 
 
 
