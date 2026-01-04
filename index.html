@@ -1528,10 +1528,11 @@ body::before {
     <span class="nav-badge">3</span>
    My Offers
   </li>
-<li onclick="activateMenu(this); showPage('offersPage'); onOffersPageOpen('myCoupons');">
+<li onclick="activateMenu(this); showPage('offersPage'); loadMyCouponsSummary();">
   <span class="nav-badge">4</span>
   My Coupons
 </li>
+
     
 </ul>
 
@@ -10141,6 +10142,27 @@ function hidePrepaidProcessing() {
     };
   }
 }
+async function showMyCouponsSummary() {
+  const section = document.getElementById("myCouponsSection");
+  if (!section) return;
+
+  const result = await fetchUserCouponSummary();
+  if (!result) return;
+
+  const { unused, used } = result;
+
+  if (unused.length === 0 && used.length === 0) {
+    section.classList.remove("hidden");
+    document.getElementById("unusedCouponsList").innerHTML =
+      `<div class="text-sm text-gray-500">No coupons available</div>`;
+    return;
+  }
+
+  renderUnusedCoupons(unused);
+  renderUsedCoupons(used);
+
+  section.classList.remove("hidden");
+}
 
 
 </script>
@@ -10282,8 +10304,33 @@ function hidePrepaidProcessing() {
 
 </div>
 
+
+<!-- ===================== -->
+<!-- 4️⃣ My Coupons summary -->
+<!-- ===================== -->
+<section id="myCouponsSection" class="mt-6 hidden">
+  <h2 class="text-lg font-semibold mb-3">4️⃣ My Coupons</h2>
+
+  <!-- Unused Coupons -->
+  <div id="unusedCouponsBlock" class="mb-5">
+    <h3 class="text-sm font-semibold text-green-700 mb-2">
+      🟢 Available Coupons
+    </h3>
+    <div id="unusedCouponsList" class="space-y-2"></div>
+  </div>
+
+  <!-- Used Coupons -->
+  <div id="usedCouponsBlock" class="hidden">
+    <h3 class="text-sm font-semibold text-gray-600 mb-2">
+      🕘 Used Coupons
+    </h3>
+    <div id="usedCouponsList" class="space-y-2"></div>
+  </div>
+</section>
+  
 </body>
 </html>
+
 
 
 
