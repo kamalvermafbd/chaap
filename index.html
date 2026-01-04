@@ -1528,7 +1528,7 @@ body::before {
     <span class="nav-badge">3</span>
    My Offers
   </li>
-<li onclick="activateMenu(this); showPage('myCouponsPage'); showMyCouponsSummary();">
+<li onclick="activateMenu(this); showPage('myCouponsPage'); onMyCouponsPageOpen();">
   <span class="nav-badge">4</span>
   My Coupons
 </li>
@@ -5167,26 +5167,36 @@ function showPage(pageId) {
   const promo = document.getElementById("promoBanner");
   if (promo) promo.style.display = "none";
 
-  document.getElementById("menuWrapper").style.display = "none";
-  document.getElementById("pageWrapper").style.display = "none";
-  document.getElementById("profilePage").style.display = "none";
-  document.getElementById("ordersPage").style.display = "none";
-  document.getElementById("offersPage").style.display = "none";
-//  document.getElementById("myCouponsPage").style.display = "none";
+  // 🔒 SAFE HIDES ONLY
+  const idsToHide = [
+    "menuWrapper",
+    "pageWrapper",
+    "profilePage",
+    "ordersPage",
+    "offersPage",
+    "myCouponsPage"
+  ];
 
+  idsToHide.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
 
   if (pageId === "menuPage") {
-    document.getElementById("menuWrapper").style.display = "block";
+    const menu = document.getElementById("menuWrapper");
+    if (menu) menu.style.display = "block";
   } else {
-    document.getElementById("pageWrapper").style.display = "block";
-    document.getElementById(pageId).style.display = "block";
+    const wrapper = document.getElementById("pageWrapper");
+    const page = document.getElementById(pageId);
+
+    if (wrapper) wrapper.style.display = "block";
+    if (page) page.style.display = "block";
   }
 
   if (pageId === "offersPage") {
-    onOffersPageOpen(); // ✅ correct
+    onOffersPageOpen(); // unchanged
   }
 
-  // ✅ IMPORTANT FIX
   document.body.classList.toggle(
     "menu-active",
     pageId === "menuPage" || pageId === "offersPage"
@@ -10146,16 +10156,19 @@ function hidePrepaidProcessing() {
   }
 }
 async function showMyCouponsSummary() {
+  const page = document.getElementById("myCouponsPage");
   const section = document.getElementById("myCouponsSection");
-  if (!section) return;
+
+  if (!page || !section) return;
 
   const result = await fetchUserCouponSummary();
   if (!result) return;
 
   const { unused, used } = result;
 
+  section.classList.remove("hidden");
+
   if (unused.length === 0 && used.length === 0) {
-    section.classList.remove("hidden");
     document.getElementById("unusedCouponsList").innerHTML =
       `<div class="text-sm text-gray-500">No coupons available</div>`;
     return;
@@ -10163,8 +10176,81 @@ async function showMyCouponsSummary() {
 
   renderUnusedCoupons(unused);
   renderUsedCoupons(used);
+}
 
-  section.classList.remove("hidden");
+
+  function onMyCouponsPageOpen() {
+  const page = document.getElementById("myCouponsPage");
+  if (!page) {
+    console.warn("myCouponsPage not ready");
+    return;
+  }
+
+  showMyCouponsSummary(); // 👈 existing function
+}
+  
+function renderUnusedCoupons(coupons) {
+  const list = document.getElementById("unusedCouponsList");
+  if (!list) {
+    console.warn("unusedCouponsList not found");
+    return;
+  }
+
+  list.innerHTML = "";
+
+  if (!coupons || coupons.length === 0) {
+    list.innerHTML =
+      `<div class="text-sm text-gray-500">No unused coupons</div>`;
+    return;
+  }
+
+  coupons.forEach(c => {
+    list.innerHTML += `
+      <div class="border rounded-lg p-3 bg-white mb-2">
+        <div class="font-semibold">
+          ${c.couponType === "paid" ? "💰" : "🎁"} ${c.couponcode}
+        </div>
+        <div class="text-sm">₹${c.flat} OFF</div>
+        <div class="text-xs text-gray-500">
+          Valid till: ${new Date(c.expiry_date).toLocaleDateString()}
+        </div>
+      </div>
+    `;
+  });
+}
+
+function renderUsedCoupons(coupons) {
+  const block = document.getElementById("usedCouponsBlock");
+  const list = document.getElementById("usedCouponsList");
+
+  if (!block || !list) {
+    console.warn("usedCouponsBlock/list not found");
+    return;
+  }
+
+  list.innerHTML = "";
+
+  if (!coupons || coupons.length === 0) {
+    block.classList.add("hidden");
+    return;
+  }
+
+  coupons.forEach(c => {
+    list.innerHTML += `
+      <div class="border rounded-lg p-3 bg-gray-50 text-gray-600 mb-2">
+        <div class="font-semibold">
+          ${c.couponType === "paid" ? "💰" : "🎁"} ${c.couponcode}
+        </div>
+        <div class="text-sm">₹${c.flat} OFF</div>
+        <div class="text-xs">
+          Used on: ${new Date(c.useddate).toLocaleDateString()}
+        </div>
+        ${c.orderId ? `<div class="text-xs">Order: ${c.orderId}</div>` : ""}
+      </div>
+    `;
+  });
+
+  block.classList.remove("hidden");
 }
 
 
@@ -10333,6 +10419,7 @@ async function showMyCouponsSummary() {
   
 </body>
 </html>
+
 
 
 
