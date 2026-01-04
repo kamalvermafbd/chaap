@@ -10538,31 +10538,21 @@ function hideMyCouponsOverlay() {
 
 </div>
 
-<!-- My Coupons Loading Overlay -->
+<!-- My Coupons Loading Overlay (FIXED) -->
 <div id="myCouponsOverlay"
-     style="
-       display:none;
-       position:absolute;
-       inset:0;
-       background:rgba(255,255,255,0.75);
-       backdrop-filter: blur(4px);
-       z-index:9999;
-       align-items:center;
-       justify-content:center;
-     ">
-  <div style="
-       font-size:22px;
-       font-weight:800;
-       color:#111827;
-     ">
+     class="fixed inset-0 bg-white bg-opacity-75 backdrop-blur-sm hidden z-[9999] flex items-center justify-center">
+
+  <div class="text-[22px] font-extrabold text-gray-900">
     Loading coupons…
   </div>
+
 </div>
 
 
   
 </body>
 </html>
+
 
 
 
