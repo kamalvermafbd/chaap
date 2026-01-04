@@ -1107,6 +1107,19 @@ body::before {
   height: 100%;
   object-fit: cover;
 }
+#myCouponsPage {
+  max-width: 720px;
+  margin-left: 0;
+  margin-right: auto;
+}
+.coupon-card {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+}
 
 
   </style>
@@ -10245,7 +10258,7 @@ function renderUnusedCoupons(coupons) {
 
   coupons.forEach(c => {
     list.innerHTML += `
-      <div class="border rounded-lg p-3 bg-white mb-2">
+      <div class="coupon-card mb-3">
         <div class="font-semibold">
           ${c.couponType === "paid" ? "💰" : "🎁"} ${c.couponcode}
         </div>
@@ -10276,7 +10289,7 @@ function renderUsedCoupons(coupons) {
 
   coupons.forEach(c => {
     list.innerHTML += `
-      <div class="border rounded-lg p-3 bg-gray-50 text-gray-600 mb-2">
+      <div class="coupon-card mb-3">
         <div class="font-semibold">
           ${c.couponType === "paid" ? "💰" : "🎁"} ${c.couponcode}
         </div>
@@ -10437,6 +10450,7 @@ function renderUsedCoupons(coupons) {
   
 </body>
 </html>
+
 
 
 
