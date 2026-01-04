@@ -5578,13 +5578,22 @@ async function loginUser() {
 
 </script>
 <script>
+  
 function hideAllPages() {
-  document.getElementById("menuWrapper").style.display = "none";
-  document.getElementById("profilePage").style.display = "none";
-  document.getElementById("ordersPage").style.display = "none";
-  document.getElementById("offersPage").style.display = "none";
-  document.getElementById("myCouponsPage").style.display = "none";
+  const ids = [
+    "menuWrapper",
+    "profilePage",
+    "ordersPage",
+    "offersPage",
+    "myCouponsPage"
+  ];
+
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
 }
+
 </script>
 <script>
 
@@ -10412,6 +10421,7 @@ function renderUsedCoupons(coupons) {
   
 </body>
 </html>
+
 
 
 
