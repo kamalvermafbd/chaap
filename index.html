@@ -10191,18 +10191,17 @@ function hidePrepaidProcessing() {
     };
   }
 }
+  
 async function showMyCouponsSummary() {
   const page = document.getElementById("myCouponsPage");
-  const section = document.getElementById("myCouponsSection");
-
-  if (!page || !section) return;
+  if (!page) return;
 
   const result = await fetchUserCouponSummary();
   if (!result) return;
 
   const { unused, used } = result;
 
-  section.classList.remove("hidden");
+  page.classList.remove("hidden");
 
   if (unused.length === 0 && used.length === 0) {
     document.getElementById("unusedCouponsList").innerHTML =
@@ -10434,11 +10433,6 @@ function renderUsedCoupons(coupons) {
   
 </body>
 </html>
-
-
-
-
-
 
 
 
