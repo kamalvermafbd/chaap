@@ -10543,12 +10543,15 @@ function hideMyCouponsOverlay() {
 
 </div>
 
-<!-- My Coupons Loading Overlay (FIXED) -->
+<!-- My Coupons Loading Overlay -->
 <div id="myCouponsOverlay"
      class="fixed inset-0 bg-white bg-opacity-75 backdrop-blur-sm hidden z-[9999] flex items-center justify-center">
 
-  <div class="text-[22px] font-extrabold text-gray-900">
-    Loading coupons…
+  <div class="bg-white rounded-xl px-6 py-5 text-center shadow-lg">
+    <div class="animate-spin rounded-full h-10 w-10 border-4 border-green-500 border-t-transparent mx-auto"></div>
+    <div class="mt-4 text-gray-800 font-extrabold text-lg">
+      Loading coupons...
+    </div>
   </div>
 
 </div>
@@ -10557,6 +10560,7 @@ function hideMyCouponsOverlay() {
   
 </body>
 </html>
+
 
 
 
