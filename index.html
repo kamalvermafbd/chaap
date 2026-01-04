@@ -1121,6 +1121,18 @@ body::before {
   box-shadow: 0 6px 14px rgba(0,0,0,0.06);
 }
 
+#myCouponsPage {
+  max-width: 680px; /* abhi thoda zyada wide lag raha */
+}
+
+    .coupon-amount {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+    .used-coupon {
+  opacity: 0.7;
+}
 
   </style>
 </head>
@@ -10264,7 +10276,8 @@ function renderUnusedCoupons(coupons) {
         </div>
         <div class="text-sm">₹${c.flat} OFF</div>
         <div class="text-xs text-gray-500">
-          Valid till: ${new Date(c.expiry_date).toLocaleDateString()}
+          Valid till: ${formatDateDMY(c.expiry_date)}
+
         </div>
       </div>
     `;
@@ -10295,7 +10308,8 @@ function renderUsedCoupons(coupons) {
         </div>
         <div class="text-sm">₹${c.flat} OFF</div>
         <div class="text-xs">
-          Used on: ${new Date(c.useddate).toLocaleDateString()}
+        Used on: ${formatDateDMY(c.useddate)}
+
         </div>
         ${c.orderId ? `<div class="text-xs">Order: ${c.orderId}</div>` : ""}
       </div>
@@ -10305,6 +10319,19 @@ function renderUsedCoupons(coupons) {
   block.classList.remove("hidden");
 }
 
+function formatDateDMY(dateStr) {
+  if (!dateStr) return "-";
+
+  const d = new Date(dateStr);
+  if (isNaN(d)) return "-";
+
+  const day = String(d.getDate()).padStart(2, "0");
+  const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const month = monthNames[d.getMonth()];
+  const year = d.getFullYear();
+
+  return `${day}-${month}-${year}`;
+}
 
 </script>
 
@@ -10450,6 +10477,7 @@ function renderUsedCoupons(coupons) {
   
 </body>
 </html>
+
 
 
 
