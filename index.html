@@ -5167,41 +5167,34 @@ function showPage(pageId) {
   const promo = document.getElementById("promoBanner");
   if (promo) promo.style.display = "none";
 
-  // 🔒 SAFE HIDES ONLY
-  const idsToHide = [
-    "menuWrapper",
-    "pageWrapper",
-    "profilePage",
-    "ordersPage",
-    "offersPage",
-    "myCouponsPage"
-  ];
+  document.getElementById("menuWrapper").style.display = "none";
+  document.getElementById("pageWrapper").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("ordersPage").style.display = "none";
+  document.getElementById("offersPage").style.display = "none";
 
-  idsToHide.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = "none";
-  });
+
+const cp = document.getElementById("myCouponsPage");
+if (cp) cp.style.display = "none";
 
   if (pageId === "menuPage") {
-    const menu = document.getElementById("menuWrapper");
-    if (menu) menu.style.display = "block";
+    document.getElementById("menuWrapper").style.display = "block";
   } else {
-    const wrapper = document.getElementById("pageWrapper");
-    const page = document.getElementById(pageId);
-
-    if (wrapper) wrapper.style.display = "block";
-    if (page) page.style.display = "block";
+    document.getElementById("pageWrapper").style.display = "block";
+    document.getElementById(pageId).style.display = "block";
   }
 
   if (pageId === "offersPage") {
-    onOffersPageOpen(); // unchanged
+    onOffersPageOpen(); // ✅ correct
   }
 
+  // ✅ IMPORTANT FIX
   document.body.classList.toggle(
     "menu-active",
     pageId === "menuPage" || pageId === "offersPage"
   );
 }
+
 
 
 
@@ -10419,6 +10412,7 @@ function renderUsedCoupons(coupons) {
   
 </body>
 </html>
+
 
 
 
