@@ -10389,14 +10389,19 @@ function formatDateDMY(dateStr) {
 }
 
 
-  function showMyCouponsOverlay() {
+ function showMyCouponsOverlay() {
   const o = document.getElementById("myCouponsOverlay");
-  if (o) o.style.display = "flex";
+  if (!o) return;
+
+  o.classList.remove("hidden");   // 🔥 IMPORTANT
+  o.style.display = "flex";
 }
 
 function hideMyCouponsOverlay() {
   const o = document.getElementById("myCouponsOverlay");
-  if (o) o.style.display = "none";
+  if (!o) return;
+
+  o.classList.add("hidden");
 }
 
 </script>
@@ -10552,27 +10557,6 @@ function hideMyCouponsOverlay() {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
