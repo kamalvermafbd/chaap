@@ -7891,10 +7891,13 @@ if (
     div.className =
       "flex justify-between items-center p-2 border rounded bg-white";
 
-    const label =
-      c.couponType === "reward"
-        ? "🎁 Reward Coupon"
-        : "🏷 Coupon";
+   const label =
+  c.couponType === "reward"
+    ? "🎁 Reward Coupon"
+    : c.couponType === "paid"
+    ? "💰 Paid Coupon"
+    : "🏷 Coupon";
+
 
     div.innerHTML = `
       <div>
@@ -10205,6 +10208,7 @@ function hidePrepaidProcessing() {
 
 </body>
 </html>
+
 
 
 
