@@ -10279,21 +10279,22 @@ async function showMyCouponsSummary() {
 
 function onMyCouponsPageOpen() {
   const page = document.getElementById("myCouponsPage");
-  if (!page) {
-    console.warn("myCouponsPage not ready");
-    return;
-  }
+  if (!page) return;
 
-  // 🔥 show loading overlay
   showMyCouponsOverlay();
 
-  // existing async loader
-  showMyCouponsSummary()
-    .finally(() => {
-      // 🔥 hide overlay after coupons load
+  const start = Date.now();
+
+  showMyCouponsSummary().finally(() => {
+    const elapsed = Date.now() - start;
+    const delay = Math.max(300 - elapsed, 0); // 👈 minimum 300ms
+
+    setTimeout(() => {
       hideMyCouponsOverlay();
-    });
+    }, delay);
+  });
 }
+
 
   
 function renderUnusedCoupons(coupons) {
@@ -10561,6 +10562,7 @@ function hideMyCouponsOverlay() {
   
 </body>
 </html>
+
 
 
 
