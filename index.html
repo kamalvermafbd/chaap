@@ -10276,15 +10276,24 @@ async function showMyCouponsSummary() {
 }
 
 
-  function onMyCouponsPageOpen() {
+function onMyCouponsPageOpen() {
   const page = document.getElementById("myCouponsPage");
   if (!page) {
     console.warn("myCouponsPage not ready");
     return;
   }
 
-  showMyCouponsSummary(); // 👈 existing function
+  // 🔥 show loading overlay
+  showMyCouponsOverlay();
+
+  // existing async loader
+  showMyCouponsSummary()
+    .finally(() => {
+      // 🔥 hide overlay after coupons load
+      hideMyCouponsOverlay();
+    });
 }
+
   
 function renderUnusedCoupons(coupons) {
   const list = document.getElementById("unusedCouponsList");
@@ -10377,6 +10386,17 @@ function formatDateDMY(dateStr) {
   const year = d.getFullYear();
 
   return `${day}-${month}-${year}`;
+}
+
+
+  function showMyCouponsOverlay() {
+  const o = document.getElementById("myCouponsOverlay");
+  if (o) o.style.display = "flex";
+}
+
+function hideMyCouponsOverlay() {
+  const o = document.getElementById("myCouponsOverlay");
+  if (o) o.style.display = "none";
 }
 
 </script>
@@ -10518,11 +10538,32 @@ function formatDateDMY(dateStr) {
 
 </div>
 
+<!-- My Coupons Loading Overlay -->
+<div id="myCouponsOverlay"
+     style="
+       display:none;
+       position:absolute;
+       inset:0;
+       background:rgba(255,255,255,0.75);
+       backdrop-filter: blur(4px);
+       z-index:9999;
+       align-items:center;
+       justify-content:center;
+     ">
+  <div style="
+       font-size:22px;
+       font-weight:800;
+       color:#111827;
+     ">
+    Loading coupons…
+  </div>
+</div>
 
 
   
 </body>
 </html>
+
 
 
 
