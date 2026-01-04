@@ -5216,9 +5216,13 @@ function showPage(pageId) {
     if (page) page.style.display = "block";
   }
 
-  // offers page hook
+  // 🔔 PAGE-SPECIFIC HOOKS
   if (pageId === "offersPage") {
-    onOffersPageOpen(); // ✅ untouched
+    onOffersPageOpen();
+  }
+
+  if (pageId === "myCouponsPage") {
+    onMyCouponsPageOpen();   // ✅ THIS WAS MISSING (MAIN BUG)
   }
 
   // body class logic untouched
@@ -10433,6 +10437,7 @@ function renderUsedCoupons(coupons) {
   
 </body>
 </html>
+
 
 
 
