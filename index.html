@@ -1765,6 +1765,11 @@ body::before {
       </div>
     </div>
 
+<button
+  class="text-sm text-orange-600 font-semibold hover:underline"
+  onclick="openInvoiceModal('ORDER_ID_HERE')">
+  View Invoice
+</button>
 
     </div>
 
@@ -10603,6 +10608,74 @@ function renderMyDispatchedOrders(orders = []) {
   });
 }
 
+<invoice work>
+  async function openInvoiceModal(orderId) {
+  const modal = document.getElementById("invoiceModal");
+  modal.classList.remove("hidden");
+
+  document.getElementById("invoiceItems").innerHTML =
+    "<div class='text-gray-400 text-sm'>Loading invoice...</div>";
+
+  const res = await fetch(
+    API_BASE + "?api=getOrderInvoice&orderId=" + encodeURIComponent(orderId)
+  );
+
+  const data = await res.json();
+  if (!data || data.success !== true) {
+    document.getElementById("invoiceItems").innerHTML =
+      "<div class='text-red-500'>Failed to load invoice</div>";
+    return;
+  }
+
+  renderInvoiceFromAPI(data.invoice);
+}
+
+
+  function renderInvoiceFromAPI(inv) {
+
+  document.getElementById("invoiceHeader").innerText =
+    `${inv.orderNumber} • ${inv.orderDate}`;
+
+  document.getElementById("invCustomer").innerText = inv.customerName;
+  document.getElementById("invContact").innerText =
+    `${inv.mobile} • ${inv.email}`;
+  document.getElementById("invAddress").innerText = inv.address;
+
+  // ITEMS
+  document.getElementById("invoiceItems").innerHTML =
+    inv.items.map(i => `
+      <div class="flex justify-between">
+        <span>${i.name} (${i.unit}) × ${i.qty}</span>
+        <span>₹${i.amount}</span>
+      </div>
+    `).join("");
+
+  document.getElementById("invBase").innerText =
+    `Base Total: ₹${inv.baseTotal}`;
+
+  document.getElementById("invService").innerText =
+    `Service Charges: ₹${inv.serviceCharges}`;
+
+  document.getElementById("invTax").innerText =
+    `CGST + SGST: ₹${inv.taxTotal}`;
+
+  const c = document.getElementById("invCoupon");
+  if (inv.couponAmount > 0) {
+    c.classList.remove("hidden");
+    c.innerText = `Coupon (${inv.couponId}): −₹${inv.couponAmount}`;
+  } else {
+    c.classList.add("hidden");
+  }
+
+  document.getElementById("invNet").innerText =
+    `₹${inv.netPayable}`;
+
+  document.getElementById("invPayment").innerText =
+    `Payment: ${inv.paymentMethod}`;
+
+  document.getElementById("invOrderId").innerText =
+    `Order ID: ${inv.orderId}`;
+}
 
 
 </script>
@@ -10757,10 +10830,74 @@ function renderMyDispatchedOrders(orders = []) {
 
 </div>
 
+<!-- ========================= -->
+<!-- INVOICE MODAL -->
+<!-- ========================= -->
+<div
+  id="invoiceModal"
+  class="fixed inset-0 bg-black bg-opacity-50 hidden z-[9999] flex items-center justify-center">
 
+  <div class="bg-white w-[95%] max-w-xl rounded-xl p-4 text-sm relative">
+
+    <!-- CLOSE -->
+    <button
+      onclick="closeInvoiceModal()"
+      class="absolute top-2 right-3 text-gray-400 text-xl">
+      ✕
+    </button>
+
+    <!-- HEADER -->
+    <div class="mb-3">
+      <div class="font-bold text-base" id="invoiceHeader">
+        Invoice
+      </div>
+      <div class="text-xs text-gray-500" id="invOrderId"></div>
+    </div>
+
+    <!-- CUSTOMER -->
+    <div class="mb-3 text-xs text-gray-700">
+      <div id="invCustomer"></div>
+      <div id="invContact"></div>
+      <div id="invAddress"></div>
+    </div>
+
+    <hr class="my-2">
+
+    <!-- ITEMS -->
+    <div class="space-y-1 mb-3" id="invoiceItems">
+      <!-- items injected by JS -->
+    </div>
+
+    <hr class="my-2">
+
+    <!-- TOTALS -->
+    <div class="space-y-1 text-xs text-gray-700">
+      <div id="invBase"></div>
+      <div id="invService"></div>
+      <div id="invTax"></div>
+
+      <div id="invCoupon"
+           class="text-green-600 hidden"></div>
+    </div>
+
+    <hr class="my-2">
+
+    <!-- NET -->
+    <div class="flex justify-between items-center font-bold text-base">
+      <span>Net Payable</span>
+      <span id="invNet"></span>
+    </div>
+
+    <div class="mt-2 text-xs text-gray-600" id="invPayment"></div>
+
+  </div>
+</div>
+
+  
   
 </body>
 </html>
+
 
 
 
