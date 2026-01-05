@@ -10279,18 +10279,23 @@ async function showMyCouponsSummary() {
 
 
 function onMyCouponsPageOpen() {
+  if (window._myCouponsOpening) {
+    console.warn("⚠️ onMyCouponsPageOpen blocked (duplicate call)");
+    return;
+  }
+
+  window._myCouponsOpening = true;
+
   console.log("🔥 onMyCouponsPageOpen CALLED");
 
   const page = document.getElementById("myCouponsPage");
-
   if (!page) {
-    console.log("❌ myCouponsPage NOT FOUND");
+    window._myCouponsOpening = false;
     return;
   }
 
   console.log("✅ myCouponsPage FOUND");
 
-  // 🔵 SHOW overlay immediately
   showMyCouponsOverlay();
   console.log("🟢 showMyCouponsOverlay() CALLED");
 
@@ -10299,28 +10304,21 @@ function onMyCouponsPageOpen() {
   showMyCouponsSummary()
     .then(() => {
       console.log("✅ showMyCouponsSummary SUCCESS");
-
+    })
+    .catch(err => {
+      console.error("❌ showMyCouponsSummary ERROR:", err);
+    })
+    .finally(() => {
       const elapsed = Date.now() - start;
       const delay = Math.max(300 - elapsed, 0);
 
       setTimeout(() => {
         hideMyCouponsOverlay();
         console.log("🔵 hideMyCouponsOverlay() CALLED");
-      }, delay);
-    })
-    .catch(err => {
-      console.error("❌ showMyCouponsSummary ERROR:", err);
-
-      const elapsed = Date.now() - start;
-      const delay = Math.max(300 - elapsed, 0);
-
-      setTimeout(() => {
-        hideMyCouponsOverlay();
-        console.log("🔵 hideMyCouponsOverlay() CALLED (error)");
+        window._myCouponsOpening = false; // 🔓 unlock
       }, delay);
     });
 }
-
 
   
 function renderUnusedCoupons(coupons) {
@@ -10606,6 +10604,7 @@ function testMyCouponsOverlay() {
   
 </body>
 </html>
+
 
 
 
