@@ -10507,7 +10507,6 @@ async function loadMyOrdersSection() {
   }
 }
 
-
 function renderMyActiveOrders(orders = []) {
   const box = document.getElementById("activeOrdersSection");
   if (!box) return;
@@ -10528,44 +10527,39 @@ function renderMyActiveOrders(orders = []) {
       "border rounded-lg p-3 mb-3 bg-white shadow-sm text-sm";
 
     div.innerHTML = `
-      <!-- HEADER ROW -->
+      <!-- HEADER -->
       <div class="flex justify-between items-start">
         <div class="font-semibold text-gray-800">
           ${o.orderNumber}
         </div>
 
-        <!-- RIGHT SIDE: STATUS + VIEW INVOICE -->
+        <!-- STATUS + BUTTON -->
         <div class="text-right">
           <span class="inline-block px-2 py-0.5 rounded bg-orange-100 text-orange-600 text-xs">
             ${o.orderStatus}
           </span>
-          <div>
-            <button
-              class="text-xs text-orange-600 font-semibold hover:underline mt-1"
-              onclick="openInvoiceModal('${o.orderId}')">
-              View Invoice
-            </button>
-          </div>
+
+          <button
+            class="mt-1 px-3 py-0.5 text-xs border border-orange-500 text-orange-600 rounded hover:bg-orange-500 hover:text-white transition"
+            onclick="openInvoiceModal('${o.orderId}')">
+            View Invoice
+          </button>
         </div>
       </div>
 
-      <!-- DATE -->
       <div class="text-xs text-gray-500 mt-1">
         ${new Date(o.timestamp).toLocaleString()}
       </div>
 
-      <!-- TYPE -->
       <div class="mt-1 text-xs">
         <b>Type:</b> ${o.orderType}
       </div>
 
-      <!-- ADDRESS -->
       ${o.fullAddress ? `
         <div class="mt-1 text-xs text-gray-600">
           ${o.fullAddress}
         </div>` : ""}
 
-      <!-- PAYMENT + AMOUNT -->
       <div class="mt-2 flex justify-between items-center">
         <div class="text-xs text-gray-600">
           ${o.paymentMethod}
@@ -10579,7 +10573,6 @@ function renderMyActiveOrders(orders = []) {
     box.appendChild(div);
   });
 }
-
 
 function renderMyDispatchedOrders(orders = []) {
   const box = document.getElementById("dispatchedOrdersSection");
@@ -10601,38 +10594,34 @@ function renderMyDispatchedOrders(orders = []) {
       "border rounded-lg p-3 mb-3 bg-gray-50 text-sm";
 
     div.innerHTML = `
-      <!-- HEADER ROW -->
+      <!-- HEADER -->
       <div class="flex justify-between items-start">
         <div class="font-semibold text-gray-800">
           ${o.orderNumber}
         </div>
 
-        <!-- RIGHT SIDE: STATUS + VIEW INVOICE -->
+        <!-- STATUS + BUTTON -->
         <div class="text-right">
           <span class="inline-block px-2 py-0.5 rounded bg-green-100 text-green-700 text-xs">
             ${o.orderStatus}
           </span>
-          <div>
-            <button
-              class="text-xs text-orange-600 font-semibold hover:underline mt-1"
-              onclick="openInvoiceModal('${o.orderId}')">
-              View Invoice
-            </button>
-          </div>
+
+          <button
+            class="mt-1 px-3 py-0.5 text-xs border border-orange-500 text-orange-600 rounded hover:bg-orange-500 hover:text-white transition"
+            onclick="openInvoiceModal('${o.orderId}')">
+            View Invoice
+          </button>
         </div>
       </div>
 
-      <!-- DATE -->
       <div class="text-xs text-gray-500 mt-1">
         ${new Date(o.timestamp).toLocaleString()}
       </div>
 
-      <!-- TYPE -->
       <div class="mt-1 text-xs">
         <b>Type:</b> ${o.orderType}
       </div>
 
-      <!-- PAYMENT + AMOUNT -->
       <div class="mt-2 flex justify-between items-center">
         <div class="text-xs text-gray-600">
           ${o.paymentMethod}
@@ -11122,6 +11111,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
