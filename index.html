@@ -10694,10 +10694,15 @@ function renderInvoiceFromAPI(inv) {
   document.getElementById("invOrderId").innerText =
     `Order ID: ${inv.orderId}`;
 
-  document.getElementById("invCustomer").innerText = inv.customerName;
-  document.getElementById("invContact").innerText =
-    `${inv.mobile} • ${inv.email}`;
-  document.getElementById("invAddress").innerText = inv.address;
+ document.getElementById("invCustomer").innerText =
+  `Name : ${inv.customerName}`;
+
+document.getElementById("invContact").innerText =
+  `Mobile / Email : ${inv.mobile} / ${inv.email}`;
+
+document.getElementById("invAddress").innerText =
+  `Address : ${inv.address}`;
+
 
   // ===== ITEMS =====
   document.getElementById("invoiceItems").innerHTML =
@@ -11043,6 +11048,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
