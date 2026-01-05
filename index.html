@@ -10260,21 +10260,38 @@ async function showMyCouponsSummary() {
   const page = document.getElementById("myCouponsPage");
   if (!page) return;
 
-  const result = await fetchUserCouponSummary();
-  if (!result) return;
+  // 🔵 SHOW overlay JUST before heavy work
+  showMyCouponsOverlay();
+  console.log("🟢 showMyCouponsOverlay() CALLED (inside summary)");
 
-  const { unused, used } = result;
+  // 🔑 CRITICAL: allow browser to PAINT overlay
+  await new Promise(resolve => setTimeout(resolve, 0));
 
-  page.classList.remove("hidden");
+  try {
+    const result = await fetchUserCouponSummary();
+    if (!result) return;
 
-  if (unused.length === 0 && used.length === 0) {
-    document.getElementById("unusedCouponsList").innerHTML =
-      `<div class="text-sm text-gray-500">No coupons available</div>`;
-    return;
+    const { unused, used } = result;
+
+    page.classList.remove("hidden");
+
+    if (unused.length === 0 && used.length === 0) {
+      const box = document.getElementById("unusedCouponsList");
+      if (box) {
+        box.innerHTML =
+          `<div class="text-sm text-gray-500">No coupons available</div>`;
+      }
+      return;
+    }
+
+    // 🔥 HEAVY DOM WORK
+    renderUnusedCoupons(unused);
+    renderUsedCoupons(used);
+
+  } finally {
+    hideMyCouponsOverlay();
+    console.log("🔵 hideMyCouponsOverlay() CALLED (inside summary)");
   }
-
-  renderUnusedCoupons(unused);
-  renderUsedCoupons(used);
 }
 
 
@@ -10284,26 +10301,9 @@ async function onMyCouponsPageOpen() {
   const page = document.getElementById("myCouponsPage");
   if (!page) return;
 
-  const start = Date.now();
-
-  showMyCouponsOverlay();
-  console.log("🟢 showMyCouponsOverlay() CALLED");
-
-  try {
-    await showMyCouponsSummary();
-    console.log("✅ showMyCouponsSummary SUCCESS");
-  } catch (err) {
-    console.error("❌ showMyCouponsSummary ERROR", err);
-  } finally {
-    const elapsed = Date.now() - start;
-    const delay = Math.max(300 - elapsed, 0); // 👈 KEY LINE
-
-    setTimeout(() => {
-      hideMyCouponsOverlay();
-      console.log("🔵 hideMyCouponsOverlay() CALLED");
-    }, delay);
-  }
+  await showMyCouponsSummary();
 }
+
 
 
   
@@ -10590,16 +10590,6 @@ function testMyCouponsOverlay() {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
 
 
 
