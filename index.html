@@ -10621,25 +10621,50 @@ function renderMyDispatchedOrders(orders = []) {
 }
 
 
-  async function openInvoiceModal(orderId) {
+async function openInvoiceModal(orderId) {
+  console.log("🧾 View Invoice clicked:", orderId);
+
   const modal = document.getElementById("invoiceModal");
-  modal.classList.remove("hidden");
-
-  document.getElementById("invoiceItems").innerHTML =
-    "<div class='text-gray-400 text-sm'>Loading invoice...</div>";
-
-  const res = await fetch(
-    API_BASE + "?api=getOrderInvoice&orderId=" + encodeURIComponent(orderId)
-  );
-
-  const data = await res.json();
-  if (!data || data.success !== true) {
-    document.getElementById("invoiceItems").innerHTML =
-      "<div class='text-red-500'>Failed to load invoice</div>";
+  if (!modal) {
+    console.error("invoiceModal not found");
     return;
   }
 
-  renderInvoiceFromAPI(data.invoice);
+  modal.classList.remove("hidden");
+
+  const itemsBox = document.getElementById("invoiceItems");
+  if (itemsBox) {
+    itemsBox.innerHTML =
+      "<div class='text-gray-400 text-sm'>Loading invoice...</div>";
+  }
+
+  try {
+    const res = await fetch(
+      API_BASE +
+        "?api=getOrderInvoice&orderId=" +
+        encodeURIComponent(orderId)
+    );
+
+    const data = await res.json();
+
+    if (!data || data.success !== true) {
+      throw new Error("API failed");
+    }
+
+    renderInvoiceFromAPI(data.invoice);
+
+  } catch (err) {
+    console.error("Invoice load error:", err);
+    if (itemsBox) {
+      itemsBox.innerHTML =
+        "<div class='text-red-500 text-sm'>Failed to load invoice</div>";
+    }
+  }
+}
+
+  function closeInvoiceModal() {
+  const modal = document.getElementById("invoiceModal");
+  if (modal) modal.classList.add("hidden");
 }
 
 
@@ -10909,6 +10934,7 @@ function renderMyDispatchedOrders(orders = []) {
   
 </body>
 </html>
+
 
 
 
