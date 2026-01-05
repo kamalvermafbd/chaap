@@ -5314,16 +5314,30 @@ function showPage(pageId) {
     onMyCouponsPageOpen();
   }
 
-  // 🧾 MY ORDERS (Option-A)
   if (pageId === "ordersPage") {
-    loadMyOrdersSection();   // ✅ NEW SAFE FUNCTION
+    loadMyOrdersSection(); // ✅ My Orders loader
   }
 
-  // body class logic untouched
+  // 🔥 SIDEBAR CONTROL (FIX LEFT GAP ISSUE)
+  const noSidebarPages = [
+    "ordersPage",
+    "profilePage",
+    "myCouponsPage"
+  ];
+
   document.body.classList.toggle(
     "menu-active",
     pageId === "menuPage" || pageId === "offersPage"
   );
+
+  const wrapper = document.getElementById("pageWrapper");
+  if (wrapper) {
+    if (noSidebarPages.includes(pageId)) {
+      wrapper.style.marginLeft = "0";
+    } else {
+      wrapper.style.marginLeft = "";
+    }
+  }
 }
 
 
@@ -10760,6 +10774,7 @@ function renderMyDispatchedOrders(orders = []) {
   
 </body>
 </html>
+
 
 
 
