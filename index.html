@@ -10186,6 +10186,10 @@ function hidePrepaidProcessing() {
 
 
   async function fetchUserCouponSummary() {
+  // 🔵 OVERLAY START (REAL ASYNC BOUNDARY)
+  showMyCouponsOverlay();
+  console.log("🟢 overlay shown (before coupon API)");
+
   try {
     const mobile =
       localStorage.getItem("userMobile") ||
@@ -10193,10 +10197,7 @@ function hidePrepaidProcessing() {
 
     if (!mobile) {
       console.warn("⚠️ No logged-in mobile found");
-      return {
-        unused: [],
-        used: []
-      };
+      return { unused: [], used: [] };
     }
 
     const res = await fetch(
@@ -10209,31 +10210,20 @@ function hidePrepaidProcessing() {
 
     if (!data || data.success !== true) {
       console.error("❌ Coupon summary API failed", data);
-      return {
-        unused: [],
-        used: []
-      };
+      return { unused: [], used: [] };
     }
 
-    const allCoupons = Array.isArray(data.coupons)
-      ? data.coupons
-      : [];
+    const allCoupons = Array.isArray(data.coupons) ? data.coupons : [];
 
-    // 🔹 Normalize + split
     const unused = [];
     const used = [];
 
     allCoupons.forEach(c => {
       const usedFlag = String(c.used || "").toLowerCase();
-
-      // normalize mobile (string safety)
       c.mobile = String(c.mobile || "");
 
-      if (usedFlag === "no") {
-        unused.push(c);
-      } else if (usedFlag === "yes") {
-        used.push(c);
-      }
+      if (usedFlag === "no") unused.push(c);
+      else if (usedFlag === "yes") used.push(c);
     });
 
     console.log("🎟️ Coupon summary loaded", {
@@ -10242,56 +10232,42 @@ function hidePrepaidProcessing() {
       used: used.length
     });
 
-    return {
-      unused,
-      used
-    };
+    return { unused, used };
 
   } catch (err) {
     console.error("❌ fetchUserCouponSummary error", err);
-    return {
-      unused: [],
-      used: []
-    };
+    return { unused: [], used: [] };
+
+  } finally {
+    // 🔵 OVERLAY END (AFTER API)
+    hideMyCouponsOverlay();
+    console.log("🔵 overlay hidden (after coupon API)");
   }
 }
+
   
 async function showMyCouponsSummary() {
   const page = document.getElementById("myCouponsPage");
   if (!page) return;
 
-  // 🔵 SHOW overlay JUST before heavy work
-  showMyCouponsOverlay();
-  console.log("🟢 showMyCouponsOverlay() CALLED (inside summary)");
+  const result = await fetchUserCouponSummary();
+  if (!result) return;
 
-  // 🔑 CRITICAL: allow browser to PAINT overlay
-  await new Promise(resolve => setTimeout(resolve, 0));
+  const { unused, used } = result;
 
-  try {
-    const result = await fetchUserCouponSummary();
-    if (!result) return;
+  page.classList.remove("hidden");
 
-    const { unused, used } = result;
-
-    page.classList.remove("hidden");
-
-    if (unused.length === 0 && used.length === 0) {
-      const box = document.getElementById("unusedCouponsList");
-      if (box) {
-        box.innerHTML =
-          `<div class="text-sm text-gray-500">No coupons available</div>`;
-      }
-      return;
+  if (unused.length === 0 && used.length === 0) {
+    const box = document.getElementById("unusedCouponsList");
+    if (box) {
+      box.innerHTML =
+        `<div class="text-sm text-gray-500">No coupons available</div>`;
     }
-
-    // 🔥 HEAVY DOM WORK
-    renderUnusedCoupons(unused);
-    renderUsedCoupons(used);
-
-  } finally {
-    hideMyCouponsOverlay();
-    console.log("🔵 hideMyCouponsOverlay() CALLED (inside summary)");
+    return;
   }
+
+  renderUnusedCoupons(unused);
+  renderUsedCoupons(used);
 }
 
 
@@ -10590,6 +10566,7 @@ function testMyCouponsOverlay() {
   
 </body>
 </html>
+
 
 
 
