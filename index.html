@@ -10278,7 +10278,7 @@ async function showMyCouponsSummary() {
 }
 
 
-function onMyCouponsPageOpen() {
+async function onMyCouponsPageOpen() {
   if (window._myCouponsOpening) {
     console.warn("⚠️ onMyCouponsPageOpen blocked (duplicate call)");
     return;
@@ -10294,31 +10294,19 @@ function onMyCouponsPageOpen() {
     return;
   }
 
-  console.log("✅ myCouponsPage FOUND");
-
   showMyCouponsOverlay();
-  console.log("🟢 showMyCouponsOverlay() CALLED");
 
-  const start = Date.now();
-
-  showMyCouponsSummary()
-    .then(() => {
-      console.log("✅ showMyCouponsSummary SUCCESS");
-    })
-    .catch(err => {
-      console.error("❌ showMyCouponsSummary ERROR:", err);
-    })
-    .finally(() => {
-      const elapsed = Date.now() - start;
-      const delay = Math.max(300 - elapsed, 0);
-
-      setTimeout(() => {
-        hideMyCouponsOverlay();
-        console.log("🔵 hideMyCouponsOverlay() CALLED");
-        window._myCouponsOpening = false; // 🔓 unlock
-      }, delay);
-    });
+  try {
+    await showMyCouponsSummary();
+    console.log("✅ showMyCouponsSummary SUCCESS");
+  } catch (err) {
+    console.error("❌ showMyCouponsSummary ERROR", err);
+  } finally {
+    hideMyCouponsOverlay();
+    window._myCouponsOpening = false;
+  }
 }
+
 
   
 function renderUnusedCoupons(coupons) {
@@ -10604,6 +10592,7 @@ function testMyCouponsOverlay() {
   
 </body>
 </html>
+
 
 
 
