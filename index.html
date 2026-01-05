@@ -10651,6 +10651,8 @@ async function openInvoiceModal(orderId) {
   // 🔴 CLEAR OLD INVOICE DATA (CRITICAL FIX)
   document.getElementById("invoiceHeader").innerText = "Loading...";
   document.getElementById("invOrderId").innerText = "";
+  document.getElementById("invInvoiceMeta").innerHTML = "";
+
   document.getElementById("invCustomer").innerText = "";
   document.getElementById("invContact").innerText = "";
   document.getElementById("invAddress").innerText = "";
@@ -11111,6 +11113,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
