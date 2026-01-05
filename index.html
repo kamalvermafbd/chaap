@@ -10758,14 +10758,14 @@ function renderInvoiceFromAPI(inv) {
   const c = document.getElementById("invCoupon");
   c.innerHTML = "";
 
-  if (coupon > 0) {
+if (coupon > 0) {
   c.classList.remove("hidden");
   c.innerHTML = `
     <div class="flex justify-between text-green-600">
       <span>Coupon (${inv.couponId})</span>
       <span>−₹${coupon.toFixed(2)}</span>
     </div>
-    <div class="flex justify-between text-green-600 font-semibold">
+    <div class="flex justify-between font-semibold">
       <span>Net Amount after Coupon</span>
       <span>₹${afterCoupon.toFixed(2)}</span>
     </div>
@@ -11028,6 +11028,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
