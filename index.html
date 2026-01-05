@@ -5282,7 +5282,7 @@ function showPage(pageId) {
   }
 
   if (pageId === "myCouponsPage") {
-    onMyCouponsPageOpen();   // ✅ THIS WAS MISSING (MAIN BUG)
+    onMyCouponsPageOpen();   // 
   }
 
   // body class logic untouched
@@ -10406,6 +10406,24 @@ function hideMyCouponsOverlay() {
   o.classList.add("hidden"); // ✅ ONLY THIS
 }
 
+function testMyCouponsOverlay() {
+  const o = document.getElementById("myCouponsOverlay");
+  console.log("myCouponsOverlay element =", o);
+
+  if (!o) {
+    alert("❌ myCouponsOverlay DOM me hi nahi hai");
+    return;
+  }
+
+  // force visible
+  o.classList.remove("hidden");
+
+  // safety force (sirf test ke liye)
+  o.style.display = "flex";
+  o.style.zIndex = "99999";
+
+  console.log("✅ overlay force shown");
+}
 
 </script>
 
@@ -10563,6 +10581,7 @@ function hideMyCouponsOverlay() {
   
 </body>
 </html>
+
 
 
 
