@@ -10470,6 +10470,7 @@ async function loadMyOrdersSection() {
     }
 
     renderMyActiveOrders(data.activeOrders || []);
+renderMyDispatchedOrders(data.dispatchedOrders || []);
 
   } catch (err) {
     console.error("My Orders error:", err);
@@ -10754,6 +10755,7 @@ function renderMyDispatchedOrders(orders = []) {
   
 </body>
 </html>
+
 
 
 
