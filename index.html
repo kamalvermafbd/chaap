@@ -10466,11 +10466,19 @@ async function loadMyOrdersSection() {
     localStorage.getItem("mobile");
 
   const activeBox = document.getElementById("activeOrdersSection");
-  if (!activeBox) return;
+  const dispatchedBox = document.getElementById("dispatchedOrdersSection");
+  if (!activeBox || !dispatchedBox) return;
+
+  // 🔥 SHOW LOADING ON BOTH
+  activeBox.innerHTML =
+    "<div class='text-center text-gray-400 py-6'>Loading orders...</div>";
+  dispatchedBox.innerHTML =
+    "<div class='text-center text-gray-400 py-6'>Loading orders...</div>";
 
   if (!mobile) {
     activeBox.innerHTML =
       "<p class='text-gray-500'>Please login to view orders</p>";
+    dispatchedBox.innerHTML = "";
     return;
   }
 
@@ -10488,14 +10496,17 @@ async function loadMyOrdersSection() {
     }
 
     renderMyActiveOrders(data.activeOrders || []);
-renderMyDispatchedOrders(data.dispatchedOrders || []);
+    renderMyDispatchedOrders(data.dispatchedOrders || []);
 
   } catch (err) {
     console.error("My Orders error:", err);
     activeBox.innerHTML =
       "<p class='text-red-500'>Failed to load orders</p>";
+    dispatchedBox.innerHTML =
+      "<p class='text-red-500'>Failed to load orders</p>";
   }
 }
+
 
 function renderMyActiveOrders(orders = []) {
   const box = document.getElementById("activeOrdersSection");
@@ -11098,6 +11109,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
