@@ -10683,7 +10683,19 @@ async function openInvoiceModal(orderId) {
   if (modal) modal.classList.add("hidden");
 }
 
+function formatInvoiceDate(dt) {
+  if (!dt) return "";
+  const d = new Date(dt);
+  if (isNaN(d)) return dt;
 
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = d.toLocaleString("en-GB", { month: "short" });
+  const yyyy = d.getFullYear();
+
+  return `${dd}-${mm}-${yyyy}`;
+}
+
+  
 function renderInvoiceFromAPI(inv) {
 
   // ===== HEADER =====
@@ -10694,6 +10706,18 @@ function renderInvoiceFromAPI(inv) {
   document.getElementById("invOrderId").innerText =
     `Order ID: ${inv.orderId}`;
 
+  document.getElementById("invInvoiceMeta").innerHTML = `
+  <div class="grid grid-cols-[140px_auto] gap-1 mt-1">
+    <span class="font-semibold">Invoice No</span>
+    <span>: ${inv.invno}</span>
+  </div>
+  <div class="grid grid-cols-[140px_auto] gap-1">
+    <span class="font-semibold">Invoice Date</span>
+    <span>: ${formatInvoiceDate(inv.invdt)}</span>
+  </div>
+`;
+
+  
  document.getElementById("invCustomer").innerHTML = `
   <div class="grid grid-cols-[140px_auto] gap-1">
     <span class="font-semibold">Name</span>
@@ -11061,6 +11085,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
