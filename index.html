@@ -10715,6 +10715,13 @@ async function openInvoiceModal(orderId) {
     `Order ID: ${inv.orderId}`;
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  const modal = document.getElementById("invoiceModal");
+  if (modal && modal.parentElement !== document.body) {
+    document.body.appendChild(modal);
+    console.log("✅ invoiceModal moved to BODY");
+  }
+});
 
 </script>
 
@@ -10935,6 +10942,7 @@ async function openInvoiceModal(orderId) {
   
 </body>
 </html>
+
 
 
 
