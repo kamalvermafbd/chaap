@@ -10694,14 +10694,27 @@ function renderInvoiceFromAPI(inv) {
   document.getElementById("invOrderId").innerText =
     `Order ID: ${inv.orderId}`;
 
- document.getElementById("invCustomer").innerText =
-  `Name : ${inv.customerName}`;
+ document.getElementById("invCustomer").innerHTML = `
+  <div class="grid grid-cols-[140px_auto] gap-1">
+    <span class="font-semibold">Name</span>
+    <span>: ${inv.customerName}</span>
+  </div>
+`;
 
-document.getElementById("invContact").innerText =
-  `Mobile / Email : ${inv.mobile} / ${inv.email}`;
+document.getElementById("invContact").innerHTML = `
+  <div class="grid grid-cols-[140px_auto] gap-1">
+    <span class="font-semibold">Mobile / Email</span>
+    <span>: ${inv.mobile} / ${inv.email}</span>
+  </div>
+`;
 
-document.getElementById("invAddress").innerText =
-  `Address : ${inv.address}`;
+document.getElementById("invAddress").innerHTML = `
+  <div class="grid grid-cols-[140px_auto] gap-1">
+    <span class="font-semibold">Address</span>
+    <span>: ${inv.address}</span>
+  </div>
+`;
+
 
 
   // ===== ITEMS =====
@@ -11048,15 +11061,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
 
 
 
