@@ -10279,33 +10279,44 @@ async function showMyCouponsSummary() {
 
 
 function onMyCouponsPageOpen() {
+  console.log("🔥 onMyCouponsPageOpen CALLED");
+
   const page = document.getElementById("myCouponsPage");
-  if (!page) return;
+
+  if (!page) {
+    console.log("❌ myCouponsPage NOT FOUND");
+    return;
+  }
+
+  console.log("✅ myCouponsPage FOUND");
 
   // 🔵 SHOW overlay immediately
   showMyCouponsOverlay();
+  console.log("🟢 showMyCouponsOverlay() CALLED");
 
   const start = Date.now();
 
   showMyCouponsSummary()
     .then(() => {
-      // ✅ SUCCESS: data render ho gaya
+      console.log("✅ showMyCouponsSummary SUCCESS");
+
       const elapsed = Date.now() - start;
       const delay = Math.max(300 - elapsed, 0);
 
       setTimeout(() => {
         hideMyCouponsOverlay();
+        console.log("🔵 hideMyCouponsOverlay() CALLED");
       }, delay);
     })
     .catch(err => {
-      console.error("My Coupons load failed:", err);
+      console.error("❌ showMyCouponsSummary ERROR:", err);
 
-      // ❌ ERROR: error message already rendered / console me
       const elapsed = Date.now() - start;
       const delay = Math.max(300 - elapsed, 0);
 
       setTimeout(() => {
         hideMyCouponsOverlay();
+        console.log("🔵 hideMyCouponsOverlay() CALLED (error)");
       }, delay);
     });
 }
@@ -10595,6 +10606,7 @@ function testMyCouponsOverlay() {
   
 </body>
 </html>
+
 
 
 
