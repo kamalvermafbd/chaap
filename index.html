@@ -10184,11 +10184,16 @@ function hidePrepaidProcessing() {
   btn.classList.remove("opacity-60", "cursor-not-allowed");
 }
 
-
-  async function fetchUserCouponSummary() {
-  // 🔵 OVERLAY START (REAL ASYNC BOUNDARY)
+async function fetchUserCouponSummary() {
   showMyCouponsOverlay();
   console.log("🟢 overlay shown (before coupon API)");
+
+  // 🔑 GUARANTEE browser PAINT (2 frames)
+  await new Promise(resolve =>
+    requestAnimationFrame(() =>
+      requestAnimationFrame(resolve)
+    )
+  );
 
   try {
     const mobile =
@@ -10220,8 +10225,6 @@ function hidePrepaidProcessing() {
 
     allCoupons.forEach(c => {
       const usedFlag = String(c.used || "").toLowerCase();
-      c.mobile = String(c.mobile || "");
-
       if (usedFlag === "no") unused.push(c);
       else if (usedFlag === "yes") used.push(c);
     });
@@ -10239,11 +10242,11 @@ function hidePrepaidProcessing() {
     return { unused: [], used: [] };
 
   } finally {
-    // 🔵 OVERLAY END (AFTER API)
     hideMyCouponsOverlay();
     console.log("🔵 overlay hidden (after coupon API)");
   }
 }
+
 
   
 async function showMyCouponsSummary() {
@@ -10566,6 +10569,7 @@ function testMyCouponsOverlay() {
   
 </body>
 </html>
+
 
 
 
