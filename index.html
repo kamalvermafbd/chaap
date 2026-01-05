@@ -10667,73 +10667,132 @@ async function openInvoiceModal(orderId) {
   const modal = document.getElementById("invoiceModal");
   if (modal) modal.classList.add("hidden");
 }
+function renderInvoiceFromAPI(inv) {
 
-function renderInvoiceTotals(container) {
-  container.innerHTML = "";
+  // ===== HEADER =====
+  const orderDt = new Date(inv.orderDate).toLocaleString();
+  document.getElementById("invoiceHeader").innerText =
+    `${inv.orderNumber} • ${orderDt}`;
 
-  const row = (label, value, cls = "") => `
-    <div class="flex justify-between ${cls}">
-      <span>${label}</span>
-      <span>${value}</span>
+  document.getElementById("invOrderId").innerText =
+    `Order ID: ${inv.orderId}`;
+
+  document.getElementById("invCustomer").innerText = inv.customerName;
+  document.getElementById("invContact").innerText =
+    `${inv.mobile} • ${inv.email}`;
+  document.getElementById("invAddress").innerText = inv.address;
+
+  // ===== ITEMS =====
+  document.getElementById("invoiceItems").innerHTML =
+    inv.items.map((i, idx) => {
+      const qty = Number(i.qty || 0);
+      const rate = Number(i.rate || 0);
+      const gross = qty * rate;
+      const net = Number(i.amount || gross);
+      const discount = gross - net;
+
+      return `
+        <div class="border-b pb-2 mb-2">
+          <div class="font-semibold">
+            ${idx + 1}. ${i.name}
+            <span class="text-xs text-gray-500">(${i.unit})</span>
+          </div>
+
+          <div class="text-xs text-gray-600 mt-0.5">
+            Qty ${qty} × ₹${rate.toFixed(2)} = ₹${gross.toFixed(2)}
+          </div>
+
+          ${
+            discount > 0
+              ? `<div class="text-xs text-green-600">
+                   Item Discount: −₹${discount.toFixed(2)}
+                 </div>`
+              : ""
+          }
+
+          <div class="flex justify-between text-sm font-medium mt-0.5">
+            <span>Item Total</span>
+            <span>₹${net.toFixed(2)}</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+  // ===== CALCULATIONS (UNCHANGED) =====
+  const itemsSubtotal = Number(inv.baseTotal || 0);
+  const service = Number(inv.serviceCharges || 0);
+  const taxableAmount = itemsSubtotal + service; // BEFORE coupon
+  const coupon = Number(inv.couponAmount || 0);
+  const afterCoupon = taxableAmount - coupon;
+  const taxTotal = Number(inv.taxTotal || 0);
+  const cgst = taxTotal / 2;
+  const sgst = taxTotal / 2;
+
+  // ===== TOTALS — FINAL FLOW LOCKED =====
+
+  // Items Subtotal
+  document.getElementById("invBase").innerHTML = `
+    <div class="flex justify-between">
+      <span>Items Subtotal</span>
+      <span>₹${itemsSubtotal.toFixed(2)}</span>
     </div>
   `;
 
-  // ===============================
-  // BASE CHARGES
-  // ===============================
-  container.innerHTML += row(
-    "Items Subtotal",
-    `₹${subtotal.toFixed(2)}`
-  );
+  // Service Charge
+  document.getElementById("invService").innerHTML = `
+    <div class="flex justify-between">
+      <span>Service Charge</span>
+      <span>₹${service.toFixed(2)}</span>
+    </div>
+  `;
 
-  container.innerHTML += row(
-    "Service Charge",
-    `₹${serviceCharge.toFixed(2)}`
-  );
+  // Taxable Amount (BEFORE coupon)
+  document.getElementById("invTax").innerHTML = `
+    <div class="flex justify-between font-medium">
+      <span>Taxable Amount</span>
+      <span>₹${taxableAmount.toFixed(2)}</span>
+    </div>
+  `;
 
-  container.innerHTML += row(
-    "Taxable Amount",
-    `₹${taxableAmount.toFixed(2)}`
-  );
-
-  // ===============================
-  // COUPON BLOCK (ATOMIC)
-  // ===============================
-  if (couponAmount > 0) {
-    container.innerHTML += `
-      <div class="border-t my-2"></div>
-      ${row(
-        `Coupon (${couponCode})`,
-        `-₹${couponAmount.toFixed(2)}`,
-        "text-green-600"
-      )}
-      ${row(
-        "Net Amount after Coupon",
-        `₹${netAfterCoupon.toFixed(2)}`,
-        "text-green-600 font-semibold"
-      )}
+  // ===== COUPON BLOCK (ATOMIC) =====
+  const c = document.getElementById("invCoupon");
+  if (coupon > 0) {
+    c.classList.remove("hidden");
+    c.innerHTML = `
+      <div class="flex justify-between text-green-600">
+        <span>Coupon (${inv.couponId})</span>
+        <span>−₹${coupon.toFixed(2)}</span>
+      </div>
+      <div class="flex justify-between font-medium text-green-600">
+        <span>Net Amount after Coupon</span>
+        <span>₹${afterCoupon.toFixed(2)}</span>
+      </div>
     `;
+  } else {
+    c.classList.add("hidden");
+    c.innerHTML = "";
   }
 
-  // ===============================
-  // TAXES (ALWAYS AFTER COUPON BLOCK)
-  // ===============================
-  container.innerHTML += `
-    <div class="border-t my-2"></div>
-    ${row("CGST", `₹${cgst.toFixed(2)}`)}
-    ${row("SGST", `₹${sgst.toFixed(2)}`)}
-  `;
-
-  // ===============================
-  // FINAL PAYABLE
-  // ===============================
-  container.innerHTML += `
-    <div class="border-t mt-2 pt-2 font-bold text-lg flex justify-between">
-      <span>Net Payable</span>
-      <span>₹${netPayable.toFixed(2)}</span>
+  // ===== TAX SECTION (ALWAYS AFTER COUPON) =====
+  document.getElementById("invTaxes").innerHTML = `
+    <div class="flex justify-between">
+      <span>CGST</span>
+      <span>₹${cgst.toFixed(2)}</span>
+    </div>
+    <div class="flex justify-between">
+      <span>SGST</span>
+      <span>₹${sgst.toFixed(2)}</span>
     </div>
   `;
+
+  // ===== NET PAYABLE =====
+  document.getElementById("invNet").innerText =
+    `₹${Number(inv.netPayable).toFixed(2)}`;
+
+  document.getElementById("invPayment").innerText =
+    `Payment: ${inv.paymentMethod}`;
 }
+
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -10962,6 +11021,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
