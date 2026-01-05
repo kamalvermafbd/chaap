@@ -10282,18 +10282,32 @@ function onMyCouponsPageOpen() {
   const page = document.getElementById("myCouponsPage");
   if (!page) return;
 
+  // 🔵 SHOW overlay immediately
   showMyCouponsOverlay();
 
   const start = Date.now();
 
-  showMyCouponsSummary().finally(() => {
-    const elapsed = Date.now() - start;
-    const delay = Math.max(300 - elapsed, 0); // 👈 minimum 300ms
+  showMyCouponsSummary()
+    .then(() => {
+      // ✅ SUCCESS: data render ho gaya
+      const elapsed = Date.now() - start;
+      const delay = Math.max(300 - elapsed, 0);
 
-    setTimeout(() => {
-      hideMyCouponsOverlay();
-    }, delay);
-  });
+      setTimeout(() => {
+        hideMyCouponsOverlay();
+      }, delay);
+    })
+    .catch(err => {
+      console.error("My Coupons load failed:", err);
+
+      // ❌ ERROR: error message already rendered / console me
+      const elapsed = Date.now() - start;
+      const delay = Math.max(300 - elapsed, 0);
+
+      setTimeout(() => {
+        hideMyCouponsOverlay();
+      }, delay);
+    });
 }
 
 
@@ -10581,6 +10595,7 @@ function testMyCouponsOverlay() {
   
 </body>
 </html>
+
 
 
 
