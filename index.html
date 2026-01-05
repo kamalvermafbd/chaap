@@ -10257,23 +10257,34 @@ async function showMyCouponsSummary() {
 
   const { unused, used } = result;
 
-  page.classList.remove("hidden");
+  page.style.display = "block";
 
-  if (unused.length === 0 && used.length === 0) {
-    const box = document.getElementById("unusedCouponsList");
-    if (box) {
-      box.innerHTML =
-        `<div class="text-sm text-gray-500">No coupons available</div>`;
-    }
-    return;
+  const unusedBlock = document.getElementById("unusedCouponsBlock");
+  const usedBlock = document.getElementById("usedCouponsBlock");
+
+  if (unused.length > 0) {
+    unusedBlock.classList.remove("hidden");
+    renderUnusedCoupons(unused);
+  } else {
+    unusedBlock.classList.add("hidden");
   }
 
-  renderUnusedCoupons(unused);
-  renderUsedCoupons(used);
+  if (used.length > 0) {
+    usedBlock.classList.remove("hidden");
+    renderUsedCoupons(used);
+  } else {
+    usedBlock.classList.add("hidden");
+  }
+
+  if (unused.length === 0 && used.length === 0) {
+    unusedBlock.classList.remove("hidden");
+    document.getElementById("unusedCouponsList").innerHTML =
+      `<div class="text-sm text-gray-500">No coupons available</div>`;
+  }
 }
 
-
-async function onMyCouponsPageOpen() {
+  
+  async function onMyCouponsPageOpen() {
   console.log("🔥 onMyCouponsPageOpen CALLED");
 
   const page = document.getElementById("myCouponsPage");
@@ -10568,6 +10579,7 @@ function testMyCouponsOverlay() {
   
 </body>
 </html>
+
 
 
 
