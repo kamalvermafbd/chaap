@@ -10183,16 +10183,22 @@ function hidePrepaidProcessing() {
   btn.classList.remove("opacity-60", "cursor-not-allowed");
 }
 
-async function fetchUserCouponSummary() {
-  showMyCouponsOverlay();
-  console.log("🟢 overlay shown (before coupon API)");
+async function onMyCouponsPageOpen() {
+  console.log("🔥 loadMyCouponsPage CALLED");
 
-  // 🔑 GUARANTEE browser PAINT (2 frames)
-  await new Promise(resolve =>
-    requestAnimationFrame(() =>
-      requestAnimationFrame(resolve)
-    )
-  );
+  const page = document.getElementById("myCouponsPage");
+  if (!page) return;
+
+  // 🔒 Hide data blocks initially (prevent flash)
+  const unusedBlock = document.getElementById("unusedCouponsBlock");
+  const usedBlock = document.getElementById("usedCouponsBlock");
+
+  if (unusedBlock) unusedBlock.classList.add("hidden");
+  if (usedBlock) usedBlock.classList.add("hidden");
+
+  // 🔵 SHOW overlay (page load start)
+  showMyCouponsOverlay();
+  console.log("🟢 overlay shown");
 
   try {
     const mobile =
@@ -10201,7 +10207,13 @@ async function fetchUserCouponSummary() {
 
     if (!mobile) {
       console.warn("⚠️ No logged-in mobile found");
-      return { unused: [], used: [] };
+      page.style.display = "block";
+      if (unusedBlock) {
+        unusedBlock.classList.remove("hidden");
+        document.getElementById("unusedCouponsList").innerHTML =
+          `<div class="text-sm text-gray-500">No coupons available</div>`;
+      }
+      return;
     }
 
     const res = await fetch(
@@ -10214,7 +10226,7 @@ async function fetchUserCouponSummary() {
 
     if (!data || data.success !== true) {
       console.error("❌ Coupon summary API failed", data);
-      return { unused: [], used: [] };
+      return;
     }
 
     const allCoupons = Array.isArray(data.coupons) ? data.coupons : [];
@@ -10234,65 +10246,36 @@ async function fetchUserCouponSummary() {
       used: used.length
     });
 
-    return { unused, used };
+    // 🔓 SHOW PAGE AFTER DATA READY
+    page.style.display = "block";
+
+    // 🔥 Render unused
+    if (unused.length > 0 && unusedBlock) {
+      unusedBlock.classList.remove("hidden");
+      renderUnusedCoupons(unused);
+    }
+
+    // 🔥 Render used
+    if (used.length > 0 && usedBlock) {
+      usedBlock.classList.remove("hidden");
+      renderUsedCoupons(used);
+    }
+
+    // 🔹 No coupons case
+    if (unused.length === 0 && used.length === 0 && unusedBlock) {
+      unusedBlock.classList.remove("hidden");
+      document.getElementById("unusedCouponsList").innerHTML =
+        `<div class="text-sm text-gray-500">No coupons available</div>`;
+    }
 
   } catch (err) {
-    console.error("❌ fetchUserCouponSummary error", err);
-    return { unused: [], used: [] };
+    console.error("❌ loadMyCouponsPage error", err);
 
   } finally {
     hideMyCouponsOverlay();
-    console.log("🔵 overlay hidden (after coupon API)");
+    console.log("🔵 overlay hidden");
   }
 }
-
-
-  
-async function showMyCouponsSummary() {
-  const page = document.getElementById("myCouponsPage");
-  if (!page) return;
-
-  const result = await fetchUserCouponSummary();
-  if (!result) return;
-
-  const { unused, used } = result;
-
-  page.style.display = "block";
-
-  const unusedBlock = document.getElementById("unusedCouponsBlock");
-  const usedBlock = document.getElementById("usedCouponsBlock");
-
-  if (unused.length > 0) {
-    unusedBlock.classList.remove("hidden");
-    renderUnusedCoupons(unused);
-  } else {
-    unusedBlock.classList.add("hidden");
-  }
-
-  if (used.length > 0) {
-    usedBlock.classList.remove("hidden");
-    renderUsedCoupons(used);
-  } else {
-    usedBlock.classList.add("hidden");
-  }
-
-  if (unused.length === 0 && used.length === 0) {
-    unusedBlock.classList.remove("hidden");
-    document.getElementById("unusedCouponsList").innerHTML =
-      `<div class="text-sm text-gray-500">No coupons available</div>`;
-  }
-}
-
-  
-  async function onMyCouponsPageOpen() {
-  console.log("🔥 onMyCouponsPageOpen CALLED");
-
-  const page = document.getElementById("myCouponsPage");
-  if (!page) return;
-
-  await showMyCouponsSummary();
-}
-
 
 
   
@@ -10579,6 +10562,7 @@ function testMyCouponsOverlay() {
   
 </body>
 </html>
+
 
 
 
