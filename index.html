@@ -10544,8 +10544,9 @@ function renderMyActiveOrders(orders = []) {
           ${o.paymentMethod}
         </div>
         <div class="font-semibold">
-          ₹${Number(o.totalAmount || 0).toFixed(2)}
-        </div>
+  ${fmt(o.totalAmount)}
+</div>
+
       </div>
 
       <div class="mt-2 text-right">
@@ -10603,9 +10604,10 @@ function renderMyDispatchedOrders(orders = []) {
         <div class="text-xs text-gray-600">
           ${o.paymentMethod}
         </div>
-        <div class="font-semibold">
-          ₹${Number(o.totalAmount || 0).toFixed(2)}
-        </div>
+       <div class="font-semibold">
+  ${fmt(o.totalAmount)}
+</div>
+
       </div>
 
       <div class="mt-2 text-right">
@@ -11096,6 +11098,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
