@@ -10279,22 +10279,15 @@ async function showMyCouponsSummary() {
 
 
 async function onMyCouponsPageOpen() {
-  if (window._myCouponsOpening) {
-    console.warn("⚠️ onMyCouponsPageOpen blocked (duplicate call)");
-    return;
-  }
-
-  window._myCouponsOpening = true;
-
   console.log("🔥 onMyCouponsPageOpen CALLED");
 
   const page = document.getElementById("myCouponsPage");
-  if (!page) {
-    window._myCouponsOpening = false;
-    return;
-  }
+  if (!page) return;
+
+  const start = Date.now();
 
   showMyCouponsOverlay();
+  console.log("🟢 showMyCouponsOverlay() CALLED");
 
   try {
     await showMyCouponsSummary();
@@ -10302,8 +10295,13 @@ async function onMyCouponsPageOpen() {
   } catch (err) {
     console.error("❌ showMyCouponsSummary ERROR", err);
   } finally {
-    hideMyCouponsOverlay();
-    window._myCouponsOpening = false;
+    const elapsed = Date.now() - start;
+    const delay = Math.max(300 - elapsed, 0); // 👈 KEY LINE
+
+    setTimeout(() => {
+      hideMyCouponsOverlay();
+      console.log("🔵 hideMyCouponsOverlay() CALLED");
+    }, delay);
   }
 }
 
@@ -10592,6 +10590,7 @@ function testMyCouponsOverlay() {
   
 </body>
 </html>
+
 
 
 
