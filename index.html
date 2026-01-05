@@ -10528,50 +10528,58 @@ function renderMyActiveOrders(orders = []) {
       "border rounded-lg p-3 mb-3 bg-white shadow-sm text-sm";
 
     div.innerHTML = `
-      <div class="flex justify-between items-center">
+      <!-- HEADER ROW -->
+      <div class="flex justify-between items-start">
         <div class="font-semibold text-gray-800">
           ${o.orderNumber}
         </div>
-        <span class="px-2 py-0.5 rounded bg-orange-100 text-orange-600 text-xs">
-          ${o.orderStatus}
-        </span>
+
+        <!-- RIGHT SIDE: STATUS + VIEW INVOICE -->
+        <div class="text-right">
+          <span class="inline-block px-2 py-0.5 rounded bg-orange-100 text-orange-600 text-xs">
+            ${o.orderStatus}
+          </span>
+          <div>
+            <button
+              class="text-xs text-orange-600 font-semibold hover:underline mt-1"
+              onclick="openInvoiceModal('${o.orderId}')">
+              View Invoice
+            </button>
+          </div>
+        </div>
       </div>
 
+      <!-- DATE -->
       <div class="text-xs text-gray-500 mt-1">
         ${new Date(o.timestamp).toLocaleString()}
       </div>
 
+      <!-- TYPE -->
       <div class="mt-1 text-xs">
         <b>Type:</b> ${o.orderType}
       </div>
 
+      <!-- ADDRESS -->
       ${o.fullAddress ? `
         <div class="mt-1 text-xs text-gray-600">
           ${o.fullAddress}
         </div>` : ""}
 
+      <!-- PAYMENT + AMOUNT -->
       <div class="mt-2 flex justify-between items-center">
         <div class="text-xs text-gray-600">
           ${o.paymentMethod}
         </div>
         <div class="font-semibold">
-  ${fmt(o.totalAmount)}
-</div>
-
-      </div>
-
-      <div class="mt-2 text-right">
-        <button
-          class="text-xs text-orange-600 font-semibold hover:underline"
-          onclick="openInvoiceModal('${o.orderId}')">
-          View Invoice
-        </button>
+          ${fmt(o.totalAmount)}
+        </div>
       </div>
     `;
 
     box.appendChild(div);
   });
 }
+
 
 
 function renderMyDispatchedOrders(orders = []) {
@@ -11109,6 +11117,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
