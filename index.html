@@ -10560,7 +10560,7 @@ function renderMyDispatchedOrders(orders = []) {
 
   if (!orders.length) {
     box.innerHTML = `
-      <div class="text-center text-gray-500 py-4 text-sm">
+      <div class="text-center text-gray-400 py-6 text-sm">
         No dispatched orders
       </div>`;
     return;
@@ -10569,42 +10569,34 @@ function renderMyDispatchedOrders(orders = []) {
   orders.forEach(o => {
     const div = document.createElement("div");
     div.className =
-      "border rounded-lg p-3 mb-3 bg-gray-50 shadow-sm text-sm";
+      "border rounded-lg p-3 mb-3 bg-white shadow-sm text-sm";
 
     div.innerHTML = `
       <div class="flex justify-between items-start mb-1">
         <div class="font-semibold text-gray-800">
           ${o.orderNumber}
         </div>
-        <span class="text-xs px-2 py-0.5 rounded bg-green-100 text-green-700">
+        <span class="text-xs px-2 py-1 rounded bg-green-100 text-green-700">
           ${o.orderStatus}
         </span>
       </div>
 
-      <div class="text-xs text-gray-500 mb-1">
-        ${new Date(o.timestamp).toLocaleString()}
+      <div class="text-xs text-gray-500 mb-2">
+        ${o.orderType} • ${new Date(o.timestamp).toLocaleDateString()}
       </div>
 
-      <div class="text-sm text-gray-700">
-        <b>Type:</b> ${o.orderType}
+      <div class="font-semibold text-gray-900 mb-1">
+        ₹${Number(o.totalAmount || 0).toFixed(2)}
       </div>
 
       ${
         o.fullAddress
-          ? `<div class="text-sm text-gray-700 mt-0.5">
-               <b>Address:</b> ${o.fullAddress}
+          ? `<div class="text-xs text-gray-600 flex items-start gap-1">
+               <span>📍</span>
+               <span>${o.fullAddress}</span>
              </div>`
           : ""
       }
-
-      <div class="mt-1 flex justify-between items-center">
-        <div class="text-sm text-gray-700">
-          <b>Payment:</b> ${o.paymentMethod}
-        </div>
-        <div class="font-semibold text-gray-900">
-          ₹${Number(o.totalAmount || 0).toFixed(2)}
-        </div>
-      </div>
     `;
 
     box.appendChild(div);
@@ -10769,6 +10761,7 @@ function renderMyDispatchedOrders(orders = []) {
   
 </body>
 </html>
+
 
 
 
