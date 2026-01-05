@@ -10633,6 +10633,20 @@ async function openInvoiceModal(orderId) {
 
   modal.classList.remove("hidden");
 
+  // 🔴 CLEAR OLD INVOICE DATA (CRITICAL FIX)
+  document.getElementById("invoiceHeader").innerText = "Loading...";
+  document.getElementById("invOrderId").innerText = "";
+  document.getElementById("invCustomer").innerText = "";
+  document.getElementById("invContact").innerText = "";
+  document.getElementById("invAddress").innerText = "";
+  document.getElementById("invBase").innerHTML = "";
+  document.getElementById("invService").innerHTML = "";
+  document.getElementById("invTax").innerHTML = "";
+  document.getElementById("invCoupon").innerHTML = "";
+  document.getElementById("invNet").innerText = "";
+  document.getElementById("invPayment").innerText = "";
+  document.querySelectorAll(".inv-tax-row").forEach(e => e.remove());
+
   const itemsBox = document.getElementById("invoiceItems");
   if (itemsBox) {
     itemsBox.innerHTML =
@@ -10662,6 +10676,7 @@ async function openInvoiceModal(orderId) {
     }
   }
 }
+
 
   function closeInvoiceModal() {
   const modal = document.getElementById("invoiceModal");
@@ -11028,6 +11043,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
