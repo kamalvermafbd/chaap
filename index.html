@@ -10720,7 +10720,52 @@ async function openInvoiceModal(orderId) {
     }).join("");
 
   // ===== TOTALS =====
-  document.getElementById("invBase").innerText =
+   // ===== TOTALS (RIGHT ALIGNED + SPLIT TAX) =====
+  const baseTotal = Number(inv.baseTotal || 0);
+  const service = Number(inv.serviceCharges || 0);
+  const taxTotal = Number(inv.taxTotal || 0);
+  const cgst = taxTotal / 2;
+  const sgst = taxTotal / 2;
+
+  document.getElementById("invBase").innerHTML = `
+    <div class="flex justify-between">
+      <span>Item Subtotal</span>
+      <span>₹${baseTotal.toFixed(2)}</span>
+    </div>
+  `;
+
+  document.getElementById("invService").innerHTML = `
+    <div class="flex justify-between">
+      <span>Service Charges</span>
+      <span>₹${service.toFixed(2)}</span>
+    </div>
+  `;
+
+  document.getElementById("invTax").innerHTML = `
+    <div class="flex justify-between">
+      <span>CGST</span>
+      <span>₹${cgst.toFixed(2)}</span>
+    </div>
+    <div class="flex justify-between">
+      <span>SGST</span>
+      <span>₹${sgst.toFixed(2)}</span>
+    </div>
+  `;
+
+  const c = document.getElementById("invCoupon");
+  if (Number(inv.couponAmount) > 0) {
+    c.classList.remove("hidden");
+    c.innerHTML = `
+      <div class="flex justify-between text-green-600">
+        <span>Coupon (${inv.couponId})</span>
+        <span>−₹${Number(inv.couponAmount).toFixed(2)}</span>
+      </div>
+    `;
+  } else {
+    c.classList.add("hidden");
+  }
+
+    document.getElementById("invBase").innerText =
     `Items Subtotal: ₹${Number(inv.baseTotal).toFixed(2)}`;
 
   document.getElementById("invService").innerText =
@@ -10972,10 +11017,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
-
-
-
-
 
 
 
