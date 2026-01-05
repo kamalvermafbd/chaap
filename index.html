@@ -10671,48 +10671,79 @@ async function openInvoiceModal(orderId) {
 
   function renderInvoiceFromAPI(inv) {
 
+  // ===== HEADER =====
+  const orderDt = new Date(inv.orderDate).toLocaleString();
   document.getElementById("invoiceHeader").innerText =
-    `${inv.orderNumber} • ${inv.orderDate}`;
+    `${inv.orderNumber} • ${orderDt}`;
+
+  document.getElementById("invOrderId").innerText =
+    `Order ID: ${inv.orderId}`;
 
   document.getElementById("invCustomer").innerText = inv.customerName;
   document.getElementById("invContact").innerText =
     `${inv.mobile} • ${inv.email}`;
   document.getElementById("invAddress").innerText = inv.address;
 
-  // ITEMS
+  // ===== ITEMS (DETAILED BREAKDOWN) =====
   document.getElementById("invoiceItems").innerHTML =
-    inv.items.map(i => `
-      <div class="flex justify-between">
-        <span>${i.name} (${i.unit}) × ${i.qty}</span>
-        <span>₹${i.amount}</span>
-      </div>
-    `).join("");
+    inv.items.map((i, idx) => {
+      const qty = Number(i.qty || 0);
+      const rate = Number(i.rate || 0);
+      const gross = qty * rate;
+      const net = Number(i.amount || gross);
+      const discount = gross - net;
 
+      return `
+        <div class="border-b pb-2 mb-2">
+          <div class="font-semibold">
+            ${idx + 1}. ${i.name} <span class="text-xs text-gray-500">(${i.unit})</span>
+          </div>
+
+          <div class="text-xs text-gray-600 mt-0.5">
+            Qty ${qty} × ₹${rate.toFixed(2)} = ₹${gross.toFixed(2)}
+          </div>
+
+          ${
+            discount > 0
+              ? `<div class="text-xs text-green-600">
+                   Item Discount: −₹${discount.toFixed(2)}
+                 </div>`
+              : ""
+          }
+
+          <div class="flex justify-between text-sm font-medium mt-0.5">
+            <span>Item Total</span>
+            <span>₹${net.toFixed(2)}</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+  // ===== TOTALS =====
   document.getElementById("invBase").innerText =
-    `Base Total: ₹${inv.baseTotal}`;
+    `Items Subtotal: ₹${Number(inv.baseTotal).toFixed(2)}`;
 
   document.getElementById("invService").innerText =
-    `Service Charges: ₹${inv.serviceCharges}`;
+    `Service Charges: ₹${Number(inv.serviceCharges).toFixed(2)}`;
 
   document.getElementById("invTax").innerText =
-    `CGST + SGST: ₹${inv.taxTotal}`;
+    `CGST + SGST: ₹${Number(inv.taxTotal).toFixed(2)}`;
 
   const c = document.getElementById("invCoupon");
-  if (inv.couponAmount > 0) {
+  if (Number(inv.couponAmount) > 0) {
     c.classList.remove("hidden");
-    c.innerText = `Coupon (${inv.couponId}): −₹${inv.couponAmount}`;
+    c.innerText =
+      `Coupon (${inv.couponId}): −₹${Number(inv.couponAmount).toFixed(2)}`;
   } else {
     c.classList.add("hidden");
   }
 
+  // ===== NET PAYABLE =====
   document.getElementById("invNet").innerText =
-    `₹${inv.netPayable}`;
+    `₹${Number(inv.netPayable).toFixed(2)}`;
 
   document.getElementById("invPayment").innerText =
     `Payment: ${inv.paymentMethod}`;
-
-  document.getElementById("invOrderId").innerText =
-    `Order ID: ${inv.orderId}`;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -10937,11 +10968,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   </div>
 </div>
-
   
   
 </body>
 </html>
+
 
 
 
