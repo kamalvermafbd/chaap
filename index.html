@@ -10758,20 +10758,22 @@ document.getElementById("invAddress").innerHTML = `
           </div>
 
           <div class="text-xs text-gray-600 mt-0.5">
-            Qty ${qty} × ₹${rate.toFixed(2)} = ₹${gross.toFixed(2)}
+           Qty ${qty} × ${fmt(rate)} = ${fmt(gross)}
+
           </div>
 
           ${
             discount > 0
               ? `<div class="text-xs text-green-600">
-                   Item Discount: −₹${discount.toFixed(2)}
+                   Item Discount: −${fmt(discount)}
                  </div>`
               : ""
           }
 
           <div class="flex justify-between text-sm font-medium mt-0.5">
             <span>Item Total</span>
-            <span>₹${net.toFixed(2)}</span>
+            <span>${fmt(net)}</span>
+
           </div>
         </div>
       `;
@@ -10791,14 +10793,16 @@ document.getElementById("invAddress").innerHTML = `
   document.getElementById("invBase").innerHTML = `
     <div class="flex justify-between font-semibold">
       <span>Items Subtotal</span>
-      <span>₹${itemsSubtotal.toFixed(2)}</span>
+      <span>${fmt(itemsSubtotal)}</span>
+
     </div>
   `;
 
   document.getElementById("invService").innerHTML = `
     <div class="flex justify-between">
       <span>Service Charges</span>
-      <span>₹${service.toFixed(2)}</span>
+      <span>${fmt(service)}</span>
+
     </div>
   `;
 
@@ -10807,7 +10811,8 @@ document.getElementById("invAddress").innerHTML = `
   taxBox.innerHTML = `
     <div class="flex justify-between font-semibold">
       <span>Taxable Amount</span>
-      <span>₹${taxableAmount.toFixed(2)}</span>
+     <span>${fmt(taxableAmount)}</span>
+
     </div>
   `;
 
@@ -10820,11 +10825,13 @@ if (coupon > 0) {
   c.innerHTML = `
     <div class="flex justify-between text-green-600">
       <span>Coupon (${inv.couponId})</span>
-      <span>−₹${coupon.toFixed(2)}</span>
+      <span>−${fmt(coupon)}</span>
+
     </div>
     <div class="flex justify-between font-semibold text-black">
       <span>Net Amount after Coupon</span>
-      <span>₹${afterCoupon.toFixed(2)}</span>
+     <span>${fmt(afterCoupon)}</span>
+
     </div>
   `;
 } else {
@@ -10841,17 +10848,20 @@ if (coupon > 0) {
   taxAnchor.insertAdjacentHTML("afterend", `
     <div class="flex justify-between inv-tax-row">
       <span>CGST</span>
-      <span>₹${cgst.toFixed(2)}</span>
+      <span>${fmt(cgst)}</span>
+
     </div>
     <div class="flex justify-between inv-tax-row">
       <span>SGST</span>
-      <span>₹${sgst.toFixed(2)}</span>
+      <span>${fmt(sgst)}</span>
+
     </div>
   `);
 
   // ===== NET PAYABLE =====
   document.getElementById("invNet").innerText =
-    `₹${Number(inv.netPayable).toFixed(2)}`;
+  fmt(inv.netPayable);
+
 
   document.getElementById("invPayment").innerText =
     `Payment: ${inv.paymentMethod}`;
@@ -11086,6 +11096,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
