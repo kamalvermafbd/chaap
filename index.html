@@ -10667,6 +10667,8 @@ async function openInvoiceModal(orderId) {
   const modal = document.getElementById("invoiceModal");
   if (modal) modal.classList.add("hidden");
 }
+
+
 function renderInvoiceFromAPI(inv) {
 
   // ===== HEADER =====
@@ -10721,16 +10723,14 @@ function renderInvoiceFromAPI(inv) {
   // ===== CALCULATIONS (UNCHANGED) =====
   const itemsSubtotal = Number(inv.baseTotal || 0);
   const service = Number(inv.serviceCharges || 0);
-  const taxableAmount = itemsSubtotal + service; // BEFORE coupon
+  const taxableAmount = itemsSubtotal + service;
   const coupon = Number(inv.couponAmount || 0);
   const afterCoupon = taxableAmount - coupon;
   const taxTotal = Number(inv.taxTotal || 0);
   const cgst = taxTotal / 2;
   const sgst = taxTotal / 2;
 
-  // ===== TOTALS — FINAL FLOW LOCKED =====
-
-  // Items Subtotal
+  // ===== BASE TOTALS =====
   document.getElementById("invBase").innerHTML = `
     <div class="flex justify-between">
       <span>Items Subtotal</span>
@@ -10738,24 +10738,26 @@ function renderInvoiceFromAPI(inv) {
     </div>
   `;
 
-  // Service Charge
   document.getElementById("invService").innerHTML = `
     <div class="flex justify-between">
-      <span>Service Charge</span>
+      <span>Service Charges</span>
       <span>₹${service.toFixed(2)}</span>
     </div>
   `;
 
-  // Taxable Amount (BEFORE coupon)
-  document.getElementById("invTax").innerHTML = `
-    <div class="flex justify-between font-medium">
+  // ===== TAXABLE AMOUNT (ALWAYS BEFORE COUPON) =====
+  const taxBox = document.getElementById("invTax");
+  taxBox.innerHTML = `
+    <div class="flex justify-between">
       <span>Taxable Amount</span>
       <span>₹${taxableAmount.toFixed(2)}</span>
     </div>
   `;
 
-  // ===== COUPON BLOCK (ATOMIC) =====
+  // ===== COUPON BLOCK =====
   const c = document.getElementById("invCoupon");
+  c.innerHTML = "";
+
   if (coupon > 0) {
     c.classList.remove("hidden");
     c.innerHTML = `
@@ -10763,27 +10765,31 @@ function renderInvoiceFromAPI(inv) {
         <span>Coupon (${inv.couponId})</span>
         <span>−₹${coupon.toFixed(2)}</span>
       </div>
-      <div class="flex justify-between font-medium text-green-600">
+      <div class="flex justify-between text-green-600">
         <span>Net Amount after Coupon</span>
         <span>₹${afterCoupon.toFixed(2)}</span>
       </div>
     `;
   } else {
     c.classList.add("hidden");
-    c.innerHTML = "";
   }
 
-  // ===== TAX SECTION (ALWAYS AFTER COUPON) =====
-  document.getElementById("invTaxes").innerHTML = `
-    <div class="flex justify-between">
+  // ===== REMOVE OLD TAX ROWS IF ANY =====
+  document.querySelectorAll(".inv-tax-row").forEach(e => e.remove());
+
+  // ===== TAXES (ALWAYS AFTER COUPON / TAXABLE) =====
+  const taxAnchor = coupon > 0 ? c : taxBox;
+
+  taxAnchor.insertAdjacentHTML("afterend", `
+    <div class="flex justify-between inv-tax-row">
       <span>CGST</span>
       <span>₹${cgst.toFixed(2)}</span>
     </div>
-    <div class="flex justify-between">
+    <div class="flex justify-between inv-tax-row">
       <span>SGST</span>
       <span>₹${sgst.toFixed(2)}</span>
     </div>
-  `;
+  `);
 
   // ===== NET PAYABLE =====
   document.getElementById("invNet").innerText =
@@ -11021,6 +11027,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
