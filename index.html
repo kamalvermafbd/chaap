@@ -10406,6 +10406,14 @@ function testMyCouponsOverlay() {
   console.log("✅ overlay force shown");
 }
 
+  document.addEventListener("DOMContentLoaded", () => {
+  const overlay = document.getElementById("myCouponsOverlay");
+  if (overlay && overlay.parentElement !== document.body) {
+    document.body.appendChild(overlay);
+    console.log("✅ myCouponsOverlay moved to BODY");
+  }
+});
+
 </script>
 
   <div id="cartHandle" onclick="expandDrawerCart()">
@@ -10562,6 +10570,7 @@ function testMyCouponsOverlay() {
   
 </body>
 </html>
+
 
 
 
