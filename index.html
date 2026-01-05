@@ -1735,7 +1735,33 @@ body::before {
     <!-- ORDERS PAGE -->
     <div id="ordersPage" style="display:none;">
         <h2>My Orders</h2>
-        <p>No order history available.</p>
+       <!-- ACTIVE -->
+    <div class="mb-8">
+      <h3 class="text-lg font-semibold text-gray-700 mb-3">
+        Active Orders
+      </h3>
+
+      <div id="activeOrdersSection">
+        <div class="text-center text-gray-400 py-6">
+          Loading orders...
+        </div>
+      </div>
+    </div>
+
+    <!-- DISPATCHED -->
+    <div>
+      <h3 class="text-lg font-semibold text-gray-700 mb-3">
+        Dispatched Orders
+      </h3>
+
+      <div id="dispatchedOrdersSection">
+        <div class="text-center text-gray-400 py-6">
+          No dispatched orders
+        </div>
+      </div>
+    </div>
+
+
     </div>
 
     <!-- OFFERS PAGE -->
@@ -2396,7 +2422,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbzvdUeBkbqbFfhuOmx2Of5Zx1mTf8Y8bvxtRJn7m67O09dK9-Sa8wPYOUsVY6-sXVnd/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbw9YyKH0R_9A3YracJAHmeTLQq2TbK7VEwpLc01N1kuzztlgMfDAv6bgbgho8tTT37X8g/exec";
 
 // ===============================
 // API HELPER
@@ -5281,7 +5307,12 @@ function showPage(pageId) {
   }
 
   if (pageId === "myCouponsPage") {
-    onMyCouponsPageOpen();   // 
+    onMyCouponsPageOpen();
+  }
+
+  // 🧾 MY ORDERS (Option-A)
+  if (pageId === "ordersPage") {
+    loadMyOrdersSection();   // ✅ NEW SAFE FUNCTION
   }
 
   // body class logic untouched
@@ -5290,7 +5321,6 @@ function showPage(pageId) {
     pageId === "menuPage" || pageId === "offersPage"
   );
 }
-
 
 
 
@@ -9726,9 +9756,6 @@ async function onOffersPageOpen() {
 
 
 
-function loadUserOrders() {
-  console.warn("loadUserOrders not implemented yet");
-}
 
 async function fetchPrepaidCoupons() {
   try {
@@ -10414,6 +10441,163 @@ function testMyCouponsOverlay() {
   }
 });
 
+
+async function loadMyOrdersSection() {
+  const mobile =
+    localStorage.getItem("userMobile") ||
+    localStorage.getItem("mobile");
+
+  const activeBox = document.getElementById("activeOrdersSection");
+  if (!activeBox) return;
+
+  if (!mobile) {
+    activeBox.innerHTML =
+      "<p class='text-gray-500'>Please login to view orders</p>";
+    return;
+  }
+
+  try {
+    const res = await fetch(
+      API_BASE +
+        "?api=getUserOrders&mobile=" +
+        encodeURIComponent(mobile)
+    );
+
+    const data = await res.json();
+
+    if (!data || data.success !== true) {
+      throw new Error("Order fetch failed");
+    }
+
+    renderMyActiveOrders(data.activeOrders || []);
+
+  } catch (err) {
+    console.error("My Orders error:", err);
+    activeBox.innerHTML =
+      "<p class='text-red-500'>Failed to load orders</p>";
+  }
+}
+
+
+
+function renderMyActiveOrders(orders = []) {
+  const box = document.getElementById("activeOrdersSection");
+  if (!box) return;
+
+  box.innerHTML = "";
+
+  if (!orders.length) {
+    box.innerHTML = `
+      <div class="text-center text-gray-500 py-6">
+        No active orders
+      </div>`;
+    return;
+  }
+
+  orders.forEach(o => {
+    const div = document.createElement("div");
+    div.className =
+      "border rounded-xl p-4 mb-4 bg-white shadow-sm";
+
+    div.innerHTML = `
+      <div class="flex justify-between items-center mb-2">
+        <div class="font-semibold text-gray-800">
+          ${o.orderNumber}
+        </div>
+        <span class="text-sm px-2 py-1 rounded bg-orange-100 text-orange-600">
+          ${o.orderStatus}
+        </span>
+      </div>
+
+      <div class="text-sm text-gray-600">
+        ${new Date(o.timestamp).toLocaleString()}
+      </div>
+
+      <div class="mt-2 text-sm">
+        <b>Type:</b> ${o.orderType}
+      </div>
+
+      ${
+        o.fullAddress
+          ? `<div class="mt-1 text-sm text-gray-700">
+               <b>Address:</b> ${o.fullAddress}
+             </div>`
+          : ""
+      }
+
+      <div class="mt-2 flex justify-between items-center">
+        <div class="text-sm text-gray-700">
+          <b>Payment:</b> ${o.paymentMethod}
+        </div>
+        <div class="font-bold text-gray-900">
+          ₹${Number(o.totalAmount || 0).toFixed(2)}
+        </div>
+      </div>
+    `;
+
+    box.appendChild(div);
+  });
+}
+
+function renderMyDispatchedOrders(orders = []) {
+  const box = document.getElementById("dispatchedOrdersSection");
+  if (!box) return;
+
+  box.innerHTML = "";
+
+  if (!orders.length) {
+    box.innerHTML = `
+      <div class="text-center text-gray-500 py-6">
+        No dispatched orders
+      </div>`;
+    return;
+  }
+
+  orders.forEach(o => {
+    const div = document.createElement("div");
+    div.className =
+      "border rounded-xl p-4 mb-4 bg-gray-50";
+
+    div.innerHTML = `
+      <div class="flex justify-between items-center mb-2">
+        <div class="font-semibold text-gray-800">
+          ${o.orderNumber}
+        </div>
+        <span class="text-sm px-2 py-1 rounded bg-green-100 text-green-700">
+          ${o.orderStatus}
+        </span>
+      </div>
+
+      <div class="text-sm text-gray-600">
+        ${new Date(o.timestamp).toLocaleString()}
+      </div>
+
+      <div class="mt-2 text-sm">
+        <b>Type:</b> ${o.orderType}
+      </div>
+
+      ${
+        o.fullAddress
+          ? `<div class="mt-1 text-sm text-gray-700">
+               <b>Address:</b> ${o.fullAddress}
+             </div>`
+          : ""
+      }
+
+      <div class="mt-2 flex justify-between items-center">
+        <div class="text-sm text-gray-700">
+          <b>Payment:</b> ${o.paymentMethod}
+        </div>
+        <div class="font-bold text-gray-900">
+          ₹${Number(o.totalAmount || 0).toFixed(2)}
+        </div>
+      </div>
+    `;
+
+    box.appendChild(div);
+  });
+}
+
 </script>
 
   <div id="cartHandle" onclick="expandDrawerCart()">
@@ -10570,6 +10754,7 @@ function testMyCouponsOverlay() {
   
 </body>
 </html>
+
 
 
 
