@@ -10719,7 +10719,7 @@ async function openInvoiceModal(orderId) {
       `;
     }).join("");
 
-  // ===== TOTALS =====
+
    // ===== TOTALS (RIGHT ALIGNED + SPLIT TAX) =====
   const baseTotal = Number(inv.baseTotal || 0);
   const service = Number(inv.serviceCharges || 0);
@@ -10774,13 +10774,13 @@ async function openInvoiceModal(orderId) {
   document.getElementById("invTax").innerText =
     `CGST + SGST: ₹${Number(inv.taxTotal).toFixed(2)}`;
 
-  const c = document.getElementById("invCoupon");
+  const d = document.getElementById("invCoupon");
   if (Number(inv.couponAmount) > 0) {
-    c.classList.remove("hidden");
-    c.innerText =
+    d.classList.remove("hidden");
+   d.innerText =
       `Coupon (${inv.couponId}): −₹${Number(inv.couponAmount).toFixed(2)}`;
   } else {
-    c.classList.add("hidden");
+    d.classList.add("hidden");
   }
 
   // ===== NET PAYABLE =====
@@ -11017,6 +11017,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
