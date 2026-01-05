@@ -10669,7 +10669,7 @@ async function openInvoiceModal(orderId) {
 }
 
 
-  function renderInvoiceFromAPI(inv) {
+function renderInvoiceFromAPI(inv) {
 
   // ===== HEADER =====
   const orderDt = new Date(inv.orderDate).toLocaleString();
@@ -10684,7 +10684,7 @@ async function openInvoiceModal(orderId) {
     `${inv.mobile} • ${inv.email}`;
   document.getElementById("invAddress").innerText = inv.address;
 
-  // ===== ITEMS (DETAILED BREAKDOWN) =====
+  // ===== ITEMS =====
   document.getElementById("invoiceItems").innerHTML =
     inv.items.map((i, idx) => {
       const qty = Number(i.qty || 0);
@@ -10696,10 +10696,11 @@ async function openInvoiceModal(orderId) {
       return `
         <div class="border-b pb-2 mb-2">
           <div class="font-semibold">
-            ${idx + 1}. ${i.name} <span class="text-xs text-gray-500">(${i.unit})</span>
+            ${idx + 1}. ${i.name}
+            <span class="text-xs text-gray-500">(${i.unit})</span>
           </div>
 
-          <div class="text-xs text-gray-600 mt-0.5">
+          <div class="text-xs text-gray-600">
             Qty ${qty} × ₹${rate.toFixed(2)} = ₹${gross.toFixed(2)}
           </div>
 
@@ -10711,7 +10712,7 @@ async function openInvoiceModal(orderId) {
               : ""
           }
 
-          <div class="flex justify-between text-sm font-medium mt-0.5">
+          <div class="flex justify-between text-sm font-medium mt-1">
             <span>Item Total</span>
             <span>₹${net.toFixed(2)}</span>
           </div>
@@ -10719,8 +10720,7 @@ async function openInvoiceModal(orderId) {
       `;
     }).join("");
 
-
-   // ===== TOTALS (RIGHT ALIGNED + SPLIT TAX) =====
+  // ===== TOTALS =====
   const baseTotal = Number(inv.baseTotal || 0);
   const service = Number(inv.serviceCharges || 0);
   const taxTotal = Number(inv.taxTotal || 0);
@@ -10729,7 +10729,7 @@ async function openInvoiceModal(orderId) {
 
   document.getElementById("invBase").innerHTML = `
     <div class="flex justify-between">
-      <span>Item Subtotal</span>
+      <span>Items Subtotal</span>
       <span>₹${baseTotal.toFixed(2)}</span>
     </div>
   `;
@@ -10765,24 +10765,6 @@ async function openInvoiceModal(orderId) {
     c.classList.add("hidden");
   }
 
-    document.getElementById("invBase").innerText =
-    `Items Subtotal: ₹${Number(inv.baseTotal).toFixed(2)}`;
-
-  document.getElementById("invService").innerText =
-    `Service Charges: ₹${Number(inv.serviceCharges).toFixed(2)}`;
-
-  document.getElementById("invTax").innerText =
-    `CGST + SGST: ₹${Number(inv.taxTotal).toFixed(2)}`;
-
-  const d = document.getElementById("invCoupon");
-  if (Number(inv.couponAmount) > 0) {
-    d.classList.remove("hidden");
-   d.innerText =
-      `Coupon (${inv.couponId}): −₹${Number(inv.couponAmount).toFixed(2)}`;
-  } else {
-    d.classList.add("hidden");
-  }
-
   // ===== NET PAYABLE =====
   document.getElementById("invNet").innerText =
     `₹${Number(inv.netPayable).toFixed(2)}`;
@@ -10790,6 +10772,7 @@ async function openInvoiceModal(orderId) {
   document.getElementById("invPayment").innerText =
     `Payment: ${inv.paymentMethod}`;
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("invoiceModal");
@@ -11017,6 +11000,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
