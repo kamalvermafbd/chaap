@@ -3938,7 +3938,8 @@ function resetPlaceOrderBtn() {
 
   window._orderLock = false;
 }
-    function disablePlaceOrder() {
+
+function disablePlaceOrder() {
   const btn = document.getElementById("placeOrderBtn");
   if (!btn) return;
   btn.disabled = true;
@@ -3961,7 +3962,7 @@ async function canProceedPlaceOrder() {
     paymentError.innerText = msg;
     paymentError.classList.remove("hidden", "text-green-600");
     paymentError.classList.add("text-red-600");
-     disablePlaceOrder(); /
+     disablePlaceOrder(); 
   };
 
   const showSuccess = (msg) => {
@@ -11266,6 +11267,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
