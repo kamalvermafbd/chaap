@@ -10861,7 +10861,9 @@ if (hasTax) {
 
   // ===== COUPON BLOCK =====
   const c = document.getElementById("invCoupon");
-  c.innerHTML = "";
+c.innerHTML = "";
+
+const signupDiscount = Number(inv.signupDiscount || 0);
 
 if (coupon > 0) {
   c.classList.remove("hidden");
@@ -10869,15 +10871,27 @@ if (coupon > 0) {
     <div class="flex justify-between text-green-600">
       <span>Coupon (${inv.couponId})</span>
       <span>−${fmt(coupon)}</span>
-
     </div>
     <div class="flex justify-between font-semibold text-black">
       <span>Net Amount after Coupon</span>
-     <span>${fmt(afterCoupon)}</span>
-
+      <span>${fmt(afterCoupon)}</span>
     </div>
   `;
-} else {
+}
+
+/* ✅ ONLY ADDITION — signup discount */
+if (signupDiscount > 0) {
+  c.classList.remove("hidden");
+  c.insertAdjacentHTML("beforeend", `
+    <div class="flex justify-between text-green-600">
+      <span>Signup Discount</span>
+      <span>−${fmt(signupDiscount)}</span>
+    </div>
+  `);
+}
+
+/* hide only when BOTH are zero */
+if (coupon <= 0 && signupDiscount <= 0) {
   c.classList.add("hidden");
   c.innerHTML = "";
 }
@@ -11142,6 +11156,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
