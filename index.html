@@ -5267,10 +5267,11 @@ function updateForgotOverlay(msg) {
 function showPage(pageId) {
   window._activePage = pageId;
 
+  // 🔕 Hide promo banner
   const promo = document.getElementById("promoBanner");
   if (promo) promo.style.display = "none";
 
-  // 🔒 SAFE HIDE
+  // 🔒 Hide all sections safely
   const idsToHide = [
     "menuWrapper",
     "pageWrapper",
@@ -5285,7 +5286,7 @@ function showPage(pageId) {
     if (el) el.style.display = "none";
   });
 
-  // 🔓 SHOW REQUESTED PAGE
+  // 🔓 Show requested page
   if (pageId === "menuPage") {
     const menu = document.getElementById("menuWrapper");
     if (menu) menu.style.display = "block";
@@ -5297,38 +5298,19 @@ function showPage(pageId) {
     if (page) page.style.display = "block";
   }
 
-  // 🔔 PAGE-SPECIFIC HOOKS
-  if (pageId === "offersPage") {
-    onOffersPageOpen();
-  }
+  // 🔔 Page-specific hooks
+  if (pageId === "offersPage") onOffersPageOpen?.();
+  if (pageId === "myCouponsPage") onMyCouponsPageOpen?.();
+  if (pageId === "ordersPage") loadMyOrdersSection?.();
 
-  if (pageId === "myCouponsPage") {
-    onMyCouponsPageOpen();
-  }
+  // ✅ ⭐ FINAL FIX: Sidebar decides layout, NOT page ⭐
+  const sidebar = document.getElementById("leftNav");
+  const main = document.getElementById("mainContent");
 
-  if (pageId === "ordersPage") {
-    loadMyOrdersSection(); // ✅ My Orders loader
-  }
-
-  // 🔥 SIDEBAR CONTROL (FIX LEFT GAP ISSUE)
-  const noSidebarPages = [
-    "ordersPage",
-    "profilePage",
-    "myCouponsPage"
-  ];
-
-  document.body.classList.toggle(
-    "menu-active",
-    pageId === "menuPage" || pageId === "offersPage"
-  );
-
-  const wrapper = document.getElementById("pageWrapper");
-  if (wrapper) {
-    if (noSidebarPages.includes(pageId)) {
-      wrapper.style.marginLeft = "0";
-    } else {
-      wrapper.style.marginLeft = "";
-    }
+  if (sidebar && sidebar.classList.contains("active")) {
+    main.style.marginLeft = "220px";
+  } else {
+    main.style.marginLeft = "0";
   }
 }
 
@@ -11160,6 +11142,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
