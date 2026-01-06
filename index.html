@@ -3934,6 +3934,39 @@ function resetPlaceOrderBtn() {
 
   window._orderLock = false;
 }
+// ==================================
+// PLACE ORDER GUARD – STEP 1
+// ==================================
+async function canProceedPlaceOrder() {
+  try {
+    const orderType = document.getElementById("orderType")?.value;
+    const amount = Number(window._drawerTotals?.baseTotal || 0);
+
+    if (!orderType) {
+      alert("Please select Order Type");
+      return false;
+    }
+
+    const res = await apiPost("checkOrderEligibility", {
+      orderType,
+      orderAmount: amount
+    });
+
+    console.log("🧪 ELIGIBILITY CHECK:", res);
+
+    if (!res || res.allowed !== true) {
+      alert(res?.message || "Order is not allowed");
+      return false;
+    }
+
+    return true;
+
+  } catch (err) {
+    console.error("Eligibility check failed", err);
+    alert("System error. Please try again.");
+    return false;
+  }
+}
     
 async function placeOrder() {
   console.log("🟢 placeOrder() called");
@@ -3946,6 +3979,13 @@ console.log("🔒 orderLock before:", window._orderLock);
   if (window._orderLock) return;
 // 🔒 STEP-1: lock + show processing immediately
 window._orderLock = true;
+  // ✅ GUARD – HARD STOP (ORDER ELIGIBILITY)
+if (!(await canProceedPlaceOrder())) {
+  window._orderLock = false;
+  resetPlaceOrderBtn();
+  return;
+}
+
 
 const placeOrderBtn = document.querySelector(
   '#checkoutForm button[onclick="placeOrder()"]'
@@ -11163,6 +11203,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
