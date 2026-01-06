@@ -5337,12 +5337,6 @@ function activateMenu(element) {
   document.querySelectorAll("#premiumMenu li")
     .forEach(li => li.classList.remove("active"));
   element.classList.add("active");
-
-  // 🔥 sidebar open ho to close karo (original behaviour)
-  const sidebar = document.getElementById("leftNav");
-  if (sidebar && sidebar.classList.contains("active")) {
-    toggleSidebar(); // reuse existing logic
-  }
 }
 
 function toggleSidebar() {
@@ -11166,6 +11160,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
