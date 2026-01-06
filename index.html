@@ -1859,9 +1859,11 @@ body::before {
       <!-- Order Type -->
       <div id="orderTypeWrapper">
         <label class="block text-sm font-medium text-gray-700 mb-1">Order Type</label>
-        <select id="orderType" required onchange="toggleAddressField()"
-                class="w-full border border-gray-300 rounded-lg p-2.5 bg-white
-                       focus:outline-none focus:ring-2 focus:ring-orange-500">
+        <select id="orderType" required
+        onchange="toggleAddressField(); recheckEligibilityOnOrderTypeChange()"
+        class="w-full border border-gray-300 rounded-lg p-2.5 bg-white
+               focus:outline-none focus:ring-2 focus:ring-orange-500">
+
           <option value="">Select Order Type</option>
           <option value="Dine In">Dine In</option>
           <option value="Take Away">Take Away</option>
@@ -2418,7 +2420,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbzFeUPSYf20iT6QY8hSg16dXaqkoxm2nhYISuTCd0HpOOSc8rMph2VpEB5e4B0x7QFsfA/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbwD1wDMH6wE2pBJyNwslrjhC3yqkku1oE55ME_DTEoVeXKtYh4pffM129WnyAe4Sjov-A/exec";
 
 // ===============================
 // API HELPER
@@ -3967,6 +3969,87 @@ async function canProceedPlaceOrder() {
     return false;
   }
 }
+
+async function canProceedPlaceOrder() {
+  try {
+    const orderType = document.getElementById("orderType")?.value;
+    const amount = Number(window._drawerTotals?.baseTotal || 0);
+    const paymentError = document.getElementById("paymentError");
+
+    // reset old message
+    if (paymentError) {
+      paymentError.innerText = "";
+      paymentError.classList.add("hidden");
+    }
+
+    const res = await apiPost("checkOrderEligibility", {
+      orderType,
+      orderAmount: amount
+    });
+
+    console.log("🧪 ELIGIBILITY CHECK:", res);
+
+    if (!res || res.allowed !== true) {
+      if (paymentError) {
+        paymentError.innerText =
+          res?.message || "Order is not allowed at this time";
+        paymentError.classList.remove("hidden");
+      }
+      return false;
+    }
+
+    return true;
+
+  } catch (err) {
+    console.error("Eligibility check failed", err);
+    const paymentError = document.getElementById("paymentError");
+    if (paymentError) {
+      paymentError.innerText = "⚠️ System error. Please try again.";
+      paymentError.classList.remove("hidden");
+    }
+    return false;
+  }
+}
+
+// ==================================
+// STEP-3: Live eligibility on OrderType change
+// ==================================
+async function recheckEligibilityOnOrderTypeChange() {
+  const paymentError = document.getElementById("paymentError");
+  if (paymentError) {
+    paymentError.innerText = "";
+    paymentError.classList.add("hidden");
+  }
+
+  const orderType = document.getElementById("orderType")?.value;
+  if (!orderType) return;
+
+  try {
+    const res = await apiPost("checkOrderEligibility", {
+      orderType,
+      orderAmount: Number(window._drawerTotals?.baseTotal || 0)
+    });
+
+    console.log("🔁 LIVE ELIGIBILITY:", res);
+
+    if (!res || res.allowed !== true) {
+      if (paymentError) {
+        paymentError.innerText =
+          res?.message || "Order is not allowed for selected order type";
+        paymentError.classList.remove("hidden");
+      }
+    } else {
+      // allowed → ensure error hidden
+      if (paymentError) {
+        paymentError.innerText = "";
+        paymentError.classList.add("hidden");
+      }
+    }
+  } catch (e) {
+    console.error("Live eligibility error", e);
+  }
+}
+
     
 async function placeOrder() {
   console.log("🟢 placeOrder() called");
@@ -11203,6 +11286,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
