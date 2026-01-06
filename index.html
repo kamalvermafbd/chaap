@@ -1860,7 +1860,7 @@ body::before {
       <div id="orderTypeWrapper">
         <label class="block text-sm font-medium text-gray-700 mb-1">Order Type</label>
         <select id="orderType" required
-        onchange="toggleAddressField(); recheckEligibilityOnOrderTypeChange()"
+        onchange="toggleAddressField(); canProceedPlaceOrder()"
         class="w-full border border-gray-300 rounded-lg p-2.5 bg-white
                focus:outline-none focus:ring-2 focus:ring-orange-500">
 
@@ -2021,13 +2021,15 @@ body::before {
 <div class="mt-3 grid grid-cols-2 gap-3">
 
   <!-- Place Order (LEFT) -->
- <button
+<button
+  id="placeOrderBtn"
   type="button"
   onclick="placeOrder()"
   class="w-full py-2.5 rounded-xl text-sm font-semibold
          bg-orange-600 hover:bg-orange-700 text-white">
   Place Order
 </button>
+
 
 
   <!-- Cancel (RIGHT - matching size & theme) -->
@@ -3936,7 +3938,20 @@ function resetPlaceOrderBtn() {
 
   window._orderLock = false;
 }
-    
+    function disablePlaceOrder() {
+  const btn = document.getElementById("placeOrderBtn");
+  if (!btn) return;
+  btn.disabled = true;
+  btn.classList.add("opacity-50", "cursor-not-allowed");
+}
+
+function enablePlaceOrder() {
+  const btn = document.getElementById("placeOrderBtn");
+  if (!btn) return;
+  btn.disabled = false;
+  btn.classList.remove("opacity-50", "cursor-not-allowed");
+}
+
 async function canProceedPlaceOrder() {
   const paymentError = document.getElementById("paymentError");
 
@@ -3946,6 +3961,7 @@ async function canProceedPlaceOrder() {
     paymentError.innerText = msg;
     paymentError.classList.remove("hidden", "text-green-600");
     paymentError.classList.add("text-red-600");
+     disablePlaceOrder(); /
   };
 
   const showSuccess = (msg) => {
@@ -3953,6 +3969,7 @@ async function canProceedPlaceOrder() {
     paymentError.innerText = msg;
     paymentError.classList.remove("hidden", "text-red-600");
     paymentError.classList.add("text-green-600");
+     enablePlaceOrder();
   };
 
   try {
@@ -11249,6 +11266,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
