@@ -10845,9 +10845,12 @@ if (addrBox) {
   const taxableAmount = itemsSubtotal + service;
   const coupon = Number(inv.couponAmount || 0);
   const afterCoupon = taxableAmount - coupon;
-  const taxTotal = Number(inv.taxTotal || 0);
-  const cgst = taxTotal / 2;
-  const sgst = taxTotal / 2;
+ const taxTotal = Number(inv.taxTotal || 0);
+const hasTax = taxTotal > 0;
+
+const cgst = hasTax ? taxTotal / 2 : 0;
+const sgst = hasTax ? taxTotal / 2 : 0;
+
 
   // ===== BASE TOTALS =====
   document.getElementById("invBase").innerHTML = `
@@ -10867,14 +10870,21 @@ if (addrBox) {
   `;
 
   // ===== TAXABLE AMOUNT (ALWAYS BEFORE COUPON) =====
-  const taxBox = document.getElementById("invTax");
+ const taxBox = document.getElementById("invTax");
+
+if (hasTax) {
+  taxBox.classList.remove("hidden");
   taxBox.innerHTML = `
     <div class="flex justify-between font-semibold">
       <span>Taxable Amount</span>
-     <span>${fmt(taxableAmount)}</span>
-
+      <span>${fmt(taxableAmount)}</span>
     </div>
   `;
+} else {
+  taxBox.classList.add("hidden");
+  taxBox.innerHTML = "";
+}
+
 
   // ===== COUPON BLOCK =====
   const c = document.getElementById("invCoupon");
@@ -10903,20 +10913,21 @@ if (coupon > 0) {
   document.querySelectorAll(".inv-tax-row").forEach(e => e.remove());
 
   // ===== TAXES (ALWAYS AFTER COUPON / TAXABLE) =====
+if (hasTax) {
   const taxAnchor = coupon > 0 ? c : taxBox;
 
   taxAnchor.insertAdjacentHTML("afterend", `
     <div class="flex justify-between inv-tax-row">
       <span>CGST</span>
       <span>${fmt(cgst)}</span>
-
     </div>
     <div class="flex justify-between inv-tax-row">
       <span>SGST</span>
       <span>${fmt(sgst)}</span>
-
     </div>
   `);
+}
+
 
   // ===== NET PAYABLE =====
   document.getElementById("invNet").innerText =
@@ -11158,6 +11169,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
