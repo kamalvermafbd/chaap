@@ -10817,7 +10817,10 @@ if (addrBox) {
   const service = Number(inv.serviceCharges || 0);
   const taxableAmount = itemsSubtotal + service;
   const coupon = Number(inv.couponAmount || 0);
-  const afterCoupon = taxableAmount - coupon;
+  const signupDiscount = Number(inv.signupDiscount || 0);
+const effectiveDiscount = coupon > 0 ? coupon : signupDiscount;
+const afterCoupon = taxableAmount - effectiveDiscount;
+
  const taxTotal = Number(inv.taxTotal || 0);
 const hasTax = taxTotal > 0;
 
@@ -10863,8 +10866,6 @@ if (hasTax) {
 const c = document.getElementById("invCoupon");
 c.innerHTML = "";
 
-const signupDiscount = Number(inv.signupDiscount || 0);
-
 // coupon variable already upar defined hai — reuse karo
 let discountLabel = "";
 let discountAmount = 0;
@@ -10899,7 +10900,7 @@ if (discountAmount > 0) {
 
   // ===== TAXES (ALWAYS AFTER COUPON / TAXABLE) =====
 if (hasTax) {
-  const taxAnchor = coupon > 0 ? c : taxBox;
+ const taxAnchor = (coupon > 0 || signupDiscount > 0) ? c : taxBox;
 
   taxAnchor.insertAdjacentHTML("afterend", `
     <div class="flex justify-between inv-tax-row">
@@ -11154,6 +11155,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
