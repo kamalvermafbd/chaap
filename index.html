@@ -10859,13 +10859,25 @@ if (hasTax) {
 }
 
 
-  // ===== COUPON BLOCK =====
-  const c = document.getElementById("invCoupon");
+// ===== COUPON / SIGNUP DISCOUNT BLOCK =====
+const c = document.getElementById("invCoupon");
 c.innerHTML = "";
 
 const signupDiscount = Number(inv.signupDiscount || 0);
 
-if (coupon > 0) {
+if (signupDiscount > 0) {
+  // 🔹 Signup discount replaces coupon completely
+  c.classList.remove("hidden");
+  c.innerHTML = `
+    <div class="flex justify-between text-green-600">
+      <span>Signup Discount</span>
+      <span>−${fmt(signupDiscount)}</span>
+    </div>
+  `;
+}
+
+else if (coupon > 0) {
+  // 🔹 Normal coupon flow
   c.classList.remove("hidden");
   c.innerHTML = `
     <div class="flex justify-between text-green-600">
@@ -10879,22 +10891,12 @@ if (coupon > 0) {
   `;
 }
 
-/* ✅ ONLY ADDITION — signup discount */
-if (signupDiscount > 0) {
-  c.classList.remove("hidden");
-  c.insertAdjacentHTML("beforeend", `
-    <div class="flex justify-between text-green-600">
-      <span>Signup Discount</span>
-      <span>−${fmt(signupDiscount)}</span>
-    </div>
-  `);
-}
-
-/* hide only when BOTH are zero */
-if (coupon <= 0 && signupDiscount <= 0) {
+else {
+  // 🔹 No discount at all
   c.classList.add("hidden");
   c.innerHTML = "";
 }
+
 
   // ===== REMOVE OLD TAX ROWS IF ANY =====
   document.querySelectorAll(".inv-tax-row").forEach(e => e.remove());
@@ -11156,6 +11158,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
