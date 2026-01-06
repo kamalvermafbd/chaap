@@ -10863,10 +10863,9 @@ if (hasTax) {
 const c = document.getElementById("invCoupon");
 c.innerHTML = "";
 
-const coupon = Number(inv.couponAmount || 0);
 const signupDiscount = Number(inv.signupDiscount || 0);
 
-// 👉 decide label + amount (sirf ek hi aayega)
+// coupon variable already upar defined hai — reuse karo
 let discountLabel = "";
 let discountAmount = 0;
 
@@ -10893,6 +10892,7 @@ if (discountAmount > 0) {
 } else {
   c.classList.add("hidden");
 }
+
 
   // ===== REMOVE OLD TAX ROWS IF ANY =====
   document.querySelectorAll(".inv-tax-row").forEach(e => e.remove());
@@ -11154,6 +11154,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
