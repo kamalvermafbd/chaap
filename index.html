@@ -3945,17 +3945,17 @@ function resetPlaceOrderBtn() {
   window._orderLock = false;
 }
     
-
 async function canProceedPlaceOrder() {
   try {
     const orderType = document.getElementById("orderType")?.value;
     const amount = Number(window._drawerTotals?.baseTotal || 0);
     const paymentError = document.getElementById("paymentError");
 
-    // reset old message
+    // 🔄 reset state (no message by default)
     if (paymentError) {
       paymentError.innerText = "";
       paymentError.classList.add("hidden");
+      paymentError.classList.remove("text-red-600", "text-green-600");
     }
 
     const res = await apiPost("checkOrderEligibility", {
@@ -3965,13 +3965,24 @@ async function canProceedPlaceOrder() {
 
     console.log("🧪 ELIGIBILITY CHECK:", res);
 
+    // ❌ NOT ELIGIBLE
     if (!res || res.allowed !== true) {
       if (paymentError) {
         paymentError.innerText =
           res?.message || "Order is not allowed at this time";
         paymentError.classList.remove("hidden");
+        paymentError.classList.remove("text-green-600");
+        paymentError.classList.add("text-red-600");
       }
       return false;
+    }
+
+    // ✅ ELIGIBLE
+    if (paymentError) {
+      paymentError.innerText = "✅ Eligible to place order";
+      paymentError.classList.remove("hidden");
+      paymentError.classList.remove("text-red-600");
+      paymentError.classList.add("text-green-600");
     }
 
     return true;
@@ -3982,6 +3993,8 @@ async function canProceedPlaceOrder() {
     if (paymentError) {
       paymentError.innerText = "⚠️ System error. Please try again.";
       paymentError.classList.remove("hidden");
+      paymentError.classList.remove("text-green-600");
+      paymentError.classList.add("text-red-600");
     }
     return false;
   }
@@ -11262,6 +11275,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
