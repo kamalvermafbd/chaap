@@ -10720,13 +10720,6 @@ function formatInvoiceDate(dt) {
 function renderInvoiceFromAPI(inv) {
 
   // ===== HEADER =====
-document.getElementById("invOrderType").innerHTML = `
-  <div class="grid grid-cols-[140px_auto] gap-1 mt-1">
-    <span class="font-semibold">Order Type</span>
-    <span>: ${inv.orderType}</span>
-  </div>
-`;
-
   
   const orderDt = new Date(inv.orderDate).toLocaleString();
   document.getElementById("invoiceHeader").innerText =
@@ -10734,8 +10727,18 @@ document.getElementById("invOrderType").innerHTML = `
 
   document.getElementById("invOrderId").innerText =
     `Order ID: ${inv.orderId}`;
-
-const invMeta = document.getElementById("invInvoiceMeta");
+  
+// ✅ ORDER TYPE (safe)
+  const orderTypeBox = document.getElementById("invOrderType");
+  if (orderTypeBox) {
+    orderTypeBox.innerHTML = `
+      <div class="grid grid-cols-[140px_auto] gap-1 mt-1">
+        <span class="font-semibold">Order Type</span>
+        <span>: ${inv.orderType}</span>
+      </div>
+    `;
+  }
+  const invMeta = document.getElementById("invInvoiceMeta");
 
 // valid invoice check
 const hasInvoice =
@@ -11140,19 +11143,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
