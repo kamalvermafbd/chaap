@@ -4029,8 +4029,6 @@ console.log("🧪 BACKEND RESPONSE:", res);
 function recheckEligibilityOnOrderTypeChange() {
   canProceedPlaceOrder();
 }
-
-
     
 async function placeOrder() {
   console.log("🟢 placeOrder() called");
@@ -4040,25 +4038,25 @@ console.log("🔒 orderLock before:", window._orderLock);
   console.log("getCart() returns:", getCart());
   console.log("global cart variable:", cart);
 
-  if (window._orderLock) return;
-// 🔒 STEP-1: lock + show processing immediately
+if (window._orderLock) return;
 window._orderLock = true;
-  // ✅ GUARD – HARD STOP (ORDER ELIGIBILITY)
-if (!(await canProceedPlaceOrder())) {
-  window._orderLock = false;
-  resetPlaceOrderBtn();
-  return;
-}
 
-
-const placeOrderBtn = document.querySelector(
-  '#checkoutForm button[onclick="placeOrder()"]'
-);
-
+// 🔥 STEP-1: BUTTON IMMEDIATELY DISABLE + TEXT CHANGE
+const placeOrderBtn = document.getElementById("placeOrderBtn");
 if (placeOrderBtn) {
   placeOrderBtn.disabled = true;
   placeOrderBtn.dataset.originalText = placeOrderBtn.innerText;
   placeOrderBtn.innerText = "Processing...";
+}
+
+// 🔒 STEP-2: NOW eligibility check (slow ho sakta hai)
+if (!(await canProceedPlaceOrder())) {
+  window._orderLock = false;
+  
+  const overlay = document.getElementById('loadingOverlay');
+  if (overlay) overlay.style.display = "none";
+  resetPlaceOrderBtn();
+  return;
 }
 
   const customerName = document.getElementById('customerName').value.trim();
@@ -4264,8 +4262,6 @@ if (orderType === "Home Delivery" && !address) {
 couponDiscount: selectedCoupon
   ? Number(dt.offerDiscount || 0)
   : 0,
-
-
     
     pincode,
   city,
@@ -4276,10 +4272,8 @@ couponDiscount: selectedCoupon
 
 console.log("🚀 ORDER PAYLOAD TO BACKEND:", JSON.stringify(orderData, null, 2));
 
-
-
-  document.querySelectorAll('#checkoutForm input, #checkoutForm select, #checkoutForm button')
-    .forEach(el => el.disabled = true);
+document.querySelectorAll('#checkoutForm input, #checkoutForm select')
+  .forEach(el => el.disabled = true);
 
   apiPost("placeOrder", orderData)
     .then(res => {
@@ -11267,6 +11261,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
