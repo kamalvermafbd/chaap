@@ -10837,13 +10837,21 @@ const sgst = hasTax ? taxTotal / 2 : 0;
     </div>
   `;
 
-  document.getElementById("invService").innerHTML = `
+  const serviceBox = document.getElementById("invService");
+
+if (service > 0) {
+  serviceBox.classList.remove("hidden");
+  serviceBox.innerHTML = `
     <div class="flex justify-between">
       <span>Service Charges</span>
       <span>${fmt(service)}</span>
-
     </div>
   `;
+} else {
+  serviceBox.classList.add("hidden");
+  serviceBox.innerHTML = "";
+}
+
 
   // ===== TAXABLE AMOUNT (ALWAYS BEFORE COUPON) =====
  const taxBox = document.getElementById("invTax");
@@ -11155,6 +11163,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
