@@ -350,19 +350,19 @@ body {
 #leftNav {
   position: fixed;
   left: 0;
+  top: 0;              /* 🔥 CHANGE */
   width: 220px;
-  top: 180px;    /* header ?? ???? */
-  bottom: 0;
-  background: #2A0A4A;  /* elegant royal blue */
+  height: 100vh;
+  background: #2A0A4A;
   color: white;
-  padding: 20px 15px;
+  padding: 200px 15px 20px; /* header ke liye space */
   border-right: 1px solid rgba(255,255,255,0.15);
   box-shadow: 2px 0 12px rgba(0,0,0,0.12);
   border-top-right-radius: 12px;
-   transform: translateX(-100%);
+  transform: translateX(-100%);
   transition: transform 0.3s ease;
-
 }
+
 
 /* Menu UL */
 #leftNav ul {
@@ -5366,9 +5366,9 @@ function toggleSidebar() {
   <rect y="16" width="24" height="3"></rect>
 </svg>`;
 
-
   }
 }
+  
 function loadUserProfile() {
   const mobile = localStorage.getItem("userMobile");
 
@@ -11161,6 +11161,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
