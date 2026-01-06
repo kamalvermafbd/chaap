@@ -10778,12 +10778,26 @@ document.getElementById("invContact").innerHTML = `
   </div>
 `;
 
-document.getElementById("invAddress").innerHTML = `
-  <div class="grid grid-cols-[140px_auto] gap-1">
-    <span class="font-semibold">Address</span>
-    <span>: ${inv.address}</span>
-  </div>
-`;
+const addrBox = document.getElementById("invAddress");
+
+const hasAddress =
+  inv.address &&
+  String(inv.address).trim() !== "";
+
+if (addrBox) {
+  if (hasAddress) {
+    addrBox.classList.remove("hidden");
+    addrBox.innerHTML = `
+      <div class="grid grid-cols-[140px_auto] gap-1">
+        <span class="font-semibold">Address</span>
+        <span>: ${inv.address}</span>
+      </div>
+    `;
+  } else {
+    addrBox.classList.add("hidden");
+    addrBox.innerHTML = "";
+  }
+}
 
 
 
@@ -11144,6 +11158,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
