@@ -10652,6 +10652,10 @@ async function openInvoiceModal(orderId) {
   document.getElementById("invoiceHeader").innerText = "Loading...";
   document.getElementById("invOrderId").innerText = "";
   document.getElementById("invInvoiceMeta").innerHTML = "";
+const orderTypeBox = document.getElementById("invOrderType");
+if (orderTypeBox) {
+  orderTypeBox.innerHTML = "";
+}
 
   document.getElementById("invCustomer").innerText = "";
   document.getElementById("invContact").innerText = "";
@@ -11089,6 +11093,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="font-bold text-base" id="invoiceHeader">
         Invoice
       </div>
+      <div id="invOrderType"></div>
       <div class="text-xs text-gray-500" id="invOrderId"></div>
        <div class="text-xs text-gray-700 mt-1" id="invInvoiceMeta"></div>
     </div>
@@ -11135,6 +11140,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
