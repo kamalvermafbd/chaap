@@ -10716,6 +10716,14 @@ function formatInvoiceDate(dt) {
 function renderInvoiceFromAPI(inv) {
 
   // ===== HEADER =====
+document.getElementById("invOrderType").innerHTML = `
+  <div class="grid grid-cols-[140px_auto] gap-1 mt-1">
+    <span class="font-semibold">Order Type</span>
+    <span>: ${inv.orderType}</span>
+  </div>
+`;
+
+  
   const orderDt = new Date(inv.orderDate).toLocaleString();
   document.getElementById("invoiceHeader").innerText =
     `${inv.orderNumber} • ${orderDt}`;
@@ -11127,6 +11135,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
