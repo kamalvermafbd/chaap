@@ -2428,7 +2428,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbwD1wDMH6wE2pBJyNwslrjhC3yqkku1oE55ME_DTEoVeXKtYh4pffM129WnyAe4Sjov-A/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbxJsGe-nJ9QwqE9VM6TLaaA67A5GPZPmKaz2rTg9JT-pXJVl7QvdNMneIGUc_jJVmywQQ/exec";
 
 // ===============================
 // API HELPER
@@ -3964,7 +3964,8 @@ async function canProceedPlaceOrder() {
   };
 
   try {
-    const orderType = document.getElementById("orderType")?.value;
+    const orderType = document.getElementById("orderType")?.value.trim();
+
     const amount = Number(window._drawerTotals?.baseTotal || 0);
 
     // 🔴 GUARD 1: Order Type mandatory
@@ -3984,6 +3985,12 @@ async function canProceedPlaceOrder() {
       orderType,
       orderAmount: amount
     });
+console.log("🧾 FRONTEND → BACKEND PAYLOAD:", {
+  orderType,
+  orderAmount: amount
+});
+
+console.log("🧪 BACKEND RESPONSE:", res);
 
     console.log("🧪 ELIGIBILITY CHECK:", res);
 
@@ -4006,41 +4013,10 @@ async function canProceedPlaceOrder() {
 // ==================================
 // STEP-3: Live eligibility on OrderType change
 // ==================================
-async function recheckEligibilityOnOrderTypeChange() {
-  const paymentError = document.getElementById("paymentError");
-  if (paymentError) {
-    paymentError.innerText = "";
-    paymentError.classList.add("hidden");
-  }
-
-  const orderType = document.getElementById("orderType")?.value;
-  if (!orderType) return;
-
-  try {
-    const res = await apiPost("checkOrderEligibility", {
-      orderType,
-      orderAmount: Number(window._drawerTotals?.baseTotal || 0)
-    });
-
-    console.log("🔁 LIVE ELIGIBILITY:", res);
-
-    if (!res || res.allowed !== true) {
-      if (paymentError) {
-        paymentError.innerText =
-          res?.message || "Order is not allowed for selected order type";
-        paymentError.classList.remove("hidden");
-      }
-    } else {
-      // allowed → ensure error hidden
-      if (paymentError) {
-        paymentError.innerText = "";
-        paymentError.classList.add("hidden");
-      }
-    }
-  } catch (e) {
-    console.error("Live eligibility error", e);
-  }
+function recheckEligibilityOnOrderTypeChange() {
+  canProceedPlaceOrder();
 }
+
 
     
 async function placeOrder() {
@@ -11278,6 +11254,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
