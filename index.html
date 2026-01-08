@@ -3158,30 +3158,27 @@ if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
 window.cartSummary = {
   // ===== ITEMS =====
   items: cart,
-  itemsSubtotal: baseTotal,
+  itemsSubtotal: d.baseTotal || baseTotal,
 
-  // ===== DISCOUNTS (DRAWER CART FINAL VALUES) =====
-  couponAmount: Number(window.appliedCouponAmount || 0),
-  rewardDiscount: Number(window.rewardDiscount || 0),
-  paidCouponDiscount: Number(window.paidCouponDiscount || 0),
-  signupDiscount: Number(window.signupDiscount || 0),
+  // 🔥 EXACT drawer discount (Offer / Reward / Paid sab yahin aa chuka)
+  couponAmount: d.offerDiscount || 0,
+  signupDiscount: d.signupDiscount || 0,
 
   totalDiscount:
-    Number(window.appliedCouponAmount || 0) +
-    Number(window.rewardDiscount || 0) +
-    Number(window.paidCouponDiscount || 0) +
-    Number(window.signupDiscount || 0),
+    Number(d.offerDiscount || 0) +
+    Number(d.signupDiscount || 0),
 
   // ===== CHARGES =====
-  serviceCharge: Number(serviceAmt || 0),
+  serviceCharge: d.serviceAmt || 0,
   deliveryCharge: Number(window.deliveryCharge || 0),
 
-  taxTotal: Number(
-    (cgstAmt || 0) + (sgstAmt || 0) + (igstAmt || 0)
-  ),
+  taxTotal:
+    Number(d.cgstAmt || 0) +
+    Number(d.sgstAmt || 0) +
+    Number(d.igstAmt || 0),
 
-  // ===== FINAL PAYABLE (USER SEEN VALUE) =====
-  netPayable: Number(grandTotalCalc || baseTotal)
+  // ===== FINAL PAYABLE (DRAWER GRAND TOTAL) =====
+  netPayable: d.grandTotal || baseTotal
 };
 
 
@@ -11402,6 +11399,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
