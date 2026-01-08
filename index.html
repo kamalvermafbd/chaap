@@ -3148,6 +3148,28 @@ cartItemsContainer.appendChild(card);
 
   const taxSummaryEl = document.getElementById("taxSummary");
   if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
+// 🔒 expose FINAL coupon-adjusted cart FOR CHECKOUT INVOICE
+// 🔒 expose FINAL coupon-adjusted cart FOR CHECKOUT INVOICE
+window.cartSummary = {
+  items: cart,                          // sanitized cart items
+  itemsSubtotal: baseTotal,             // coupon se pehle
+  couponDiscount: cart.couponAmount || 0,
+  signupDiscount: cart.signupDiscount || 0,
+  serviceCharge: restaurantTax.servicePercent > 0
+    ? parseFloat(((baseTotal * restaurantTax.servicePercent) / 100).toFixed(2))
+    : 0,
+  taxTotal: restaurantTax.taxType === "On Bill"
+    ? parseFloat((
+        ((baseTotal +
+          ((baseTotal * restaurantTax.servicePercent) / 100)
+        ) * (restaurantTax.cgstPercent + restaurantTax.sgstPercent + restaurantTax.igstPercent)
+        ) / 100
+      ).toFixed(2))
+    : 0,
+
+  // ✅ FINAL NET (SINGLE SOURCE OF TRUTH)
+  netPayable: cart.netPayable || baseTotal
+};
 
   updateCartBadge();
 }
@@ -11039,52 +11061,44 @@ if (hasTax) {
   
 function buildCheckoutPreviewInv() {
 
-  const cart = getCart() || [];
-
-  const itemsSubtotal = cart.reduce((sum, i) => {
-    return sum + (Number(i.qty || 0) * Number(i.rate || 0));
-  }, 0);
+  // 🔒 SINGLE SOURCE OF TRUTH (drawer cart snapshot)
+  const s = window.cartSummary || {};
 
   const orderType = document.getElementById("orderType")?.value || "";
 
+  // 🔁 service vs delivery switch (checkout decision)
   let serviceCharges = 0;
-  if (orderType === "Dine In") serviceCharges = window.cartServiceCharge || 0;
-  if (orderType === "Home Delivery") serviceCharges = window.cartDeliveryCharge || 0;
-
-  const taxTotal = window.cartTaxTotal || 0;
-  const couponAmount = window.cartCouponAmount || 0;
-  const signupDiscount = window.cartSignupDiscount || 0;
-
-  const netPayable =
-    itemsSubtotal +
-    serviceCharges +
-    taxTotal -
-    couponAmount -
-    signupDiscount;
+  if (orderType === "Dine In") {
+    serviceCharges = s.serviceCharge || 0;
+  } else if (orderType === "Home Delivery") {
+    serviceCharges = s.deliveryCharge || 0;
+  }
 
   return {
+    // ===== HEADER =====
     orderNumber: "PREVIEW",
     orderDate: new Date(),
     orderId: "-",
     orderType,
 
+    // ===== CUSTOMER =====
     customerName: document.getElementById("customerName")?.value || "",
     mobile: document.getElementById("mobile")?.value || "",
     email: document.getElementById("email")?.value || "",
     address: document.getElementById("address")?.value || "",
 
-    items: cart.map(i => ({
-      ...i,
-      amount: i.amount ?? (i.qty * i.rate)
-    })),
+    // ===== ITEMS (AS-IS FROM DRAWER CART) =====
+    items: s.items || [],
 
-    baseTotal: itemsSubtotal,
+    // ===== TOTALS (LOCKED FROM DRAWER CART) =====
+    baseTotal: s.itemsSubtotal || 0,
     serviceCharges,
-    taxTotal,
-    couponAmount,
-    signupDiscount,
-    netPayable,
+    taxTotal: s.taxTotal || 0,
+    couponAmount: s.couponDiscount || 0,
+    signupDiscount: s.signupDiscount || 0,
+    netPayable: s.netPayable || 0,
 
+    // ===== PAYMENT =====
     paymentMethod:
       document.getElementById("paymentMethod")?.value || ""
   };
@@ -11358,6 +11372,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
