@@ -3149,7 +3149,6 @@ cartItemsContainer.appendChild(card);
   const taxSummaryEl = document.getElementById("taxSummary");
   if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
 // 🔒 expose FINAL coupon-adjusted cart FOR CHECKOUT INVOICE
-// 🔒 expose FINAL coupon-adjusted cart FOR CHECKOUT INVOICE
 window.cartSummary = {
   items: cart,                          // sanitized cart items
   itemsSubtotal: baseTotal,             // coupon se pehle
@@ -3170,6 +3169,11 @@ window.cartSummary = {
   // ✅ FINAL NET (SINGLE SOURCE OF TRUTH)
   netPayable: cart.netPayable || baseTotal
 };
+// 🔁 If checkout open, refresh invoice preview
+const checkoutModal = document.getElementById("checkoutModal");
+if (checkoutModal && checkoutModal.style.display === "flex") {
+  updateCheckoutInvoice();
+}
 
   updateCartBadge();
 }
@@ -11372,6 +11376,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
