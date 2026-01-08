@@ -11114,7 +11114,8 @@ serviceCharges,
 taxTotal: s.taxTotal || 0,
 
 // 🔥 ALL COUPONS (FINAL & FUTURE SAFE)
-couponAmount: s.totalDiscount || 0,
+couponAmount: Number(s.couponAmount || 0),
+
 normalCoupon: s.couponAmount || 0,
 rewardDiscount: s.rewardDiscount || 0,
 paidCouponDiscount: s.paidCouponDiscount || 0,
@@ -11129,6 +11130,7 @@ netPayable: s.netPayable || 0,
       document.getElementById("paymentMethod")?.value || ""
   };
 }
+  
 function injectCheckoutOfferDiscount(inv) {
   if (!inv || !inv.couponAmount || inv.couponAmount <= 0) return;
 
@@ -11425,6 +11427,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
