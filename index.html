@@ -2048,12 +2048,7 @@ body::before {
 </form>
 </div>
   <div class="w-5/12">
-
-  RIGHT SIDE (invoice yahan aayega)
-
 <div id="checkoutInvoiceContainer"></div>
-
-    
 </div>
   </div>
 </div>
@@ -6763,6 +6758,10 @@ async function openCheckout() {
       toggleAddressField();
     }
   }, 0);
+
+  // 🔥 ADD THESE 2 LINES (MISSING THI)
+const inv = buildCheckoutPreviewInv();
+renderInvoiceFromAPI(inv);
 }
 
 
@@ -11295,6 +11294,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
