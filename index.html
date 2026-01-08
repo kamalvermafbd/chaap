@@ -3153,7 +3153,7 @@ else if (restaurantTax.taxType === "On Item") {
 const taxSummaryEl = document.getElementById("taxSummary");
 if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
 
-  
+  const d = window._drawerTotals || {};
 
 window.cartSummary = {
   // ===== ITEMS =====
@@ -11399,6 +11399,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
