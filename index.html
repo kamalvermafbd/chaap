@@ -11041,42 +11041,45 @@ if (hasTax) {
 function buildCheckoutPreviewInv() {
   const orderType = document.getElementById("orderType")?.value || "";
 
+  // ✅ ALWAYS use cart SUMMARY (same as drawer cart)
+  const cartObj = getCartSummary();
+
   let serviceCharges = 0;
   if (orderType === "Dine In") {
-    serviceCharges = cart.serviceCharge || 0;
+    serviceCharges = cartObj.serviceCharge || 0;
   } else if (orderType === "Home Delivery") {
-    serviceCharges = cart.deliveryCharge || 0;
+    serviceCharges = cartObj.deliveryCharge || 0;
   }
 
   return {
-    // 🔥 HEADER SAFE VALUES
+    // ===== HEADER =====
     orderNumber: "PREVIEW",
     orderDate: new Date(),
     orderId: "-",
 
     orderType,
 
-    // 🔥 CUSTOMER
+    // ===== CUSTOMER =====
     customerName: document.getElementById("customerName")?.value || "",
     mobile: document.getElementById("mobile")?.value || "",
     email: document.getElementById("email")?.value || "",
     address: document.getElementById("address")?.value || "",
 
-    // 🔥 ITEMS (IMPORTANT: amount field)
-    items: (cart.items || []).map(i => ({
+    // ===== ITEMS (drawer-grade data) =====
+    items: (cartObj.items || []).map(i => ({
       ...i,
       amount: i.amount ?? (i.qty * i.rate)
     })),
 
-    // 🔥 TOTALS
-    baseTotal: cart.subtotal || 0,
+    // ===== TOTALS =====
+    baseTotal: cartObj.subtotal || 0,
     serviceCharges,
-    taxTotal: cart.taxTotal || 0,
-    couponAmount: cart.couponAmount || 0,
+    taxTotal: cartObj.taxTotal || 0,
+    couponAmount: cartObj.couponAmount || 0,
     signupDiscount: 0,
-    netPayable: cart.netPayable || 0,
+    netPayable: cartObj.netPayable || 0,
 
-    // 🔥 PAYMENT
+    // ===== PAYMENT =====
     paymentMethod: document.getElementById("paymentMethod")?.value || ""
   };
 }
@@ -11353,6 +11356,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
