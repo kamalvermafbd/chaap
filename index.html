@@ -11110,12 +11110,22 @@ function buildCheckoutPreviewInv() {
     items: s.items || [],
 
     // ===== TOTALS (LOCKED FROM DRAWER CART) =====
-    baseTotal: s.itemsSubtotal || 0,
-    serviceCharges,
-    taxTotal: s.taxTotal || 0,
-    couponAmount: s.couponAmount || 0,
-    signupDiscount: s.signupDiscount || 0,
-    netPayable: s.netPayable || 0,
+    // ===== TOTALS (LOCKED FROM DRAWER CART) =====
+baseTotal: s.itemsSubtotal || 0,
+
+serviceCharges,
+taxTotal: s.taxTotal || 0,
+
+// 🔥 ALL COUPONS (FINAL & FUTURE SAFE)
+couponAmount: s.totalDiscount || 0,
+normalCoupon: s.couponAmount || 0,
+rewardDiscount: s.rewardDiscount || 0,
+paidCouponDiscount: s.paidCouponDiscount || 0,
+signupDiscount: s.signupDiscount || 0,
+
+// 🔒 FINAL PAYABLE (SINGLE SOURCE)
+netPayable: s.netPayable || 0,
+
 
     // ===== PAYMENT =====
     paymentMethod:
@@ -11127,6 +11137,7 @@ function buildCheckoutPreviewInv() {
   const inv = buildCheckoutPreviewInv();
   renderInvoiceFromAPI(inv);
 }
+  
 function mountInvoiceIntoCheckout() {
   const src = document.getElementById("invoiceTemplate");
   const target = document.getElementById("checkoutInvoiceContainer");
@@ -11391,6 +11402,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
