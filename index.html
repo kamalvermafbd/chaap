@@ -6759,10 +6759,9 @@ async function openCheckout() {
     }
   }, 0);
 
-  // 🔥 ADD THESE 2 LINES (MISSING THI)
-const inv = buildCheckoutPreviewInv();
+
 mountInvoiceIntoCheckout();
-renderInvoiceFromAPI(inv);
+  updateCheckoutInvoice();
 
 }
 
@@ -11037,49 +11036,41 @@ if (hasTax) {
   document.getElementById("invPayment").innerText =
     `Payment: ${inv.paymentMethod}`;
 }
+  
 function buildCheckoutPreviewInv() {
-  const orderType = document.getElementById("orderType")?.value || "";
 
-  // 🔹 cart object already maintained globally in your flow
-  const cartObj = window.cart || {};
-
-  let serviceCharges = 0;
-  if (orderType === "Dine In") {
-    serviceCharges = cartObj.serviceCharge || 0;
-  } else if (orderType === "Home Delivery") {
-    serviceCharges = cartObj.deliveryCharge || 0;
-  }
+  // 🔹 CART SUMMARY — existing system ka hi use
+  const summary = getCartSummary(); 
+  // 👆 ye tumhare system me already hai (Orders ke liye use hota hai)
 
   return {
-    // HEADER
+    // ===== HEADER =====
     orderNumber: "PREVIEW",
     orderDate: new Date(),
     orderId: "-",
-    orderType,
+    orderType: document.getElementById("orderType")?.value || "",
 
-    // CUSTOMER
+    // ===== CUSTOMER =====
     customerName: document.getElementById("customerName")?.value || "",
     mobile: document.getElementById("mobile")?.value || "",
     email: document.getElementById("email")?.value || "",
     address: document.getElementById("address")?.value || "",
 
-    // ITEMS (already normalized by cart)
-    items: cartObj.items || [],
+    // ===== ITEMS (AS-IS) =====
+    items: summary.items || [],
 
-    // TOTALS (single source of truth)
-    baseTotal: cartObj.subtotal || 0,
-    serviceCharges,
-    taxTotal: cartObj.taxTotal || 0,
-    couponAmount: cartObj.couponAmount || 0,
-    signupDiscount: 0,
-    netPayable: cartObj.netPayable || 0,
+    // ===== TOTALS (AS-IS — SAME AS FINAL ORDER) =====
+    baseTotal: summary.itemsSubtotal || 0,
+    serviceCharges: summary.serviceCharge || 0,
+    taxTotal: summary.taxTotal || 0,
+    couponAmount: summary.couponDiscount || 0,
+    signupDiscount: summary.signupDiscount || 0,
+    netPayable: summary.netPayable || 0,
 
-    // PAYMENT
-    paymentMethod:
-      document.getElementById("paymentMethod")?.value || ""
+    // ===== PAYMENT =====
+    paymentMethod: document.getElementById("paymentMethod")?.value || ""
   };
 }
-
 
   function updateCheckoutInvoice() {
   const inv = buildCheckoutPreviewInv();
@@ -11352,6 +11343,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
