@@ -11049,16 +11049,38 @@ function buildCheckoutPreviewInv() {
   }
 
   return {
+    // 🔥 HEADER SAFE VALUES
+    orderNumber: "PREVIEW",
+    orderDate: new Date(),
+    orderId: "-",
+
     orderType,
-    items: cart.items || [],
+
+    // 🔥 CUSTOMER
+    customerName: document.getElementById("customerName")?.value || "",
+    mobile: document.getElementById("mobile")?.value || "",
+    email: document.getElementById("email")?.value || "",
+    address: document.getElementById("address")?.value || "",
+
+    // 🔥 ITEMS (IMPORTANT: amount field)
+    items: (cart.items || []).map(i => ({
+      ...i,
+      amount: i.amount ?? (i.qty * i.rate)
+    })),
+
+    // 🔥 TOTALS
     baseTotal: cart.subtotal || 0,
-    serviceCharges: serviceCharges,
+    serviceCharges,
     taxTotal: cart.taxTotal || 0,
     couponAmount: cart.couponAmount || 0,
+    signupDiscount: 0,
     netPayable: cart.netPayable || 0,
+
+    // 🔥 PAYMENT
     paymentMethod: document.getElementById("paymentMethod")?.value || ""
   };
 }
+
 
   function updateCheckoutInvoice() {
   const inv = buildCheckoutPreviewInv();
@@ -11084,6 +11106,29 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(modal);
     console.log("✅ invoiceModal moved to BODY");
   }
+});
+
+
+
+  document.addEventListener("input", e => {
+  if (
+    e.target.id === "customerName" ||
+    e.target.id === "mobile" ||
+    e.target.id === "email" ||
+    e.target.id === "address"
+  ) {
+    updateCheckoutInvoice();
+  }
+});
+
+document.getElementById("orderType")?.addEventListener("change", () => {
+  updateCheckoutInvoice();
+});
+
+document.querySelectorAll(".payment-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    setTimeout(updateCheckoutInvoice, 0);
+  });
 });
 
 </script>
@@ -11308,6 +11353,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
