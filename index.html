@@ -11154,6 +11154,7 @@ function injectCheckoutOfferDiscount(inv) {
 
   const container = document.querySelector("#checkoutInvoiceContainer");
   if (!container) return;
+if (container.innerText.includes("Coupon")) return;
 
   // already injected? → avoid duplicate
   if (container.querySelector(".offer-discount-row")) return;
@@ -11446,6 +11447,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
