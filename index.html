@@ -3096,84 +3096,95 @@ cartItemsContainer.appendChild(card);
 
 
   // TAX BLOCK unchanged
-  let taxHtml = "";
+  // ===== TAX CALCULATION (FINAL & SAFE) =====
+let taxHtml = "";
+let serviceAmt = 0;
+let cgstAmt = 0;
+let sgstAmt = 0;
+let igstAmt = 0;
+let grandTotalCalc = baseTotal;
 
-  if (restaurantTax.taxType === "On Bill") {
+if (restaurantTax.taxType === "On Bill") {
 
-    const serviceAmt = parseFloat(((baseTotal * restaurantTax.servicePercent) / 100).toFixed(2));
-    const taxableAmount = parseFloat((baseTotal + serviceAmt).toFixed(2));
+  serviceAmt = parseFloat(((baseTotal * restaurantTax.servicePercent) / 100).toFixed(2));
+  const taxableAmount = baseTotal + serviceAmt;
 
-    const cgstAmt = parseFloat(((taxableAmount * restaurantTax.cgstPercent) / 100).toFixed(2));
-    const sgstAmt = parseFloat(((taxableAmount * restaurantTax.sgstPercent) / 100).toFixed(2));
-    const igstAmt = parseFloat(((taxableAmount * restaurantTax.igstPercent) / 100).toFixed(2));
+  cgstAmt = parseFloat(((taxableAmount * restaurantTax.cgstPercent) / 100).toFixed(2));
+  sgstAmt = parseFloat(((taxableAmount * restaurantTax.sgstPercent) / 100).toFixed(2));
+  igstAmt = parseFloat(((taxableAmount * restaurantTax.igstPercent) / 100).toFixed(2));
 
-    const grandTotalCalc = parseFloat((taxableAmount + cgstAmt + sgstAmt + igstAmt).toFixed(2));
+  grandTotalCalc = taxableAmount + cgstAmt + sgstAmt + igstAmt;
 
   taxHtml = `
-  ${restaurantTax.servicePercent > 0 
-    ? `<p style="margin:2px 0;">
-         Service Charges (${restaurantTax.servicePercent}%): 
-         ${fmt(serviceAmt)}
-       </p>`
-    : ""
-  }
+    ${serviceAmt ? `<p>Service Charge: ${fmt(serviceAmt)}</p>` : ""}
+    ${cgstAmt ? `<p>CGST: ${fmt(cgstAmt)}</p>` : ""}
+    ${sgstAmt ? `<p>SGST: ${fmt(sgstAmt)}</p>` : ""}
+    ${igstAmt ? `<p>IGST: ${fmt(igstAmt)}</p>` : ""}
+  `;
+}
 
-  <p style="margin:2px 0;">
-    CGST (${restaurantTax.cgstPercent}%): 
-    ${fmt(cgstAmt)}
-  </p>
+else if (restaurantTax.taxType === "On Item") {
 
-  <p style="margin:2px 0;">
-    SGST (${restaurantTax.sgstPercent}%): 
-    ${fmt(sgstAmt)}
-  </p>
+  const totalTaxPercent =
+    restaurantTax.cgstPercent +
+    restaurantTax.sgstPercent +
+    restaurantTax.igstPercent;
 
-  ${restaurantTax.igstPercent > 0 
-    ? `<p style="margin:2px 0;">
-         IGST (${restaurantTax.igstPercent}%): 
-         ${fmt(igstAmt)}
-       </p>`
-    : ""
-  }
+  const taxableBase = parseFloat(
+    (baseTotal * 100 / (100 + totalTaxPercent)).toFixed(2)
+  );
 
-  <div class="flex justify-between items-center mt-4">
-    <div class="font-semibold text-lg text-gray-800">Grand Total</div>
-    <div class="font-semibold text-lg text-red-500">
-     ${fmt(grandTotal)}
-    </div>
-  </div>
-`;
+  const taxAmount = baseTotal - taxableBase;
 
-  }
+  cgstAmt = restaurantTax.cgstPercent ? taxAmount / 2 : 0;
+  sgstAmt = restaurantTax.sgstPercent ? taxAmount / 2 : 0;
+  igstAmt = restaurantTax.igstPercent ? taxAmount : 0;
 
-  const taxSummaryEl = document.getElementById("taxSummary");
-  if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
-// 🔒 expose FINAL coupon-adjusted cart FOR CHECKOUT INVOICE
+  grandTotalCalc = baseTotal; // tax included price
+
+  taxHtml = `
+    <p>Taxable Amount: ${fmt(taxableBase)}</p>
+    ${cgstAmt ? `<p>CGST: ${fmt(cgstAmt)}</p>` : ""}
+    ${sgstAmt ? `<p>SGST: ${fmt(sgstAmt)}</p>` : ""}
+    ${igstAmt ? `<p>IGST: ${fmt(igstAmt)}</p>` : ""}
+  `;
+}
+
+const taxSummaryEl = document.getElementById("taxSummary");
+if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
+
+  
+
 window.cartSummary = {
+  // ===== ITEMS =====
   items: cart,
   itemsSubtotal: baseTotal,
 
-  // 🔥 SAME KEY AS INVOICE EXPECTS
-  couponAmount: cart.couponAmount || 0,
-  signupDiscount: cart.signupDiscount || 0,
+  // ===== DISCOUNTS (DRAWER CART FINAL VALUES) =====
+  couponAmount: Number(window.appliedCouponAmount || 0),
+  rewardDiscount: Number(window.rewardDiscount || 0),
+  paidCouponDiscount: Number(window.paidCouponDiscount || 0),
+  signupDiscount: Number(window.signupDiscount || 0),
 
-  serviceCharge: restaurantTax.servicePercent > 0
-    ? parseFloat(((baseTotal * restaurantTax.servicePercent) / 100).toFixed(2))
-    : 0,
+  totalDiscount:
+    Number(window.appliedCouponAmount || 0) +
+    Number(window.rewardDiscount || 0) +
+    Number(window.paidCouponDiscount || 0) +
+    Number(window.signupDiscount || 0),
 
-  taxTotal: restaurantTax.taxType === "On Bill"
-    ? parseFloat((
-        ((baseTotal +
-          ((baseTotal * restaurantTax.servicePercent) / 100)
-        ) * (restaurantTax.cgstPercent + restaurantTax.sgstPercent + restaurantTax.igstPercent)
-        ) / 100
-      ).toFixed(2))
-    : 0,
+  // ===== CHARGES =====
+  serviceCharge: Number(serviceAmt || 0),
+  deliveryCharge: Number(window.deliveryCharge || 0),
 
-  netPayable: cart.netPayable || baseTotal
+  taxTotal: Number(
+    (cgstAmt || 0) + (sgstAmt || 0) + (igstAmt || 0)
+  ),
+
+  // ===== FINAL PAYABLE (USER SEEN VALUE) =====
+  netPayable: Number(grandTotalCalc || baseTotal)
 };
 
-// 🔁 If checkout open, refresh invoice preview
+
 const checkoutModal = document.getElementById("checkoutModal");
 if (checkoutModal && checkoutModal.style.display === "flex") {
   updateCheckoutInvoice();
@@ -11380,6 +11391,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
