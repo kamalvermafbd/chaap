@@ -11037,12 +11037,11 @@ if (hasTax) {
   document.getElementById("invPayment").innerText =
     `Payment: ${inv.paymentMethod}`;
 }
-
 function buildCheckoutPreviewInv() {
   const orderType = document.getElementById("orderType")?.value || "";
 
-  // ✅ ALWAYS use cart SUMMARY (same as drawer cart)
-  const cartObj = getCartSummary();
+  // 🔹 cart object already maintained globally in your flow
+  const cartObj = window.cart || {};
 
   let serviceCharges = 0;
   if (orderType === "Dine In") {
@@ -11052,26 +11051,22 @@ function buildCheckoutPreviewInv() {
   }
 
   return {
-    // ===== HEADER =====
+    // HEADER
     orderNumber: "PREVIEW",
     orderDate: new Date(),
     orderId: "-",
-
     orderType,
 
-    // ===== CUSTOMER =====
+    // CUSTOMER
     customerName: document.getElementById("customerName")?.value || "",
     mobile: document.getElementById("mobile")?.value || "",
     email: document.getElementById("email")?.value || "",
     address: document.getElementById("address")?.value || "",
 
-    // ===== ITEMS (drawer-grade data) =====
-    items: (cartObj.items || []).map(i => ({
-      ...i,
-      amount: i.amount ?? (i.qty * i.rate)
-    })),
+    // ITEMS (already normalized by cart)
+    items: cartObj.items || [],
 
-    // ===== TOTALS =====
+    // TOTALS (single source of truth)
     baseTotal: cartObj.subtotal || 0,
     serviceCharges,
     taxTotal: cartObj.taxTotal || 0,
@@ -11079,8 +11074,9 @@ function buildCheckoutPreviewInv() {
     signupDiscount: 0,
     netPayable: cartObj.netPayable || 0,
 
-    // ===== PAYMENT =====
-    paymentMethod: document.getElementById("paymentMethod")?.value || ""
+    // PAYMENT
+    paymentMethod:
+      document.getElementById("paymentMethod")?.value || ""
   };
 }
 
@@ -11356,6 +11352,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
