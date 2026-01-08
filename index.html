@@ -11039,36 +11039,54 @@ if (hasTax) {
   
 function buildCheckoutPreviewInv() {
 
-  // 🔹 CART SUMMARY — existing system ka hi use
-  const summary = getCartSummary(); 
-  // 👆 ye tumhare system me already hai (Orders ke liye use hota hai)
+  const cart = getCart() || [];
+
+  const itemsSubtotal = cart.reduce((sum, i) => {
+    return sum + (Number(i.qty || 0) * Number(i.rate || 0));
+  }, 0);
+
+  const orderType = document.getElementById("orderType")?.value || "";
+
+  let serviceCharges = 0;
+  if (orderType === "Dine In") serviceCharges = window.cartServiceCharge || 0;
+  if (orderType === "Home Delivery") serviceCharges = window.cartDeliveryCharge || 0;
+
+  const taxTotal = window.cartTaxTotal || 0;
+  const couponAmount = window.cartCouponAmount || 0;
+  const signupDiscount = window.cartSignupDiscount || 0;
+
+  const netPayable =
+    itemsSubtotal +
+    serviceCharges +
+    taxTotal -
+    couponAmount -
+    signupDiscount;
 
   return {
-    // ===== HEADER =====
     orderNumber: "PREVIEW",
     orderDate: new Date(),
     orderId: "-",
-    orderType: document.getElementById("orderType")?.value || "",
+    orderType,
 
-    // ===== CUSTOMER =====
     customerName: document.getElementById("customerName")?.value || "",
     mobile: document.getElementById("mobile")?.value || "",
     email: document.getElementById("email")?.value || "",
     address: document.getElementById("address")?.value || "",
 
-    // ===== ITEMS (AS-IS) =====
-    items: summary.items || [],
+    items: cart.map(i => ({
+      ...i,
+      amount: i.amount ?? (i.qty * i.rate)
+    })),
 
-    // ===== TOTALS (AS-IS — SAME AS FINAL ORDER) =====
-    baseTotal: summary.itemsSubtotal || 0,
-    serviceCharges: summary.serviceCharge || 0,
-    taxTotal: summary.taxTotal || 0,
-    couponAmount: summary.couponDiscount || 0,
-    signupDiscount: summary.signupDiscount || 0,
-    netPayable: summary.netPayable || 0,
+    baseTotal: itemsSubtotal,
+    serviceCharges,
+    taxTotal,
+    couponAmount,
+    signupDiscount,
+    netPayable,
 
-    // ===== PAYMENT =====
-    paymentMethod: document.getElementById("paymentMethod")?.value || ""
+    paymentMethod:
+      document.getElementById("paymentMethod")?.value || ""
   };
 }
 
@@ -11100,26 +11118,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-  document.addEventListener("input", e => {
+document.addEventListener("input", e => {
   if (
-    e.target.id === "customerName" ||
-    e.target.id === "mobile" ||
-    e.target.id === "email" ||
-    e.target.id === "address"
+    ["customerName", "mobile", "email", "address"].includes(e.target.id)
   ) {
     updateCheckoutInvoice();
   }
 });
 
-document.getElementById("orderType")?.addEventListener("change", () => {
-  updateCheckoutInvoice();
-});
+document.getElementById("orderType")
+  ?.addEventListener("change", updateCheckoutInvoice);
 
 document.querySelectorAll(".payment-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     setTimeout(updateCheckoutInvoice, 0);
   });
 });
+
 
 </script>
 
@@ -11343,6 +11358,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
