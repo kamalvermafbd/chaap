@@ -6761,7 +6761,9 @@ async function openCheckout() {
 
   // 🔥 ADD THESE 2 LINES (MISSING THI)
 const inv = buildCheckoutPreviewInv();
+mountInvoiceIntoCheckout();
 renderInvoiceFromAPI(inv);
+
 }
 
 
@@ -11062,6 +11064,18 @@ function buildCheckoutPreviewInv() {
   const inv = buildCheckoutPreviewInv();
   renderInvoiceFromAPI(inv);
 }
+function mountInvoiceIntoCheckout() {
+  const src = document.getElementById("invoiceTemplate");
+  const target = document.getElementById("checkoutInvoiceContainer");
+
+  if (!src || !target) return;
+
+  target.innerHTML = "";
+  const clone = src.cloneNode(true);
+  clone.removeAttribute("id");
+
+  target.appendChild(clone);
+}
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -11294,6 +11308,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 </body>
 </html>
+
 
 
 
