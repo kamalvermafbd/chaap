@@ -11130,7 +11130,25 @@ netPayable: s.netPayable || 0,
       document.getElementById("paymentMethod")?.value || ""
   };
 }
-  
+  function syncCouponFromDrawerForCheckout() {
+  if (!window.cartSummary) return;
+  if (!window._drawerTotals) return;
+
+  // agar cartSummary me coupon missing hai
+  if (
+    (!window.cartSummary.couponAmount || window.cartSummary.couponAmount === 0) &&
+    window._drawerTotals.offerDiscount > 0
+  ) {
+    window.cartSummary = {
+      ...window.cartSummary,
+      couponAmount: window._drawerTotals.offerDiscount,
+      totalDiscount:
+        Number(window._drawerTotals.offerDiscount || 0) +
+        Number(window.cartSummary.signupDiscount || 0)
+    };
+  }
+}
+
 function injectCheckoutOfferDiscount(inv) {
   if (!inv || !inv.couponAmount || inv.couponAmount <= 0) return;
 
@@ -11158,6 +11176,7 @@ function injectCheckoutOfferDiscount(inv) {
 }
 
   function updateCheckoutInvoice() {
+     syncCouponFromDrawerForCheckout();
   const inv = buildCheckoutPreviewInv();
   renderInvoiceFromAPI(inv);
     injectCheckoutOfferDiscount(inv);
@@ -11427,6 +11446,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
