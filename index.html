@@ -11129,10 +11129,36 @@ netPayable: s.netPayable || 0,
       document.getElementById("paymentMethod")?.value || ""
   };
 }
+function injectCheckoutOfferDiscount(inv) {
+  if (!inv || !inv.couponAmount || inv.couponAmount <= 0) return;
+
+  const container = document.querySelector("#checkoutInvoiceContainer");
+  if (!container) return;
+
+  // already injected? → avoid duplicate
+  if (container.querySelector(".offer-discount-row")) return;
+
+  const row = document.createElement("div");
+  row.className = "offer-discount-row flex justify-between text-green-600 mt-2";
+
+  row.innerHTML = `
+    <span>Offer Discount</span>
+    <span>- ${fmt(inv.couponAmount)}</span>
+  `;
+
+  // 👉 INSERT BEFORE NET PAYABLE (safe spot)
+  const netPayableRow = container.querySelector(".net-payable-row");
+  if (netPayableRow) {
+    netPayableRow.before(row);
+  } else {
+    container.appendChild(row);
+  }
+}
 
   function updateCheckoutInvoice() {
   const inv = buildCheckoutPreviewInv();
   renderInvoiceFromAPI(inv);
+    injectCheckoutOfferDiscount(inv);
 }
   
 function mountInvoiceIntoCheckout() {
@@ -11399,6 +11425,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
