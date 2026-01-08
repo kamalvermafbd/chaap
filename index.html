@@ -3150,13 +3150,17 @@ cartItemsContainer.appendChild(card);
   if (taxSummaryEl) taxSummaryEl.innerHTML = taxHtml;
 // 🔒 expose FINAL coupon-adjusted cart FOR CHECKOUT INVOICE
 window.cartSummary = {
-  items: cart,                          // sanitized cart items
-  itemsSubtotal: baseTotal,             // coupon se pehle
-  couponDiscount: cart.couponAmount || 0,
+  items: cart,
+  itemsSubtotal: baseTotal,
+
+  // 🔥 SAME KEY AS INVOICE EXPECTS
+  couponAmount: cart.couponAmount || 0,
   signupDiscount: cart.signupDiscount || 0,
+
   serviceCharge: restaurantTax.servicePercent > 0
     ? parseFloat(((baseTotal * restaurantTax.servicePercent) / 100).toFixed(2))
     : 0,
+
   taxTotal: restaurantTax.taxType === "On Bill"
     ? parseFloat((
         ((baseTotal +
@@ -3166,9 +3170,9 @@ window.cartSummary = {
       ).toFixed(2))
     : 0,
 
-  // ✅ FINAL NET (SINGLE SOURCE OF TRUTH)
   netPayable: cart.netPayable || baseTotal
 };
+
 // 🔁 If checkout open, refresh invoice preview
 const checkoutModal = document.getElementById("checkoutModal");
 if (checkoutModal && checkoutModal.style.display === "flex") {
@@ -11098,7 +11102,7 @@ function buildCheckoutPreviewInv() {
     baseTotal: s.itemsSubtotal || 0,
     serviceCharges,
     taxTotal: s.taxTotal || 0,
-    couponAmount: s.couponDiscount || 0,
+    couponAmount: s.couponAmount || 0,
     signupDiscount: s.signupDiscount || 0,
     netPayable: s.netPayable || 0,
 
@@ -11376,6 +11380,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
