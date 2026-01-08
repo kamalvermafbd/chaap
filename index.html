@@ -1864,7 +1864,7 @@ body::before {
       <div id="orderTypeWrapper">
         <label class="block text-sm font-medium text-gray-700 mb-1">Order Type</label>
         <select id="orderType" required
-        onchange="toggleAddressField(); canProceedPlaceOrder()"
+        onchange="toggleAddressField(); canProceedPlaceOrder(); updateCheckoutInvoice()"
         class="w-full border border-gray-300 rounded-lg p-2.5 bg-white
                focus:outline-none focus:ring-2 focus:ring-orange-500">
 
@@ -2050,6 +2050,10 @@ body::before {
   <div class="w-5/12">
 
   RIGHT SIDE (invoice yahan aayega)
+
+<div id="checkoutInvoiceContainer"></div>
+
+    
 </div>
   </div>
 </div>
@@ -11033,6 +11037,32 @@ if (hasTax) {
     `Payment: ${inv.paymentMethod}`;
 }
 
+function buildCheckoutPreviewInv() {
+  const orderType = document.getElementById("orderType")?.value || "";
+
+  let serviceCharges = 0;
+  if (orderType === "Dine In") {
+    serviceCharges = cart.serviceCharge || 0;
+  } else if (orderType === "Home Delivery") {
+    serviceCharges = cart.deliveryCharge || 0;
+  }
+
+  return {
+    orderType,
+    items: cart.items || [],
+    baseTotal: cart.subtotal || 0,
+    serviceCharges: serviceCharges,
+    taxTotal: cart.taxTotal || 0,
+    couponAmount: cart.couponAmount || 0,
+    netPayable: cart.netPayable || 0,
+    paymentMethod: document.getElementById("paymentMethod")?.value || ""
+  };
+}
+
+  function updateCheckoutInvoice() {
+  const inv = buildCheckoutPreviewInv();
+  renderInvoiceFromAPI(inv);
+}
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -11203,6 +11233,7 @@ document.addEventListener("DOMContentLoaded", () => {
   class="fixed inset-0 bg-black bg-opacity-50 hidden z-[9999] flex items-center justify-center">
 
   <div class="bg-white w-[95%] max-w-xl rounded-xl p-4 text-sm relative">
+<div id="invoiceTemplate">
 
     <!-- CLOSE -->
     <button
@@ -11257,52 +11288,13 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
 
     <div class="mt-2 text-xs text-gray-600" id="invPayment"></div>
-
+</div>
   </div>
 </div>
   
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
