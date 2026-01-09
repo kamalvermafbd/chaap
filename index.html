@@ -3672,6 +3672,8 @@ console.log("toggleAddressField fired");
 if (!isLoggedIn() && !/^[0-9]{10}$/.test(mobile)) return;
 if (!orderType) return;
 
+const __row = document.getElementById("cityStateRow");
+console.log("BEFORE show:", __row && __row.style.display, __row && getComputedStyle(__row).display);
  
   // --- 2) Base references ---
   const nameField = document.getElementById("customerName");
@@ -3763,6 +3765,7 @@ console.log("overlay about to show");   //
 
     return; // STOP HERE — DO NOT TOUCH GUEST LOGIC
   }
+console.log("AFTER show:", cityStateRow.style.display, getComputedStyle(cityStateRow).display);
 
   // ==========================================================
   //                GUEST USER LOGIC (UNTOUCHED)
@@ -11633,6 +11636,7 @@ function hideAddressIfOrderTypeBlank() {
   
 </body>
 </html>
+
 
 
 
