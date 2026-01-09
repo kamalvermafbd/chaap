@@ -10887,15 +10887,23 @@ function renderInvoiceFromAPI(inv) {
     `Order ID: ${inv.orderId}`;
   
 // ✅ ORDER TYPE (safe)
-  const orderTypeBox = document.getElementById("invOrderType");
-  if (orderTypeBox) {
+const orderTypeBox = document.getElementById("invOrderType");
+
+if (orderTypeBox) {
+  if (inv.orderType && inv.orderType.trim() !== "") {
+    orderTypeBox.classList.remove("hidden");
     orderTypeBox.innerHTML = `
       <div class="grid grid-cols-[140px_auto] gap-1 mt-1">
         <span class="font-semibold">Order Type</span>
         <span>: ${inv.orderType}</span>
       </div>
     `;
+  } else {
+    orderTypeBox.classList.add("hidden");
+    orderTypeBox.innerHTML = "";
   }
+}
+
   const invMeta = document.getElementById("invInvoiceMeta");
 
 // valid invoice check
@@ -11602,39 +11610,6 @@ function hideAddressIfOrderTypeBlank() {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
