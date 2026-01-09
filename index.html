@@ -11264,8 +11264,17 @@ if (container.innerText.includes("Coupon")) return;
     deliveryBox.classList.add("hidden");
   }
 
+  // ✅ PAYMENT (checkout preview only)
+  const payBox = root.querySelector("#invPayment");
+  if (!inv.paymentMethod || inv.paymentMethod.trim() === "") {
+    payBox.classList.add("hidden");
+  } else {
+    payBox.classList.remove("hidden");
+  }
+
   injectCheckoutOfferDiscount(inv);
 }
+
 
 
   
@@ -11534,6 +11543,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
