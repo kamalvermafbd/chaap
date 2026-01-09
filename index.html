@@ -11203,11 +11203,17 @@ if (container.innerText.includes("Coupon")) return;
 }
 
   function updateCheckoutInvoice() {
-     syncCouponFromDrawerForCheckout();
+  syncCouponFromDrawerForCheckout();
+
+  // 🔥 FIRST mount invoice template (DOM ready)
+  mountInvoiceIntoCheckout();
+
+  // 🔥 THEN render data
   const inv = buildCheckoutPreviewInv();
   renderInvoiceFromAPI(inv);
-    injectCheckoutOfferDiscount(inv);
+  injectCheckoutOfferDiscount(inv);
 }
+
   
 function mountInvoiceIntoCheckout() {
   const src = document.getElementById("invoiceTemplate");
@@ -11473,6 +11479,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
