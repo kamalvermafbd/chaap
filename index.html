@@ -4016,7 +4016,8 @@ async function canProceedPlaceOrder() {
   try {
     const orderType = document.getElementById("orderType")?.value.trim();
 
-    const amount = Number(window._drawerTotals?.baseTotal || 0);
+  const amount = Number(window.cartSummary?.itemsSubtotal || 0);
+
 
     // 🔴 GUARD 1: Order Type mandatory
     if (!orderType) {
@@ -11543,6 +11544,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
