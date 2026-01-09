@@ -10883,8 +10883,18 @@ function renderInvoiceFromAPI(inv) {
   document.getElementById("invoiceHeader").innerText =
     `${inv.orderNumber} • ${orderDt}`;
 
-  document.getElementById("invOrderId").innerText =
-    `Order ID: ${inv.orderId}`;
+const orderIdBox = document.getElementById("invOrderId");
+
+if (orderIdBox) {
+  if (inv.orderId && inv.orderId !== "-" && String(inv.orderId).trim() !== "") {
+    orderIdBox.classList.remove("hidden");
+    orderIdBox.innerText = `Order ID: ${inv.orderId}`;
+  } else {
+    orderIdBox.classList.add("hidden");
+    orderIdBox.innerText = "";
+  }
+}
+
   
 // ✅ ORDER TYPE (safe)
 const orderTypeBox = document.getElementById("invOrderType");
@@ -11610,6 +11620,7 @@ function hideAddressIfOrderTypeBlank() {
   
 </body>
 </html>
+
 
 
 
