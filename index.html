@@ -11086,6 +11086,7 @@ function buildCheckoutPreviewInv() {
   const s = window.cartSummary || {};
 
   const orderType = document.getElementById("orderType")?.value || "";
+const eligibility = window.orderEligibility || {};
 
   // 🔁 service vs delivery switch (checkout decision)
   let serviceCharges = 0;
@@ -11094,6 +11095,13 @@ function buildCheckoutPreviewInv() {
   } else if (orderType === "Home Delivery") {
     serviceCharges = s.deliveryCharge || 0;
   }
+let deliveryCharge = 0;
+let deliveryChargeLabel = "";
+
+if (eligibility.allowed && eligibility.extraCharge > 0) {
+  deliveryCharge = Number(eligibility.extraCharge);
+  deliveryChargeLabel = eligibility.chargeType || "Delivery Charges";
+}
 
   return {
     // ===== HEADER =====
@@ -11101,6 +11109,8 @@ function buildCheckoutPreviewInv() {
     orderDate: new Date(),
     orderId: "-",
     orderType,
+deliveryCharge,
+deliveryChargeLabel,
 
     // ===== CUSTOMER =====
     customerName: document.getElementById("customerName")?.value || "",
@@ -11127,7 +11137,7 @@ paidCouponDiscount: s.paidCouponDiscount || 0,
 signupDiscount: s.signupDiscount || 0,
 
 // 🔒 FINAL PAYABLE (SINGLE SOURCE)
-netPayable: s.netPayable || 0,
+netPayable: (s.netPayable || 0) + deliveryCharge,
 
 
     // ===== PAYMENT =====
@@ -11452,6 +11462,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
