@@ -1165,6 +1165,25 @@ body::before {
 .used-coupon .coupon-meta {
   color: #dc2626;
 }
+/* Red pulse around Place Order when blocked */
+.payment-attention {
+  position: relative;
+}
+
+.payment-attention::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 14px;
+  border: 2px solid #ef4444;
+  animation: paymentPulse 1.2s infinite;
+}
+
+@keyframes paymentPulse {
+  0%   { opacity: 0.9; transform: scale(1); }
+  50%  { opacity: 0.4; transform: scale(1.05); }
+  100% { opacity: 0.9; transform: scale(1); }
+}
 
     
   </style>
@@ -4147,6 +4166,11 @@ if (!paymentMethod) {
     paymentError.innerText = "⚠️ Please select a payment method";
     paymentError.classList.remove("hidden");
   }
+
+  const btn = document.getElementById("placeOrderBtn");
+  btn.classList.add("payment-attention");
+  setTimeout(() => btn.classList.remove("payment-attention"), 4000);
+
   resetPlaceOrderBtn();
 
   return;
@@ -11620,6 +11644,7 @@ function hideAddressIfOrderTypeBlank() {
   
 </body>
 </html>
+
 
 
 
