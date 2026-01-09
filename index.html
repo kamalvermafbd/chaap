@@ -11020,8 +11020,6 @@ if (hasTax) {
 }
 // ===== DELIVERY / COURIER CHARGES =====
 const deliveryBox = document.getElementById("invDelivery");
-deliveryBox.classList.add("hidden");
-deliveryBox.innerHTML = "";
 
 if (inv.deliveryCharge > 0) {
   deliveryBox.classList.remove("hidden");
@@ -11032,9 +11030,6 @@ if (inv.deliveryCharge > 0) {
     </div>
   `;
 }
-
-
-
 
 // ===== COUPON / SIGNUP DISCOUNT BLOCK =====
 const c = document.getElementById("invCoupon");
@@ -11209,17 +11204,35 @@ if (container.innerText.includes("Coupon")) return;
   }
 }
 
-  function updateCheckoutInvoice() {
+ function updateCheckoutInvoice() {
   syncCouponFromDrawerForCheckout();
-
-  // 🔥 FIRST mount invoice template (DOM ready)
   mountInvoiceIntoCheckout();
 
-  // 🔥 THEN render data
   const inv = buildCheckoutPreviewInv();
   renderInvoiceFromAPI(inv);
+
+  // 🔒 SINGLE CONTROL POINT
+  const root = document.getElementById("checkoutInvoiceContainer");
+
+  // Service
+  const serviceBox = root.querySelector("#invService");
+  if (inv.serviceCharges > 0) {
+    serviceBox.classList.remove("hidden");
+  } else {
+    serviceBox.classList.add("hidden");
+  }
+
+  // Delivery
+  const deliveryBox = root.querySelector("#invDelivery");
+  if (inv.deliveryCharge > 0) {
+    deliveryBox.classList.remove("hidden");
+  } else {
+    deliveryBox.classList.add("hidden");
+  }
+
   injectCheckoutOfferDiscount(inv);
 }
+
 
   
 function mountInvoiceIntoCheckout() {
@@ -11487,6 +11500,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
