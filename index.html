@@ -10963,7 +10963,9 @@ if (addrBox) {
   // ===== CALCULATIONS (UNCHANGED) =====
   const itemsSubtotal = Number(inv.baseTotal || 0);
   const service = Number(inv.serviceCharges || 0);
-  const taxableAmount = itemsSubtotal + service;
+  const delivery = Number(inv.deliveryCharge || 0);
+const taxableAmount = itemsSubtotal + service + delivery;
+
   const coupon = Number(inv.couponAmount || 0);
   const signupDiscount = Number(inv.signupDiscount || 0);
 const effectiveDiscount = coupon > 0 ? coupon : signupDiscount;
@@ -11017,16 +11019,21 @@ if (hasTax) {
   taxBox.innerHTML = "";
 }
 // ===== DELIVERY / COURIER CHARGES =====
-document.querySelectorAll(".inv-delivery-row").forEach(e => e.remove());
+const deliveryBox = document.getElementById("invDelivery");
+deliveryBox.classList.add("hidden");
+deliveryBox.innerHTML = "";
 
 if (inv.deliveryCharge > 0) {
-  document.getElementById("invBase").insertAdjacentHTML("afterend", `
-    <div class="flex justify-between inv-delivery-row">
+  deliveryBox.classList.remove("hidden");
+  deliveryBox.innerHTML = `
+    <div class="flex justify-between">
       <span>${inv.deliveryChargeLabel || "Delivery Charges"}</span>
       <span>${fmt(inv.deliveryCharge)}</span>
     </div>
-  `);
+  `;
 }
+
+
 
 
 // ===== COUPON / SIGNUP DISCOUNT BLOCK =====
@@ -11457,6 +11464,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
     <div class="space-y-1 text-xs text-gray-700">
       <div id="invBase"></div>
       <div id="invService"></div>
+      <div id="invDelivery"></div>
       <div id="invTax"></div>
 
       <div id="invCoupon"
@@ -11479,6 +11487,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
