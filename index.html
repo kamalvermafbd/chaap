@@ -3723,8 +3723,8 @@ console.log("overlay about to show");   //
           // Address + 3 other fields visible
           addressWrapper.style.display = "block";
           pincodeWrapper.style.display = "block";
-          cityWrapper.style.display    = "block";
-          stateWrapper.style.display   = "block";
+          cityStateRow.style.display    = "grid";
+         
           changeBtn?.classList.remove("hidden");
 
           addressField.required = true;
@@ -3733,8 +3733,8 @@ console.log("overlay about to show");   //
           // Takeaway / Dine-In → hide address + pincode/city/state
           addressWrapper.style.display = "none";
           pincodeWrapper.style.display = "none";
-          cityWrapper.style.display    = "none";
-          stateWrapper.style.display   = "none";
+          cityStateRow.style.display    = "none";
+        
 
           changeBtn?.classList.add("hidden");
 
@@ -3783,8 +3783,8 @@ apiGet("getCustomerDetailsByMobile", { mobile })
 if (orderType === "Home Delivery") {
   addressWrapper.style.display = "block";
   pincodeWrapper.style.display = "block";
-  cityWrapper.style.display    = "block";
-  stateWrapper.style.display   = "block";
+  cityStateRow.style.display = "grid";
+
 
   addressField.required = true;
   addressField.readOnly = false;
@@ -3792,8 +3792,8 @@ if (orderType === "Home Delivery") {
 } else {
   addressWrapper.style.display = "none";
   pincodeWrapper.style.display = "none";
-  cityWrapper.style.display    = "none";
-  stateWrapper.style.display   = "none";
+  cityStateRow.style.display = "none";
+
 
   addressField.value = "";
   pincodeField.value = "";
@@ -3850,8 +3850,7 @@ console.log("🏠 Latest Home Delivery Address =", latestHD);
      if (orderType === "Home Delivery") {
   addressWrapper.style.display = "block";
   pincodeWrapper.style.display = "block";
-  cityWrapper.style.display    = "block";
-  stateWrapper.style.display   = "block";
+cityStateRow.style.display = "grid";
 
   addressField.required = true;
   addressField.readOnly = false;
@@ -3874,8 +3873,7 @@ stateField.classList.remove("cursor-not-allowed", "bg-gray-100");
 } else {
   addressWrapper.style.display = "none";
   pincodeWrapper.style.display = "none";
-  cityWrapper.style.display    = "none";
-  stateWrapper.style.display   = "none";
+  cityStateRow.style.display = "none";
 
   addressField.value = "";
   pincodeField.value = "";
@@ -11620,6 +11618,7 @@ function hideAddressIfOrderTypeBlank() {
   
 </body>
 </html>
+
 
 
 
