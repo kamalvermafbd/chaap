@@ -3632,8 +3632,9 @@ function onMobileChanged() {
 
     addressWrapper.style.display = "none";
     pincodeWrapper.style.display = "none";
-    cityWrapper.style.display    = "none";
-    stateWrapper.style.display   = "none";
+   const cityStateRow = document.getElementById("cityStateRow");
+if (cityStateRow) cityStateRow.style.display = "none";
+
 
     return;
   }
@@ -3729,7 +3730,8 @@ console.log("overlay about to show");   //
           addressWrapper.style.display = "block";
           pincodeWrapper.style.display = "block";
           cityStateRow.style.display    = "grid";
-         
+         cityStateRow.classList.remove("hidden");
+
           changeBtn?.classList.remove("hidden");
 
           addressField.required = true;
@@ -11623,6 +11625,7 @@ function hideAddressIfOrderTypeBlank() {
   
 </body>
 </html>
+
 
 
 
