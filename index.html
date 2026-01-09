@@ -11017,11 +11017,11 @@ if (hasTax) {
   taxBox.innerHTML = "";
 }
 // ===== DELIVERY / COURIER CHARGES =====
-  document.querySelectorAll(".inv-delivery-row").forEach(e => e.remove());
-if (inv.deliveryCharge > 0) {
-  taxBox.insertAdjacentHTML("afterend", `
-    <div class="flex justify-between inv-delivery-row">
+document.querySelectorAll(".inv-delivery-row").forEach(e => e.remove());
 
+if (inv.deliveryCharge > 0) {
+  document.getElementById("invBase").insertAdjacentHTML("afterend", `
+    <div class="flex justify-between inv-delivery-row">
       <span>${inv.deliveryChargeLabel || "Delivery Charges"}</span>
       <span>${fmt(inv.deliveryCharge)}</span>
     </div>
@@ -11473,6 +11473,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
