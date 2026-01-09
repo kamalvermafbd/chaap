@@ -4051,6 +4051,11 @@ console.log("🧪 BACKEND RESPONSE:", res);
       showError(res?.message || "Order is not allowed at this time");
       return false;
     }
+window.orderEligibility = {
+  allowed: true,
+  extraCharge: Number(res.extraCharge || 0),
+  chargeType: res.chargeType || ""
+};
 
     // ✅ PASSED ALL CHECKS
     showSuccess("✅ Eligible to place order");
@@ -11447,6 +11452,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
