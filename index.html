@@ -6784,7 +6784,7 @@ async function openCheckout() {
   autofillMobileForLoggedIn();
   resetCheckoutFieldsDefault();
   document.getElementById("orderType").value = "";
-
+hideAddressIfOrderTypeBlank();
   setupAddressUIVisibility();
   loadPrimaryAddress();
 
@@ -11326,6 +11326,31 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   });
 });
 
+function hideAddressIfOrderTypeBlank() {
+  const orderType = document.getElementById("orderType")?.value || "";
+
+  if (orderType !== "") return; // 🛑 only blank case
+
+  const fieldIds = ["address", "pincode", "city", "state"];
+  const wrapperIds = [
+    "addressWrapper",
+    "pincodeWrapper",
+    "cityWrapper",
+    "stateWrapper"
+  ];
+
+  // clear values
+  fieldIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+
+  // hide UI
+  wrapperIds.forEach(id => {
+    const box = document.getElementById(id);
+    if (box) box.style.display = "none";
+  });
+}
 
 </script>
 
@@ -11550,6 +11575,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
