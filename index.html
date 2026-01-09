@@ -1165,13 +1165,6 @@ body::before {
 .used-coupon .coupon-meta {
   color: #dc2626;
 }
-#checkoutModal,
-#checkoutModal .modal-content {
-  overflow: visible !important;
-}
-#checkoutForm {
-  overflow: visible !important;
-}
 
     
   </style>
@@ -1868,7 +1861,7 @@ body::before {
       <div id="orderTypeWrapper">
         <label class="block text-sm font-medium text-gray-700 mb-1">Order Type</label>
         <select id="orderType" required
-        onchange="toggleAddressField()"
+        onchange="toggleAddressField(); recheckEligibilityOnOrderTypeChange()"
         class="w-full border border-gray-300 rounded-lg p-2.5 bg-white
                focus:outline-none focus:ring-2 focus:ring-orange-500">
 
@@ -1929,26 +1922,22 @@ body::before {
                 bg-gray-100 cursor-not-allowed">
 </div>
 
-<div id="cityStateRow" class="grid grid-cols-2 gap-3 mt-3 w-full" style="display:none">
+<!-- CITY -->
+<div id="cityWrapper" style="display:none; margin-top:10px;">
+  <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+  <input id="city"
+         readonly
+         class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
+                bg-gray-100 cursor-not-allowed">
+</div>
 
-  <!-- CITY -->
-  <div id="cityWrapper">
-    <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
-    <input id="city"
-           readonly
-           class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
-                  bg-gray-100 cursor-not-allowed">
-  </div>
-
-  <!-- STATE -->
-  <div id="stateWrapper">
-    <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
-    <input id="state"
-           readonly
-           class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
-                  bg-gray-100 cursor-not-allowed">
-  </div>
-
+<!-- STATE -->
+<div id="stateWrapper" style="display:none; margin-top:10px;">
+  <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
+  <input id="state"
+         readonly
+         class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
+                bg-gray-100 cursor-not-allowed">
 </div>
 
 
@@ -3639,9 +3628,8 @@ function onMobileChanged() {
 
     addressWrapper.style.display = "none";
     pincodeWrapper.style.display = "none";
-   const cityStateRow = document.getElementById("cityStateRow");
-if (cityStateRow) cityStateRow.style.display = "none";
-
+    cityWrapper.style.display    = "none";
+    stateWrapper.style.display   = "none";
 
     return;
   }
@@ -3666,14 +3654,11 @@ function toggleAddressField() {
 console.log("toggleAddressField fired");
 
   const mobile = document.getElementById("mobile").value.trim();
-  const orderType = document.getElementById("orderType").value.trim();
+  const orderType = document.getElementById("orderType").value;
 
-
-if (!isLoggedIn() && !/^[0-9]{10}$/.test(mobile)) return;
+if (!/^[0-9]{10}$/.test(mobile)) return;
 if (!orderType) return;
 
-const __row = document.getElementById("cityStateRow");
-console.log("BEFORE show:", __row && __row.style.display, __row && getComputedStyle(__row).display);
  
   // --- 2) Base references ---
   const nameField = document.getElementById("customerName");
@@ -3694,7 +3679,6 @@ console.log("BEFORE show:", __row && __row.style.display, __row && getComputedSt
   const pincodeWrapper = document.getElementById("pincodeWrapper");
   const cityWrapper    = document.getElementById("cityWrapper");
   const stateWrapper   = document.getElementById("stateWrapper");
-const cityStateRow = document.getElementById("cityStateRow");
 
   if (!nameField || !emailField || !addressField) return;
 
@@ -3739,10 +3723,8 @@ console.log("overlay about to show");   //
           // Address + 3 other fields visible
           addressWrapper.style.display = "block";
           pincodeWrapper.style.display = "block";
-          cityStateRow.style.display    = "grid";
-         cityStateRow.classList.remove("hidden");
- cityStateRow.style.visibility = "visible";
-  cityStateRow.style.opacity    = "1";
+          cityWrapper.style.display    = "block";
+          stateWrapper.style.display   = "block";
           changeBtn?.classList.remove("hidden");
 
           addressField.required = true;
@@ -3751,8 +3733,8 @@ console.log("overlay about to show");   //
           // Takeaway / Dine-In → hide address + pincode/city/state
           addressWrapper.style.display = "none";
           pincodeWrapper.style.display = "none";
-          cityStateRow.style.display    = "none";
-        
+          cityWrapper.style.display    = "none";
+          stateWrapper.style.display   = "none";
 
           changeBtn?.classList.add("hidden");
 
@@ -3766,7 +3748,6 @@ console.log("overlay about to show");   //
 
     return; // STOP HERE — DO NOT TOUCH GUEST LOGIC
   }
-console.log("AFTER show:", cityStateRow.style.display, getComputedStyle(cityStateRow).display);
 
   // ==========================================================
   //                GUEST USER LOGIC (UNTOUCHED)
@@ -3802,8 +3783,8 @@ apiGet("getCustomerDetailsByMobile", { mobile })
 if (orderType === "Home Delivery") {
   addressWrapper.style.display = "block";
   pincodeWrapper.style.display = "block";
-  cityStateRow.style.display = "grid";
-
+  cityWrapper.style.display    = "block";
+  stateWrapper.style.display   = "block";
 
   addressField.required = true;
   addressField.readOnly = false;
@@ -3811,8 +3792,8 @@ if (orderType === "Home Delivery") {
 } else {
   addressWrapper.style.display = "none";
   pincodeWrapper.style.display = "none";
-  cityStateRow.style.display = "none";
-
+  cityWrapper.style.display    = "none";
+  stateWrapper.style.display   = "none";
 
   addressField.value = "";
   pincodeField.value = "";
@@ -3853,7 +3834,7 @@ let latestState = "";
 
         const type = String(row.orderType || "").trim().toLowerCase();
 
-if (type === "Home Delivery" && hd !== "") {
+if (type === "home delivery" && hd !== "") {
   latestHD    = hd;
   latestPin   = row.pincode || "";
   latestCity  = row.city || "";
@@ -3869,7 +3850,8 @@ console.log("🏠 Latest Home Delivery Address =", latestHD);
      if (orderType === "Home Delivery") {
   addressWrapper.style.display = "block";
   pincodeWrapper.style.display = "block";
-cityStateRow.style.display = "grid";
+  cityWrapper.style.display    = "block";
+  stateWrapper.style.display   = "block";
 
   addressField.required = true;
   addressField.readOnly = false;
@@ -3892,7 +3874,8 @@ stateField.classList.remove("cursor-not-allowed", "bg-gray-100");
 } else {
   addressWrapper.style.display = "none";
   pincodeWrapper.style.display = "none";
-  cityStateRow.style.display = "none";
+  cityWrapper.style.display    = "none";
+  stateWrapper.style.display   = "none";
 
   addressField.value = "";
   pincodeField.value = "";
@@ -11637,20 +11620,6 @@ function hideAddressIfOrderTypeBlank() {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
