@@ -1861,7 +1861,7 @@ body::before {
       <div id="orderTypeWrapper">
         <label class="block text-sm font-medium text-gray-700 mb-1">Order Type</label>
         <select id="orderType" required
-        onchange="toggleAddressField(); recheckEligibilityOnOrderTypeChange()"
+        onchange="toggleAddressField()"
         class="w-full border border-gray-300 rounded-lg p-2.5 bg-white
                focus:outline-none focus:ring-2 focus:ring-orange-500">
 
@@ -11625,6 +11625,7 @@ function hideAddressIfOrderTypeBlank() {
   
 </body>
 </html>
+
 
 
 
