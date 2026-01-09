@@ -5795,8 +5795,10 @@ async function loginUser() {
       }
 
       // 1️⃣ Save user identity
-      localStorage.setItem("userMobile", mobile);
-      localStorage.setItem("userEmail", res.email || "");
+    
+localStorage.setItem("userMobile", mobile);
+localStorage.setItem("userEmail", res.email || "");
+localStorage.setItem("userName", res.name || res.customerName || ""); // ✅ ADD
 
       // 2️⃣ Save SIGNUP DISCOUNT immediately (most important)
       const sd = Number(res.signupDiscount || 0);
@@ -11600,6 +11602,7 @@ function hideAddressIfOrderTypeBlank() {
   
 </body>
 </html>
+
 
 
 
