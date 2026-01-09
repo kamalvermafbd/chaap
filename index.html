@@ -3668,7 +3668,7 @@ console.log("toggleAddressField fired");
   const mobile = document.getElementById("mobile").value.trim();
   const orderType = document.getElementById("orderType").value;
 
-if (!/^[0-9]{10}$/.test(mobile)) return;
+if (!isLoggedIn() && !/^[0-9]{10}$/.test(mobile)) return;
 if (!orderType) return;
 
  
@@ -11632,6 +11632,7 @@ function hideAddressIfOrderTypeBlank() {
   
 </body>
 </html>
+
 
 
 
