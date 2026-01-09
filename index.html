@@ -4014,6 +4014,10 @@ async function canProceedPlaceOrder() {
   };
 
   try {
+    window.orderEligibility = { allowed: false, extraCharge: 0, chargeType: "" };
+  disablePlaceOrder();
+  if (paymentError) paymentError.classList.add("hidden");
+
     const orderType = document.getElementById("orderType")?.value.trim();
 
   const amount = Number(window.cartSummary?.itemsSubtotal || 0);
@@ -11544,6 +11548,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
