@@ -1922,25 +1922,28 @@ body::before {
                 bg-gray-100 cursor-not-allowed">
 </div>
 
-<div id="cityStateRow" style="display:none;" class="grid grid-cols-2 gap-3 mt-3">    
-<!-- CITY -->
-<div id="cityWrapper" style="display:none; margin-top:10px;">
-  <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
-  <input id="city"
-         readonly
-         class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
-                bg-gray-100 cursor-not-allowed">
+<div id="cityStateRow" class="grid grid-cols-2 gap-3 mt-3 hidden">    
+
+  <!-- CITY -->
+  <div id="cityWrapper">
+    <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+    <input id="city"
+           readonly
+           class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
+                  bg-gray-100 cursor-not-allowed">
+  </div>
+
+  <!-- STATE -->
+  <div id="stateWrapper">
+    <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
+    <input id="state"
+           readonly
+           class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
+                  bg-gray-100 cursor-not-allowed">
+  </div>
+
 </div>
 
-<!-- STATE -->
-<div id="stateWrapper" style="display:none; margin-top:10px;">
-  <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
-  <input id="state"
-         readonly
-         class="w-full border border-gray-300 rounded-lg p-2.5 text-gray-800
-                bg-gray-100 cursor-not-allowed">
-</div>
-</div>
 
 <!-- CHANGE ADDRESS BUTTON (shown only for logged-in users via JS) -->
 <div class="space-y-3">
@@ -11620,6 +11623,7 @@ function hideAddressIfOrderTypeBlank() {
   
 </body>
 </html>
+
 
 
 
