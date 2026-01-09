@@ -6380,22 +6380,50 @@ document.addEventListener("DOMContentLoaded", setupAddressUIVisibility);
   
 function autofillMobileForLoggedIn() {
   const mobileInput = document.getElementById("mobile");
+  const nameInput   = document.getElementById("customerName");
+  const emailInput  = document.getElementById("email");
 
   if (!mobileInput) return;
 
-  // Only logged-in users
+  // Logged-in data
   const mobile = localStorage.getItem("userMobile");
+  const name   = localStorage.getItem("userName");
+  const email  = localStorage.getItem("userEmail");
+
+  // ---------- GUEST ----------
   if (!mobile) {
-    // Guest → allow typing
-    mobileInput.value = "";
-    mobileInput.readOnly = false;
+    if (mobileInput) {
+      mobileInput.value = "";
+      mobileInput.readOnly = false;
+    }
+    if (nameInput) {
+      nameInput.value = "";
+      nameInput.readOnly = false;
+    }
+    if (emailInput) {
+      emailInput.value = "";
+      emailInput.readOnly = false;
+    }
     return;
   }
 
-  // Logged-in user → auto-fill and lock the field
-  mobileInput.value = mobile;
-  mobileInput.readOnly = true;
+  // ---------- LOGGED-IN ----------
+  if (mobileInput) {
+    mobileInput.value = mobile;
+    mobileInput.readOnly = true;
+  }
+
+  if (nameInput && name) {
+    nameInput.value = name;
+    nameInput.readOnly = true;
+  }
+
+  if (emailInput && email) {
+    emailInput.value = email;
+    emailInput.readOnly = true;
+  }
 }
+
 
   
 window.__NEW_ADDRESS_FLOW = false;
@@ -11575,6 +11603,7 @@ function hideAddressIfOrderTypeBlank() {
   
 </body>
 </html>
+
 
 
 
