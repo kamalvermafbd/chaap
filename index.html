@@ -1165,6 +1165,13 @@ body::before {
 .used-coupon .coupon-meta {
   color: #dc2626;
 }
+#checkoutModal,
+#checkoutModal .modal-content {
+  overflow: visible !important;
+}
+#checkoutForm {
+  overflow: visible !important;
+}
 
     
   </style>
@@ -1922,6 +1929,7 @@ body::before {
                 bg-gray-100 cursor-not-allowed">
 </div>
 
+<div id="cityStateRow" class="grid grid-cols-2 gap-3 mt-3 w-full" style="display:none">
 
   <!-- CITY -->
   <div id="cityWrapper">
@@ -1941,7 +1949,7 @@ body::before {
                   bg-gray-100 cursor-not-allowed">
   </div>
 
-
+</div>
 
 
 <!-- CHANGE ADDRESS BUTTON (shown only for logged-in users via JS) -->
@@ -11624,6 +11632,7 @@ function hideAddressIfOrderTypeBlank() {
   
 </body>
 </html>
+
 
 
 
