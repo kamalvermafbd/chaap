@@ -11244,6 +11244,7 @@ if (container.innerText.includes("Coupon")) return;
 }
 
  function updateCheckoutInvoice() {
+    toggleAddressField(); 
   syncCouponFromDrawerForCheckout();
   mountInvoiceIntoCheckout();
 
@@ -11548,6 +11549,7 @@ document.querySelectorAll(".payment-btn").forEach(btn => {
   
 </body>
 </html>
+
 
 
 
