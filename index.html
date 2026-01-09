@@ -6389,10 +6389,9 @@ function autofillMobileForLoggedIn() {
 
   // ---------- GUEST ----------
   if (!mobile) {
-    if (mobileInput) {
-      mobileInput.value = "";
-      mobileInput.readOnly = false;
-    }
+    mobileInput.value = "";
+    mobileInput.readOnly = false;
+
     if (nameInput) {
       nameInput.value = "";
       nameInput.readOnly = false;
@@ -6405,21 +6404,21 @@ function autofillMobileForLoggedIn() {
   }
 
   // ---------- LOGGED-IN ----------
-  if (mobileInput) {
-    mobileInput.value = mobile;
-    mobileInput.readOnly = true;
+  mobileInput.value = mobile;
+  mobileInput.readOnly = true;
+
+  // 🔥 IMPORTANT: even if name missing, keep field editable
+  if (nameInput) {
+    nameInput.value = name || "";
+    nameInput.readOnly = !!name;   // lock only if we actually have name
   }
 
-  if (nameInput && name) {
-    nameInput.value = name;
-    nameInput.readOnly = true;
-  }
-
-  if (emailInput && email) {
-    emailInput.value = email;
-    emailInput.readOnly = true;
+  if (emailInput) {
+    emailInput.value = email || "";
+    emailInput.readOnly = !!email; // lock only if we actually have email
   }
 }
+
 
 
   
@@ -11600,6 +11599,7 @@ function hideAddressIfOrderTypeBlank() {
   
 </body>
 </html>
+
 
 
 
