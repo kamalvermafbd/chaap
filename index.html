@@ -3772,13 +3772,55 @@ if (res.lat && res.lng) {
     mapFrame.src = `https://maps.google.com/maps?q=${res.lat},${res.lng}&z=16&output=embed`;
   }
 }
+// 🔥 If location already exists in user sheet, auto-validate it
+if (res.lat && res.lng) {
+  apiPost("checkDeliveryDistance", { mobile })
+    .then(dist => {
+      console.log("📍 AUTO DIST CHECK:", dist);
+
+      const row  = document.getElementById("locationStatusRow");
+      const txt  = document.getElementById("locationStatusText");
+      const icon = document.getElementById("locationStatusIcon");
+
+      if (!row || !txt || !icon) return;
+
+      if (dist.success && dist.allowed === true) {
+        // user is inside delivery radius
+        window._deliveryLocationReady = true;
+
+        row.classList.remove("border-red-400", "bg-red-50", "text-red-700");
+        row.classList.add("border-green-400", "bg-green-50", "text-green-700");
+        icon.innerText = "📍";
+        txt.innerText  = `Location verified (${dist.distanceKm} km)`;
+row.dataset.autoChecked = "1";
+
+      } else {
+        // location exists but outside radius
+        window._deliveryLocationReady = false;
+
+        row.classList.remove("border-green-400", "bg-green-50", "text-green-700");
+        row.classList.add("border-red-400", "bg-red-50", "text-red-700");
+        icon.innerText = "⚠️";
+        txt.innerText  = dist.error || 
+          `Outside delivery radius (${dist.distanceKm} km, limit ${dist.radiusKm} km)`;
+        row.dataset.autoChecked = "1";
+
+      }
+
+      updatePlaceOrderLockByLocation();
+    })
+    .catch(err => {
+      console.error("Distance auto check failed", err);
+    });
+}
 
 // Update UI
 const row  = document.getElementById("locationStatusRow");
 const txt  = document.getElementById("locationStatusText");
 const icon = document.getElementById("locationStatusIcon");
 
-if (row) {
+if (row && !row.dataset.autoChecked) {
+
   row.classList.remove("hidden");
 
   if (window._deliveryLocationReady) {
@@ -11845,6 +11887,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
