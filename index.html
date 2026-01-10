@@ -11656,13 +11656,23 @@ function updatePlaceOrderLockByLocation() {
 
   if (!btn) return;
 
-  if (orderType === "Home Delivery" && !window._deliveryLocationReady) {
-    btn.disabled = true;
-    btn.classList.add("opacity-50", "cursor-not-allowed");
-  } else {
+  // Only Home Delivery depends on GPS
+  if (orderType !== "Home Delivery") {
     btn.disabled = false;
     btn.classList.remove("opacity-50", "cursor-not-allowed");
+    return;
   }
+
+  // 🔒 If location NOT ready → lock
+  if (!window._deliveryLocationReady) {
+    btn.disabled = true;
+    btn.classList.add("opacity-50", "cursor-not-allowed");
+    return;
+  }
+
+  // ✅ Location ready → allow order
+  btn.disabled = false;
+  btn.classList.remove("opacity-50", "cursor-not-allowed");
 }
 
 </script>
@@ -11888,6 +11898,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
