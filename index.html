@@ -3762,6 +3762,16 @@ console.log("overlay about to show");   //
           // 🔑 Location readiness (lat/lng)
 window._deliveryLocationReady =
   !!(res.lat && res.lng);
+// 🗺️ If GPS already saved, show map preview also
+if (res.lat && res.lng) {
+  const mapBox = document.getElementById("mapPreviewBox");
+  const mapFrame = document.getElementById("mapPreviewFrame");
+
+  if (mapBox && mapFrame) {
+    mapBox.classList.remove("hidden");
+    mapFrame.src = `https://maps.google.com/maps?q=${res.lat},${res.lng}&z=16&output=embed`;
+  }
+}
 
 // Update UI
 const row  = document.getElementById("locationStatusRow");
@@ -11831,6 +11841,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
