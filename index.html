@@ -11587,7 +11587,7 @@ function captureDeliveryLocation() {
             mapFrame.src = `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
           }
 // 🔥 After saving GPS, immediately re-validate delivery radius
-apiPost("checkDeliveryDistance", { mobile })
+apiPost("checkOrderEligibility", { mobile })
   .then(dist => {
     console.log("📍 POST-SAVE DIST CHECK:", dist);
 
@@ -11907,6 +11907,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
