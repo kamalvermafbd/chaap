@@ -1851,9 +1851,11 @@ body::before {
   <!-- Mobile -->
 <div id="mobileWrapper" class="mb-3">
 
-  <div class="grid grid-cols-[90px_1fr] gap-x-4 items-center">
+  <div class="flex items-center gap-4">
 
-    <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
+    <label
+      class="w-24 text-sm font-medium text-gray-700 whitespace-nowrap"
+    >
       Mobile
     </label>
 
@@ -1866,7 +1868,7 @@ body::before {
       placeholder="Enter 10-digit Mobile"
       required
       oninput="checkCustomerByMobile()"
-       class="w-[70%] border border-gray-300 rounded-lg p-2.5 text-gray-800
+     class="flex-1 border border-gray-300 rounded-lg p-2.5 text-gray-800
              focus:outline-none focus:ring-2 focus:ring-orange-500"
     />
   </div>
@@ -11877,6 +11879,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
