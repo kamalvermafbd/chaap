@@ -4118,10 +4118,14 @@ async function canProceedPlaceOrder() {
     }
 
     // 🔴 GUARD 3: Backend eligibility (final authority)
-    const res = await apiPost("checkOrderEligibility", {
-      orderType,
-      orderAmount: amount
-    });
+    const mobile = document.getElementById("mobile")?.value.trim();
+
+const res = await apiPost("checkOrderEligibility", {
+  orderType,
+  orderAmount: amount,
+  mobile
+});
+
     console.log("🧠 FULL RES KEYS:", Object.keys(res));
 console.log("🧠 RES JSON:", JSON.stringify(res, null, 2));
 
@@ -11841,6 +11845,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
