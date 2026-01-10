@@ -4123,6 +4123,26 @@ console.log("🧾 FRONTEND → BACKEND PAYLOAD:", {
 console.log("🧪 BACKEND RESPONSE:", res);
 
     console.log("🧪 ELIGIBILITY CHECK:", res);
+// 📍 Location based delivery errors → show under location box
+if (
+  res?.reason === "OUT_OF_DELIVERY_RADIUS" ||
+  res?.reason === "LOCATION_NOT_SET"
+) {
+  const row = document.getElementById("locationStatusRow");
+  const txt = document.getElementById("locationStatusText");
+
+  if (row && txt) {
+    row.classList.remove("hidden");
+    row.classList.remove("border-green-400", "bg-green-50", "text-green-700");
+    row.classList.add("border-red-400", "bg-red-50", "text-red-700");
+
+    txt.innerText = res.message || "Delivery not available for this location";
+  }
+
+  // also show small message near payment
+  showError(res.message || "Delivery not available for this location");
+  return false;
+}
 
     if (!res || res.allowed !== true) {
       showError(res?.message || "Order is not allowed at this time");
@@ -11811,6 +11831,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
