@@ -3819,7 +3819,8 @@ const row  = document.getElementById("locationStatusRow");
 const txt  = document.getElementById("locationStatusText");
 const icon = document.getElementById("locationStatusIcon");
 
-if (row && !row.dataset.autoChecked) {
+if (row && row.dataset.autoChecked !== "1") {
+
 
   row.classList.remove("hidden");
 
@@ -11887,6 +11888,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
