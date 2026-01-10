@@ -1970,6 +1970,21 @@ body::before {
   <span id="locationStatusIcon">📍</span>
   <span id="locationStatusText">Set delivery location</span>
 </div>
+<!-- Mini Map Preview (hidden by default) -->
+<div id="mapPreviewBox" class="mt-3 hidden">
+  <div class="text-xs text-gray-500 mb-1">
+    Delivery location preview
+  </div>
+
+  <div class="w-full h-[200px] rounded-lg overflow-hidden border">
+    <iframe
+      id="mapPreviewFrame"
+      class="w-full h-full border-0"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+  </div>
+</div>
 
 
 <!-- CHANGE ADDRESS BUTTON (shown only for logged-in users via JS) -->
@@ -3775,18 +3790,6 @@ if (row) {
 
         // UI rules based on order type
         if (orderType === "Home Delivery") {
-const placeBtn = document.getElementById("placeOrderBtn");
-
-if (placeBtn) {
-  if (!window._deliveryLocationReady) {
-    placeBtn.disabled = true;
-    placeBtn.classList.add("opacity-50", "cursor-not-allowed");
-  } else {
-    placeBtn.disabled = false;
-    placeBtn.classList.remove("opacity-50", "cursor-not-allowed");
-  }
-}
-
           // Address + 3 other fields visible
           addressWrapper.style.display = "block";
           pincodeWrapper.style.display = "block";
@@ -3795,7 +3798,7 @@ if (placeBtn) {
           changeBtn?.classList.remove("hidden");
 
           addressField.required = true;
-
+          updatePlaceOrderLockByLocation();
         } else {
           // Takeaway / Dine-In → hide address + pincode/city/state
           addressWrapper.style.display = "none";
@@ -3806,6 +3809,7 @@ if (placeBtn) {
           changeBtn?.classList.add("hidden");
 
           addressField.required = false;
+          updatePlaceOrderLockByLocation();
         }
 
         overlay.style.display = "none";
@@ -3815,6 +3819,7 @@ if (placeBtn) {
 
     return; // STOP HERE — DO NOT TOUCH GUEST LOGIC
   }
+
 
   // ==========================================================
   //                GUEST USER LOGIC (UNTOUCHED)
@@ -3855,7 +3860,8 @@ if (orderType === "Home Delivery") {
 
   addressField.required = true;
   addressField.readOnly = false;
-  
+  updatePlaceOrderLockByLocation();
+
 } else {
   addressWrapper.style.display = "none";
   pincodeWrapper.style.display = "none";
@@ -3868,6 +3874,8 @@ if (orderType === "Home Delivery") {
   stateField.value   = "";
 
   addressField.required = false;
+  updatePlaceOrderLockByLocation();
+
 }
 
   return;
@@ -4200,6 +4208,12 @@ const userType = isUserLoggedIn() ? "logged" : "guest";
 // ✅ OPTION A: Address sirf Home Delivery me hi save hoga
 const finalAddress =
   orderType === "Home Delivery" ? address : "";
+// 🔒 BLOCK Home Delivery if GPS location not saved
+if (orderType === "Home Delivery" && !window._deliveryLocationReady) {
+  alert("📍 Please set your delivery location to continue.");
+  resetPlaceOrderBtn();
+  return;
+}
 
   if (!orderType) {
   alert("Please select Order Type");
@@ -11499,27 +11513,37 @@ function captureDeliveryLocation() {
         mobile,
         lat,
         lng
-      }).then(res => {
+      })
+      .then(res => {
         if (res && res.success) {
+
+          // 🔑 authoritative flag
           window._deliveryLocationReady = true;
 
+          // 🔑 SINGLE SOURCE OF TRUTH → controls Place Order button
+          updatePlaceOrderLockByLocation();
+
+          // 🗺️ Show mini map preview
+          const mapBox   = document.getElementById("mapPreviewBox");
+          const mapFrame = document.getElementById("mapPreviewFrame");
+
+          if (mapBox && mapFrame) {
+            mapBox.classList.remove("hidden");
+            mapFrame.src = `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
+          }
+
+          // 🟢 UI success state
           row.classList.remove("border-red-400", "bg-red-50", "text-red-700");
           row.classList.add("border-green-400", "bg-green-50", "text-green-700");
-
           icon.innerText = "📍";
           txt.innerText  = "Location saved";
 
-          // unlock place order
-          const btn = document.getElementById("placeOrderBtn");
-          if (btn) {
-            btn.classList.remove("opacity-50", "cursor-not-allowed");
-            btn.disabled = false;
-          }
         } else {
           icon.innerText = "⚠️";
           txt.innerText  = "Failed to save location";
         }
-      }).catch(() => {
+      })
+      .catch(() => {
         icon.innerText = "⚠️";
         txt.innerText  = "Server error while saving";
       });
@@ -11530,6 +11554,38 @@ function captureDeliveryLocation() {
     },
     { enableHighAccuracy: true, timeout: 15000 }
   );
+}
+
+function openLocationPicker() {
+  if (!navigator.geolocation) {
+    alert("GPS not supported on this device");
+    return;
+  }
+
+  const row  = document.getElementById("locationStatusRow");
+  const txt  = document.getElementById("locationStatusText");
+  const icon = document.getElementById("locationStatusIcon");
+
+  icon.innerText = "⏳";
+  txt.innerText  = "Updating location...";
+
+  // reuse existing logic
+  captureDeliveryLocation();
+}
+  
+function updatePlaceOrderLockByLocation() {
+  const btn = document.getElementById("placeOrderBtn");
+  const orderType = document.getElementById("orderType")?.value;
+
+  if (!btn) return;
+
+  if (orderType === "Home Delivery" && !window._deliveryLocationReady) {
+    btn.disabled = true;
+    btn.classList.add("opacity-50", "cursor-not-allowed");
+  } else {
+    btn.disabled = false;
+    btn.classList.remove("opacity-50", "cursor-not-allowed");
+  }
 }
 
 </script>
@@ -11755,6 +11811,7 @@ function captureDeliveryLocation() {
   
 </body>
 </html>
+
 
 
 
