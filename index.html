@@ -1851,25 +1851,27 @@ body::before {
   <!-- Mobile -->
 <div id="mobileWrapper" class="mb-3">
 
-  <div class="flex items-center gap-4">
+ <div class="flex items-center">
 
-       <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
-      Mobile
-    </label>
-
-    <input
-      id="mobile"
-      type="tel"
-      inputmode="numeric"
-      maxlength="10"
-      pattern="[0-9]{10}"
-      placeholder="Enter 10-digit Mobile"
-      required
-      oninput="checkCustomerByMobile()"
-     class="flex-1 min-w-0 border border-gray-300 rounded-lg p-2.5 text-gray-800
-             focus:outline-none focus:ring-2 focus:ring-orange-500"
-    />
+  <div class="w-24 pr-3 text-sm font-medium text-gray-700">
+    Mobile
   </div>
+
+  <input
+    id="mobile"
+    type="tel"
+    inputmode="numeric"
+    maxlength="10"
+    pattern="[0-9]{10}"
+    placeholder="Enter 10-digit Mobile"
+    required
+    oninput="checkCustomerByMobile()"
+    class="flex-1 border border-gray-300 rounded-lg p-2.5 text-gray-800
+           focus:outline-none focus:ring-2 focus:ring-orange-500"
+  />
+
+</div>
+
 
   <label
     id="mobileHint"
@@ -11877,6 +11879,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
