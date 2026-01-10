@@ -3814,28 +3814,6 @@ row.dataset.autoChecked = "1";
     });
 }
 
-// Update UI
-const row  = document.getElementById("locationStatusRow");
-const txt  = document.getElementById("locationStatusText");
-const icon = document.getElementById("locationStatusIcon");
-
-if (row && row.dataset.autoChecked !== "1") {
-
-
-  row.classList.remove("hidden");
-
-  if (window._deliveryLocationReady) {
-    row.classList.remove("border-red-400", "bg-red-50", "text-red-700");
-    row.classList.add("border-green-400", "bg-green-50", "text-green-700");
-    icon.innerText = "📍";
-    txt.innerText  = "Location saved";
-  } else {
-    row.classList.remove("border-green-400", "bg-green-50", "text-green-700");
-    row.classList.add("border-red-400", "bg-red-50", "text-red-700");
-    icon.innerText = "⚠️";
-    txt.innerText  = "Set delivery location";
-  }
-}
 
         }
       })
@@ -11898,6 +11876,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
