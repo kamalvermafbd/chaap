@@ -11176,27 +11176,23 @@ let igst = Number(inv.igstAmt || 0);
   let netPayable = Number(inv.netPayable || 0);
 
 // 🔐 If orderType not chosen, ignore service & delivery
+// 🔥 If orderType not chosen → calculate GST from sheet %
 if (!inv.orderType || inv.orderType === "Select Order Type") {
 
-  // ❌ no service / delivery when orderType not chosen
-  serviceAmt = 0;
-  deliveryAmt = 0;
+  const baseForGst = gstOnDiscounted ? afterDiscount : items;
 
-  // 🔥 GST base only on items or discounted items
-  gstBase = gstOnDiscounted ? afterDiscount : items;
-
-  // 🔥 Recalculate GST using sheet percentages (single source of truth)
   const cgstRate = Number(inv.cgstPercent || 0);
   const sgstRate = Number(inv.sgstPercent || 0);
   const igstRate = Number(inv.igstPercent || 0);
 
-  cgst = gstBase * cgstRate / 100;
-  sgst = gstBase * sgstRate / 100;
-  igst = gstBase * igstRate / 100;
+  cgst = baseForGst * cgstRate / 100;
+  sgst = baseForGst * sgstRate / 100;
+  igst = baseForGst * igstRate / 100;
 
-  // 🔥 Final payable
-  netPayable = gstBase + cgst + sgst + igst;
+  gstBase = baseForGst;
+  netPayable = baseForGst + cgst + sgst + igst;
 }
+
 
 
 
@@ -11268,9 +11264,9 @@ taxBox.innerHTML = `
 
 // Insert AFTER service + discount block
 const anchor =
-  deliveryAmt > 0 ? document.getElementById("invDelivery") :
-  serviceAmt > 0 ? document.getElementById("invService") :
-  discount > 0 ? document.getElementById("invCoupon") :
+  deliveryAmt > 0 ? deliveryBox :
+  serviceAmt > 0 ? serviceBox :
+  discount > 0 ? c :
   document.getElementById("invBase");
 
 
@@ -11990,6 +11986,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
