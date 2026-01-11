@@ -11146,10 +11146,20 @@ function renderInvoiceFromAPI(inv) {
   const signup = Number(inv.signupDiscount || 0);
   const discount = coupon > 0 ? coupon : signup;
 
-  const serviceAmt = Number(inv.serviceCharges || 0);
-  const cgst = Number(inv.cgstAmt || 0);
-  const sgst = Number(inv.sgstAmt || 0);
-  const igst = Number(inv.igstAmt || 0);
+  let serviceAmt = 0;
+let deliveryAmt = 0;
+
+// 🔐 order-type based charges
+if (inv.orderType === "Dine In") {
+  serviceAmt = Number(inv.serviceCharges || 0);
+} else if (inv.orderType === "Home Delivery" || inv.orderType === "Courier") {
+  deliveryAmt = Number(inv.deliveryCharge || 0);
+}
+
+const cgst = Number(inv.cgstAmt || 0);
+const sgst = Number(inv.sgstAmt || 0);
+const igst = Number(inv.igstAmt || 0);
+
 
   const gstOnDiscounted =
     String(inv.gstOnDiscountedAmount || "TRUE").toUpperCase() === "TRUE";
@@ -11157,16 +11167,23 @@ function renderInvoiceFromAPI(inv) {
   const afterDiscount = items - discount;
 
   let gstBase = gstOnDiscounted
-    ? (afterDiscount + serviceAmt)      // Case-A
-    : (items + serviceAmt);             // Case-B
+  ? (afterDiscount + serviceAmt + deliveryAmt)
+  : (items + serviceAmt + deliveryAmt);
+
 
   const taxTotal = cgst + sgst + igst;
   let netPayable = Number(inv.netPayable || 0);
 
 // 🔐 If orderType not chosen, ignore service & delivery
 if (!inv.orderType || inv.orderType === "Select Order Type") {
-  netPayable = (items - discount) + cgst + sgst + igst;
+  serviceAmt = 0;
+  deliveryAmt = 0;
+  gstBase = gstOnDiscounted
+    ? (afterDiscount)
+    : (items);
+  netPayable = afterDiscount + cgst + sgst + igst;
 }
+
 
 
   // ================= RENDER TOTALS =================
@@ -11194,7 +11211,21 @@ if (!inv.orderType || inv.orderType === "Select Order Type") {
     c.classList.add("hidden");
   }
 
-  const serviceBox = document.getElementById("invService");
+  const deliveryBox = document.getElementById("invDelivery");
+const serviceBox = document.getElementById("invService");
+  
+if (deliveryAmt > 0) {
+  deliveryBox.classList.remove("hidden");
+  deliveryBox.innerHTML = `
+    <div class="flex justify-between">
+      <span>${inv.deliveryChargeLabel || "Delivery Charges"}</span>
+      <span>${fmt(deliveryAmt)}</span>
+    </div>
+  `;
+} else {
+  deliveryBox.classList.add("hidden");
+}
+
   if (serviceAmt > 0) {
     serviceBox.classList.remove("hidden");
     serviceBox.innerHTML = `
@@ -11221,9 +11252,12 @@ taxBox.innerHTML = `
 `;
 
 // Insert AFTER service + discount block
-const anchor = serviceAmt > 0
-  ? document.getElementById("invService")
-  : (discount > 0 ? document.getElementById("invCoupon") : document.getElementById("invBase"));
+const anchor =
+  deliveryAmt > 0 ? document.getElementById("invDelivery") :
+  serviceAmt > 0 ? document.getElementById("invService") :
+  discount > 0 ? document.getElementById("invCoupon") :
+  document.getElementById("invBase");
+
 
 anchor.insertAdjacentElement("afterend", taxBox);
 
@@ -11249,7 +11283,8 @@ taxBox.insertAdjacentHTML("afterend", `
     items: (inv.items || []).map(i => ({ ...i })),
     itemsSubtotal: items,
     serviceCharge: serviceAmt,
-    deliveryCharge: Number(inv.deliveryCharge || 0),
+deliveryCharge: deliveryAmt,
+
     couponAmount: coupon,
     signupDiscount: signup,
     taxableAmount: gstBase,
@@ -11940,6 +11975,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
