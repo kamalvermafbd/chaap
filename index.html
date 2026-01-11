@@ -2294,6 +2294,7 @@ function fmtNoSymbol(amount, digits = 2) {
   return n.toFixed(digits);
 }
     // === AUTO LOAD RESTAURANT CURRENCY ===
+    window.taxRules = null;
 async function loadRestaurantSettings() {
   try {
     const res = await apiGet("getRestaurantInfo");
@@ -11144,17 +11145,10 @@ function renderInvoiceFromAPI(inv) {
   }
 
   /* ================= GST BASE ================= */
-  let gstBase = 0;
-
-  if (!orderType || orderType === "Select Order Type") {
-    // checkout open — no service / delivery
-    gstBase = gstOnDiscounted ? afterDiscount : items;
-  } else {
-    // order type selected — include charges
-    gstBase = gstOnDiscounted
-      ? (afterDiscount + serviceAmt + deliveryAmt)
-      : (items + serviceAmt + deliveryAmt);
-  }
+  /* ================= GST BASE (BACKEND AUTHORITATIVE) ================= */
+const gstBase = gstOnDiscounted
+  ? (afterDiscount + serviceAmt + deliveryAmt)
+  : (items + serviceAmt + deliveryAmt);
 
   /* ================= GST ================= */
   const cgst = gstBase * cgstRate / 100;
@@ -11261,14 +11255,13 @@ function renderInvoiceFromAPI(inv) {
   
 function buildCheckoutPreviewInv() {
 
-  // 🔒 SINGLE SOURCE OF TRUTH (drawer cart snapshot)
+  // 🔒 SINGLE SOURCE OF TRUTH (drawer cart snapshot for amounts only)
   const s = window.cartSummary || {};
   const d = window._drawerTotals || {};
 
   const orderType = document.getElementById("orderType")?.value || "";
   const eligibility = window.orderEligibility || {};
 
-  // 🔥 is orderType selected?
   const isOrderTypeChosen = orderType && orderType !== "Select Order Type";
 
   /* ======================
@@ -11285,7 +11278,6 @@ function buildCheckoutPreviewInv() {
       deliveryAmt = Number(d.deliveryCharge || 0);
     }
 
-    // backend extra delivery rule
     if (
       eligibility.allowed &&
       eligibility.extraCharge > 0 &&
@@ -11303,19 +11295,18 @@ function buildCheckoutPreviewInv() {
   const afterDiscount = Number(d.payableAfterDiscount || base);
 
   /* ======================
-     GST RATES (from drawer)
+     GST RULES (from getRestaurantInfo)
   ====================== */
-  const drawerTaxable = Number(d.taxableAmount || 0);
-  const cgstRate = drawerTaxable > 0 ? (Number(d.cgstAmt || 0) / drawerTaxable) : 0;
-  const sgstRate = drawerTaxable > 0 ? (Number(d.sgstAmt || 0) / drawerTaxable) : 0;
-  const igstRate = drawerTaxable > 0 ? (Number(d.igstAmt || 0) / drawerTaxable) : 0;
+  const cgstRate = Number(window.cgstPercent || 0) / 100;
+  const sgstRate = Number(window.sgstPercent || 0) / 100;
+  const igstRate = Number(window.igstPercent || 0) / 100;
+
+  const gstOnDiscounted = window.gstOnDiscountedAmount === true;
 
   /* ======================
      GST BASE
   ====================== */
-  const gstBase = isOrderTypeChosen
-    ? Number(d.taxableAmount || 0)   // drawer already includes service/delivery
-    : afterDiscount;                // clean base when orderType not chosen
+  const gstBase = gstOnDiscounted ? afterDiscount : base;
 
   /* ======================
      TAX AMOUNTS
@@ -11372,6 +11363,7 @@ function buildCheckoutPreviewInv() {
     paymentMethod: document.getElementById("paymentMethod")?.value || ""
   };
 }
+
 function syncCouponFromDrawerForCheckout() {
   if (!window.cartSummary) return;
   if (!window._drawerTotals) return;
@@ -11864,6 +11856,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
