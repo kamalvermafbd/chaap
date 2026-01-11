@@ -11056,7 +11056,7 @@ function renderInvoiceFromAPI(inv) {
   console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
 console.log("🧾 INVOICE READS", {
   orderType: inv.orderType,
-  serviceAmt: inv.serviceAmt,
+serviceAmt: inv.serviceAmt,
   serviceCharges: inv.serviceCharges,
   deliveryCharge: inv.deliveryCharge
 });
@@ -11478,12 +11478,13 @@ if (container.innerText.includes("Coupon")) return;
   const root = document.getElementById("checkoutInvoiceContainer");
 
   // Service
-  const serviceBox = root.querySelector("#invService");
-  if (inv.serviceCharges > 0) {
-    serviceBox.classList.remove("hidden");
-  } else {
-    serviceBox.classList.add("hidden");
-  }
+const serviceBox = root.querySelector("#invService");
+if (inv.serviceAmt > 0) {
+  serviceBox.classList.remove("hidden");
+} else {
+  serviceBox.classList.add("hidden");
+}
+
 
   // Delivery
   const deliveryBox = root.querySelector("#invDelivery");
@@ -11912,6 +11913,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
