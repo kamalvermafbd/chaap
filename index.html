@@ -11173,7 +11173,8 @@ const gstBase = gstOnDiscounted
   const taxTotal = cgst + sgst + igst;
 
   /* ================= NET ================= */
-  const netPayable = gstBase + taxTotal;
+  const netPayable =
+  (afterDiscount + serviceAmt + deliveryAmt) + taxTotal;
 
   /* ================= RENDER TOTALS ================= */
   document.getElementById("invBase").innerHTML = `
@@ -11334,7 +11335,9 @@ const gstBase = gstOnDiscounted
   /* ======================
      NET PAYABLE
   ====================== */
-  const netPayable = gstBase + taxTotal;
+  const netPayable =
+  (afterDiscount + serviceAmt + deliveryAmt) + taxTotal;
+
 
   /* ======================
      RETURN PAYLOAD
@@ -11877,6 +11880,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
