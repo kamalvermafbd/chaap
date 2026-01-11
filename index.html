@@ -11174,18 +11174,33 @@ if (addrBox) {
   const itemsSubtotal = Number(inv.baseTotal || 0);
   const service = Number(inv.serviceCharges || 0);
   const delivery = Number(inv.deliveryCharge || 0);
-const taxableAmount = itemsSubtotal + service + delivery;
-
   const coupon = Number(inv.couponAmount || 0);
   const signupDiscount = Number(inv.signupDiscount || 0);
 const effectiveDiscount = coupon > 0 ? coupon : signupDiscount;
-const afterCoupon = taxableAmount - effectiveDiscount;
+// Net items after discount
+const netItems = itemsSubtotal - effectiveDiscount;
 
- const taxTotal = Number(inv.taxTotal || 0);
-const hasTax = taxTotal > 0;
+// Service & delivery always on Net Items
+const gross = netItems + service + delivery;
 
-const cgst = hasTax ? taxTotal / 2 : 0;
-const sgst = hasTax ? taxTotal / 2 : 0;
+// GST toggle from Restaurant Info
+const gstOnDiscountedAmount = window._gstOnDiscountedAmount === true;
+
+// Taxable amount depends on restaurant rule
+const taxableAmount = gstOnDiscountedAmount
+  ? gross
+  : (itemsSubtotal + service + delivery);
+
+// After-coupon amount (used only for UI display)
+const afterCoupon = gross;
+
+const gstPercent = taxTotal && taxableAmount
+  ? (taxTotal * 100) / taxableAmount
+  : 0;
+
+const cgst = hasTax ? +(taxableAmount * gstPercent / 200).toFixed(2) : 0;
+const sgst = hasTax ? +(taxableAmount * gstPercent / 200).toFixed(2) : 0;
+
 
 
   // ===== BASE TOTALS =====
@@ -11929,6 +11944,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
