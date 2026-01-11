@@ -2309,8 +2309,8 @@ async function loadRestaurantSettings() {
       }
 
       // GST base rule
-      window.gstOnDiscountedAmount =
-        String(res.gstOnDiscountedAmount || "TRUE").toUpperCase() === "TRUE";
+     window.gstOnDiscountedAmount =
+  String(res.gstOnDiscountedAmount).toUpperCase() === "TRUE";
 
       // 🔥 CORRECT GST % FIELD NAMES
       window.cgstPercent = Number(res.cgstPercent || 0);
@@ -11877,6 +11877,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
