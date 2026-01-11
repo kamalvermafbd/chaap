@@ -11161,7 +11161,13 @@ function renderInvoiceFromAPI(inv) {
     : (items + serviceAmt);             // Case-B
 
   const taxTotal = cgst + sgst + igst;
-  const netPayable = Number(inv.netPayable || 0);
+  let netPayable = Number(inv.netPayable || 0);
+
+// 🔐 If orderType not chosen, ignore service & delivery
+if (!inv.orderType || inv.orderType === "Select Order Type") {
+  netPayable = (items - discount) + cgst + sgst + igst;
+}
+
 
   // ================= RENDER TOTALS =================
   document.getElementById("invBase").innerHTML = `
@@ -11934,6 +11940,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
