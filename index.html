@@ -11037,17 +11037,17 @@ function formatInvoiceDate(dt) {
   return `${dd}-${mm}-${yyyy}`;
 }
 
-function renderInvoiceFromAPI(inv) {
-console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
+  function renderInvoiceFromAPI(inv) {
+  console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
 
-  // ================= HEADER =================
+  /* ================= HEADER ================= */
   const orderDt = new Date(inv.orderDate).toLocaleString();
   document.getElementById("invoiceHeader").innerText =
     `${inv.orderNumber} • ${orderDt}`;
 
   const orderIdBox = document.getElementById("invOrderId");
   if (orderIdBox) {
-    if (inv.orderId && inv.orderId !== "-" && String(inv.orderId).trim() !== "") {
+    if (inv.orderId && String(inv.orderId).trim() !== "" && inv.orderId !== "-") {
       orderIdBox.classList.remove("hidden");
       orderIdBox.innerText = `Order ID: ${inv.orderId}`;
     } else {
@@ -11056,7 +11056,6 @@ console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
     }
   }
 
-  // ================= ORDER TYPE =================
   const orderTypeBox = document.getElementById("invOrderType");
   if (orderTypeBox && inv.orderType) {
     orderTypeBox.classList.remove("hidden");
@@ -11064,42 +11063,21 @@ console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
       <div class="grid grid-cols-[140px_auto] gap-1 mt-1">
         <span class="font-semibold">Order Type</span>
         <span>: ${inv.orderType}</span>
-      </div>
-    `;
+      </div>`;
   }
 
-  // ================= INVOICE META =================
-  const invMeta = document.getElementById("invInvoiceMeta");
-  if (inv.invno && inv.invdt) {
-    invMeta.classList.remove("hidden");
-    invMeta.innerHTML = `
-      <div class="grid grid-cols-[140px_auto] gap-1 mt-1">
-        <span class="font-semibold">Invoice No</span>
-        <span>: ${inv.invno}</span>
-      </div>
-      <div class="grid grid-cols-[140px_auto] gap-1">
-        <span class="font-semibold">Invoice Date</span>
-        <span>: ${formatInvoiceDate(inv.invdt)}</span>
-      </div>
-    `;
-  } else {
-    invMeta.classList.add("hidden");
-  }
-
-  // ================= CUSTOMER =================
+  /* ================= CUSTOMER ================= */
   document.getElementById("invCustomer").innerHTML = `
     <div class="grid grid-cols-[140px_auto] gap-1">
       <span class="font-semibold">Name</span>
       <span>: ${inv.customerName || ""}</span>
-    </div>
-  `;
+    </div>`;
 
   document.getElementById("invContact").innerHTML = `
     <div class="grid grid-cols-[140px_auto] gap-1">
       <span class="font-semibold">Mobile / Email</span>
       <span>: ${inv.mobile || ""} / ${inv.email || ""}</span>
-    </div>
-  `;
+    </div>`;
 
   const addrBox = document.getElementById("invAddress");
   if (inv.address) {
@@ -11108,13 +11086,12 @@ console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
       <div class="grid grid-cols-[140px_auto] gap-1">
         <span class="font-semibold">Address</span>
         <span>: ${inv.address}</span>
-      </div>
-    `;
+      </div>`;
   } else {
     addrBox.classList.add("hidden");
   }
 
-  // ================= ITEMS =================
+  /* ================= ITEMS ================= */
   document.getElementById("invoiceItems").innerHTML =
     (inv.items || []).map((i, idx) => {
       const qty = Number(i.qty || 0);
@@ -11129,82 +11106,68 @@ console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
             ${idx + 1}. ${i.name}
             <span class="text-xs text-gray-500">(${i.unit})</span>
           </div>
-          <div class="text-xs text-gray-600 mt-0.5">
+          <div class="text-xs text-gray-600">
             Qty ${qty} × ${fmt(rate)} = ${fmt(gross)}
           </div>
           ${discount > 0 ? `<div class="text-xs text-green-600">Item Discount: −${fmt(discount)}</div>` : ""}
-          <div class="flex justify-between text-sm font-medium mt-0.5">
+          <div class="flex justify-between text-sm font-medium">
             <span>Item Total</span>
             <span>${fmt(net)}</span>
           </div>
-        </div>
-      `;
+        </div>`;
     }).join("");
 
-  // ================= TOTALS (BACKEND SAFE) =================
+  /* ================= BASE TOTAL ================= */
   const items = Number(inv.baseTotal || 0);
   const coupon = Number(inv.couponAmount || 0);
   const signup = Number(inv.signupDiscount || 0);
   const discount = coupon > 0 ? coupon : signup;
-
-  let serviceAmt = 0;
-let deliveryAmt = 0;
-
-// 🔐 order-type based charges
-if (inv.orderType === "Dine In") {
-  serviceAmt = Number(inv.serviceCharges || 0);
-} else if (inv.orderType === "Home Delivery" || inv.orderType === "Courier") {
-  deliveryAmt = Number(inv.deliveryCharge || 0);
-}
-
-let cgst = Number(inv.cgstAmt || 0);
-let sgst = Number(inv.sgstAmt || 0);
-let igst = Number(inv.igstAmt || 0);
-
-
-
-  const gstOnDiscounted =
-    String(inv.gstOnDiscountedAmount || "TRUE").toUpperCase() === "TRUE";
-
   const afterDiscount = items - discount;
 
-  let gstBase = gstOnDiscounted
-  ? (afterDiscount + serviceAmt + deliveryAmt)
-  : (items + serviceAmt + deliveryAmt);
+  /* ================= CHARGES ================= */
+  let serviceAmt = 0;
+  let deliveryAmt = 0;
 
+  if (inv.orderType === "Dine In") {
+    serviceAmt = Number(inv.serviceCharges || 0);
+  } else if (inv.orderType === "Home Delivery" || inv.orderType === "Courier") {
+    deliveryAmt = Number(inv.deliveryCharge || 0);
+  }
 
-  const taxTotal = cgst + sgst + igst;
-  let netPayable = Number(inv.netPayable || 0);
-
-// 🔐 If orderType not chosen, ignore service & delivery
-// 🔥 If orderType not chosen → calculate GST from sheet %
-if (!inv.orderType || inv.orderType === "Select Order Type") {
-
-  const baseForGst = gstOnDiscounted ? afterDiscount : items;
-
+  /* ================= GST CONFIG ================= */
   const cgstRate = Number(inv.cgstPercent || 0);
   const sgstRate = Number(inv.sgstPercent || 0);
   const igstRate = Number(inv.igstPercent || 0);
+  const gstOnDiscounted =
+    String(inv.gstOnDiscountedAmount || "TRUE").toUpperCase() === "TRUE";
 
-  cgst = baseForGst * cgstRate / 100;
-  sgst = baseForGst * sgstRate / 100;
-  igst = baseForGst * igstRate / 100;
+  /* ================= GST BASE ================= */
+  let gstBase = 0;
 
-  gstBase = baseForGst;
-  netPayable = baseForGst + cgst + sgst + igst;
-}
+  if (!inv.orderType || inv.orderType === "Select Order Type") {
+    gstBase = gstOnDiscounted ? afterDiscount : items;
+    serviceAmt = 0;
+    deliveryAmt = 0;
+  } else {
+    gstBase = gstOnDiscounted
+      ? afterDiscount + serviceAmt + deliveryAmt
+      : items + serviceAmt + deliveryAmt;
+  }
 
+  /* ================= GST CALC ================= */
+  const cgst = gstBase * cgstRate / 100;
+  const sgst = gstBase * sgstRate / 100;
+  const igst = gstBase * igstRate / 100;
+  const taxTotal = cgst + sgst + igst;
 
+  const netPayable = gstBase + taxTotal;
 
-
-
-  // ================= RENDER TOTALS =================
+  /* ================= RENDER TOTALS ================= */
   document.getElementById("invBase").innerHTML = `
     <div class="flex justify-between font-semibold">
       <span>Items Subtotal</span>
       <span>${fmt(items)}</span>
-    </div>
-  `;
+    </div>`;
 
   const c = document.getElementById("invCoupon");
   if (discount > 0) {
@@ -11217,26 +11180,22 @@ if (!inv.orderType || inv.orderType === "Select Order Type") {
       <div class="flex justify-between font-semibold">
         <span>After Discount</span>
         <span>${fmt(afterDiscount)}</span>
-      </div>
-    `;
+      </div>`;
   } else {
     c.classList.add("hidden");
   }
 
   const deliveryBox = document.getElementById("invDelivery");
-const serviceBox = document.getElementById("invService");
-  
-if (deliveryAmt > 0) {
-  deliveryBox.classList.remove("hidden");
-  deliveryBox.innerHTML = `
-    <div class="flex justify-between">
-      <span>${inv.deliveryChargeLabel || "Delivery Charges"}</span>
-      <span>${fmt(deliveryAmt)}</span>
-    </div>
-  `;
-} else {
-  deliveryBox.classList.add("hidden");
-}
+  const serviceBox = document.getElementById("invService");
+
+  if (deliveryAmt > 0) {
+    deliveryBox.classList.remove("hidden");
+    deliveryBox.innerHTML = `
+      <div class="flex justify-between">
+        <span>${inv.deliveryChargeLabel || "Delivery Charges"}</span>
+        <span>${fmt(deliveryAmt)}</span>
+      </div>`;
+  } else deliveryBox.classList.add("hidden");
 
   if (serviceAmt > 0) {
     serviceBox.classList.remove("hidden");
@@ -11244,165 +11203,59 @@ if (deliveryAmt > 0) {
       <div class="flex justify-between">
         <span>Service Charges</span>
         <span>${fmt(serviceAmt)}</span>
-      </div>
-    `;
-  } else {
-    serviceBox.classList.add("hidden");
-  }
+      </div>`;
+  } else serviceBox.classList.add("hidden");
 
   const taxBox = document.getElementById("invTax");
+  document.querySelectorAll(".inv-tax-row").forEach(e => e.remove());
 
-// Clear old
-document.querySelectorAll(".inv-tax-row").forEach(e => e.remove());
+  taxBox.innerHTML = `
+    <div class="flex justify-between font-semibold inv-tax-row">
+      <span>Taxable Amount</span>
+      <span>${fmt(gstBase)}</span>
+    </div>`;
 
-// Build taxable row
-taxBox.innerHTML = `
-  <div class="flex justify-between font-semibold inv-tax-row">
-    <span>Taxable Amount</span>
-    <span>${fmt(gstBase)}</span>
-  </div>
-`;
+  const anchor =
+    deliveryAmt > 0 ? deliveryBox :
+    serviceAmt > 0 ? serviceBox :
+    discount > 0 ? c :
+    document.getElementById("invBase");
 
-// Insert AFTER service + discount block
-const anchor =
-  deliveryAmt > 0 ? deliveryBox :
-  serviceAmt > 0 ? serviceBox :
-  discount > 0 ? c :
-  document.getElementById("invBase");
+  anchor.insertAdjacentElement("afterend", taxBox);
 
-
-anchor.insertAdjacentElement("afterend", taxBox);
-
-// Insert GST after taxable
-taxBox.insertAdjacentHTML("afterend", `
-  <div class="flex justify-between inv-tax-row">
-    <span>CGST</span>
-    <span>${fmt(cgst)}</span>
-  </div>
-  <div class="flex justify-between inv-tax-row">
-    <span>SGST</span>
-    <span>${fmt(sgst)}</span>
-  </div>
-`);
+  taxBox.insertAdjacentHTML("afterend", `
+    <div class="flex justify-between inv-tax-row">
+      <span>CGST</span>
+      <span>${fmt(cgst)}</span>
+    </div>
+    <div class="flex justify-between inv-tax-row">
+      <span>SGST</span>
+      <span>${fmt(sgst)}</span>
+    </div>`);
 
   document.getElementById("invNet").innerText = fmt(netPayable);
-
   document.getElementById("invPayment").innerText =
     `Payment: ${inv.paymentMethod || ""}`;
 
-  // ================= SNAPSHOT =================
+  /* ================= SNAPSHOT ================= */
   window._checkoutInvoice = {
     items: (inv.items || []).map(i => ({ ...i })),
     itemsSubtotal: items,
     serviceCharge: serviceAmt,
-deliveryCharge: deliveryAmt,
-
+    deliveryCharge: deliveryAmt,
     couponAmount: coupon,
     signupDiscount: signup,
     taxableAmount: gstBase,
-    cgst: cgst,
-    sgst: sgst,
-    igst: igst,
-    taxTotal: taxTotal,
-    netPayable: netPayable,
+    cgst, sgst, igst,
+    taxTotal,
+    netPayable,
     couponId: inv.couponId || "",
     paymentMethod: inv.paymentMethod || ""
   };
 
   console.log("🔐 CHECKOUT SNAPSHOT LOCKED:", window._checkoutInvoice);
 }
-  
-function buildCheckoutPreviewInv() {
 
-  // 🔒 SINGLE SOURCE OF TRUTH (drawer cart snapshot)
-  const s = window.cartSummary || {};
-
-  const orderType = document.getElementById("orderType")?.value || "";
-const eligibility = window.orderEligibility || {};
-
-  // 🔁 service vs delivery switch (checkout decision)
-  let serviceCharges = 0;
-  if (orderType === "Dine In") {
-    serviceCharges = s.serviceCharge || 0;
-  } else if (orderType === "Home Delivery") {
-    serviceCharges = s.deliveryCharge || 0;
-  }
-let deliveryCharge = 0;
-let deliveryChargeLabel = "";
-
-if (
-  eligibility.allowed &&
-  eligibility.extraCharge > 0 &&
-  (orderType === "Home Delivery" || orderType === "Courier")
-) {
-  deliveryCharge = Number(eligibility.extraCharge);
-  deliveryChargeLabel = eligibility.chargeType || "Delivery Charges";
-} else {
-  deliveryCharge = 0;
-  deliveryChargeLabel = "";
-}
-// ===== CHECKOUT PREVIEW CALCULATION (FROM DRAWER) =====
-const d = window._drawerTotals || {};
-
-const base = Number(d.baseTotal || 0);
-const serviceAmt = Number(d.serviceAmt || 0);
-const taxableAmount = Number(d.taxableAmount || 0);
-const cgst = Number(d.cgstAmt || 0);
-const sgst = Number(d.sgstAmt || 0);
-const igst = Number(d.igstAmt || 0);
-const taxTotal = cgst + sgst + igst;
-const netPayable = Number(d.grandTotal || 0);
-
-
-return {
-  // ===== HEADER =====
-  orderNumber: "PREVIEW",
-  orderDate: new Date(),
-  orderId: "-",
-  orderType,
-  deliveryCharge,
-  deliveryChargeLabel,
-
-  // ===== CUSTOMER =====
-  customerName: document.getElementById("customerName")?.value || "",
-  mobile: document.getElementById("mobile")?.value || "",
-  email: document.getElementById("email")?.value || "",
-  address: document.getElementById("address")?.value || "",
-
-  // ===== ITEMS (AS-IS FROM DRAWER CART) =====
-  items: s.items || [],
-
-  // ===== TOTALS =====
-  baseTotal: base,
-
-  // 🔥 backend expects this exact key
- serviceAmt: serviceAmt,
-
-  // 🔥 GST base (coupon rule already applied above)
- taxableAmount: taxableAmount,
-
-  // 🔥 split GST (sheet driven)
-  cgstAmt: cgst,
-  sgstAmt: sgst,
-  igstAmt: igst,
-
-  // 🔥 ALL COUPONS (FINAL & FUTURE SAFE)
-  couponAmount: Number(s.couponAmount || 0),
-  normalCoupon: s.couponAmount || 0,
-  rewardDiscount: s.rewardDiscount || 0,
-  paidCouponDiscount: s.paidCouponDiscount || 0,
-  signupDiscount: s.signupDiscount || 0,
-
-  // 🔥 totals
-  taxTotal: taxTotal,
-   netPayable: netPayable,
-
-  // ===== PAYMENT =====
-  paymentMethod: document.getElementById("paymentMethod")?.value || ""
-};
-
-}
- 
   
 function buildCheckoutPreviewInv() {
 
@@ -11987,6 +11840,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
