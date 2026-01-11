@@ -11317,28 +11317,30 @@ if (hasTax) {
   document.getElementById("invPayment").innerText =
     `Payment: ${inv.paymentMethod}`;
     // 🔒 LOCK CHECKOUT INVOICE SNAPSHOT (single source of truth)
+
   window._checkoutInvoice = {
-    items: (inv.items || []).map(i => ({ ...i })),
+  items: (inv.items || []).map(i => ({ ...i })),
 
-    itemsSubtotal: Number(inv.baseTotal || 0),
-    serviceCharge: Number(inv.serviceCharges || 0),
-    deliveryCharge: Number(inv.deliveryCharge || 0),
+  itemsSubtotal: Number(inv.baseTotal || 0),
+  serviceCharge: Number(inv.serviceCharges || 0),
+  deliveryCharge: Number(inv.deliveryCharge || 0),
 
-    taxableAmount: taxBase,
+  taxableAmount: taxBase,
 
-    couponAmount: Number(inv.couponAmount || 0),
-    signupDiscount: Number(inv.signupDiscount || 0),
+  couponAmount: Number(inv.couponAmount || 0),
+  signupDiscount: Number(inv.signupDiscount || 0),
 
-   taxTotal: taxTotal,
-cgst: cgst,
-sgst: sgst,
-    igst: 0,
+  taxTotal: taxTotal,
+  cgst: cgst,
+  sgst: sgst,
+  igst: 0,
 
-    netPayable: Number(inv.netPayable || 0),
+  netPayable: netPayable,
 
-    couponId: inv.couponId || "",
-    paymentMethod: inv.paymentMethod || ""
-  };
+  couponId: inv.couponId || "",
+  paymentMethod: inv.paymentMethod || ""
+};
+
 
   console.log("🔐 CHECKOUT SNAPSHOT LOCKED:", window._checkoutInvoice);
 
@@ -11940,6 +11942,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
