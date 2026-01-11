@@ -11350,6 +11350,98 @@ return {
 
 }
  
+  
+function buildCheckoutPreviewInv() {
+
+  // 🔒 SINGLE SOURCE OF TRUTH (drawer cart snapshot)
+  const s = window.cartSummary || {};
+
+  const orderType = document.getElementById("orderType")?.value || "";
+const eligibility = window.orderEligibility || {};
+
+  // 🔁 service vs delivery switch (checkout decision)
+  let serviceCharges = 0;
+  if (orderType === "Dine In") {
+    serviceCharges = s.serviceCharge || 0;
+  } else if (orderType === "Home Delivery") {
+    serviceCharges = s.deliveryCharge || 0;
+  }
+let deliveryCharge = 0;
+let deliveryChargeLabel = "";
+
+if (
+  eligibility.allowed &&
+  eligibility.extraCharge > 0 &&
+  (orderType === "Home Delivery" || orderType === "Courier")
+) {
+  deliveryCharge = Number(eligibility.extraCharge);
+  deliveryChargeLabel = eligibility.chargeType || "Delivery Charges";
+} else {
+  deliveryCharge = 0;
+  deliveryChargeLabel = "";
+}
+// ===== CHECKOUT PREVIEW CALCULATION (FROM DRAWER) =====
+const d = window._drawerTotals || {};
+
+const base = Number(d.baseTotal || 0);
+const serviceAmt = Number(d.serviceAmt || 0);
+const taxableAmount = Number(d.taxableAmount || 0);
+const cgst = Number(d.cgstAmt || 0);
+const sgst = Number(d.sgstAmt || 0);
+const igst = Number(d.igstAmt || 0);
+const taxTotal = cgst + sgst + igst;
+const netPayable = Number(d.grandTotal || 0);
+
+
+return {
+  // ===== HEADER =====
+  orderNumber: "PREVIEW",
+  orderDate: new Date(),
+  orderId: "-",
+  orderType,
+  deliveryCharge,
+  deliveryChargeLabel,
+
+  // ===== CUSTOMER =====
+  customerName: document.getElementById("customerName")?.value || "",
+  mobile: document.getElementById("mobile")?.value || "",
+  email: document.getElementById("email")?.value || "",
+  address: document.getElementById("address")?.value || "",
+
+  // ===== ITEMS (AS-IS FROM DRAWER CART) =====
+  items: s.items || [],
+
+  // ===== TOTALS =====
+  baseTotal: base,
+
+  // 🔥 backend expects this exact key
+ serviceAmt: serviceAmt,
+
+  // 🔥 GST base (coupon rule already applied above)
+ taxableAmount: taxableAmount,
+
+  // 🔥 split GST (sheet driven)
+  cgstAmt: cgst,
+  sgstAmt: sgst,
+  igstAmt: igst,
+
+  // 🔥 ALL COUPONS (FINAL & FUTURE SAFE)
+  couponAmount: Number(s.couponAmount || 0),
+  normalCoupon: s.couponAmount || 0,
+  rewardDiscount: s.rewardDiscount || 0,
+  paidCouponDiscount: s.paidCouponDiscount || 0,
+  signupDiscount: s.signupDiscount || 0,
+
+  // 🔥 totals
+  taxTotal: taxTotal,
+   netPayable: netPayable,
+
+  // ===== PAYMENT =====
+  paymentMethod: document.getElementById("paymentMethod")?.value || ""
+};
+
+}
+ 
 function syncCouponFromDrawerForCheckout() {
   if (!window.cartSummary) return;
   if (!window._drawerTotals) return;
@@ -11842,6 +11934,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
