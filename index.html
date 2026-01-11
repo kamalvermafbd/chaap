@@ -11267,8 +11267,7 @@ const gstBase = gstOnDiscounted
 }
 
 
-  
-function buildCheckoutPreviewInv() {
+  function buildCheckoutPreviewInv() {
 
   // 🔒 SINGLE SOURCE OF TRUTH (drawer cart snapshot for amounts only)
   const s = window.cartSummary || {};
@@ -11366,6 +11365,12 @@ function buildCheckoutPreviewInv() {
     igstAmt: igst,
     taxTotal: taxTotal,
     netPayable: netPayable,
+
+    // 🔥 ADD THESE — so invoice renderer gets GST rules
+    cgstPercent: window.cgstPercent,
+    sgstPercent: window.sgstPercent,
+    igstPercent: window.igstPercent,
+    gstOnDiscountedAmount: window.gstOnDiscountedAmount,
 
     // ===== COUPONS =====
     couponAmount: Number(s.couponAmount || 0),
@@ -11871,6 +11876,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
