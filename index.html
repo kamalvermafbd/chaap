@@ -11177,6 +11177,8 @@ if (addrBox) {
   const coupon = Number(inv.couponAmount || 0);
   const signupDiscount = Number(inv.signupDiscount || 0);
 const effectiveDiscount = coupon > 0 ? coupon : signupDiscount;
+  const taxTotal = Number(inv.taxTotal || 0);
+
 // Net items after discount
 const netItems = itemsSubtotal - effectiveDiscount;
 
@@ -11944,6 +11946,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
