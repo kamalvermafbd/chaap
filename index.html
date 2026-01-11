@@ -11384,43 +11384,18 @@ if (
   deliveryCharge = 0;
   deliveryChargeLabel = "";
 }
-// ===== CHECKOUT PREVIEW CALCULATION (FRESH) =====
+// ===== CHECKOUT PREVIEW CALCULATION (FROM DRAWER) =====
+const d = window._drawerTotals || {};
 
-// base
-const base = Number(s.itemsSubtotal || 0);
+const base = Number(d.baseTotal || 0);
+const serviceAmt = Number(d.serviceAmt || 0);
+const taxableAmount = Number(d.taxableAmount || 0);
+const cgst = Number(d.cgstAmt || 0);
+const sgst = Number(d.sgstAmt || 0);
+const igst = Number(d.igstAmt || 0);
+const taxTotal = cgst + sgst + igst;
+const netPayable = Number(d.grandTotal || 0);
 
-// discounts
-const discount =
-  Number(s.couponAmount || 0) +
-  Number(s.signupDiscount || 0);
-
-// gross before coupon
-const gross =
-  base +
-  Number(serviceCharges || 0) +
-  Number(deliveryCharge || 0);
-
-// 🔥 restaurant rule from backend
-const gstOnDiscountedAmount = window.restaurantTax?.gstOnDiscountedAmount === true;
-
-// tax base
-const taxBase = gstOnDiscountedAmount
-  ? (gross - discount)
-  : gross;
-
-// tax
-const cgstPercent = Number(window.restaurantTax?.cgstPercent || 0);
-const sgstPercent = Number(window.restaurantTax?.sgstPercent || 0);
-const igstPercent = Number(window.restaurantTax?.igstPercent || 0);
-
-const cgst = +(taxBase * cgstPercent / 100).toFixed(2);
-const sgst = +(taxBase * sgstPercent / 100).toFixed(2);
-const igst = +(taxBase * igstPercent / 100).toFixed(2);
-
-const taxTotal = +(cgst + sgst + igst).toFixed(2);
-
-// final payable
-const netPayable = +((gross - discount) + taxTotal).toFixed(2);
 
 return {
   // ===== HEADER =====
@@ -11444,10 +11419,10 @@ return {
   baseTotal: base,
 
   // 🔥 backend expects this exact key
-  serviceAmt: Number(serviceCharges || 0),
+ serviceAmt: serviceAmt,
 
   // 🔥 GST base (coupon rule already applied above)
-  taxableAmount: taxBase,
+ taxableAmount: taxableAmount,
 
   // 🔥 split GST (sheet driven)
   cgstAmt: cgst,
@@ -11964,6 +11939,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
