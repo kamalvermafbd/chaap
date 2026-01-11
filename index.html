@@ -11038,6 +11038,7 @@ function formatInvoiceDate(dt) {
 }
 
 function renderInvoiceFromAPI(inv) {
+console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
 
   // ================= HEADER =================
   const orderDt = new Date(inv.orderDate).toLocaleString();
@@ -11986,6 +11987,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
