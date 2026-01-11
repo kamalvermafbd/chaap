@@ -2313,18 +2313,17 @@ async function loadRestaurantSettings() {
       window.sgstPercent = Number(res.sgstPercent || 0);
       window.igstPercent = Number(res.igstPercent || 0);
 
-      // 🔥 THIS WAS MISSING
+      // 🔥 ADD THIS LINE
       window.servicePercent = Number(res.servicePercent || 0);
 
       console.log("🔥 RESTAURANT SETTINGS:", {
         servicePercent: window.servicePercent,
-        gstOnDiscountedAmount: window.gstOnDiscountedAmount,
         cgst: window.cgstPercent,
         sgst: window.sgstPercent,
-        igst: window.igstPercent
+        igst: window.igstPercent,
+        gstOnDiscountedAmount: window.gstOnDiscountedAmount
       });
     }
-
   } catch (err) {
     console.error("Restaurant settings load error:", err);
   }
@@ -11911,6 +11910,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
