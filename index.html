@@ -2294,22 +2294,37 @@ function fmtNoSymbol(amount, digits = 2) {
   return n.toFixed(digits);
 }
     // === AUTO LOAD RESTAURANT CURRENCY ===
-    window.taxRules = null;
+  window.taxRules = null;
+
 async function loadRestaurantSettings() {
   try {
     const res = await apiGet("getRestaurantInfo");
 
     if (res && res.success) {
+
+      // 🔥 Currency
       if (res.currency) {
         window.CURRENCY = res.currency.trim();
         console.log("🔥 Currency Loaded:", window.CURRENCY);
       }
 
-      if (typeof res.gstOnDiscountedAmount !== "undefined") {
-        window.gstOnDiscountedAmount = String(res.gstOnDiscountedAmount).toUpperCase() === "TRUE";
-        console.log("🔥 GST on Discounted Amount:", window.gstOnDiscountedAmount);
-      }
+      // 🔥 GST on discounted or not
+      window.gstOnDiscountedAmount =
+        String(res.gstOnDiscountedAmount || "TRUE").toUpperCase() === "TRUE";
+
+      // 🔥 GST Percentages
+      window.cgstPercent = Number(res.cgst || 0);
+      window.sgstPercent = Number(res.sgst || 0);
+      window.igstPercent = Number(res.igst || 0);
+
+      console.log("🔥 GST SETTINGS LOADED:", {
+        gstOnDiscountedAmount: window.gstOnDiscountedAmount,
+        cgst: window.cgstPercent,
+        sgst: window.sgstPercent,
+        igst: window.igstPercent
+      });
     }
+
   } catch (err) {
     console.error("Restaurant settings load error:", err);
   }
@@ -11856,6 +11871,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
