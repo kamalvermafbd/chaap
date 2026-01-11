@@ -11031,8 +11031,7 @@ function formatInvoiceDate(dt) {
 
   
 function renderInvoiceFromAPI(inv) {
-
-  // ===== HEADER =====
+// ===== HEADER =====
   
   const orderDt = new Date(inv.orderDate).toLocaleString();
   document.getElementById("invoiceHeader").innerText =
@@ -11177,35 +11176,37 @@ if (addrBox) {
   const coupon = Number(inv.couponAmount || 0);
   const signupDiscount = Number(inv.signupDiscount || 0);
 const effectiveDiscount = coupon > 0 ? coupon : signupDiscount;
-  const taxTotal = Number(inv.taxTotal || 0);
-const hasTax = taxTotal > 0;
+  // ===== GST MODE (Restaurant Info) =====
+const gstOnDiscountedAmount = window._gstOnDiscountedAmount === true;
 
-// Net items after discount
-const netItems = itemsSubtotal - effectiveDiscount;
+// Percentages from Restaurant Info
+const cgstPercent = Number(window.restaurantTax?.cgstPercent || 0);
+const sgstPercent = Number(window.restaurantTax?.sgstPercent || 0);
+
+// -------- Base values --------
+const base = itemsSubtotal;
+const discount = effectiveDiscount;
+
+// Net items after coupon
+const netItems = base - discount;
 
 // Service & delivery always on Net Items
 const gross = netItems + service + delivery;
 
-// GST toggle from Restaurant Info
-const gstOnDiscountedAmount = window._gstOnDiscountedAmount === true;
+// -------- TAX BASE (Case A / Case B) --------
+const taxBase = gstOnDiscountedAmount
+  ? gross                              // Case-A (GST after coupon)
+  : (base + service + delivery);       // Case-B (GST before coupon)
 
-// Taxable amount depends on restaurant rule
-const taxableAmount = gstOnDiscountedAmount
-  ? gross
-  : (itemsSubtotal + service + delivery);
+// -------- GST --------
+const cgst = +(taxBase * cgstPercent / 100).toFixed(2);
+const sgst = +(taxBase * sgstPercent / 100).toFixed(2);
+const taxTotal = +(cgst + sgst).toFixed(2);
+const hasTax = taxTotal > 0;
 
-// After-coupon amount (used only for UI display)
+// -------- FINAL PAYABLE --------
+const netPayable = +(gross + taxTotal).toFixed(2);
 const afterCoupon = gross;
-
-const gstPercent = taxTotal && taxableAmount
-  ? (taxTotal * 100) / taxableAmount
-  : 0;
-
-const cgst = hasTax ? +(taxableAmount * gstPercent / 200).toFixed(2) : 0;
-const sgst = hasTax ? +(taxableAmount * gstPercent / 200).toFixed(2) : 0;
-
-
-
   // ===== BASE TOTALS =====
   document.getElementById("invBase").innerHTML = `
     <div class="flex justify-between font-semibold">
@@ -11230,7 +11231,6 @@ if (service > 0) {
   serviceBox.innerHTML = "";
 }
 
-
   // ===== TAXABLE AMOUNT (ALWAYS BEFORE COUPON) =====
  const taxBox = document.getElementById("invTax");
 
@@ -11239,7 +11239,8 @@ if (hasTax) {
   taxBox.innerHTML = `
     <div class="flex justify-between font-semibold">
       <span>Taxable Amount</span>
-      <span>${fmt(taxableAmount)}</span>
+<span>${fmt(taxBase)}</span>
+
     </div>
   `;
 } else {
@@ -11290,8 +11291,6 @@ if (discountAmount > 0) {
 } else {
   c.classList.add("hidden");
 }
-
-
   // ===== REMOVE OLD TAX ROWS IF ANY =====
   document.querySelectorAll(".inv-tax-row").forEach(e => e.remove());
 
@@ -11310,11 +11309,9 @@ if (hasTax) {
     </div>
   `);
 }
-
-
   // ===== NET PAYABLE =====
   document.getElementById("invNet").innerText =
-  fmt(inv.netPayable);
+  fmt(netPayable);
 
 
   document.getElementById("invPayment").innerText =
@@ -11327,18 +11324,14 @@ if (hasTax) {
     serviceCharge: Number(inv.serviceCharges || 0),
     deliveryCharge: Number(inv.deliveryCharge || 0),
 
-    taxableAmount: Number(
-      Number(inv.baseTotal || 0) +
-      Number(inv.serviceCharges || 0) +
-      Number(inv.deliveryCharge || 0)
-    ),
+    taxableAmount: taxBase,
 
     couponAmount: Number(inv.couponAmount || 0),
     signupDiscount: Number(inv.signupDiscount || 0),
 
-    taxTotal: Number(inv.taxTotal || 0),
-    cgst: Number(inv.taxTotal || 0) / 2,
-    sgst: Number(inv.taxTotal || 0) / 2,
+   taxTotal: taxTotal,
+cgst: cgst,
+sgst: sgst,
     igst: 0,
 
     netPayable: Number(inv.netPayable || 0),
@@ -11947,6 +11940,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
