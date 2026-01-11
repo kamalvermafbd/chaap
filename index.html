@@ -11230,19 +11230,26 @@ const gstBase = gstOnDiscounted
   // Always place taxable block AFTER charges (delivery/service) if present,
 // otherwise after After Discount if present, else after Items Subtotal
 
-let anchor = null;
+// Start after Items Subtotal
+let insertAfter = document.getElementById("invBase");
 
-if (deliveryAmt > 0) {
-  anchor = deliveryBox;
-} else if (serviceAmt > 0) {
-  anchor = serviceBox;
-} else if (discount > 0) {
-  anchor = c;
-} else {
-  anchor = document.getElementById("invBase");
+// 1️⃣ Discount always comes immediately after Items
+if (discount > 0) {
+  insertAfter.insertAdjacentElement("afterend", c);
+  insertAfter = c;
 }
 
-anchor.insertAdjacentElement("afterend", taxBox);
+// 2️⃣ Charges come after After Discount
+if (deliveryAmt > 0) {
+  insertAfter.insertAdjacentElement("afterend", deliveryBox);
+  insertAfter = deliveryBox;
+} else if (serviceAmt > 0) {
+  insertAfter.insertAdjacentElement("afterend", serviceBox);
+  insertAfter = serviceBox;
+}
+
+// 3️⃣ Taxable always comes after Charges
+insertAfter.insertAdjacentElement("afterend", taxBox);
 
 
   taxBox.insertAdjacentHTML("afterend", `
@@ -11890,6 +11897,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
