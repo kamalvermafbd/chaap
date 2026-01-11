@@ -11055,6 +11055,12 @@ function formatInvoiceDate(dt) {
 
 function renderInvoiceFromAPI(inv) {
   console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
+console.log("🧾 INVOICE READS", {
+  orderType: inv.orderType,
+  serviceAmt: inv.serviceAmt,
+  serviceCharges: inv.serviceCharges,
+  deliveryCharge: inv.deliveryCharge
+});
 
   /* ================= HEADER ================= */
   const orderDt = new Date(inv.orderDate).toLocaleString();
@@ -11355,6 +11361,14 @@ insertAfter.insertAdjacentElement("afterend", taxBox);
   const netPayable =
   (afterDiscount + serviceAmt + deliveryAmt) + taxTotal;
 
+console.log("🧪 PREVIEW DEBUG", {
+  orderType,
+  serviceAmt,
+  serviceFromDrawer: d.serviceAmt,
+  windowServicePercent: window.servicePercent,
+  base,
+  afterDiscount
+});
 
   /* ======================
      RETURN PAYLOAD
@@ -11897,6 +11911,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
