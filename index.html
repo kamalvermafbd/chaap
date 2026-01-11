@@ -11183,12 +11183,13 @@ const service = Number(inv.serviceCharges || 0);
 const delivery = Number(inv.deliveryCharge || 0);
 
 const taxableAmount = Number(inv.taxableAmount || 0);
+const cgst = Number(inv.cgstAmt || inv.cgst || 0);
+const sgst = Number(inv.sgstAmt || inv.sgst || 0);
+const igst = Number(inv.igstAmt || inv.igst || 0);
 
-const cgst = Number(inv.cgst || 0);
-const sgst = Number(inv.sgst || 0);
-const igst = Number(inv.igst || 0);
 const taxTotal = Number(inv.taxTotal || (cgst + sgst + igst));
 const hasTax = taxTotal > 0;
+
 
 const coupon = Number(inv.couponAmount || 0);
 const signupDiscount = Number(inv.signupDiscount || 0);
@@ -11925,6 +11926,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
