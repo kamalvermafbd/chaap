@@ -2294,7 +2294,7 @@ function fmtNoSymbol(amount, digits = 2) {
   return n.toFixed(digits);
 }
     // === AUTO LOAD RESTAURANT CURRENCY ===
-  window.taxRules = null;
+window.taxRules = null;
 
 async function loadRestaurantSettings() {
   try {
@@ -2302,22 +2302,22 @@ async function loadRestaurantSettings() {
 
     if (res && res.success) {
 
-      // 🔥 Currency
+      // Currency
       if (res.currency) {
         window.CURRENCY = res.currency.trim();
         console.log("🔥 Currency Loaded:", window.CURRENCY);
       }
 
-      // 🔥 GST on discounted or not
+      // GST base rule
       window.gstOnDiscountedAmount =
         String(res.gstOnDiscountedAmount || "TRUE").toUpperCase() === "TRUE";
 
-      // 🔥 GST Percentages
-      window.cgstPercent = Number(res.cgst || 0);
-      window.sgstPercent = Number(res.sgst || 0);
-      window.igstPercent = Number(res.igst || 0);
+      // 🔥 CORRECT GST % FIELD NAMES
+      window.cgstPercent = Number(res.cgstPercent || 0);
+      window.sgstPercent = Number(res.sgstPercent || 0);
+      window.igstPercent = Number(res.igstPercent || 0);
 
-      console.log("🔥 GST SETTINGS LOADED:", {
+      console.log("🔥 GST SETTINGS:", {
         gstOnDiscountedAmount: window.gstOnDiscountedAmount,
         cgst: window.cgstPercent,
         sgst: window.sgstPercent,
@@ -11871,6 +11871,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
