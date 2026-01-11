@@ -11176,13 +11176,27 @@ const igst = Number(inv.igstAmt || 0);
 
 // 🔐 If orderType not chosen, ignore service & delivery
 if (!inv.orderType || inv.orderType === "Select Order Type") {
+
+  // ❌ no service / delivery when orderType not chosen
   serviceAmt = 0;
   deliveryAmt = 0;
-  gstBase = gstOnDiscounted
-    ? (afterDiscount)
-    : (items);
-  netPayable = afterDiscount + cgst + sgst + igst;
+
+  // 🔥 GST base only on items or discounted items
+  gstBase = gstOnDiscounted ? afterDiscount : items;
+
+  // 🔥 Recalculate GST using sheet percentages (single source of truth)
+  const cgstRate = Number(inv.cgstPercent || 0);
+  const sgstRate = Number(inv.sgstPercent || 0);
+  const igstRate = Number(inv.igstPercent || 0);
+
+  cgst = gstBase * cgstRate / 100;
+  sgst = gstBase * sgstRate / 100;
+  igst = gstBase * igstRate / 100;
+
+  // 🔥 Final payable
+  netPayable = gstBase + cgst + sgst + igst;
 }
+
 
 
 
@@ -11975,6 +11989,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
