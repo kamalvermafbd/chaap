@@ -11142,7 +11142,8 @@ function renderInvoiceFromAPI(inv) {
 
   /* ================= GST SETTINGS ================= */
   const gstOnDiscounted =
-    String(inv.gstOnDiscountedAmount || "TRUE").toUpperCase() === "TRUE";
+  String(inv.gstOnDiscountedAmount).toUpperCase() === "TRUE";
+
 
   const cgstRate = Number(inv.cgstPercent || 0);
   const sgstRate = Number(inv.sgstPercent || 0);
@@ -11876,6 +11877,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
