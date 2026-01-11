@@ -4421,10 +4421,17 @@ if (orderType === "Home Delivery" && !address) {
 
 // clear error if valid
 
-  const dt = window._drawerTotals || {};
+  const inv = window._checkoutInvoice;
 
-  // 🔒 IMPORTANT: cart ka COPY bhejo (reference nahi)
-  const safeCartItems = getCart().map(i => ({ ...i }));
+if (!inv) {
+  alert("Invoice not ready. Please reopen checkout.");
+  resetPlaceOrderBtn();
+  return;
+}
+
+// 🔒 cart & totals checkout invoice se aayenge
+const safeCartItems = inv.items.map(i => ({ ...i }));
+
 
   const orderData = {
     customerName,
@@ -4435,26 +4442,32 @@ if (orderType === "Home Delivery" && !address) {
     cartItems: normalizeCartForOrder(safeCartItems),
 
 
-    baseTotal: Number(dt.baseTotal || 0),
-    offerDiscount: Number(dt.offerDiscount || 0),
-    signupDiscount: Number(dt.signupDiscount || 0),
-    payableAfterDiscount: Number(dt.payableAfterDiscount || 0),
+    baseTotal: Number(inv.itemsSubtotal || 0),
 
-    serviceAmt: Number(dt.serviceAmt || 0),
-    taxableAmount: Number(dt.taxableAmount || 0),
-    cgstAmt: Number(dt.cgstAmt || 0),
-    sgstAmt: Number(dt.sgstAmt || 0),
-    igstAmt: Number(dt.igstAmt || 0),
-    grandTotal: Number(dt.grandTotal || 0),
+offerDiscount: Number(inv.couponAmount || 0),
+signupDiscount: Number(inv.signupDiscount || 0),
+payableAfterDiscount: Number(
+  (inv.taxableAmount || 0) -
+  (inv.couponAmount || inv.signupDiscount || 0)
+),
+
+serviceAmt: Number(inv.serviceCharge || 0),
+taxableAmount: Number(inv.taxableAmount || 0),
+
+cgstAmt: Number(inv.cgst || 0),
+sgstAmt: Number(inv.sgst || 0),
+igstAmt: Number(inv.igst || 0),
+
+grandTotal: Number(inv.netPayable || 0),
+
 
     paymentMethod,
 
     couponId: selectedCoupon ? selectedCoupon.id : "",
     couponType: selectedCoupon ? selectedCoupon.type : "",
 
-couponDiscount: selectedCoupon
-  ? Number(dt.offerDiscount || 0)
-  : 0,
+couponDiscount: Number(inv.couponAmount || inv.signupDiscount || 0),
+
     
     pincode,
   city,
@@ -11288,6 +11301,36 @@ if (hasTax) {
 
   document.getElementById("invPayment").innerText =
     `Payment: ${inv.paymentMethod}`;
+    // 🔒 LOCK CHECKOUT INVOICE SNAPSHOT (single source of truth)
+  window._checkoutInvoice = {
+    items: (inv.items || []).map(i => ({ ...i })),
+
+    itemsSubtotal: Number(inv.baseTotal || 0),
+    serviceCharge: Number(inv.serviceCharges || 0),
+    deliveryCharge: Number(inv.deliveryCharge || 0),
+
+    taxableAmount: Number(
+      Number(inv.baseTotal || 0) +
+      Number(inv.serviceCharges || 0) +
+      Number(inv.deliveryCharge || 0)
+    ),
+
+    couponAmount: Number(inv.couponAmount || 0),
+    signupDiscount: Number(inv.signupDiscount || 0),
+
+    taxTotal: Number(inv.taxTotal || 0),
+    cgst: Number(inv.taxTotal || 0) / 2,
+    sgst: Number(inv.taxTotal || 0) / 2,
+    igst: 0,
+
+    netPayable: Number(inv.netPayable || 0),
+
+    couponId: inv.couponId || "",
+    paymentMethod: inv.paymentMethod || ""
+  };
+
+  console.log("🔐 CHECKOUT SNAPSHOT LOCKED:", window._checkoutInvoice);
+
 }
   
 function buildCheckoutPreviewInv() {
@@ -11877,6 +11920,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
