@@ -11137,8 +11137,6 @@ if (addrBox) {
   }
 }
 
-
-
   // ===== ITEMS =====
   document.getElementById("invoiceItems").innerHTML =
     inv.items.map((i, idx) => {
@@ -11178,43 +11176,31 @@ if (addrBox) {
     }).join("");
 
   // ===== CALCULATIONS (UNCHANGED) =====
-  const itemsSubtotal = Number(inv.baseTotal || 0);
-  const service = Number(inv.serviceCharges || 0);
-  const delivery = Number(inv.deliveryCharge || 0);
-  const coupon = Number(inv.couponAmount || 0);
-  const signupDiscount = Number(inv.signupDiscount || 0);
-const effectiveDiscount = coupon > 0 ? coupon : signupDiscount;
-  // ===== GST MODE (Restaurant Info) =====
-const gstOnDiscountedAmount = window._gstOnDiscountedAmount === true;
 
-// Percentages from Restaurant Info
-const cgstPercent = Number(window.restaurantTax?.cgstPercent || 0);
-const sgstPercent = Number(window.restaurantTax?.sgstPercent || 0);
+// ===== CALCULATIONS (FROM BACKEND — SINGLE SOURCE OF TRUTH) =====
+const itemsSubtotal = Number(inv.baseTotal || 0);
+const service = Number(inv.serviceCharges || 0);
+const delivery = Number(inv.deliveryCharge || 0);
 
-// -------- Base values --------
-const base = itemsSubtotal;
-const discount = effectiveDiscount;
+const taxableAmount = Number(inv.taxableAmount || 0);
 
-// Net items after coupon
-const netItems = base - discount;
-
-// Service & delivery always on Net Items
-const gross = netItems + service + delivery;
-
-// -------- TAX BASE (Case A / Case B) --------
-const taxBase = gstOnDiscountedAmount
-  ? gross                              // Case-A (GST after coupon)
-  : (base + service + delivery);       // Case-B (GST before coupon)
-
-// -------- GST --------
-const cgst = +(taxBase * cgstPercent / 100).toFixed(2);
-const sgst = +(taxBase * sgstPercent / 100).toFixed(2);
-const taxTotal = +(cgst + sgst).toFixed(2);
+const cgst = Number(inv.cgst || 0);
+const sgst = Number(inv.sgst || 0);
+const igst = Number(inv.igst || 0);
+const taxTotal = Number(inv.taxTotal || (cgst + sgst + igst));
 const hasTax = taxTotal > 0;
 
-// -------- FINAL PAYABLE --------
-const netPayable = +(gross + taxTotal).toFixed(2);
-const afterCoupon = gross;
+const coupon = Number(inv.couponAmount || 0);
+const signupDiscount = Number(inv.signupDiscount || 0);
+const effectiveDiscount = coupon > 0 ? coupon : signupDiscount;
+
+// Net amount after coupon (before tax)
+const afterCoupon = Number(inv.payableAfterDiscount || (itemsSubtotal - effectiveDiscount + service + delivery));
+
+// Final payable
+const netPayable = Number(inv.netPayable || inv.grandTotal || 0);
+
+  
   // ===== BASE TOTALS =====
   document.getElementById("invBase").innerHTML = `
     <div class="flex justify-between font-semibold">
@@ -11247,7 +11233,8 @@ if (hasTax) {
   taxBox.innerHTML = `
     <div class="flex justify-between font-semibold">
       <span>Taxable Amount</span>
-<span>${fmt(taxBase)}</span>
+<span>${fmt(taxableAmount)}</span>
+
 
     </div>
   `;
@@ -11333,7 +11320,7 @@ if (hasTax) {
   serviceCharge: Number(inv.serviceCharges || 0),
   deliveryCharge: Number(inv.deliveryCharge || 0),
 
-  taxableAmount: taxBase,
+  taxableAmount: taxableAmount,
 
   couponAmount: Number(inv.couponAmount || 0),
   signupDiscount: Number(inv.signupDiscount || 0),
@@ -11341,7 +11328,7 @@ if (hasTax) {
   taxTotal: taxTotal,
   cgst: cgst,
   sgst: sgst,
-  igst: 0,
+  igst: igst,
 
   netPayable: netPayable,
 
@@ -11438,8 +11425,7 @@ return {
 
   // 🔥 totals
   taxTotal: taxTotal,
-  grandTotal: netPayable,
-  netPayable: netPayable,
+   netPayable: netPayable,
 
   // ===== PAYMENT =====
   paymentMethod: document.getElementById("paymentMethod")?.value || ""
@@ -11939,6 +11925,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
