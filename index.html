@@ -11130,8 +11130,6 @@ if (addrBox) {
   }
 }
 
-
-
   // ===== ITEMS =====
   document.getElementById("invoiceItems").innerHTML =
     inv.items.map((i, idx) => {
@@ -11174,12 +11172,11 @@ if (addrBox) {
   const itemsSubtotal = Number(inv.baseTotal || 0);
   const service = Number(inv.serviceCharges || 0);
   const delivery = Number(inv.deliveryCharge || 0);
-const taxableAmount = itemsSubtotal + service + delivery;
+
 
   const coupon = Number(inv.couponAmount || 0);
   const signupDiscount = Number(inv.signupDiscount || 0);
 const effectiveDiscount = coupon > 0 ? coupon : signupDiscount;
-const afterCoupon = taxableAmount - effectiveDiscount;
 
  const taxTotal = Number(inv.taxTotal || 0);
 const hasTax = taxTotal > 0;
@@ -11188,17 +11185,61 @@ const cgst = hasTax ? taxTotal / 2 : 0;
 const sgst = hasTax ? taxTotal / 2 : 0;
 
 
-  // ===== BASE TOTALS =====
-  document.getElementById("invBase").innerHTML = `
-    <div class="flex justify-between font-semibold">
-      <span>Items Subtotal</span>
-      <span>${fmt(itemsSubtotal)}</span>
+  // ===== TOTALS (GST MODE AWARE) =====
+const gstOnDiscountedAmount = window._gstOnDiscountedAmount === true;
 
+const base = itemsSubtotal;
+const discount = effectiveDiscount;
+
+// service already on (items - discount)
+const netItems = base - discount;
+
+// gross after service + delivery
+const gross = netItems + service + delivery;
+
+// tax base depends on restaurant setting
+const taxBase = gstOnDiscountedAmount
+  ? gross
+  : (base + service + delivery);
+
+// ---- Clear all blocks ----
+const taxBox = document.getElementById("invTax");
+const serviceBox = document.getElementById("invService");
+const deliveryBox = document.getElementById("invDelivery");
+const c = document.getElementById("invCoupon");
+
+taxBox.innerHTML = "";
+serviceBox.innerHTML = "";
+deliveryBox.innerHTML = "";
+c.innerHTML = "";
+document.querySelectorAll(".inv-tax-row").forEach(e => e.remove());
+
+// ---- Items ----
+document.getElementById("invBase").innerHTML = `
+  <div class="flex justify-between font-semibold">
+    <span>Items Subtotal</span>
+    <span>${fmt(base)}</span>
+  </div>
+`;
+
+// ---- Discount first ----
+if (discount > 0) {
+  c.classList.remove("hidden");
+  c.innerHTML = `
+    <div class="flex justify-between text-green-600">
+      <span>${discountLabel}</span>
+      <span>−${fmt(discount)}</span>
+    </div>
+    <div class="flex justify-between font-semibold">
+      <span>Net Items</span>
+      <span>${fmt(netItems)}</span>
     </div>
   `;
+} else {
+  c.classList.add("hidden");
+}
 
-  const serviceBox = document.getElementById("invService");
-
+// ---- Service & Delivery ----
 if (service > 0) {
   serviceBox.classList.remove("hidden");
   serviceBox.innerHTML = `
@@ -11209,79 +11250,32 @@ if (service > 0) {
   `;
 } else {
   serviceBox.classList.add("hidden");
-  serviceBox.innerHTML = "";
 }
 
-
-  // ===== TAXABLE AMOUNT (ALWAYS BEFORE COUPON) =====
- const taxBox = document.getElementById("invTax");
-
-if (hasTax) {
-  taxBox.classList.remove("hidden");
-  taxBox.innerHTML = `
-    <div class="flex justify-between font-semibold">
-      <span>Taxable Amount</span>
-      <span>${fmt(taxableAmount)}</span>
-    </div>
-  `;
-} else {
-  taxBox.classList.add("hidden");
-  taxBox.innerHTML = "";
-}
-// ===== DELIVERY / COURIER CHARGES =====
-const deliveryBox = document.getElementById("invDelivery");
-
-if (inv.deliveryCharge > 0) {
+if (delivery > 0) {
   deliveryBox.classList.remove("hidden");
   deliveryBox.innerHTML = `
     <div class="flex justify-between">
       <span>${inv.deliveryChargeLabel || "Delivery Charges"}</span>
-      <span>${fmt(inv.deliveryCharge)}</span>
-    </div>
-  `;
-}
-
-// ===== COUPON / SIGNUP DISCOUNT BLOCK =====
-const c = document.getElementById("invCoupon");
-c.innerHTML = "";
-
-// coupon variable already upar defined hai — reuse karo
-let discountLabel = "";
-let discountAmount = 0;
-
-if (coupon > 0) {
-  discountLabel = `Coupon (${inv.couponId})`;
-  discountAmount = coupon;
-} else if (signupDiscount > 0) {
-  discountLabel = "Signup Discount";
-  discountAmount = signupDiscount;
-}
-
-if (discountAmount > 0) {
-  c.classList.remove("hidden");
-  c.innerHTML = `
-    <div class="flex justify-between text-green-600">
-      <span>${discountLabel}</span>
-      <span>−${fmt(discountAmount)}</span>
-    </div>
-    <div class="flex justify-between font-semibold text-black">
-      <span>Net Amount after Coupon</span>
-      <span>${fmt(afterCoupon)}</span>
+      <span>${fmt(delivery)}</span>
     </div>
   `;
 } else {
-  c.classList.add("hidden");
+  deliveryBox.classList.add("hidden");
 }
 
+// ---- Taxable Amount ----
+taxBox.classList.remove("hidden");
+taxBox.innerHTML = `
+  <div class="flex justify-between font-semibold">
+    <span>Taxable Amount</span>
+    <span>${fmt(taxBase)}</span>
+  </div>
+`;
 
-  // ===== REMOVE OLD TAX ROWS IF ANY =====
-  document.querySelectorAll(".inv-tax-row").forEach(e => e.remove());
-
-  // ===== TAXES (ALWAYS AFTER COUPON / TAXABLE) =====
+// ---- GST ----
 if (hasTax) {
- const taxAnchor = (coupon > 0 || signupDiscount > 0) ? c : taxBox;
-
-  taxAnchor.insertAdjacentHTML("afterend", `
+  taxBox.insertAdjacentHTML("afterend", `
     <div class="flex justify-between inv-tax-row">
       <span>CGST</span>
       <span>${fmt(cgst)}</span>
@@ -11292,42 +11286,6 @@ if (hasTax) {
     </div>
   `);
 }
-
-
-  // ===== NET PAYABLE =====
-  document.getElementById("invNet").innerText =
-  fmt(inv.netPayable);
-
-
-  document.getElementById("invPayment").innerText =
-    `Payment: ${inv.paymentMethod}`;
-    // 🔒 LOCK CHECKOUT INVOICE SNAPSHOT (single source of truth)
-  window._checkoutInvoice = {
-    items: (inv.items || []).map(i => ({ ...i })),
-
-    itemsSubtotal: Number(inv.baseTotal || 0),
-    serviceCharge: Number(inv.serviceCharges || 0),
-    deliveryCharge: Number(inv.deliveryCharge || 0),
-
-    taxableAmount: Number(
-      Number(inv.baseTotal || 0) +
-      Number(inv.serviceCharges || 0) +
-      Number(inv.deliveryCharge || 0)
-    ),
-
-    couponAmount: Number(inv.couponAmount || 0),
-    signupDiscount: Number(inv.signupDiscount || 0),
-
-    taxTotal: Number(inv.taxTotal || 0),
-    cgst: Number(inv.taxTotal || 0) / 2,
-    sgst: Number(inv.taxTotal || 0) / 2,
-    igst: 0,
-
-    netPayable: Number(inv.netPayable || 0),
-
-    couponId: inv.couponId || "",
-    paymentMethod: inv.paymentMethod || ""
-  };
 
   console.log("🔐 CHECKOUT SNAPSHOT LOCKED:", window._checkoutInvoice);
 
@@ -11928,6 +11886,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
