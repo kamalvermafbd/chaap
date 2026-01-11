@@ -11156,9 +11156,10 @@ if (inv.orderType === "Dine In") {
   deliveryAmt = Number(inv.deliveryCharge || 0);
 }
 
-const cgst = Number(inv.cgstAmt || 0);
-const sgst = Number(inv.sgstAmt || 0);
-const igst = Number(inv.igstAmt || 0);
+let cgst = Number(inv.cgstAmt || 0);
+let sgst = Number(inv.sgstAmt || 0);
+let igst = Number(inv.igstAmt || 0);
+
 
 
   const gstOnDiscounted =
@@ -11989,6 +11990,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
