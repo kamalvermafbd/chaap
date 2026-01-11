@@ -11037,7 +11037,7 @@ function formatInvoiceDate(dt) {
   return `${dd}-${mm}-${yyyy}`;
 }
 
-  function renderInvoiceFromAPI(inv) {
+function renderInvoiceFromAPI(inv) {
   console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
 
   /* ================= HEADER ================= */
@@ -11118,49 +11118,56 @@ function formatInvoiceDate(dt) {
     }).join("");
 
   /* ================= BASE TOTAL ================= */
-  const items = Number(inv.baseTotal || 0);
-  const coupon = Number(inv.couponAmount || 0);
-  const signup = Number(inv.signupDiscount || 0);
-  const discount = coupon > 0 ? coupon : signup;
-  const afterDiscount = items - discount;
+  // ===== BASE AMOUNTS =====
+const items = Number(inv.baseTotal || 0);
+const coupon = Number(inv.couponAmount || 0);
+const signup = Number(inv.signupDiscount || 0);
+const discount = coupon > 0 ? coupon : signup;
+const afterDiscount = items - discount;
 
-  /* ================= CHARGES ================= */
-  let serviceAmt = 0;
-  let deliveryAmt = 0;
+// ===== GST RULE =====
+const gstOnDiscounted =
+  String(inv.gstOnDiscountedAmount || "TRUE").toUpperCase() === "TRUE";
 
-  if (inv.orderType === "Dine In") {
-    serviceAmt = Number(inv.serviceCharges || 0);
-  } else if (inv.orderType === "Home Delivery" || inv.orderType === "Courier") {
-    deliveryAmt = Number(inv.deliveryCharge || 0);
-  }
+// ===== GST % FROM BACKEND =====
+const cgstRate = Number(inv.cgstPercent || 0);
+const sgstRate = Number(inv.sgstPercent || 0);
+const igstRate = Number(inv.igstPercent || 0);
 
-  /* ================= GST CONFIG ================= */
-  const cgstRate = Number(inv.cgstPercent || 0);
-  const sgstRate = Number(inv.sgstPercent || 0);
-  const igstRate = Number(inv.igstPercent || 0);
-  const gstOnDiscounted =
-    String(inv.gstOnDiscountedAmount || "TRUE").toUpperCase() === "TRUE";
+// ===== ORDER TYPE =====
+const orderType = inv.orderType || "";
 
-  /* ================= GST BASE ================= */
-  let gstBase = 0;
+// ===== CHARGES =====
+let serviceAmt = 0;
+let deliveryAmt = 0;
 
-  if (!inv.orderType || inv.orderType === "Select Order Type") {
-    gstBase = gstOnDiscounted ? afterDiscount : items;
-    serviceAmt = 0;
-    deliveryAmt = 0;
-  } else {
-    gstBase = gstOnDiscounted
-      ? afterDiscount + serviceAmt + deliveryAmt
-      : items + serviceAmt + deliveryAmt;
-  }
+if (orderType === "Dine In") {
+  serviceAmt = Number(inv.serviceCharges || 0);
+} else if (orderType === "Home Delivery" || orderType === "Courier") {
+  deliveryAmt = Number(inv.deliveryCharge || 0);
+}
 
-  /* ================= GST CALC ================= */
-  const cgst = gstBase * cgstRate / 100;
-  const sgst = gstBase * sgstRate / 100;
-  const igst = gstBase * igstRate / 100;
-  const taxTotal = cgst + sgst + igst;
+// ===== GST BASE =====
+let gstBase = 0;
 
-  const netPayable = gstBase + taxTotal;
+// When order type NOT selected → NO service, NO delivery
+if (!orderType || orderType === "Select Order Type") {
+  gstBase = gstOnDiscounted ? afterDiscount : items;
+} else {
+  // when orderType selected → include service/delivery
+  gstBase = gstOnDiscounted
+    ? (afterDiscount + serviceAmt + deliveryAmt)
+    : (items + serviceAmt + deliveryAmt);
+}
+
+// ===== GST AMOUNTS =====
+const cgst = gstBase * cgstRate / 100;
+const sgst = gstBase * sgstRate / 100;
+const igst = gstBase * igstRate / 100;
+
+// ===== NET PAYABLE =====
+const netPayable = gstBase + cgst + sgst + igst;
+
 
   /* ================= RENDER TOTALS ================= */
   document.getElementById("invBase").innerHTML = `
@@ -11840,6 +11847,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
