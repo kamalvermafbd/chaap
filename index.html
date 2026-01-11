@@ -11372,19 +11372,27 @@ const discount =
   Number(s.couponAmount || 0) +
   Number(s.signupDiscount || 0);
 
-// taxable amount
-const taxableAmount =
+// gross before coupon
+const gross =
   base +
   Number(serviceCharges || 0) +
-  Number(deliveryCharge || 0) -
-  discount;
+  Number(deliveryCharge || 0);
 
-// tax (GST % already drawer me hai)
+// 🔥 restaurant rule from backend
+const gstOnDiscountedAmount = window.restaurantTax?.gstOnDiscountedAmount === true;
+
+// tax base
+const taxBase = gstOnDiscountedAmount
+  ? (gross - discount)
+  : gross;
+
+// tax
 const taxPercent = Number(s.taxPercent || 5);
-const taxTotal = +(taxableAmount * taxPercent / 100).toFixed(2);
+const taxTotal = +(taxBase * taxPercent / 100).toFixed(2);
 
 // final payable
-const netPayable = +(taxableAmount + taxTotal).toFixed(2);
+const netPayable = +((gross - discount) + taxTotal).toFixed(2);
+
 
 
   return {
@@ -11920,6 +11928,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
