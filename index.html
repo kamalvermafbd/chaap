@@ -11202,26 +11202,36 @@ function renderInvoiceFromAPI(inv) {
   }
 
   const taxBox = document.getElementById("invTax");
-  taxBox.classList.remove("hidden");
-  taxBox.innerHTML = `
-    <div class="flex justify-between font-semibold">
-      <span>Taxable Amount</span>
-      <span>${fmt(gstBase)}</span>
-    </div>
-  `;
 
-  document.querySelectorAll(".inv-tax-row").forEach(e => e.remove());
+// Clear old
+document.querySelectorAll(".inv-tax-row").forEach(e => e.remove());
 
-  taxBox.insertAdjacentHTML("afterend", `
-    <div class="flex justify-between inv-tax-row">
-      <span>CGST</span>
-      <span>${fmt(cgst)}</span>
-    </div>
-    <div class="flex justify-between inv-tax-row">
-      <span>SGST</span>
-      <span>${fmt(sgst)}</span>
-    </div>
-  `);
+// Build taxable row
+taxBox.innerHTML = `
+  <div class="flex justify-between font-semibold inv-tax-row">
+    <span>Taxable Amount</span>
+    <span>${fmt(gstBase)}</span>
+  </div>
+`;
+
+// Insert AFTER service + discount block
+const anchor = serviceAmt > 0
+  ? document.getElementById("invService")
+  : (discount > 0 ? document.getElementById("invCoupon") : document.getElementById("invBase"));
+
+anchor.insertAdjacentElement("afterend", taxBox);
+
+// Insert GST after taxable
+taxBox.insertAdjacentHTML("afterend", `
+  <div class="flex justify-between inv-tax-row">
+    <span>CGST</span>
+    <span>${fmt(cgst)}</span>
+  </div>
+  <div class="flex justify-between inv-tax-row">
+    <span>SGST</span>
+    <span>${fmt(sgst)}</span>
+  </div>
+`);
 
   document.getElementById("invNet").innerText = fmt(netPayable);
 
@@ -11832,6 +11842,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
