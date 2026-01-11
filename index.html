@@ -11037,32 +11037,27 @@ function formatInvoiceDate(dt) {
   return `${dd}-${mm}-${yyyy}`;
 }
 
-  
 function renderInvoiceFromAPI(inv) {
-// ===== HEADER =====
-  
+
+  // ================= HEADER =================
   const orderDt = new Date(inv.orderDate).toLocaleString();
   document.getElementById("invoiceHeader").innerText =
     `${inv.orderNumber} • ${orderDt}`;
 
-const orderIdBox = document.getElementById("invOrderId");
-
-if (orderIdBox) {
-  if (inv.orderId && inv.orderId !== "-" && String(inv.orderId).trim() !== "") {
-    orderIdBox.classList.remove("hidden");
-    orderIdBox.innerText = `Order ID: ${inv.orderId}`;
-  } else {
-    orderIdBox.classList.add("hidden");
-    orderIdBox.innerText = "";
+  const orderIdBox = document.getElementById("invOrderId");
+  if (orderIdBox) {
+    if (inv.orderId && inv.orderId !== "-" && String(inv.orderId).trim() !== "") {
+      orderIdBox.classList.remove("hidden");
+      orderIdBox.innerText = `Order ID: ${inv.orderId}`;
+    } else {
+      orderIdBox.classList.add("hidden");
+      orderIdBox.innerText = "";
+    }
   }
-}
 
-  
-// ✅ ORDER TYPE (safe)
-const orderTypeBox = document.getElementById("invOrderType");
-
-if (orderTypeBox) {
-  if (inv.orderType && inv.orderType.trim() !== "") {
+  // ================= ORDER TYPE =================
+  const orderTypeBox = document.getElementById("invOrderType");
+  if (orderTypeBox && inv.orderType) {
     orderTypeBox.classList.remove("hidden");
     orderTypeBox.innerHTML = `
       <div class="grid grid-cols-[140px_auto] gap-1 mt-1">
@@ -11070,60 +11065,43 @@ if (orderTypeBox) {
         <span>: ${inv.orderType}</span>
       </div>
     `;
-  } else {
-    orderTypeBox.classList.add("hidden");
-    orderTypeBox.innerHTML = "";
   }
-}
 
+  // ================= INVOICE META =================
   const invMeta = document.getElementById("invInvoiceMeta");
+  if (inv.invno && inv.invdt) {
+    invMeta.classList.remove("hidden");
+    invMeta.innerHTML = `
+      <div class="grid grid-cols-[140px_auto] gap-1 mt-1">
+        <span class="font-semibold">Invoice No</span>
+        <span>: ${inv.invno}</span>
+      </div>
+      <div class="grid grid-cols-[140px_auto] gap-1">
+        <span class="font-semibold">Invoice Date</span>
+        <span>: ${formatInvoiceDate(inv.invdt)}</span>
+      </div>
+    `;
+  } else {
+    invMeta.classList.add("hidden");
+  }
 
-// valid invoice check
-const hasInvoice =
-  inv.invno &&
-  String(inv.invno).trim() !== "" &&
-  inv.invdt;
-
-if (hasInvoice) {
-  invMeta.classList.remove("hidden");
-  invMeta.innerHTML = `
-    <div class="grid grid-cols-[140px_auto] gap-1 mt-1">
-      <span class="font-semibold">Invoice No</span>
-      <span>: ${inv.invno}</span>
-    </div>
+  // ================= CUSTOMER =================
+  document.getElementById("invCustomer").innerHTML = `
     <div class="grid grid-cols-[140px_auto] gap-1">
-      <span class="font-semibold">Invoice Date</span>
-      <span>: ${formatInvoiceDate(inv.invdt)}</span>
+      <span class="font-semibold">Name</span>
+      <span>: ${inv.customerName || ""}</span>
     </div>
   `;
-} else {
-  invMeta.classList.add("hidden");
-  invMeta.innerHTML = "";
-}
 
-  
- document.getElementById("invCustomer").innerHTML = `
-  <div class="grid grid-cols-[140px_auto] gap-1">
-    <span class="font-semibold">Name</span>
-    <span>: ${inv.customerName}</span>
-  </div>
-`;
+  document.getElementById("invContact").innerHTML = `
+    <div class="grid grid-cols-[140px_auto] gap-1">
+      <span class="font-semibold">Mobile / Email</span>
+      <span>: ${inv.mobile || ""} / ${inv.email || ""}</span>
+    </div>
+  `;
 
-document.getElementById("invContact").innerHTML = `
-  <div class="grid grid-cols-[140px_auto] gap-1">
-    <span class="font-semibold">Mobile / Email</span>
-    <span>: ${inv.mobile} / ${inv.email}</span>
-  </div>
-`;
-
-const addrBox = document.getElementById("invAddress");
-
-const hasAddress =
-  inv.address &&
-  String(inv.address).trim() !== "";
-
-if (addrBox) {
-  if (hasAddress) {
+  const addrBox = document.getElementById("invAddress");
+  if (inv.address) {
     addrBox.classList.remove("hidden");
     addrBox.innerHTML = `
       <div class="grid grid-cols-[140px_auto] gap-1">
@@ -11133,13 +11111,11 @@ if (addrBox) {
     `;
   } else {
     addrBox.classList.add("hidden");
-    addrBox.innerHTML = "";
   }
-}
 
-  // ===== ITEMS =====
+  // ================= ITEMS =================
   document.getElementById("invoiceItems").innerHTML =
-    inv.items.map((i, idx) => {
+    (inv.items || []).map((i, idx) => {
       const qty = Number(i.qty || 0);
       const rate = Number(i.rate || 0);
       const gross = qty * rate;
@@ -11152,149 +11128,91 @@ if (addrBox) {
             ${idx + 1}. ${i.name}
             <span class="text-xs text-gray-500">(${i.unit})</span>
           </div>
-
           <div class="text-xs text-gray-600 mt-0.5">
-           Qty ${qty} × ${fmt(rate)} = ${fmt(gross)}
-
+            Qty ${qty} × ${fmt(rate)} = ${fmt(gross)}
           </div>
-
-          ${
-            discount > 0
-              ? `<div class="text-xs text-green-600">
-                   Item Discount: −${fmt(discount)}
-                 </div>`
-              : ""
-          }
-
+          ${discount > 0 ? `<div class="text-xs text-green-600">Item Discount: −${fmt(discount)}</div>` : ""}
           <div class="flex justify-between text-sm font-medium mt-0.5">
             <span>Item Total</span>
             <span>${fmt(net)}</span>
-
           </div>
         </div>
       `;
     }).join("");
 
-  // ===== CALCULATIONS (UNCHANGED) =====
+  // ================= TOTALS (BACKEND SAFE) =================
+  const items = Number(inv.baseTotal || 0);
+  const coupon = Number(inv.couponAmount || 0);
+  const signup = Number(inv.signupDiscount || 0);
+  const discount = coupon > 0 ? coupon : signup;
 
-// ===== CALCULATIONS (FROM BACKEND — SINGLE SOURCE OF TRUTH) =====
-const itemsSubtotal = Number(inv.baseTotal || 0);
-const service = Number(inv.serviceCharges || 0);
-const delivery = Number(inv.deliveryCharge || 0);
+  const serviceAmt = Number(inv.serviceCharges || 0);
+  const cgst = Number(inv.cgstAmt || 0);
+  const sgst = Number(inv.sgstAmt || 0);
+  const igst = Number(inv.igstAmt || 0);
 
-const taxableAmount = Number(inv.taxableAmount || 0);
-const cgst = Number(inv.cgstAmt || inv.cgst || 0);
-const sgst = Number(inv.sgstAmt || inv.sgst || 0);
-const igst = Number(inv.igstAmt || inv.igst || 0);
+  const gstOnDiscounted =
+    String(inv.gstOnDiscountedAmount || "TRUE").toUpperCase() === "TRUE";
 
-const taxTotal = Number(inv.taxTotal || (cgst + sgst + igst));
-const hasTax = taxTotal > 0;
+  const afterDiscount = items - discount;
 
+  let gstBase = gstOnDiscounted
+    ? (afterDiscount + serviceAmt)      // Case-A
+    : (items + serviceAmt);             // Case-B
 
-const coupon = Number(inv.couponAmount || 0);
-const signupDiscount = Number(inv.signupDiscount || 0);
-const effectiveDiscount = coupon > 0 ? coupon : signupDiscount;
+  const taxTotal = cgst + sgst + igst;
+  const netPayable = Number(inv.netPayable || 0);
 
-// Net amount after coupon (before tax)
-const afterCoupon = Number(inv.payableAfterDiscount || (itemsSubtotal - effectiveDiscount + service + delivery));
-
-// Final payable
-const netPayable = Number(inv.netPayable || inv.grandTotal || 0);
-
-  
-  // ===== BASE TOTALS =====
+  // ================= RENDER TOTALS =================
   document.getElementById("invBase").innerHTML = `
     <div class="flex justify-between font-semibold">
       <span>Items Subtotal</span>
-      <span>${fmt(itemsSubtotal)}</span>
-
+      <span>${fmt(items)}</span>
     </div>
   `;
+
+  const c = document.getElementById("invCoupon");
+  if (discount > 0) {
+    c.classList.remove("hidden");
+    c.innerHTML = `
+      <div class="flex justify-between text-green-600">
+        <span>${coupon ? "Coupon" : "Signup Discount"}</span>
+        <span>−${fmt(discount)}</span>
+      </div>
+      <div class="flex justify-between font-semibold">
+        <span>After Discount</span>
+        <span>${fmt(afterDiscount)}</span>
+      </div>
+    `;
+  } else {
+    c.classList.add("hidden");
+  }
 
   const serviceBox = document.getElementById("invService");
+  if (serviceAmt > 0) {
+    serviceBox.classList.remove("hidden");
+    serviceBox.innerHTML = `
+      <div class="flex justify-between">
+        <span>Service Charges</span>
+        <span>${fmt(serviceAmt)}</span>
+      </div>
+    `;
+  } else {
+    serviceBox.classList.add("hidden");
+  }
 
-if (service > 0) {
-  serviceBox.classList.remove("hidden");
-  serviceBox.innerHTML = `
-    <div class="flex justify-between">
-      <span>Service Charges</span>
-      <span>${fmt(service)}</span>
-    </div>
-  `;
-} else {
-  serviceBox.classList.add("hidden");
-  serviceBox.innerHTML = "";
-}
-
-  // ===== TAXABLE AMOUNT (ALWAYS BEFORE COUPON) =====
- const taxBox = document.getElementById("invTax");
-
-if (hasTax) {
+  const taxBox = document.getElementById("invTax");
   taxBox.classList.remove("hidden");
   taxBox.innerHTML = `
     <div class="flex justify-between font-semibold">
       <span>Taxable Amount</span>
-<span>${fmt(taxableAmount)}</span>
-
-
+      <span>${fmt(gstBase)}</span>
     </div>
   `;
-} else {
-  taxBox.classList.add("hidden");
-  taxBox.innerHTML = "";
-}
-// ===== DELIVERY / COURIER CHARGES =====
-const deliveryBox = document.getElementById("invDelivery");
 
-if (inv.deliveryCharge > 0) {
-  deliveryBox.classList.remove("hidden");
-  deliveryBox.innerHTML = `
-    <div class="flex justify-between">
-      <span>${inv.deliveryChargeLabel || "Delivery Charges"}</span>
-      <span>${fmt(inv.deliveryCharge)}</span>
-    </div>
-  `;
-}
-
-// ===== COUPON / SIGNUP DISCOUNT BLOCK =====
-const c = document.getElementById("invCoupon");
-c.innerHTML = "";
-
-// coupon variable already upar defined hai — reuse karo
-let discountLabel = "";
-let discountAmount = 0;
-
-if (coupon > 0) {
-  discountLabel = `Coupon (${inv.couponId})`;
-  discountAmount = coupon;
-} else if (signupDiscount > 0) {
-  discountLabel = "Signup Discount";
-  discountAmount = signupDiscount;
-}
-
-if (discountAmount > 0) {
-  c.classList.remove("hidden");
-  c.innerHTML = `
-    <div class="flex justify-between text-green-600">
-      <span>${discountLabel}</span>
-      <span>−${fmt(discountAmount)}</span>
-    </div>
-    <div class="flex justify-between font-semibold text-black">
-      <span>Net Amount after Coupon</span>
-      <span>${fmt(afterCoupon)}</span>
-    </div>
-  `;
-} else {
-  c.classList.add("hidden");
-}
-  // ===== REMOVE OLD TAX ROWS IF ANY =====
   document.querySelectorAll(".inv-tax-row").forEach(e => e.remove());
 
-  // ===== TAXES (ALWAYS AFTER COUPON / TAXABLE) =====
-if (hasTax) {
- const taxAnchor = (coupon > 0 || signupDiscount > 0) ? c : taxBox;
-
-  taxAnchor.insertAdjacentHTML("afterend", `
+  taxBox.insertAdjacentHTML("afterend", `
     <div class="flex justify-between inv-tax-row">
       <span>CGST</span>
       <span>${fmt(cgst)}</span>
@@ -11304,44 +11222,32 @@ if (hasTax) {
       <span>${fmt(sgst)}</span>
     </div>
   `);
-}
-  // ===== NET PAYABLE =====
-  document.getElementById("invNet").innerText =
-  fmt(netPayable);
 
+  document.getElementById("invNet").innerText = fmt(netPayable);
 
   document.getElementById("invPayment").innerText =
-    `Payment: ${inv.paymentMethod}`;
-    // 🔒 LOCK CHECKOUT INVOICE SNAPSHOT (single source of truth)
+    `Payment: ${inv.paymentMethod || ""}`;
 
+  // ================= SNAPSHOT =================
   window._checkoutInvoice = {
-  items: (inv.items || []).map(i => ({ ...i })),
-
-  itemsSubtotal: Number(inv.baseTotal || 0),
-  serviceCharge: Number(inv.serviceCharges || 0),
-  deliveryCharge: Number(inv.deliveryCharge || 0),
-
-  taxableAmount: taxableAmount,
-
-  couponAmount: Number(inv.couponAmount || 0),
-  signupDiscount: Number(inv.signupDiscount || 0),
-
-  taxTotal: taxTotal,
-  cgst: cgst,
-  sgst: sgst,
-  igst: igst,
-
-  netPayable: netPayable,
-
-  couponId: inv.couponId || "",
-  paymentMethod: inv.paymentMethod || ""
-};
-
+    items: (inv.items || []).map(i => ({ ...i })),
+    itemsSubtotal: items,
+    serviceCharge: serviceAmt,
+    deliveryCharge: Number(inv.deliveryCharge || 0),
+    couponAmount: coupon,
+    signupDiscount: signup,
+    taxableAmount: gstBase,
+    cgst: cgst,
+    sgst: sgst,
+    igst: igst,
+    taxTotal: taxTotal,
+    netPayable: netPayable,
+    couponId: inv.couponId || "",
+    paymentMethod: inv.paymentMethod || ""
+  };
 
   console.log("🔐 CHECKOUT SNAPSHOT LOCKED:", window._checkoutInvoice);
-
 }
-
   
 function buildCheckoutPreviewInv() {
 
@@ -11926,6 +11832,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
