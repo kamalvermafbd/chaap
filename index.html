@@ -11098,7 +11098,7 @@ function renderInvoiceFromAPI(inv) {
       const rate = Number(i.rate || 0);
       const gross = qty * rate;
       const net = Number(i.amount || gross);
-      const discount = gross - net;
+      const disc = gross - net;
 
       return `
         <div class="border-b pb-2 mb-2">
@@ -11109,7 +11109,7 @@ function renderInvoiceFromAPI(inv) {
           <div class="text-xs text-gray-600">
             Qty ${qty} × ${fmt(rate)} = ${fmt(gross)}
           </div>
-          ${discount > 0 ? `<div class="text-xs text-green-600">Item Discount: −${fmt(discount)}</div>` : ""}
+          ${disc > 0 ? `<div class="text-xs text-green-600">Item Discount: −${fmt(disc)}</div>` : ""}
           <div class="flex justify-between text-sm font-medium">
             <span>Item Total</span>
             <span>${fmt(net)}</span>
@@ -11117,57 +11117,53 @@ function renderInvoiceFromAPI(inv) {
         </div>`;
     }).join("");
 
-  /* ================= BASE TOTAL ================= */
-  // ===== BASE AMOUNTS =====
-const items = Number(inv.baseTotal || 0);
-const coupon = Number(inv.couponAmount || 0);
-const signup = Number(inv.signupDiscount || 0);
-const discount = coupon > 0 ? coupon : signup;
-const afterDiscount = items - discount;
+  /* ================= BASE & DISCOUNT ================= */
+  const items = Number(inv.baseTotal || 0);
+  const coupon = Number(inv.couponAmount || 0);
+  const signup = Number(inv.signupDiscount || 0);
+  const discount = coupon > 0 ? coupon : signup;
+  const afterDiscount = items - discount;
 
-// ===== GST RULE =====
-const gstOnDiscounted =
-  String(inv.gstOnDiscountedAmount || "TRUE").toUpperCase() === "TRUE";
+  /* ================= GST SETTINGS ================= */
+  const gstOnDiscounted =
+    String(inv.gstOnDiscountedAmount || "TRUE").toUpperCase() === "TRUE";
 
-// ===== GST % FROM BACKEND =====
-const cgstRate = Number(inv.cgstPercent || 0);
-const sgstRate = Number(inv.sgstPercent || 0);
-const igstRate = Number(inv.igstPercent || 0);
+  const cgstRate = Number(inv.cgstPercent || 0);
+  const sgstRate = Number(inv.sgstPercent || 0);
+  const igstRate = Number(inv.igstPercent || 0);
 
-// ===== ORDER TYPE =====
-const orderType = inv.orderType || "";
+  /* ================= ORDER TYPE CHARGES ================= */
+  const orderType = inv.orderType || "";
+  let serviceAmt = 0;
+  let deliveryAmt = 0;
 
-// ===== CHARGES =====
-let serviceAmt = 0;
-let deliveryAmt = 0;
+  if (orderType === "Dine In") {
+    serviceAmt = Number(inv.serviceCharges || 0);
+  } else if (orderType === "Home Delivery" || orderType === "Courier") {
+    deliveryAmt = Number(inv.deliveryCharge || 0);
+  }
 
-if (orderType === "Dine In") {
-  serviceAmt = Number(inv.serviceCharges || 0);
-} else if (orderType === "Home Delivery" || orderType === "Courier") {
-  deliveryAmt = Number(inv.deliveryCharge || 0);
-}
+  /* ================= GST BASE ================= */
+  let gstBase = 0;
 
-// ===== GST BASE =====
-let gstBase = 0;
+  if (!orderType || orderType === "Select Order Type") {
+    // checkout open — no service / delivery
+    gstBase = gstOnDiscounted ? afterDiscount : items;
+  } else {
+    // order type selected — include charges
+    gstBase = gstOnDiscounted
+      ? (afterDiscount + serviceAmt + deliveryAmt)
+      : (items + serviceAmt + deliveryAmt);
+  }
 
-// When order type NOT selected → NO service, NO delivery
-if (!orderType || orderType === "Select Order Type") {
-  gstBase = gstOnDiscounted ? afterDiscount : items;
-} else {
-  // when orderType selected → include service/delivery
-  gstBase = gstOnDiscounted
-    ? (afterDiscount + serviceAmt + deliveryAmt)
-    : (items + serviceAmt + deliveryAmt);
-}
+  /* ================= GST ================= */
+  const cgst = gstBase * cgstRate / 100;
+  const sgst = gstBase * sgstRate / 100;
+  const igst = gstBase * igstRate / 100;
+  const taxTotal = cgst + sgst + igst;
 
-// ===== GST AMOUNTS =====
-const cgst = gstBase * cgstRate / 100;
-const sgst = gstBase * sgstRate / 100;
-const igst = gstBase * igstRate / 100;
-
-// ===== NET PAYABLE =====
-const netPayable = gstBase + cgst + sgst + igst;
-
+  /* ================= NET ================= */
+  const netPayable = gstBase + taxTotal;
 
   /* ================= RENDER TOTALS ================= */
   document.getElementById("invBase").innerHTML = `
@@ -11188,12 +11184,10 @@ const netPayable = gstBase + cgst + sgst + igst;
         <span>After Discount</span>
         <span>${fmt(afterDiscount)}</span>
       </div>`;
-  } else {
-    c.classList.add("hidden");
-  }
+  } else c.classList.add("hidden");
 
   const deliveryBox = document.getElementById("invDelivery");
-  const serviceBox = document.getElementById("invService");
+  const serviceBox  = document.getElementById("invService");
 
   if (deliveryAmt > 0) {
     deliveryBox.classList.remove("hidden");
@@ -11262,6 +11256,7 @@ const netPayable = gstBase + cgst + sgst + igst;
 
   console.log("🔐 CHECKOUT SNAPSHOT LOCKED:", window._checkoutInvoice);
 }
+
 
   
 function buildCheckoutPreviewInv() {
@@ -11847,6 +11842,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
