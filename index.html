@@ -11422,47 +11422,54 @@ const taxTotal = +(cgst + sgst + igst).toFixed(2);
 // final payable
 const netPayable = +((gross - discount) + taxTotal).toFixed(2);
 
+return {
+  // ===== HEADER =====
+  orderNumber: "PREVIEW",
+  orderDate: new Date(),
+  orderId: "-",
+  orderType,
+  deliveryCharge,
+  deliveryChargeLabel,
 
+  // ===== CUSTOMER =====
+  customerName: document.getElementById("customerName")?.value || "",
+  mobile: document.getElementById("mobile")?.value || "",
+  email: document.getElementById("email")?.value || "",
+  address: document.getElementById("address")?.value || "",
 
-  return {
-    // ===== HEADER =====
-    orderNumber: "PREVIEW",
-    orderDate: new Date(),
-    orderId: "-",
-    orderType,
-deliveryCharge,
-deliveryChargeLabel,
+  // ===== ITEMS (AS-IS FROM DRAWER CART) =====
+  items: s.items || [],
 
-    // ===== CUSTOMER =====
-    customerName: document.getElementById("customerName")?.value || "",
-    mobile: document.getElementById("mobile")?.value || "",
-    email: document.getElementById("email")?.value || "",
-    address: document.getElementById("address")?.value || "",
+  // ===== TOTALS =====
+  baseTotal: base,
 
-    // ===== ITEMS (AS-IS FROM DRAWER CART) =====
-    items: s.items || [],
+  // 🔥 backend expects this exact key
+  serviceAmt: Number(serviceCharges || 0),
 
-    // ===== TOTALS (LOCKED FROM DRAWER CART) =====
-    // ===== TOTALS (LOCKED FROM DRAWER CART) =====
-baseTotal: base,
+  // 🔥 GST base (coupon rule already applied above)
+  taxableAmount: taxBase,
 
-serviceCharges,
+  // 🔥 split GST (sheet driven)
+  cgstAmt: cgst,
+  sgstAmt: sgst,
+  igstAmt: igst,
 
-// 🔥 ALL COUPONS (FINAL & FUTURE SAFE)
-couponAmount: Number(s.couponAmount || 0),
+  // 🔥 ALL COUPONS (FINAL & FUTURE SAFE)
+  couponAmount: Number(s.couponAmount || 0),
+  normalCoupon: s.couponAmount || 0,
+  rewardDiscount: s.rewardDiscount || 0,
+  paidCouponDiscount: s.paidCouponDiscount || 0,
+  signupDiscount: s.signupDiscount || 0,
 
-normalCoupon: s.couponAmount || 0,
-rewardDiscount: s.rewardDiscount || 0,
-paidCouponDiscount: s.paidCouponDiscount || 0,
-signupDiscount: s.signupDiscount || 0,
-    taxTotal,
-  netPayable,
-// 🔒 FINAL PAYABLE (SINGLE SOURCE)
+  // 🔥 totals
+  taxTotal: taxTotal,
+  grandTotal: netPayable,
+  netPayable: netPayable,
 
-    // ===== PAYMENT =====
-    paymentMethod:
-      document.getElementById("paymentMethod")?.value || ""
-  };
+  // ===== PAYMENT =====
+  paymentMethod: document.getElementById("paymentMethod")?.value || ""
+};
+
 }
  
 function syncCouponFromDrawerForCheckout() {
@@ -11957,6 +11964,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
