@@ -11247,9 +11247,11 @@ if (discount > 0) {
 // 2️⃣ Charges come after After Discount
 if (deliveryAmt > 0) {
   insertAfter.insertAdjacentElement("afterend", deliveryBox);
+  deliveryBox.classList.remove("hidden");
   insertAfter = deliveryBox;
 } else if (serviceAmt > 0) {
   insertAfter.insertAdjacentElement("afterend", serviceBox);
+   serviceBox.classList.remove("hidden"); 
   insertAfter = serviceBox;
 }
 
@@ -11910,6 +11912,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
