@@ -9088,30 +9088,14 @@ if (isNaN(signupDiscount)) signupDiscount = 0;
   // =====================================================
   // ========== 4) TAX + SERVICE CHARGE ==================
   // =====================================================
-  // ===== Order Type (blank / Dine In / Home Delivery)
-const orderType = document.getElementById("orderType")?.value || "";
+  const t = restaurantTax || {};
 
-// ===== SERVICE / DELIVERY =====
-let serviceAmt = 0;
-let deliveryAmt = 0;
+  let serviceAmt = 0;
+  if (t.servicePercent > 0) {
+    serviceAmt = payable * (t.servicePercent / 100);
+  }
 
-if (orderType === "Dine In") {
-  serviceAmt = payable * (t.servicePercent / 100);
-}
-
-if (orderType === "Home Delivery" || orderType === "Courier") {
-  deliveryAmt = Number(window.deliveryCharge || 0);
-}
-
-// ===== GST BASE =====
-let taxable;
-
-if (String(t.gstOnDiscountedAmount).toUpperCase() === "TRUE") {
-  taxable = payable + serviceAmt + deliveryAmt;
-} else {
-  taxable = subtotal + serviceAmt + deliveryAmt;
-}
-
+  let taxable = payable + serviceAmt;
 
   let cgstAmt = taxable * ((t.cgstPercent || 0) / 100);
   let sgstAmt = taxable * ((t.sgstPercent || 0) / 100);
@@ -9170,18 +9154,17 @@ if (String(t.gstOnDiscountedAmount).toUpperCase() === "TRUE") {
 
   }
 window._drawerTotals = {
-  baseTotal: subtotal,
-  offerDiscount: offerDiscount,
-  signupDiscount: signupDiscount,
-  payableAfterDiscount: payable,
-  serviceAmt: serviceAmt,
-  deliveryAmt: deliveryAmt,
-  taxableAmount: taxable,
-  cgstAmt: cgstAmt,
-  sgstAmt: sgstAmt,
-  igstAmt: igstAmt,
-  grandTotal: grandTotal
-};
+    baseTotal: subtotal,
+    offerDiscount: offerDiscount,
+    signupDiscount: signupDiscount,
+    payableAfterDiscount: payable,
+    serviceAmt: serviceAmt,
+    taxableAmount: taxable,
+    cgstAmt: cgstAmt,
+    sgstAmt: sgstAmt,
+    igstAmt: igstAmt,
+    grandTotal: grandTotal
+  };
 
   try { updateCartBadge(); } catch(e){}
    refreshCouponMotivationHint();
@@ -11322,27 +11305,17 @@ function buildCheckoutPreviewInv() {
   /* ======================
      GST RATES (from drawer)
   ====================== */
-  const cgstRate = Number(window.restaurantTax?.cgstPercent || 0) / 100;
-const sgstRate = Number(window.restaurantTax?.sgstPercent || 0) / 100;
-const igstRate = Number(window.restaurantTax?.igstPercent || 0) / 100;
+  const drawerTaxable = Number(d.taxableAmount || 0);
+  const cgstRate = drawerTaxable > 0 ? (Number(d.cgstAmt || 0) / drawerTaxable) : 0;
+  const sgstRate = drawerTaxable > 0 ? (Number(d.sgstAmt || 0) / drawerTaxable) : 0;
+  const igstRate = drawerTaxable > 0 ? (Number(d.igstAmt || 0) / drawerTaxable) : 0;
 
   /* ======================
      GST BASE
   ====================== */
- const gstOnDiscounted =
-  String(window.restaurantTax?.gstOnDiscountedAmount || "TRUE").toUpperCase() === "TRUE";
-
-let gstBase;
-
-if (!isOrderTypeChosen) {
-  // checkout open
-  gstBase = gstOnDiscounted ? afterDiscount : base;
-} else {
-  // order type chosen → include charges
-  gstBase = gstOnDiscounted
-    ? (afterDiscount + serviceAmt + deliveryAmt)
-    : (base + serviceAmt + deliveryAmt);
-}
+  const gstBase = isOrderTypeChosen
+    ? Number(d.taxableAmount || 0)   // drawer already includes service/delivery
+    : afterDiscount;                // clean base when orderType not chosen
 
   /* ======================
      TAX AMOUNTS
@@ -11399,7 +11372,6 @@ if (!isOrderTypeChosen) {
     paymentMethod: document.getElementById("paymentMethod")?.value || ""
   };
 }
-  
 function syncCouponFromDrawerForCheckout() {
   if (!window.cartSummary) return;
   if (!window._drawerTotals) return;
@@ -11892,77 +11864,6 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
