@@ -2298,14 +2298,22 @@ async function loadRestaurantSettings() {
   try {
     const res = await apiGet("getRestaurantInfo");
 
-    if (res && res.success && res.currency) {
-      window.CURRENCY = res.currency.trim();
-      console.log("🔥 Currency Loaded:", window.CURRENCY);
+    if (res && res.success) {
+      if (res.currency) {
+        window.CURRENCY = res.currency.trim();
+        console.log("🔥 Currency Loaded:", window.CURRENCY);
+      }
+
+      if (typeof res.gstOnDiscountedAmount !== "undefined") {
+        window.gstOnDiscountedAmount = String(res.gstOnDiscountedAmount).toUpperCase() === "TRUE";
+        console.log("🔥 GST on Discounted Amount:", window.gstOnDiscountedAmount);
+      }
     }
   } catch (err) {
-    console.error("Currency load error:", err);
+    console.error("Restaurant settings load error:", err);
   }
 }
+
 
 // === END CURRENCY SETUP ===
 
@@ -11401,8 +11409,15 @@ const taxBase = gstOnDiscountedAmount
   : gross;
 
 // tax
-const taxPercent = Number(s.taxPercent || 5);
-const taxTotal = +(taxBase * taxPercent / 100).toFixed(2);
+const cgstPercent = Number(window.restaurantTax?.cgstPercent || 0);
+const sgstPercent = Number(window.restaurantTax?.sgstPercent || 0);
+const igstPercent = Number(window.restaurantTax?.igstPercent || 0);
+
+const cgst = +(taxBase * cgstPercent / 100).toFixed(2);
+const sgst = +(taxBase * sgstPercent / 100).toFixed(2);
+const igst = +(taxBase * igstPercent / 100).toFixed(2);
+
+const taxTotal = +(cgst + sgst + igst).toFixed(2);
 
 // final payable
 const netPayable = +((gross - discount) + taxTotal).toFixed(2);
@@ -11942,6 +11957,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
