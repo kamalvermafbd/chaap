@@ -11374,10 +11374,15 @@ function renderInvoiceFromAPI(inv) {
     igstAmt: igst,
     taxTotal,
     netPayable,
-
+cgstPercent: window.cgstPercent,
+sgstPercent: window.sgstPercent,
+igstPercent: window.igstPercent,
+gstOnDiscountedAmount: window.gstOnDiscountedAmount,
+    
     // ===== COUPONS =====
-    couponAmount: normalCoupon,
-    normalCoupon,
+   couponAmount: Number(s.couponAmount || 0),
+normalCoupon: Number(s.couponAmount || 0),
+
     rewardDiscount: reward,
     paidCouponDiscount: paid,
     signupDiscount: signup,
@@ -11880,6 +11885,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
