@@ -6322,10 +6322,13 @@ async function saveCartToBackend(cartData = null) {
  blockRender = false;  
       window.cartSaveLock = false;
 
-      if (window.cartSaveQueued) {
-        window.cartSaveQueued = false;
-        await saveCartToBackend();
-      }
+     if (window.cartSaveQueued) {
+  window.cartSaveQueued = false;
+  const p2 = saveCartToBackend();
+  window._cartSavePromise = p2;
+  await p2;
+}
+
   // FINAL SAFE CHECK
     if (isLoggedIn()) {
         
@@ -11917,6 +11920,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
