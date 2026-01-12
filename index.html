@@ -6267,10 +6267,10 @@ item.itemId = String(
 
 // Delegated click handler for all Add buttons (works for Single and Multi)
 // ADD-TO-CART HANDLER
+window._cartSavePromise = Promise.resolve();
 
 async function saveCartToBackend(cartData = null) {
-  return new Promise(async (resolve) => {
-
+   const p = new Promise(async (resolve) => {
     // Only if logged in
     if (!isLoggedIn()) return resolve();
 
@@ -6335,6 +6335,10 @@ async function saveCartToBackend(cartData = null) {
     }
 
   });
+    // 🔒 register this save as "latest"
+  window._cartSavePromise = p;
+
+  return p;
 }
 
 
@@ -11456,7 +11460,10 @@ if (container.innerText.includes("Coupon")) return;
   }
 }
 
- function updateCheckoutInvoice() {
+ async function updateCheckoutInvoice() {
+     if (window._cartSavePromise) {
+    await window._cartSavePromise;
+  }
     toggleAddressField(); 
   syncCouponFromDrawerForCheckout();
   mountInvoiceIntoCheckout();
@@ -11910,6 +11917,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
