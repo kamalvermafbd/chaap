@@ -11111,31 +11111,48 @@ function renderInvoiceFromAPI(inv) {
       </div>`;
   } else addrBox.classList.add("hidden");
 
-  /* ================= ITEMS ================= */
-  document.getElementById("invoiceItems").innerHTML =
-    (inv.items || []).map((i, idx) => {
-      const qty = Number(i.qty || 0);
-      const rate = Number(i.rate || 0);
-      const gross = qty * rate;
-      const net = Number(i.amount || gross);
-      const disc = gross - net;
+ /* ================= ITEMS ================= */
+document.getElementById("invoiceItems").innerHTML =
+  (inv.items || []).map((i, idx) => {
+    const qty = Number(i.qty || 0);
+    const rate = Number(i.rate || 0);
+    const discPercent = Number(i.discPercent || 0);
 
-      return `
-        <div class="border-b pb-2 mb-2">
-          <div class="font-semibold">
-            ${idx + 1}. ${i.name}
-            <span class="text-xs text-gray-500">(${i.unit})</span>
-          </div>
-          <div class="text-xs text-gray-600">
-            Qty ${qty} × ${fmt(rate)} = ${fmt(gross)}
-          </div>
-          ${disc > 0 ? `<div class="text-xs text-green-600">Item Discount: −${fmt(disc)}</div>` : ""}
-          <div class="flex justify-between text-sm font-medium">
-            <span>Item Total</span>
-            <span>${fmt(net)}</span>
-          </div>
-        </div>`;
-    }).join("");
+    const gross = qty * rate;              // MRP total
+    const net   = Number(i.amount || gross); // discounted total
+    const discAmt = gross - net;           // discount amount
+
+    return `
+      <div class="border-b pb-2 mb-2">
+        <div class="font-semibold">
+          ${idx + 1}. ${i.name}
+          <span class="text-xs text-gray-500">(${i.unit})</span>
+        </div>
+
+        <div class="text-xs text-gray-600">
+          Qty ${qty} × ${fmt(rate)} = ${fmt(gross)}
+        </div>
+
+        ${
+          discPercent > 0
+            ? `
+              <div class="text-xs text-green-600">
+                Discount: ${discPercent}%  (−${fmt(discAmt)})
+              </div>
+              <div class="text-xs text-gray-600">
+                Net Rate: ${fmt(net / qty)}
+              </div>
+            `
+            : ""
+        }
+
+        <div class="flex justify-between text-sm font-medium mt-0.5">
+          <span>Item Total</span>
+          <span>${fmt(net)}</span>
+        </div>
+      </div>`;
+  }).join("");
+
 
   /* ================= ORDER TYPE CHARGES ================= */
   const orderType = inv.orderType || "";
@@ -11932,6 +11949,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
