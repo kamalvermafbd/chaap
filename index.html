@@ -11263,29 +11263,43 @@ function renderInvoiceFromAPI(inv) {
 
   const orderType = document.getElementById("orderType")?.value || "";
   const eligibility = window.orderEligibility || {};
-
   const isOrderTypeChosen = orderType && orderType !== "Select Order Type";
 
   /* ======================
-     SERVICE / DELIVERY
+     BASE & COUPONS
+  ====================== */
+  const base = Number(d.baseTotal || 0);
+
+  const normalCoupon = Number(d.couponAmount || 0);
+  const signup = Number(d.signupDiscount || 0);
+  const reward = Number(d.rewardDiscount || 0);
+  const paid   = Number(d.paidCouponDiscount || 0);
+
+  // Sale value after ONLY normal coupon
+  const grossValue = base - normalCoupon;
+
+  // What customer pays before tax
+  const afterAllDiscounts = grossValue - signup - reward - paid;
+
+  /* ======================
+     SERVICE / DELIVERY (on GROSS VALUE)
   ====================== */
   let serviceAmt = 0;
   let deliveryAmt = 0;
   let deliveryChargeLabel = "";
 
+  const servicePercent  = Number(window.servicePercent || 0) / 100;
+  const deliveryPercent = Number(window.deliveryPercent || 0) / 100;
+
   if (isOrderTypeChosen) {
-  // Recalculate service/delivery on GROSS VALUE (not on drawer value)
-const servicePercent = Number(window.servicePercent || 0) / 100;
-const deliveryPercent = Number(window.deliveryPercent || 0) / 100;
+    if (orderType === "Dine In") {
+      serviceAmt = grossValue * servicePercent;
+    }
+    else if (orderType === "Home Delivery" || orderType === "Courier") {
+      deliveryAmt = grossValue * deliveryPercent;
+    }
 
-if (orderType === "Dine In") {
-  serviceAmt = grossValue * servicePercent;
-}
-else if (orderType === "Home Delivery" || orderType === "Courier") {
-  deliveryAmt = grossValue * deliveryPercent;
-}
-
-
+    // Eligibility override (flat delivery if any)
     if (
       eligibility.allowed &&
       eligibility.extraCharge > 0 &&
@@ -11297,32 +11311,14 @@ else if (orderType === "Home Delivery" || orderType === "Courier") {
   }
 
   /* ======================
-     BASE & DISCOUNT
-  ====================== */
-  const base = Number(d.baseTotal || 0);
-  
-
-  /* ======================
-     GST RULES (from getRestaurantInfo)
+     GST RULES
   ====================== */
   const cgstRate = Number(window.cgstPercent || 0) / 100;
   const sgstRate = Number(window.sgstPercent || 0) / 100;
   const igstRate = Number(window.igstPercent || 0) / 100;
 
-const normalCoupon = Number(d.couponAmount || 0);
-const signup = Number(d.signupDiscount || 0);
-const reward = Number(d.rewardDiscount || 0);
-const paid = Number(d.paidCouponDiscount || 0);
-
-// Sale value after only normal coupon
-const grossValue = base - normalCoupon;
-
-// What customer pays before tax
-const afterAllDiscounts = grossValue - signup - reward - paid;
-
-// GST base (service/delivery added later)
-const gstBase = grossValue + serviceAmt + deliveryAmt;
-
+  // GST base = Gross value + Service/Delivery
+  const gstBase = grossValue + serviceAmt + deliveryAmt;
 
   /* ======================
      TAX AMOUNTS
@@ -11336,16 +11332,17 @@ const gstBase = grossValue + serviceAmt + deliveryAmt;
      NET PAYABLE
   ====================== */
   const netPayable =
-  (afterAllDiscounts + serviceAmt + deliveryAmt) + taxTotal;
+    (afterAllDiscounts + serviceAmt + deliveryAmt) + taxTotal;
 
-console.log("🧪 PREVIEW DEBUG", {
-  orderType,
-  serviceAmt,
-  serviceFromDrawer: d.serviceAmt,
-  windowServicePercent: window.servicePercent,
-  base,
-  afterAllDiscounts
-});
+  console.log("🧪 PREVIEW DEBUG", {
+    orderType,
+    grossValue,
+    serviceAmt,
+    deliveryAmt,
+    gstBase,
+    afterAllDiscounts,
+    netPayable
+  });
 
   /* ======================
      RETURN PAYLOAD
@@ -11370,26 +11367,20 @@ console.log("🧪 PREVIEW DEBUG", {
 
     // ===== TOTALS =====
     baseTotal: base,
-    serviceAmt: serviceAmt,
+    serviceAmt,
     taxableAmount: gstBase,
     cgstAmt: cgst,
     sgstAmt: sgst,
     igstAmt: igst,
-    taxTotal: taxTotal,
-    netPayable: netPayable,
-
-    // 🔥 ADD THESE — so invoice renderer gets GST rules
-    cgstPercent: window.cgstPercent,
-    sgstPercent: window.sgstPercent,
-    igstPercent: window.igstPercent,
-    gstOnDiscountedAmount: window.gstOnDiscountedAmount,
+    taxTotal,
+    netPayable,
 
     // ===== COUPONS =====
-    couponAmount: Number(s.couponAmount || 0),
-    normalCoupon: s.couponAmount || 0,
-    rewardDiscount: s.rewardDiscount || 0,
-    paidCouponDiscount: s.paidCouponDiscount || 0,
-    signupDiscount: s.signupDiscount || 0,
+    couponAmount: normalCoupon,
+    normalCoupon,
+    rewardDiscount: reward,
+    paidCouponDiscount: paid,
+    signupDiscount: signup,
 
     // ===== PAYMENT =====
     paymentMethod: document.getElementById("paymentMethod")?.value || ""
@@ -11889,6 +11880,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
