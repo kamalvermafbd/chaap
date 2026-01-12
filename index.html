@@ -11134,21 +11134,24 @@ document.getElementById("invoiceItems").innerHTML =
           <span class="text-xs text-gray-500">(${i.unit})</span>
         </div>
 
-        <div class="text-xs text-gray-600">
-          Qty ${qty} × ${fmt(rate)} = ${fmt(gross)}
-        </div>
-
         ${
           discPercent > 0
             ? `
+              <div class="text-xs text-gray-600">
+                Qty ${qty} × ${fmt(rate)} = ${fmt(gross)}
+              </div>
               <div class="text-xs text-green-600">
-                Discount: ${discPercent}% (−${fmt(discAmt)})
+                Discount: ${discPercent}% on ${fmt(gross)} i.e. ${fmt(discAmt)}
               </div>
               <div class="text-xs text-gray-600">
-                Net Rate: ${fmt(netRate)}
+                Net Rate: ${fmt(gross)} − ${fmt(discAmt)} = ${fmt(net)}
               </div>
             `
-            : ""
+            : `
+              <div class="text-xs text-gray-600">
+                Qty ${qty} × ${fmt(rate)} = ${fmt(gross)}
+              </div>
+            `
         }
 
         <div class="flex justify-between text-sm font-medium mt-0.5">
@@ -11158,7 +11161,6 @@ document.getElementById("invoiceItems").innerHTML =
       </div>
     `;
   }).join("");
-
 
   /* ================= ORDER TYPE CHARGES ================= */
   const orderType = inv.orderType || "";
@@ -11955,6 +11957,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
