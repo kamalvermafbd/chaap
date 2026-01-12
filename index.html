@@ -11291,9 +11291,9 @@ if (signup > 0) {
   /* ======================
      BASE & COUPONS
   ====================== */
-  const base = Number(d.baseTotal || 0);
+const base = Number(d.baseTotal || 0);
 
-  const normalCoupon = Number(s.couponAmount || 0);
+const normalCoupon = Number(s.couponAmount || 0);
 const signup = Number(s.signupDiscount || 0);
 const reward = Number(s.rewardDiscount || 0);
 const paid   = Number(s.paidCouponDiscount || 0);
@@ -11320,7 +11320,7 @@ const paid   = Number(s.paidCouponDiscount || 0);
       serviceAmt = grossValue * servicePercent;
     }
     else if (orderType === "Home Delivery" || orderType === "Courier") {
-      deliveryAmt = grossValue * deliveryPercent;
+      deliveryAmt = Number(d.deliveryCharge || 0); 
     }
 
     // Eligibility override (flat delivery if any)
@@ -11916,6 +11916,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
