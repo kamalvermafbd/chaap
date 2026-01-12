@@ -11512,6 +11512,7 @@ async function updateCheckoutInvoice() {
     });
 
     inv = await res.json();
+    mountInvoiceIntoCheckout(); 
     renderInvoiceFromAPI(inv);   // ✅ ONLY backend snapshot
   }
   catch (e) {
@@ -11951,6 +11952,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
