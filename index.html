@@ -11189,7 +11189,7 @@ if (normalCoupon > 0) {
       <span>Normal Coupon</span>
       <span>−${fmt(normalCoupon)}</span>
     </div>
-    <div class="flex justify-between font-semibold">
+    <div class="flex justify-between font-semibold text-gray-900">
       <span>Gross Value</span>
       <span>${fmt(grossValue)}</span>
     </div>`;
@@ -11887,8 +11887,7 @@ function updatePlaceOrderLockByLocation() {
   <div id="invBase"></div>
 
   <!-- Coupon & Gross come immediately after Items -->
-  <div id="invCoupon" class="text-green-600 hidden"></div>
-
+<div id="invCoupon" class="hidden"></div>
   <!-- Charges -->
   <div id="invService"></div>
   <div id="invDelivery"></div>
@@ -11917,6 +11916,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
