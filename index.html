@@ -7024,8 +7024,8 @@ hideAddressIfOrderTypeBlank();
   }, 0);
 
 
-mountInvoiceIntoCheckout();
-  updateCheckoutInvoice();
+//mountInvoiceIntoCheckout();
+//  updateCheckoutInvoice();
 toggleAddressField();
 
 }
@@ -11488,31 +11488,50 @@ if (container.innerText.includes("Coupon")) return;
   }
 }
 
- async function updateCheckoutInvoice() {
-   document.getElementById("checkoutInvoiceOverlay")?.classList.remove("hidden");
+async function updateCheckoutInvoice() {
+  document.getElementById("checkoutInvoiceOverlay")?.classList.remove("hidden");
 
-     if (window._cartSavePromise) {
+  if (window._cartSavePromise) {
     await window._cartSavePromise;
   }
-    toggleAddressField(); 
+
+  toggleAddressField(); 
   syncCouponFromDrawerForCheckout();
   mountInvoiceIntoCheckout();
 
-  const inv = buildCheckoutPreviewInv();
-  renderInvoiceFromAPI(inv);
-document.getElementById("checkoutInvoiceOverlay")?.classList.add("hidden");
+  let inv = null;
 
-  // 🔒 SINGLE CONTROL POINT
+  try {
+    const res = await fetch(API_URL + "?action=previewInvoice", {
+      method: "POST",
+      body: JSON.stringify({
+        cart: getCart(),
+        mobile: getMobile(),
+        orderType: document.getElementById("orderType")?.value || ""
+      })
+    });
+
+    inv = await res.json();
+    renderInvoiceFromAPI(inv);   // ✅ ONLY backend snapshot
+  }
+  catch (e) {
+    alert("Failed to load invoice. Please try again.");
+    return;
+  }
+  finally {
+    document.getElementById("checkoutInvoiceOverlay")?.classList.add("hidden");
+  }
+
+  // 🔒 SINGLE CONTROL POINT — now safe
   const root = document.getElementById("checkoutInvoiceContainer");
 
   // Service
-const serviceBox = root.querySelector("#invService");
-if (inv.serviceAmt > 0) {
-  serviceBox.classList.remove("hidden");
-} else {
-  serviceBox.classList.add("hidden");
-}
-
+  const serviceBox = root.querySelector("#invService");
+  if (inv.serviceAmt > 0) {
+    serviceBox.classList.remove("hidden");
+  } else {
+    serviceBox.classList.add("hidden");
+  }
 
   // Delivery
   const deliveryBox = root.querySelector("#invDelivery");
@@ -11522,7 +11541,7 @@ if (inv.serviceAmt > 0) {
     deliveryBox.classList.add("hidden");
   }
 
-  // ✅ PAYMENT (checkout preview only)
+  // Payment
   const payBox = root.querySelector("#invPayment");
   if (!inv.paymentMethod || inv.paymentMethod.trim() === "") {
     payBox.classList.add("hidden");
@@ -11532,7 +11551,6 @@ if (inv.serviceAmt > 0) {
 
   injectCheckoutOfferDiscount(inv);
 }
-
 
 
   
@@ -11957,6 +11975,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
