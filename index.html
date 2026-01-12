@@ -7024,8 +7024,8 @@ hideAddressIfOrderTypeBlank();
   }, 0);
 
 
-//mountInvoiceIntoCheckout();
-updateCheckoutInvoice();
+mountInvoiceIntoCheckout();
+  updateCheckoutInvoice();
 toggleAddressField();
 
 }
@@ -11111,56 +11111,31 @@ function renderInvoiceFromAPI(inv) {
       </div>`;
   } else addrBox.classList.add("hidden");
 
-/* ================= ITEMS ================= */
-document.getElementById("invoiceItems").innerHTML =
-  (inv.items || []).map((i, idx) => {
+  /* ================= ITEMS ================= */
+  document.getElementById("invoiceItems").innerHTML =
+    (inv.items || []).map((i, idx) => {
+      const qty = Number(i.qty || 0);
+      const rate = Number(i.rate || 0);
+      const gross = qty * rate;
+      const net = Number(i.amount || gross);
+      const disc = gross - net;
 
-    const qty = Number(i.qty || 0);
-    const rate = Number(i.rate || 0);
-    const discPercent = Number(i.discPercent || 0);
-
-    const gross = qty * rate;
-
-    // 🔥 SAME FORMULA AS DRAWER
-    const perUnitDiscount = rate * discPercent / 100;
-    const netRate = rate - perUnitDiscount;
-    const net = netRate * qty;
-    const discAmt = gross - net;
-
-    return `
-      <div class="border-b pb-2 mb-2">
-        <div class="font-semibold">
-          ${idx + 1}. ${i.name}
-          <span class="text-xs text-gray-500">(${i.unit})</span>
-        </div>
-
-        ${
-          discPercent > 0
-            ? `
-              <div class="text-xs text-gray-600">
-                Qty ${qty} × ${fmt(rate)} = ${fmt(gross)}
-              </div>
-              <div class="text-xs text-green-600">
-                Discount: ${discPercent}% on ${fmt(gross)} i.e. ${fmt(discAmt)}
-              </div>
-              <div class="text-xs text-gray-600">
-                Net Rate: ${fmt(gross)} − ${fmt(discAmt)} = ${fmt(net)}
-              </div>
-            `
-            : `
-              <div class="text-xs text-gray-600">
-                Qty ${qty} × ${fmt(rate)} = ${fmt(gross)}
-              </div>
-            `
-        }
-
-        <div class="flex justify-between text-sm font-medium mt-0.5">
-          <span>Item Total</span>
-          <span>${fmt(net)}</span>
-        </div>
-      </div>
-    `;
-  }).join("");
+      return `
+        <div class="border-b pb-2 mb-2">
+          <div class="font-semibold">
+            ${idx + 1}. ${i.name}
+            <span class="text-xs text-gray-500">(${i.unit})</span>
+          </div>
+          <div class="text-xs text-gray-600">
+            Qty ${qty} × ${fmt(rate)} = ${fmt(gross)}
+          </div>
+          ${disc > 0 ? `<div class="text-xs text-green-600">Item Discount: −${fmt(disc)}</div>` : ""}
+          <div class="flex justify-between text-sm font-medium">
+            <span>Item Total</span>
+            <span>${fmt(net)}</span>
+          </div>
+        </div>`;
+    }).join("");
 
   /* ================= ORDER TYPE CHARGES ================= */
   const orderType = inv.orderType || "";
@@ -11488,46 +11463,51 @@ if (container.innerText.includes("Coupon")) return;
   }
 }
 
-async function updateCheckoutInvoice() {
-  document.getElementById("checkoutInvoiceOverlay")?.classList.remove("hidden");
+ async function updateCheckoutInvoice() {
+   document.getElementById("checkoutInvoiceOverlay")?.classList.remove("hidden");
 
-  if (window._cartSavePromise) {
+     if (window._cartSavePromise) {
     await window._cartSavePromise;
   }
-
-  toggleAddressField(); 
+    toggleAddressField(); 
   syncCouponFromDrawerForCheckout();
- 
-  let inv = null;
+  mountInvoiceIntoCheckout();
 
-  try {
-   const res = await fetch(API_BASE + "?action=previewInvoice", {
+  const inv = buildCheckoutPreviewInv();
+  renderInvoiceFromAPI(inv);
+document.getElementById("checkoutInvoiceOverlay")?.classList.add("hidden");
 
-      method: "POST",
-      body: JSON.stringify({
-        cart: getCart(),
-        mobile: getMobile(),
-        orderType: document.getElementById("orderType")?.value || ""
-      })
-    });
+  // 🔒 SINGLE CONTROL POINT
+  const root = document.getElementById("checkoutInvoiceContainer");
 
-    inv = await res.json();
-    mountInvoiceIntoCheckout(); 
-    renderInvoiceFromAPI(inv);   // ✅ ONLY backend snapshot
+  // Service
+const serviceBox = root.querySelector("#invService");
+if (inv.serviceAmt > 0) {
+  serviceBox.classList.remove("hidden");
+} else {
+  serviceBox.classList.add("hidden");
+}
+
+
+  // Delivery
+  const deliveryBox = root.querySelector("#invDelivery");
+  if (inv.deliveryCharge > 0) {
+    deliveryBox.classList.remove("hidden");
+  } else {
+    deliveryBox.classList.add("hidden");
   }
-  catch (e) {
-    alert("Failed to load invoice. Please try again.");
-    return;
-  }
-  finally {
-    document.getElementById("checkoutInvoiceOverlay")?.classList.add("hidden");
+
+  // ✅ PAYMENT (checkout preview only)
+  const payBox = root.querySelector("#invPayment");
+  if (!inv.paymentMethod || inv.paymentMethod.trim() === "") {
+    payBox.classList.add("hidden");
+  } else {
+    payBox.classList.remove("hidden");
   }
 
-  // 🔒 SINGLE CONTROL POINT — now safe
-
- 
   injectCheckoutOfferDiscount(inv);
 }
+
 
 
   
@@ -11868,7 +11848,9 @@ function updatePlaceOrderLockByLocation() {
 <!-- ========================= -->
 <!-- INVOICE MODAL -->
 <!-- ========================= -->
-
+<div
+  id="invoiceModal"
+  class="fixed inset-0 bg-black bg-opacity-50 hidden z-[9999] flex items-center justify-center">
 <div id="checkoutInvoiceOverlay"
      class="hidden fixed inset-0 bg-white bg-opacity-80 z-[9999] flex items-center justify-center">
   <div class="text-center">
@@ -11878,9 +11860,7 @@ function updatePlaceOrderLockByLocation() {
     </div>
   </div>
 </div>
-<div
-  id="invoiceModal"
-  class="fixed inset-0 bg-black bg-opacity-50 hidden z-[9999] flex items-center justify-center">
+
   <div class="bg-white w-[95%] max-w-xl rounded-xl p-4 text-sm relative">
 <div id="invoiceTemplate">
 
@@ -11952,18 +11932,6 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
