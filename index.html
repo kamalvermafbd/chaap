@@ -11054,12 +11054,6 @@ function formatInvoiceDate(dt) {
 
 function renderInvoiceFromAPI(inv) {
   console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
-console.log("🧾 INVOICE READS", {
-  orderType: inv.orderType,
-serviceAmt: inv.serviceAmt,
-  serviceCharges: inv.serviceCharges,
-  deliveryCharge: inv.deliveryCharge
-});
 
   /* ================= HEADER ================= */
   const orderDt = new Date(inv.orderDate).toLocaleString();
@@ -11108,9 +11102,7 @@ serviceAmt: inv.serviceAmt,
         <span class="font-semibold">Address</span>
         <span>: ${inv.address}</span>
       </div>`;
-  } else {
-    addrBox.classList.add("hidden");
-  }
+  } else addrBox.classList.add("hidden");
 
   /* ================= ITEMS ================= */
   document.getElementById("invoiceItems").innerHTML =
@@ -11138,22 +11130,6 @@ serviceAmt: inv.serviceAmt,
         </div>`;
     }).join("");
 
-  /* ================= BASE & DISCOUNT ================= */
-  const items = Number(inv.baseTotal || 0);
-  const coupon = Number(inv.couponAmount || 0);
-  const signup = Number(inv.signupDiscount || 0);
-  const discount = coupon > 0 ? coupon : signup;
-  const afterDiscount = items - discount;
-
-  /* ================= GST SETTINGS ================= */
-  const gstOnDiscounted =
-  String(inv.gstOnDiscountedAmount).toUpperCase() === "TRUE";
-
-
-  const cgstRate = Number(inv.cgstPercent || 0);
-  const sgstRate = Number(inv.sgstPercent || 0);
-  const igstRate = Number(inv.igstPercent || 0);
-
   /* ================= ORDER TYPE CHARGES ================= */
   const orderType = inv.orderType || "";
   let serviceAmt = 0;
@@ -11165,13 +11141,28 @@ serviceAmt: inv.serviceAmt,
     deliveryAmt = Number(inv.deliveryCharge || 0);
   }
 
-  /* ================= GST BASE ================= */
-  /* ================= GST BASE (BACKEND AUTHORITATIVE) ================= */
-const gstBase = gstOnDiscounted
-  ? (afterDiscount + serviceAmt + deliveryAmt)
-  : (items + serviceAmt + deliveryAmt);
+  /* ================= BASE & COUPONS ================= */
+  const items = Number(inv.baseTotal || 0);
+
+  const normalCoupon = Number(inv.couponAmount || 0);
+  const signup = Number(inv.signupDiscount || 0);
+  const reward = Number(inv.rewardDiscount || 0);
+  const paid = Number(inv.paidCouponDiscount || 0);
+
+  // Actual selling price
+  const grossValue = items - normalCoupon;
+
+  // What customer pays before tax
+  const afterAllDiscounts = grossValue - signup - reward - paid;
+
+  // 🔥 FINAL GST BASE
+  const gstBase = grossValue + serviceAmt + deliveryAmt;
 
   /* ================= GST ================= */
+  const cgstRate = Number(inv.cgstPercent || 0);
+  const sgstRate = Number(inv.sgstPercent || 0);
+  const igstRate = Number(inv.igstPercent || 0);
+
   const cgst = gstBase * cgstRate / 100;
   const sgst = gstBase * sgstRate / 100;
   const igst = gstBase * igstRate / 100;
@@ -11179,7 +11170,7 @@ const gstBase = gstOnDiscounted
 
   /* ================= NET ================= */
   const netPayable =
-  (afterDiscount + serviceAmt + deliveryAmt) + taxTotal;
+    (afterAllDiscounts + serviceAmt + deliveryAmt) + taxTotal;
 
   /* ================= RENDER TOTALS ================= */
   document.getElementById("invBase").innerHTML = `
@@ -11189,16 +11180,16 @@ const gstBase = gstOnDiscounted
     </div>`;
 
   const c = document.getElementById("invCoupon");
-  if (discount > 0) {
+  if (normalCoupon > 0) {
     c.classList.remove("hidden");
     c.innerHTML = `
       <div class="flex justify-between text-green-600">
-        <span>${coupon ? "Coupon" : "Signup Discount"}</span>
-        <span>−${fmt(discount)}</span>
+        <span>Normal Coupon</span>
+        <span>−${fmt(normalCoupon)}</span>
       </div>
       <div class="flex justify-between font-semibold">
-        <span>After Discount</span>
-        <span>${fmt(afterDiscount)}</span>
+        <span>Gross Value</span>
+        <span>${fmt(grossValue)}</span>
       </div>`;
   } else c.classList.add("hidden");
 
@@ -11224,54 +11215,19 @@ const gstBase = gstOnDiscounted
   } else serviceBox.classList.add("hidden");
 
   const taxBox = document.getElementById("invTax");
-  document.querySelectorAll(".inv-tax-row").forEach(e => e.remove());
-
   taxBox.innerHTML = `
-    <div class="flex justify-between font-semibold inv-tax-row">
+    <div class="flex justify-between font-semibold">
       <span>Taxable Amount</span>
       <span>${fmt(gstBase)}</span>
-    </div>`;
-
-  // Always place taxable block AFTER charges (delivery/service) if present,
-// otherwise after After Discount if present, else after Items Subtotal
-
-// Start after Items Subtotal
-let insertAfter = document.getElementById("invBase");
-
-// 1️⃣ Discount always comes immediately after Items
-if (discount > 0) {
-  insertAfter.insertAdjacentElement("afterend", c);
-  insertAfter = c;
-}
-
-
-// 2️⃣ Charges come after After Discount (BOTH allowed)
-if (deliveryAmt > 0) {
-  insertAfter.insertAdjacentElement("afterend", deliveryBox);
-  deliveryBox.classList.remove("hidden");
-  insertAfter = deliveryBox;
-}
-
-if (serviceAmt > 0) {
-  insertAfter.insertAdjacentElement("afterend", serviceBox);
-  serviceBox.classList.remove("hidden");
-  insertAfter = serviceBox;
-}
-
-
-// 3️⃣ Taxable always comes after Charges
-insertAfter.insertAdjacentElement("afterend", taxBox);
-
-
-  taxBox.insertAdjacentHTML("afterend", `
-    <div class="flex justify-between inv-tax-row">
+    </div>
+    <div class="flex justify-between">
       <span>CGST</span>
       <span>${fmt(cgst)}</span>
     </div>
-    <div class="flex justify-between inv-tax-row">
+    <div class="flex justify-between">
       <span>SGST</span>
       <span>${fmt(sgst)}</span>
-    </div>`);
+    </div>`;
 
   document.getElementById("invNet").innerText = fmt(netPayable);
   document.getElementById("invPayment").innerText =
@@ -11283,8 +11239,10 @@ insertAfter.insertAdjacentElement("afterend", taxBox);
     itemsSubtotal: items,
     serviceCharge: serviceAmt,
     deliveryCharge: deliveryAmt,
-    couponAmount: coupon,
+    normalCoupon,
     signupDiscount: signup,
+    rewardDiscount: reward,
+    paidCouponDiscount: paid,
     taxableAmount: gstBase,
     cgst, sgst, igst,
     taxTotal,
@@ -11336,7 +11294,7 @@ insertAfter.insertAdjacentElement("afterend", taxBox);
      BASE & DISCOUNT
   ====================== */
   const base = Number(d.baseTotal || 0);
-  const afterDiscount = Number(d.payableAfterDiscount || base);
+  
 
   /* ======================
      GST RULES (from getRestaurantInfo)
@@ -11345,12 +11303,20 @@ insertAfter.insertAdjacentElement("afterend", taxBox);
   const sgstRate = Number(window.sgstPercent || 0) / 100;
   const igstRate = Number(window.igstPercent || 0) / 100;
 
-  const gstOnDiscounted = window.gstOnDiscountedAmount === true;
+const normalCoupon = Number(d.couponAmount || 0);
+const signup = Number(d.signupDiscount || 0);
+const reward = Number(d.rewardDiscount || 0);
+const paid = Number(d.paidCouponDiscount || 0);
 
-  /* ======================
-     GST BASE
-  ====================== */
-  const gstBase = gstOnDiscounted ? afterDiscount : base;
+// Sale value after only normal coupon
+const grossValue = base - normalCoupon;
+
+// What customer pays before tax
+const afterAllDiscounts = grossValue - signup - reward - paid;
+
+// GST base (service/delivery added later)
+const gstBase = grossValue + serviceAmt + deliveryAmt;
+
 
   /* ======================
      TAX AMOUNTS
@@ -11364,7 +11330,7 @@ insertAfter.insertAdjacentElement("afterend", taxBox);
      NET PAYABLE
   ====================== */
   const netPayable =
-  (afterDiscount + serviceAmt + deliveryAmt) + taxTotal;
+  (afterAllDiscounts + serviceAmt + deliveryAmt) + taxTotal;
 
 console.log("🧪 PREVIEW DEBUG", {
   orderType,
@@ -11372,7 +11338,7 @@ console.log("🧪 PREVIEW DEBUG", {
   serviceFromDrawer: d.serviceAmt,
   windowServicePercent: window.servicePercent,
   base,
-  afterDiscount
+  afterAllDiscounts
 });
 
   /* ======================
@@ -11917,6 +11883,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
