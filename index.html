@@ -11111,16 +11111,21 @@ function renderInvoiceFromAPI(inv) {
       </div>`;
   } else addrBox.classList.add("hidden");
 
- /* ================= ITEMS ================= */
+/* ================= ITEMS ================= */
 document.getElementById("invoiceItems").innerHTML =
   (inv.items || []).map((i, idx) => {
+
     const qty = Number(i.qty || 0);
     const rate = Number(i.rate || 0);
     const discPercent = Number(i.discPercent || 0);
 
-    const gross = qty * rate;              // MRP total
-    const net   = Number(i.amount || gross); // discounted total
-    const discAmt = gross - net;           // discount amount
+    const gross = qty * rate;
+
+    // 🔥 SAME FORMULA AS DRAWER
+    const perUnitDiscount = rate * discPercent / 100;
+    const netRate = rate - perUnitDiscount;
+    const net = netRate * qty;
+    const discAmt = gross - net;
 
     return `
       <div class="border-b pb-2 mb-2">
@@ -11137,10 +11142,10 @@ document.getElementById("invoiceItems").innerHTML =
           discPercent > 0
             ? `
               <div class="text-xs text-green-600">
-                Discount: ${discPercent}%  (−${fmt(discAmt)})
+                Discount: ${discPercent}% (−${fmt(discAmt)})
               </div>
               <div class="text-xs text-gray-600">
-                Net Rate: ${fmt(net / qty)}
+                Net Rate: ${fmt(netRate)}
               </div>
             `
             : ""
@@ -11150,7 +11155,8 @@ document.getElementById("invoiceItems").innerHTML =
           <span>Item Total</span>
           <span>${fmt(net)}</span>
         </div>
-      </div>`;
+      </div>
+    `;
   }).join("");
 
 
@@ -11949,6 +11955,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
