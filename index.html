@@ -11173,61 +11173,84 @@ function renderInvoiceFromAPI(inv) {
     (afterAllDiscounts + serviceAmt + deliveryAmt) + taxTotal;
 
   /* ================= RENDER TOTALS ================= */
-  document.getElementById("invBase").innerHTML = `
-    <div class="flex justify-between font-semibold">
-      <span>Items Subtotal</span>
-      <span>${fmt(items)}</span>
-    </div>`;
+  // 1️⃣ Items
+document.getElementById("invBase").innerHTML = `
+  <div class="flex justify-between font-semibold">
+    <span>Items Subtotal</span>
+    <span>${fmt(items)}</span>
+  </div>`;
 
-  const c = document.getElementById("invCoupon");
-  if (normalCoupon > 0) {
-    c.classList.remove("hidden");
-    c.innerHTML = `
-      <div class="flex justify-between text-green-600">
-        <span>Normal Coupon</span>
-        <span>−${fmt(normalCoupon)}</span>
-      </div>
-      <div class="flex justify-between font-semibold">
-        <span>Gross Value</span>
-        <span>${fmt(grossValue)}</span>
-      </div>`;
-  } else c.classList.add("hidden");
-
-  const deliveryBox = document.getElementById("invDelivery");
-  const serviceBox  = document.getElementById("invService");
-
-  if (deliveryAmt > 0) {
-    deliveryBox.classList.remove("hidden");
-    deliveryBox.innerHTML = `
-      <div class="flex justify-between">
-        <span>${inv.deliveryChargeLabel || "Delivery Charges"}</span>
-        <span>${fmt(deliveryAmt)}</span>
-      </div>`;
-  } else deliveryBox.classList.add("hidden");
-
-  if (serviceAmt > 0) {
-    serviceBox.classList.remove("hidden");
-    serviceBox.innerHTML = `
-      <div class="flex justify-between">
-        <span>Service Charges</span>
-        <span>${fmt(serviceAmt)}</span>
-      </div>`;
-  } else serviceBox.classList.add("hidden");
-
-  const taxBox = document.getElementById("invTax");
-  taxBox.innerHTML = `
-    <div class="flex justify-between font-semibold">
-      <span>Taxable Amount</span>
-      <span>${fmt(gstBase)}</span>
+// 2️⃣ Normal Coupon + Gross
+const c = document.getElementById("invCoupon");
+if (normalCoupon > 0) {
+  c.classList.remove("hidden");
+  c.innerHTML = `
+    <div class="flex justify-between text-green-600">
+      <span>Normal Coupon</span>
+      <span>−${fmt(normalCoupon)}</span>
     </div>
-    <div class="flex justify-between">
-      <span>CGST</span>
-      <span>${fmt(cgst)}</span>
-    </div>
-    <div class="flex justify-between">
-      <span>SGST</span>
-      <span>${fmt(sgst)}</span>
+    <div class="flex justify-between font-semibold">
+      <span>Gross Value</span>
+      <span>${fmt(grossValue)}</span>
     </div>`;
+} else {
+  c.classList.add("hidden");
+}
+
+// 3️⃣ Service / Delivery
+const deliveryBox = document.getElementById("invDelivery");
+const serviceBox  = document.getElementById("invService");
+
+if (deliveryAmt > 0) {
+  deliveryBox.classList.remove("hidden");
+  deliveryBox.innerHTML = `
+    <div class="flex justify-between">
+      <span>${inv.deliveryChargeLabel || "Delivery Charges"}</span>
+      <span>${fmt(deliveryAmt)}</span>
+    </div>`;
+} else deliveryBox.classList.add("hidden");
+
+if (serviceAmt > 0) {
+  serviceBox.classList.remove("hidden");
+  serviceBox.innerHTML = `
+    <div class="flex justify-between">
+      <span>Service Charges</span>
+      <span>${fmt(serviceAmt)}</span>
+    </div>`;
+} else serviceBox.classList.add("hidden");
+
+// 4️⃣ Tax block
+const taxBox = document.getElementById("invTax");
+taxBox.innerHTML = `
+  <div class="flex justify-between font-semibold">
+    <span>Taxable Amount</span>
+    <span>${fmt(gstBase)}</span>
+  </div>
+  <div class="flex justify-between">
+    <span>CGST</span>
+    <span>${fmt(cgst)}</span>
+  </div>
+  <div class="flex justify-between">
+    <span>SGST</span>
+    <span>${fmt(sgst)}</span>
+  </div>
+  <div class="flex justify-between font-semibold">
+    <span>Bill Amount</span>
+    <span>${fmt(gstBase + taxTotal)}</span>
+  </div>`;
+
+// 5️⃣ Signup Discount (after Bill)
+const signupBox = document.getElementById("invSignup");
+if (signup > 0) {
+  signupBox.classList.remove("hidden");
+  signupBox.innerHTML = `
+    <div class="flex justify-between text-green-600">
+      <span>Signup Discount</span>
+      <span>−${fmt(signup)}</span>
+    </div>`;
+} else {
+  signupBox.classList.add("hidden");
+}
 
   document.getElementById("invNet").innerText = fmt(netPayable);
   document.getElementById("invPayment").innerText =
@@ -11868,6 +11891,7 @@ function updatePlaceOrderLockByLocation() {
 
       <div id="invCoupon"
            class="text-green-600 hidden"></div>
+      <div id="invSignup" class="text-green-600 hidden"></div>
     </div>
 
     <hr class="my-2">
@@ -11886,6 +11910,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
