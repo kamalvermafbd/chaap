@@ -11138,7 +11138,7 @@ function renderInvoiceFromAPI(inv) {
   if (orderType === "Dine In") {
     serviceAmt = Number(inv.serviceAmt || 0);
   } else if (orderType === "Home Delivery" || orderType === "Courier") {
-    deliveryAmt = Number(inv.deliveryCharge || 0);
+    deliveryAmt = Number(d.deliveryCharge || 0);
   }
 
   /* ================= BASE & COUPONS ================= */
@@ -11916,6 +11916,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
