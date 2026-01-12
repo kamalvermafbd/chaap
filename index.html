@@ -11464,6 +11464,8 @@ if (container.innerText.includes("Coupon")) return;
 }
 
  async function updateCheckoutInvoice() {
+   document.getElementById("checkoutInvoiceOverlay")?.classList.remove("hidden");
+
      if (window._cartSavePromise) {
     await window._cartSavePromise;
   }
@@ -11473,6 +11475,7 @@ if (container.innerText.includes("Coupon")) return;
 
   const inv = buildCheckoutPreviewInv();
   renderInvoiceFromAPI(inv);
+document.getElementById("checkoutInvoiceOverlay")?.classList.add("hidden");
 
   // 🔒 SINGLE CONTROL POINT
   const root = document.getElementById("checkoutInvoiceContainer");
@@ -11848,6 +11851,15 @@ function updatePlaceOrderLockByLocation() {
 <div
   id="invoiceModal"
   class="fixed inset-0 bg-black bg-opacity-50 hidden z-[9999] flex items-center justify-center">
+<div id="checkoutInvoiceOverlay"
+     class="hidden fixed inset-0 bg-white bg-opacity-80 z-[9999] flex items-center justify-center">
+  <div class="text-center">
+    <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-500 border-t-transparent mx-auto"></div>
+    <div class="mt-3 text-gray-700 font-semibold">
+      Please wait, preparing your invoice…
+    </div>
+  </div>
+</div>
 
   <div class="bg-white w-[95%] max-w-xl rounded-xl p-4 text-sm relative">
 <div id="invoiceTemplate">
@@ -11920,12 +11932,6 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
-
-
-
-
-
-
 
 
 
