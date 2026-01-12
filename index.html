@@ -11270,10 +11270,11 @@ function renderInvoiceFromAPI(inv) {
   ====================== */
   const base = Number(d.baseTotal || 0);
 
-  const normalCoupon = Number(d.couponAmount || 0);
-  const signup = Number(d.signupDiscount || 0);
-  const reward = Number(d.rewardDiscount || 0);
-  const paid   = Number(d.paidCouponDiscount || 0);
+  const normalCoupon = Number(s.couponAmount || 0);
+const signup = Number(s.signupDiscount || 0);
+const reward = Number(s.rewardDiscount || 0);
+const paid   = Number(s.paidCouponDiscount || 0);
+
 
   // Sale value after ONLY normal coupon
   const grossValue = base - normalCoupon;
@@ -11885,6 +11886,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
