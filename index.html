@@ -11279,6 +11279,7 @@ if (signup > 0) {
 
 
   function buildCheckoutPreviewInv() {
+console.log("🚚 ELIGIBILITY USED:", window.orderEligibility);
 
   // 🔒 SINGLE SOURCE OF TRUTH (drawer cart snapshot for amounts only)
   const s = window.cartSummary || {};
@@ -11321,8 +11322,8 @@ const paid   = Number(s.paidCouponDiscount || 0);
   }
   else if (orderType === "Home Delivery" || orderType === "Courier") {
     // 🔥 Delivery ALWAYS from backend eligibility
-    deliveryAmt = Number(eligibility.extraCharge || 0);
-    deliveryChargeLabel = eligibility.chargeType || "Delivery Charges";
+   deliveryAmt = Number(window.orderEligibility?.extraCharge || 0);
+  deliveryChargeLabel = window.orderEligibility?.chargeType || "Delivery Charges";
   }
 }
 
@@ -11909,6 +11910,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
