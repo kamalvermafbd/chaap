@@ -11316,23 +11316,16 @@ const paid   = Number(s.paidCouponDiscount || 0);
   const deliveryPercent = Number(window.deliveryPercent || 0) / 100;
 
   if (isOrderTypeChosen) {
-    if (orderType === "Dine In") {
-      serviceAmt = grossValue * servicePercent;
-    }
-    else if (orderType === "Home Delivery" || orderType === "Courier") {
-      deliveryAmt = Number(d.deliveryCharge || 0); 
-    }
-
-    // Eligibility override (flat delivery if any)
-    if (
-      eligibility.allowed &&
-      eligibility.extraCharge > 0 &&
-      (orderType === "Home Delivery" || orderType === "Courier")
-    ) {
-      deliveryAmt = Number(eligibility.extraCharge);
-      deliveryChargeLabel = eligibility.chargeType || "Delivery Charges";
-    }
+  if (orderType === "Dine In") {
+    serviceAmt = grossValue * servicePercent;
   }
+  else if (orderType === "Home Delivery" || orderType === "Courier") {
+    // 🔥 Delivery ALWAYS from backend eligibility
+    deliveryAmt = Number(eligibility.extraCharge || 0);
+    deliveryChargeLabel = eligibility.chargeType || "Delivery Charges";
+  }
+}
+
 
   /* ======================
      GST RULES
@@ -11916,6 +11909,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
