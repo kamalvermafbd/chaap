@@ -11883,16 +11883,23 @@ function updatePlaceOrderLockByLocation() {
     <hr class="my-2">
 
     <!-- TOTALS -->
-    <div class="space-y-1 text-xs text-gray-700">
-      <div id="invBase"></div>
-      <div id="invService"></div>
-      <div id="invDelivery"></div>
-      <div id="invTax"></div>
+  <div class="space-y-1 text-xs text-gray-700">
+  <div id="invBase"></div>
 
-      <div id="invCoupon"
-           class="text-green-600 hidden"></div>
-      <div id="invSignup" class="text-green-600 hidden"></div>
-    </div>
+  <!-- Coupon & Gross come immediately after Items -->
+  <div id="invCoupon" class="text-green-600 hidden"></div>
+
+  <!-- Charges -->
+  <div id="invService"></div>
+  <div id="invDelivery"></div>
+
+  <!-- Tax block (Taxable + CGST + SGST + Bill Amount) -->
+  <div id="invTax"></div>
+
+  <!-- Post-tax discounts -->
+  <div id="invSignup" class="text-green-600 hidden"></div>
+</div>
+
 
     <hr class="my-2">
 
@@ -11910,30 +11917,6 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
