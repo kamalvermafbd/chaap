@@ -11501,7 +11501,8 @@ async function updateCheckoutInvoice() {
   let inv = null;
 
   try {
-    const res = await fetch(API_URL + "?action=previewInvoice", {
+   const res = await fetch(API_BASE + "?action=previewInvoice", {
+
       method: "POST",
       body: JSON.stringify({
         cart: getCart(),
@@ -11950,6 +11951,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
