@@ -11522,32 +11522,8 @@ async function updateCheckoutInvoice() {
   }
 
   // 🔒 SINGLE CONTROL POINT — now safe
-  const root = document.getElementById("checkoutInvoiceContainer");
 
-  // Service
-  const serviceBox = root.querySelector("#invService");
-  if (inv.serviceAmt > 0) {
-    serviceBox.classList.remove("hidden");
-  } else {
-    serviceBox.classList.add("hidden");
-  }
-
-  // Delivery
-  const deliveryBox = root.querySelector("#invDelivery");
-  if (inv.deliveryCharge > 0) {
-    deliveryBox.classList.remove("hidden");
-  } else {
-    deliveryBox.classList.add("hidden");
-  }
-
-  // Payment
-  const payBox = root.querySelector("#invPayment");
-  if (!inv.paymentMethod || inv.paymentMethod.trim() === "") {
-    payBox.classList.add("hidden");
-  } else {
-    payBox.classList.remove("hidden");
-  }
-
+ 
   injectCheckoutOfferDiscount(inv);
 }
 
@@ -11974,6 +11950,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
