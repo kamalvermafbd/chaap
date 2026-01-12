@@ -11274,11 +11274,17 @@ function renderInvoiceFromAPI(inv) {
   let deliveryChargeLabel = "";
 
   if (isOrderTypeChosen) {
-    if (orderType === "Dine In") {
-      serviceAmt = Number(d.serviceAmt || 0);
-    } else if (orderType === "Home Delivery" || orderType === "Courier") {
-      deliveryAmt = Number(d.deliveryCharge || 0);
-    }
+  // Recalculate service/delivery on GROSS VALUE (not on drawer value)
+const servicePercent = Number(window.servicePercent || 0) / 100;
+const deliveryPercent = Number(window.deliveryPercent || 0) / 100;
+
+if (orderType === "Dine In") {
+  serviceAmt = grossValue * servicePercent;
+}
+else if (orderType === "Home Delivery" || orderType === "Courier") {
+  deliveryAmt = grossValue * deliveryPercent;
+}
+
 
     if (
       eligibility.allowed &&
@@ -11883,6 +11889,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
