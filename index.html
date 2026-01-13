@@ -7739,7 +7739,6 @@ async function updateCart(itemId, variantId = "", action, meta = {}) {
 
   // 🔒 START LOCK
 window._cartUpdating = true;
-renderCart();        // DOM recreate hoga
 syncCheckoutButton(); // uske baad button ko lock + grey karo
 
   itemId = String(itemId);
@@ -7807,7 +7806,6 @@ syncCheckoutButton(); // uske baad button ko lock + grey karo
     // minimum visible lock (UX)
     setTimeout(() => {
   window._cartUpdating = false;
-  renderCart();          // DOM recreate
   syncCheckoutButton();  // phir enable
 }, 300);
 
@@ -12070,6 +12068,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
