@@ -3297,12 +3297,17 @@ async function updateQty(index, newQty) {
 
   // 🔒 TRANSACTION START
   window._cartUpdating = true;
-syncCheckoutButton();
+  window._cartLockStart = Date.now();   // 👈 for minimum lock time
+  syncCheckoutButton();
+  renderCart();
+
   if (blockRender) return;
 
+  // 1 — Validate qty
   newQty = Number(newQty);
   if (isNaN(newQty) || newQty < 1) newQty = 1;
 
+  // ⭐ Remove onetime / regular coupon if qty changes
   if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type === "regular")) {
     selectedCoupon = null;
     alreadyAppliedCouponId = "";
@@ -3311,22 +3316,40 @@ syncCheckoutButton();
     if (appliedBox) appliedBox.style.display = "none";
   }
 
+  // 2 — Update cart
   cart[index].qty = newQty;
 
+  // 3 — Save to localStorage for guests
   if (!isLoggedIn()) {
     localStorage.setItem("guestCart", JSON.stringify(cart));
   }
 
+  // 4 — Instant UI refresh
   renderCart();
   updateCartBadge();
 
+  // 5 — Backend save
   try {
     window._cartSavePromise = saveCartToBackend();
     await window._cartSavePromise;
-  } finally {
-    window._cartUpdating = false;
-    syncCheckoutButton();
-    renderCart();   // 🔥 this will unlock button via renderCart logic
+  }
+  finally {
+
+    // 🔓 ENSURE MINIMUM LOCK TIME (UX FIX)
+    const elapsed = Date.now() - window._cartLockStart;
+    const MIN_LOCK = 400;   // ms — human visible lock
+
+    const unlock = () => {
+      window._cartUpdating = false;
+      syncCheckoutButton();
+      renderCart();
+    };
+
+    if (elapsed < MIN_LOCK) {
+      setTimeout(unlock, MIN_LOCK - elapsed);
+    } else {
+      unlock();
+    }
   }
 }
 
@@ -12018,6 +12041,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
