@@ -7033,16 +7033,15 @@ function updateCartBadge() {
 
   if (window._cartUpdating) {
     btn.disabled = true;
-    btn.innerText = "Updating cart…";
-    btn.classList.remove("bg-red-500", "hover:bg-red-600");
-    btn.classList.add("bg-gray-400", "cursor-not-allowed", "opacity-60");
+    btn.innerText = "Processing...";
+    btn.classList.add("opacity-50", "cursor-not-allowed");
   } else {
     btn.disabled = false;
     btn.innerText = "Checkout";
-    btn.classList.remove("bg-gray-400", "cursor-not-allowed", "opacity-60");
-    btn.classList.add("bg-red-500", "hover:bg-red-600");
+    btn.classList.remove("opacity-50", "cursor-not-allowed");
   }
 }
+
 
 async function openCheckout() {
 
@@ -7739,9 +7738,9 @@ async function updateCart(itemId, variantId = "", action, meta = {}) {
   console.log("🟡 updateCart drawer");
 
   // 🔒 START LOCK
-  window._cartUpdating = true;
-  syncCheckoutButton();
-  renderCart();   // show gray checkout immediately
+window._cartUpdating = true;
+renderCart();        // DOM recreate hoga
+syncCheckoutButton(); // uske baad button ko lock + grey karo
 
   itemId = String(itemId);
   variantId = String(variantId);
@@ -7807,10 +7806,11 @@ async function updateCart(itemId, variantId = "", action, meta = {}) {
   function unlock() {
     // minimum visible lock (UX)
     setTimeout(() => {
-      window._cartUpdating = false;
-      syncCheckoutButton();
-      renderCart();
-    }, 300);
+  window._cartUpdating = false;
+  renderCart();          // DOM recreate
+  syncCheckoutButton();  // phir enable
+}, 300);
+
   }
 }
 
@@ -12070,6 +12070,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
