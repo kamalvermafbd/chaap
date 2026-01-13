@@ -11481,28 +11481,24 @@ if (container.innerText.includes("Coupon")) return;
 
   function lockCheckout(text = "Updating cart…") {
   const btn = document.getElementById("checkoutBtn");
-
-  // If drawer not open yet, try again on next frame
-  if (!btn) {
-    requestAnimationFrame(() => lockCheckout(text));
-    return;
-  }
+  if (!btn) return;
 
   btn.disabled = true;
   btn.dataset.originalText = btn.innerText;
   btn.innerText = text;
-  btn.classList.add("opacity-60", "cursor-not-allowed");
+
+  // 🔥 THIS IS WHAT YOUR CSS IS WAITING FOR
+  btn.classList.add("disabled-btn");
 }
-
-
 function unlockCheckout() {
   const btn = document.getElementById("checkoutBtn");
   if (!btn) return;
 
   btn.disabled = false;
   btn.innerText = btn.dataset.originalText || "Checkout";
-  btn.classList.remove("opacity-60", "cursor-not-allowed");
+  btn.classList.remove("disabled-btn");
 }
+
 
  async function updateCheckoutInvoice() {
    document.getElementById("checkoutInvoiceOverlay")?.classList.remove("hidden");
@@ -11973,6 +11969,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
