@@ -6976,7 +6976,7 @@ function updateCartBadge() {
 
 async function openCheckout() {
 
-  // ✅ 0️⃣ FIRST — close drawer cart
+  // ✅ 0️⃣ Close drawer cart
   closeCartDrawer();
 
   // 🔒 Lock background scroll
@@ -6996,7 +6996,7 @@ async function openCheckout() {
   autofillMobileForLoggedIn();
   resetCheckoutFieldsDefault();
   document.getElementById("orderType").value = "";
-hideAddressIfOrderTypeBlank();
+  hideAddressIfOrderTypeBlank();
   setupAddressUIVisibility();
   loadPrimaryAddress();
 
@@ -7007,7 +7007,7 @@ hideAddressIfOrderTypeBlank();
   const modal = document.getElementById("checkoutModal");
   modal.style.display = "flex";
 
-  // 🔒 FIX: Logged-in user → hide mobile hint
+  // 🔒 Logged-in user → hide mobile hint
   if (isLoggedIn()) {
     const hint = document.getElementById("mobileHint");
     if (hint) hint.style.display = "none";
@@ -7016,20 +7016,28 @@ hideAddressIfOrderTypeBlank();
   // 🔁 Restore correct UI AFTER modal open
   setTimeout(() => {
     updateGuestFieldsVisibility();
-
     const orderType = document.getElementById("orderType")?.value;
-    if (orderType) {
-      toggleAddressField();
-    }
+    if (orderType) toggleAddressField();
   }, 0);
 
+  // ===============================
+  // 🔥 CHECKOUT INVOICE FLOW
+  // ===============================
 
-mountInvoiceIntoCheckout();
-  updateCheckoutInvoice();
-toggleAddressField();
+  // 1️⃣ Mount invoice ONCE
+  mountInvoiceIntoCheckout();
+
+  // 2️⃣ Show overlay
+  const overlay = document.getElementById("checkoutInvoiceOverlay");
+  if (overlay) overlay.classList.remove("hidden");
+
+  // 3️⃣ Build invoice
+  updateCheckoutInvoice().finally(() => {
+    // 4️⃣ Hide overlay when ready
+    if (overlay) overlay.classList.add("hidden");
+  });
 
 }
-
 
 
 
@@ -11471,15 +11479,12 @@ if (container.innerText.includes("Coupon")) return;
 }
 async function updateCheckoutInvoice() {
 
-  // 🔒 If cart updating → skip silently (no overlay flicker)
+  // 🔒 If cart updating → skip silently
   if (window._cartUpdating) return;
 
   // 🔒 Prevent re-entry
   if (window._invoiceBusy) return;
   window._invoiceBusy = true;
-
-  const overlay = document.getElementById("checkoutInvoiceOverlay");
-  if (overlay) overlay.classList.remove("hidden");
 
   try {
     if (window._cartSavePromise) {
@@ -11488,9 +11493,6 @@ async function updateCheckoutInvoice() {
 
     toggleAddressField(); 
     syncCouponFromDrawerForCheckout();
-
-    // ❌ DO NOT remount every time
-    // mountInvoiceIntoCheckout();
 
     const inv = buildCheckoutPreviewInv();
     renderInvoiceFromAPI(inv);
@@ -11525,10 +11527,10 @@ async function updateCheckoutInvoice() {
     injectCheckoutOfferDiscount(inv);
 
   } finally {
-    if (overlay) overlay.classList.add("hidden");
-    window._invoiceBusy = false;   // 🔓 THIS WAS MISSING
+    window._invoiceBusy = false;
   }
 }
+
 
 
 
@@ -11954,6 +11956,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
