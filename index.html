@@ -7014,51 +7014,91 @@ function updateCartBadge() {
 }
 
 
+// Replace any existing syncCheckoutButton() with this robust version
 function syncCheckoutButton() {
-    console.log("SYNC → cartUpdating =", window._cartUpdating);
-  if (typeof lockCheckout === "function" && typeof unlockCheckout === "function") {
-    const btn = document.getElementById("checkoutBtn");
-
-    if (window._cartUpdating) {
-      // 🔥 save original text once
-      if (btn && !btn.dataset.originalText) {
-        btn.dataset.originalText = btn.innerText || "Checkout";
-      }
-
-      lockCheckout("Processing...");
-    } else {
-      unlockCheckout();
-
-      // 🔥 restore text after unlock
-      if (btn && btn.dataset.originalText) {
-        btn.innerText = btn.dataset.originalText;
-        delete btn.dataset.originalText;
-      }
-    }
-    return;
-  }
-
-  // ===== fallback (unchanged) =====
   const btn = document.getElementById("checkoutBtn");
   if (!btn) return;
 
-  if (window._cartUpdating) {
-    if (!btn.dataset.originalText) btn.dataset.originalText = btn.innerText || "Checkout";
-    btn.disabled = true;
-    btn.innerText = "Processing...";
+  // store default text once (safe fallback)
+  if (!btn.dataset.defaultText) btn.dataset.defaultText = (btn.innerText || "Checkout").trim();
+
+  const showProcessing = !!window._cartUpdating;
+  const defaultText = btn.dataset.defaultText || "Checkout";
+  const processingText = "Processing...";
+
+  // Apply desired state immediately
+  btn.disabled = showProcessing;
+  btn.textContent = showProcessing ? processingText : defaultText;
+  btn.setAttribute("aria-busy", showProcessing ? "true" : "false");
+
+  // class toggles (keeps styling consistent)
+  if (showProcessing) {
     btn.classList.remove("bg-red-500", "hover:bg-red-600");
     btn.classList.add("bg-gray-400", "cursor-not-allowed", "opacity-60");
-    btn.style.backgroundColor = "#9ca3af";
-    btn.style.cursor = "not-allowed";
   } else {
-    btn.disabled = false;
-    btn.innerText = btn.dataset.originalText || "Checkout";
     btn.classList.remove("bg-gray-400", "cursor-not-allowed", "opacity-60");
     btn.classList.add("bg-red-500", "hover:bg-red-600");
-    btn.style.backgroundColor = "";
-    btn.style.cursor = "";
+  }
+
+  // Defensive: if someone else keeps overwriting the text, watch and correct temporarily.
+  // Install a MutationObserver only once per button; it auto-disconnects after idle.
+  if (!btn._syncObserverInstalled) {
+    const mo = new MutationObserver(() => {
+      // If unlocked, ensure default text stays restored
+      if (!window._cartUpdating) {
+        if ((btn.textContent || "").trim() !== defaultText) {
+          btn.textContent = defaultText;
+        }
+        if (btn.disabled) btn.disabled = false;
+        btn.setAttribute("aria-busy", "false");
+        btn.classList.remove("bg-gray-400", "cursor-not-allowed", "opacity-60");
+        btn.classList.add("bg-red-500", "hover:bg-red-600");
+      } else {
+        // while locked, ensure processing is visible
+        if ((btn.textContent || "").trim() !== processingText) {
+          btn.textContent = processingText;
+        }
+        if (!btn.disabled) btn.disabled = true;
+        btn.setAttribute("aria-busy", "true");
+        btn.classList.remove("bg-red-500", "hover:bg-red-600");
+        btn.classList.add("bg-gray-400", "cursor-not-allowed", "opacity-60");
+      }
+    });
+
+    mo.observe(btn, { childList: true, subtree: true, characterData: true });
+
+    btn._syncObserverInstalled = true;
+
+    // Auto-disconnect after 2s of stable unlocked state to avoid permanent watching
+    let idleTimer = null;
+    function resetIdleTimer() {
+      clearTimeout(idleTimer);
+      if (!window._cartUpdating) {
+        idleTimer = setTimeout(() => {
+          try { mo.disconnect(); } catch (e) {}
+          btn._syncObserverInstalled = false;
+        }, 2000);
+      }
+    }
+
+    // reset on every sync call (so keep it alive while updates happen)
+    resetIdleTimer();
+    // also hook simple event listeners to detect activity and reset idle
+    const activityHandler = () => resetIdleTimer();
+    document.addEventListener("click", activityHandler, { passive: true });
+    document.addEventListener("keydown", activityHandler, { passive: true });
+
+    // cleanup listeners once observer disconnected
+    const cleanupCheck = setInterval(() => {
+      if (!btn._syncObserverInstalled) {
+        clearInterval(cleanupCheck);
+        document.removeEventListener("click", activityHandler);
+        document.removeEventListener("keydown", activityHandler);
+      }
+    }, 500);
   }
 }
+
 
 
 async function openCheckout() {
@@ -12094,6 +12134,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
