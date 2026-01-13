@@ -3258,6 +3258,22 @@ if (checkoutModal && checkoutModal.style.display === "flex") {
 }
 
   updateCartBadge();
+  // 🔒 Checkout button state must always follow cart transaction state
+const checkoutBtn = document.getElementById("checkoutBtn");
+if (checkoutBtn) {
+  if (window._cartUpdating) {
+    checkoutBtn.disabled = true;
+    checkoutBtn.innerText = "Updating cart…";
+    checkoutBtn.style.backgroundColor = "#9ca3af";
+    checkoutBtn.style.cursor = "not-allowed";
+  } else {
+    checkoutBtn.disabled = false;
+    checkoutBtn.innerText = "Checkout";
+    checkoutBtn.style.backgroundColor = "";
+    checkoutBtn.style.cursor = "";
+  }
+}
+
 }
 
 
@@ -3265,53 +3281,37 @@ if (checkoutModal && checkoutModal.style.display === "flex") {
 // Ultra-stable qty update handler (no debounce, no rollback)
 async function updateQty(index, newQty) {
 
-  // 🔒 TRANSACTION START — user pressed + / −
+  // 🔒 TRANSACTION START
   window._cartUpdating = true;
-  lockCheckout("Updating cart…");
 
-  // If backend save is running → skip UI update
   if (blockRender) return;
 
-  // 1 — Validate qty
   newQty = Number(newQty);
   if (isNaN(newQty) || newQty < 1) newQty = 1;
 
-  // ⭐ G3: REMOVE COUPON IF QTY CHANGES (only for onetime coupons)
-  if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type === "regular"))  {
-
-      selectedCoupon = null;
-      alreadyAppliedCouponId = "";
-
-      showCouponError("Coupon removed because cart quantity changed. Please apply again.");
-
-      const appliedBox = document.getElementById("bestOfferApplied");
-      if (appliedBox) appliedBox.style.display = "none";
+  if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type === "regular")) {
+    selectedCoupon = null;
+    alreadyAppliedCouponId = "";
+    showCouponError("Coupon removed because cart quantity changed. Please apply again.");
+    const appliedBox = document.getElementById("bestOfferApplied");
+    if (appliedBox) appliedBox.style.display = "none";
   }
 
-  // 2 — Update cart safely
   cart[index].qty = newQty;
 
-  // 3 — Save immediately to local storage
   if (!isLoggedIn()) {
     localStorage.setItem("guestCart", JSON.stringify(cart));
   }
 
-  // 4 — Re-render cart instantly
   renderCart();
-if (window._cartUpdating) {
-  lockCheckout("Updating cart…");
-}
-  // 5 — Update badge
   updateCartBadge();
 
-  // 6 — Backend save
   try {
     window._cartSavePromise = saveCartToBackend();
     await window._cartSavePromise;
   } finally {
-    // 🔓 TRANSACTION END
     window._cartUpdating = false;
-    unlockCheckout();
+    renderCart();   // 🔥 this will unlock button via renderCart logic
   }
 }
 
@@ -11985,6 +11985,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
