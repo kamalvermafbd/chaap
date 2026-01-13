@@ -7016,28 +7016,26 @@ function updateCartBadge() {
 
 // Replace any existing syncCheckoutButton() with this robust version
 function syncCheckoutButton() {
-    console.log("SYNC → cartUpdating =", window._cartUpdating);
-  if (typeof lockCheckout === "function" && typeof unlockCheckout === "function") {
-    const btn = document.getElementById("checkoutBtn");
+      console.log("SYNC → cartUpdating =", window._cartUpdating);
+  const btn = document.getElementById("checkoutBtn");
+  if (!btn) return;
 
-    if (window._cartUpdating) {
-      // 🔥 save original text once
-      if (btn && !btn.dataset.originalText) {
-        btn.dataset.originalText = btn.innerText || "Checkout";
-      }
+  // force boolean
+  const updating = window._cartUpdating === true;
 
-      lockCheckout("Processing...");
-    } else {
-      unlockCheckout();
-
-      // 🔥 restore text after unlock
-      if (btn && btn.dataset.originalText) {
-        btn.innerText = btn.dataset.originalText;
-        delete btn.dataset.originalText;
-      }
-    }
-    return;
+  if (!btn.dataset.defaultText) {
+    btn.dataset.defaultText = btn.innerText || "Checkout";
   }
+
+  if (updating) {
+    btn.disabled = true;
+    btn.textContent = "Processing...";
+  } else {
+    btn.disabled = false;
+    btn.textContent = btn.dataset.defaultText;
+  }
+}
+
 
   // ===== fallback (unchanged) =====
   const btn = document.getElementById("checkoutBtn");
@@ -12096,6 +12094,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
