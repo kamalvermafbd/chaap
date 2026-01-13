@@ -11487,17 +11487,19 @@ if (container.innerText.includes("Coupon")) return;
   btn.dataset.originalText = btn.innerText;
   btn.innerText = text;
 
-  // 🔥 THIS IS WHAT YOUR CSS IS WAITING FOR
-  btn.classList.add("disabled-btn");
+  // 👇 only visual cue needed
+  btn.classList.add("opacity-40");
 }
+  
 function unlockCheckout() {
   const btn = document.getElementById("checkoutBtn");
   if (!btn) return;
 
   btn.disabled = false;
   btn.innerText = btn.dataset.originalText || "Checkout";
-  btn.classList.remove("disabled-btn");
+  btn.classList.remove("opacity-40");
 }
+
 
 
  async function updateCheckoutInvoice() {
@@ -11969,6 +11971,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
