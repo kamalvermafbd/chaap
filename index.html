@@ -7658,7 +7658,7 @@ function finalizeCartUpdate(cartArr) {
 }
 
   function updateCart(itemId, variantId = "", action, meta = {}) {
-
+  window._cartUpdating = true;  
   itemId = String(itemId);
   variantId = String(variantId);
 
@@ -7702,15 +7702,22 @@ function finalizeCartUpdate(cartArr) {
   }
 
   // 🔥 SINGLE FINAL UPDATE (MOST IMPORTANT)
-  if (cartChanged) {
-    setCart(cartArr);
+if (cartChanged) {
+  setCart(cartArr);
 
-    try {
-      updateDrawerTotals();
-      refreshCouponMotivationHint();
-       toggleClaimRewardOnCart();
-    } catch (e) {}
-  }
+  try {
+    updateDrawerTotals();
+    refreshCouponMotivationHint();
+    toggleClaimRewardOnCart();
+  } catch (e) {}
+
+  // 🔒 cart now stable
+  window._cartUpdating = false;
+
+  // 🔥 refresh invoice only AFTER cart settled
+  updateCheckoutInvoice();
+}
+
 }
 
 
@@ -11464,50 +11471,61 @@ if (container.innerText.includes("Coupon")) return;
 }
 
  async function updateCheckoutInvoice() {
-   document.getElementById("checkoutInvoiceOverlay")?.classList.remove("hidden");
 
-     if (window._cartSavePromise) {
-    await window._cartSavePromise;
-  }
+  // 🔒 If cart updating → skip silently (no overlay flicker)
+  if (window._cartUpdating) return;
+
+  const overlay = document.getElementById("checkoutInvoiceOverlay");
+  if (overlay) overlay.classList.remove("hidden");
+
+  try {
+    if (window._cartSavePromise) {
+      await window._cartSavePromise;
+    }
+
     toggleAddressField(); 
-  syncCouponFromDrawerForCheckout();
-  mountInvoiceIntoCheckout();
+    syncCouponFromDrawerForCheckout();
 
-  const inv = buildCheckoutPreviewInv();
-  renderInvoiceFromAPI(inv);
-document.getElementById("checkoutInvoiceOverlay")?.classList.add("hidden");
+    // ❌ DO NOT remount every time
+    // mountInvoiceIntoCheckout();   ← remove this from here
 
-  // 🔒 SINGLE CONTROL POINT
-  const root = document.getElementById("checkoutInvoiceContainer");
+    const inv = buildCheckoutPreviewInv();
+    renderInvoiceFromAPI(inv);
 
-  // Service
-const serviceBox = root.querySelector("#invService");
-if (inv.serviceAmt > 0) {
-  serviceBox.classList.remove("hidden");
-} else {
-  serviceBox.classList.add("hidden");
-}
+    // 🔒 SINGLE CONTROL POINT
+    const root = document.getElementById("checkoutInvoiceContainer");
+    if (!root) return;
 
+    // Service
+    const serviceBox = root.querySelector("#invService");
+    if (serviceBox) {
+      inv.serviceAmt > 0
+        ? serviceBox.classList.remove("hidden")
+        : serviceBox.classList.add("hidden");
+    }
 
-  // Delivery
-  const deliveryBox = root.querySelector("#invDelivery");
-  if (inv.deliveryCharge > 0) {
-    deliveryBox.classList.remove("hidden");
-  } else {
-    deliveryBox.classList.add("hidden");
+    // Delivery
+    const deliveryBox = root.querySelector("#invDelivery");
+    if (deliveryBox) {
+      inv.deliveryCharge > 0
+        ? deliveryBox.classList.remove("hidden")
+        : deliveryBox.classList.add("hidden");
+    }
+
+    // Payment
+    const payBox = root.querySelector("#invPayment");
+    if (payBox) {
+      (!inv.paymentMethod || inv.paymentMethod.trim() === "")
+        ? payBox.classList.add("hidden")
+        : payBox.classList.remove("hidden");
+    }
+
+    injectCheckoutOfferDiscount(inv);
+
+  } finally {
+    if (overlay) overlay.classList.add("hidden");
   }
-
-  // ✅ PAYMENT (checkout preview only)
-  const payBox = root.querySelector("#invPayment");
-  if (!inv.paymentMethod || inv.paymentMethod.trim() === "") {
-    payBox.classList.add("hidden");
-  } else {
-    payBox.classList.remove("hidden");
-  }
-
-  injectCheckoutOfferDiscount(inv);
 }
-
 
 
   
@@ -11932,6 +11950,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
