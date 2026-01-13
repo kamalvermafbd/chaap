@@ -1359,12 +1359,7 @@ body::before {
 
 </div>
 
-<button id="checkoutBtn"
-        onclick="openCheckout()"
-        class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg">
-  Checkout
-</button>
-
+<div id="drawerCheckoutSlot"></div>
 
 
 </div>
@@ -3004,13 +2999,30 @@ function renderCart() {
     "blockRender:", blockRender,
     "checkoutBtn:", document.getElementById("checkoutBtn")
   );
- 
-if (blockRender) {
-  // 🔥 Only update checkout button state, don't rebuild cart DOM
-  syncCheckoutButton();
-  return;
+  const checkoutBtn = document.getElementById("checkoutBtn");
+if (checkoutBtn) {
+  if (window._cartUpdating) {
+    checkoutBtn.disabled = true;
+    checkoutBtn.innerText = "Updating cart…";
+
+    checkoutBtn.classList.remove("bg-red-500", "hover:bg-red-600");
+    checkoutBtn.classList.add("bg-gray-400", "cursor-not-allowed", "opacity-60");
+
+  } else {
+    checkoutBtn.disabled = false;
+    checkoutBtn.innerText = "Checkout";
+
+    checkoutBtn.classList.remove("bg-gray-400", "cursor-not-allowed", "opacity-60");
+    checkoutBtn.classList.add("bg-red-500", "hover:bg-red-600");
+  }
 }
 
+if (blockRender) {
+  // still allow checkout button state update
+} else {
+  console.log("Rendering Cart...");
+  console.log(cart);
+}
   const cartItemsContainer = document.querySelector('#cartItems');
 cartItemsContainer.innerHTML = '';
   const thead = document.querySelector('#cartTable thead tr');
@@ -3264,8 +3276,21 @@ if (checkoutModal && checkoutModal.style.display === "flex") {
 
   updateCartBadge();
   // 🔒 Checkout button state must always follow cart transaction state
+const slot = document.getElementById("drawerCheckoutSlot");
+if (!slot) return;
 
-syncCheckoutButton();
+slot.innerHTML = `
+  <button id="checkoutBtn"
+    onclick="openCheckout()"
+    class="mt-4 w-full text-white font-semibold py-2 rounded-lg
+    ${window._cartUpdating
+      ? "bg-gray-400 cursor-not-allowed opacity-60"
+      : "bg-red-500 hover:bg-red-600"}"
+    ${window._cartUpdating ? "disabled" : ""}>
+    ${window._cartUpdating ? "Updating cart…" : "Checkout"}
+  </button>
+`;
+
 
 }
 
@@ -3279,8 +3304,8 @@ async function updateQty(index, newQty) {
   window._cartUpdating = true;
   window._cartLockStart = Date.now();
 
-  renderCart();          // DOM recreate
-syncCheckoutButton(); // apply Processing state AFTER
+  syncCheckoutButton?.();
+  renderCart();
 
   if (blockRender) {
     console.warn("⛔ blockRender = true");
@@ -3309,10 +3334,8 @@ syncCheckoutButton(); // apply Processing state AFTER
   }
 
   // 4 — Instant UI refresh
- renderCart();
-syncCheckoutButton();   // 🔥 re-apply Processing after redraw
-updateCartBadge();
-
+  renderCart();
+  updateCartBadge();
 
   // 5 — Backend save
   try {
@@ -7013,94 +7036,83 @@ function updateCartBadge() {
 }
 
 
-
-function syncCheckoutButton() {
-      console.log("SYNC → cartUpdating =", window._cartUpdating);
+  function syncCheckoutButton() {
   const btn = document.getElementById("checkoutBtn");
   if (!btn) return;
 
-  // force boolean
-  const updating = window._cartUpdating === true;
-
-  if (!btn.dataset.defaultText) {
-    btn.dataset.defaultText = btn.innerText || "Checkout";
-  }
-
-  if (updating) {
+  if (window._cartUpdating) {
     btn.disabled = true;
-    btn.textContent = "Processing...";
+    btn.innerText = "Updating cart…";
+    btn.classList.remove("bg-red-500", "hover:bg-red-600");
+    btn.classList.add("bg-gray-400", "cursor-not-allowed", "opacity-60");
   } else {
     btn.disabled = false;
-    btn.textContent = btn.dataset.defaultText;
+    btn.innerText = "Checkout";
+    btn.classList.remove("bg-gray-400", "cursor-not-allowed", "opacity-60");
+    btn.classList.add("bg-red-500", "hover:bg-red-600");
   }
 }
-
-
 
 async function openCheckout() {
 
-  if (window._checkoutOpening) return;
-  window._checkoutOpening = true;
-
-  try {
-
-    // ⛔ Cart must be stable
     if (window._cartUpdating) {
-      alert("Cart is still updating. Please wait…");
-      return;
-    }
-
-    if (window._cartSavePromise) {
-      try { await window._cartSavePromise; } catch(e){}
-    }
-
-    closeCartDrawer();
-    document.body.style.overflow = "hidden";
-
-    const freshCart = getCart();
-    cart = freshCart;
-    window.cart = freshCart;
-
-    if (freshCart.length === 0) {
-      alert("Your cart is empty!");
-      document.body.style.overflow = "";
-      return;
-    }
-
-    autofillMobileForLoggedIn();
-    resetCheckoutFieldsDefault();
-    document.getElementById("orderType").value = "";
-    hideAddressIfOrderTypeBlank();
-    setupAddressUIVisibility();
-    loadPrimaryAddress();
-
-    refreshCheckout();
-    document.getElementById("changeAddressBtn")?.classList.add("hidden");
-
-    const modal = document.getElementById("checkoutModal");
-    modal.style.display = "flex";
-
-    if (isLoggedIn()) {
-      const hint = document.getElementById("mobileHint");
-      if (hint) hint.style.display = "none";
-    }
-
-    setTimeout(() => {
-      updateGuestFieldsVisibility();
-      const orderType = document.getElementById("orderType")?.value;
-      if (orderType) toggleAddressField();
-    }, 0);
-
-    mountInvoiceIntoCheckout();
-    updateCheckoutInvoice();
-
-  } finally {
-    // 🔓 Always unlock checkout button
-    setTimeout(() => {
-      window._checkoutOpening = false;
-    }, 300);
+    alert("Cart is still updating. Please wait…");
+    return;
   }
+
+  // ✅ 0️⃣ FIRST — close drawer cart
+  closeCartDrawer();
+
+  // 🔒 Lock background scroll
+  document.body.style.overflow = "hidden";
+
+  const freshCart = getCart();
+  cart = freshCart;
+  window.cart = freshCart;
+
+  if (freshCart.length === 0) {
+    alert("Your cart is empty!");
+    document.body.style.overflow = "";
+    return;
+  }
+
+  // Autofill + reset
+  autofillMobileForLoggedIn();
+  resetCheckoutFieldsDefault();
+  document.getElementById("orderType").value = "";
+hideAddressIfOrderTypeBlank();
+  setupAddressUIVisibility();
+  loadPrimaryAddress();
+
+  refreshCheckout();
+  document.getElementById("changeAddressBtn")?.classList.add("hidden");
+
+  // ✅ Open modal
+  const modal = document.getElementById("checkoutModal");
+  modal.style.display = "flex";
+
+  // 🔒 FIX: Logged-in user → hide mobile hint
+  if (isLoggedIn()) {
+    const hint = document.getElementById("mobileHint");
+    if (hint) hint.style.display = "none";
+  }
+
+  // 🔁 Restore correct UI AFTER modal open
+  setTimeout(() => {
+    updateGuestFieldsVisibility();
+
+    const orderType = document.getElementById("orderType")?.value;
+    if (orderType) {
+      toggleAddressField();
+    }
+  }, 0);
+
+
+mountInvoiceIntoCheckout();
+  updateCheckoutInvoice();
+
 }
+
 
 
 
@@ -7727,14 +7739,14 @@ function finalizeCartUpdate(cartArr) {
 
   return;
 }
-  
-async function updateCart(itemId, variantId = "", action, meta = {}) {
+
+ async function updateCart(itemId, variantId = "", action, meta = {}) {
 
   console.log("🟡 updateCart drawer");
 
   // 🔒 START LOCK
   window._cartUpdating = true;
-  syncCheckoutButton();   // grey + Processing...
+  syncCheckoutButton();
 
   itemId = String(itemId);
   variantId = String(variantId);
@@ -7755,65 +7767,41 @@ async function updateCart(itemId, variantId = "", action, meta = {}) {
   }
 
   if (action === "dec") {
-    if (!existing) {
-      await unlock();
-      return;
-    }
-
-    if (existing.qty > 1) {
-      existing.qty--;
-    } else {
+    if (!existing) return unlockDrawer();
+    if (existing.qty > 1) existing.qty--;
+    else {
       cartArr = cartArr.filter(c =>
         !(String(c.itemId) === itemId &&
           String(c.variantId || "") === variantId)
       );
     }
-
     cartChanged = true;
   }
 
-  if (!cartChanged) {
-    await unlock();
-    return;
-  }
+  if (!cartChanged) return unlockDrawer();
 
-  // 🔥 Persist cart
+  // 🔥 save + UI refresh is one transaction
   setCart(cartArr);
 
-  // 🔐 Cart save / backend promise
-  window._cartSavePromise = (async () => {
-    // future me yahin backend API / sheet save aayega
-    // abhi local only, but async contract ready hai
-    await Promise.resolve();
-  })();
-
   try {
-    // Update single row qty (if still exists)
-    const newItem = cartArr.find(c =>
-      String(c.itemId) === itemId &&
-      String(c.variantId || "") === variantId
-    );
+    updateDrawerItemQty(itemId, variantId, existing?.qty || 0);
 
-    updateDrawerItemQty(itemId, variantId, newItem?.qty || 0);
-    updateDrawerTotals();
-    refreshCouponMotivationHint();
-    toggleClaimRewardOnCart();
+    await updateDrawerTotals();              // 🔒 wait totals
+    await refreshCouponMotivationHint();     // 🔒 wait coupon UI
+    await toggleClaimRewardOnCart();         // 🔒 wait reward UI
 
   } finally {
-    await unlock();
-  }
-
-  async function unlock() {
-    try {
-      if (window._cartSavePromise) {
-        await window._cartSavePromise;   // ⏳ wait till backend/cart save done
-      }
-    } finally {
-      window._cartUpdating = false;
-      syncCheckoutButton();             // back to red Checkout
-    }
+    unlockDrawer();
   }
 }
+
+
+function unlockDrawer() {
+  window._cartUpdating = false;
+  syncCheckoutButton();
+}
+
+
 
   
 function cleanCartInvalidItems(arr) {
@@ -12070,59 +12058,5 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
