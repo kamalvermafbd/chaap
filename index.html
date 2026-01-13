@@ -7740,12 +7740,13 @@ function finalizeCartUpdate(cartArr) {
   return;
 }
 
-  function updateCart(itemId, variantId = "", action, meta = {}) {
+ async function updateCart(itemId, variantId = "", action, meta = {}) {
+
   console.log("🟡 updateCart drawer");
 
   // 🔒 START LOCK
   window._cartUpdating = true;
-  syncCheckoutButton();   // 👈 ONLY button state change
+  syncCheckoutButton();
 
   itemId = String(itemId);
   variantId = String(variantId);
@@ -7766,11 +7767,7 @@ function finalizeCartUpdate(cartArr) {
   }
 
   if (action === "dec") {
-    if (!existing) {
-      unlockDrawer();
-      return;
-    }
-
+    if (!existing) return unlockDrawer();
     if (existing.qty > 1) existing.qty--;
     else {
       cartArr = cartArr.filter(c =>
@@ -7781,19 +7778,23 @@ function finalizeCartUpdate(cartArr) {
     cartChanged = true;
   }
 
-  if (cartChanged) {
-    setCart(cartArr);
+  if (!cartChanged) return unlockDrawer();
 
-    try {
-      updateDrawerItemQty(itemId, variantId, existing?.qty || 0); // 🔥 no redraw
-      updateDrawerTotals();
-      refreshCouponMotivationHint();
-      toggleClaimRewardOnCart();
-    } catch (e) {}
+  // 🔥 save + UI refresh is one transaction
+  setCart(cartArr);
+
+  try {
+    updateDrawerItemQty(itemId, variantId, existing?.qty || 0);
+
+    await updateDrawerTotals();              // 🔒 wait totals
+    await refreshCouponMotivationHint();     // 🔒 wait coupon UI
+    await toggleClaimRewardOnCart();         // 🔒 wait reward UI
+
+  } finally {
+    unlockDrawer();
   }
-
-  setTimeout(unlockDrawer, 300);
 }
+
 
 function unlockDrawer() {
   window._cartUpdating = false;
@@ -12057,6 +12058,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
