@@ -11469,11 +11469,14 @@ if (container.innerText.includes("Coupon")) return;
     container.appendChild(row);
   }
 }
-
- async function updateCheckoutInvoice() {
+async function updateCheckoutInvoice() {
 
   // 🔒 If cart updating → skip silently (no overlay flicker)
   if (window._cartUpdating) return;
+
+  // 🔒 Prevent re-entry
+  if (window._invoiceBusy) return;
+  window._invoiceBusy = true;
 
   const overlay = document.getElementById("checkoutInvoiceOverlay");
   if (overlay) overlay.classList.remove("hidden");
@@ -11487,12 +11490,11 @@ if (container.innerText.includes("Coupon")) return;
     syncCouponFromDrawerForCheckout();
 
     // ❌ DO NOT remount every time
-    // mountInvoiceIntoCheckout();   ← remove this from here
+    // mountInvoiceIntoCheckout();
 
     const inv = buildCheckoutPreviewInv();
     renderInvoiceFromAPI(inv);
 
-    // 🔒 SINGLE CONTROL POINT
     const root = document.getElementById("checkoutInvoiceContainer");
     if (!root) return;
 
@@ -11524,8 +11526,10 @@ if (container.innerText.includes("Coupon")) return;
 
   } finally {
     if (overlay) overlay.classList.add("hidden");
+    window._invoiceBusy = false;   // 🔓 THIS WAS MISSING
   }
 }
+
 
 
   
@@ -11950,6 +11954,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
