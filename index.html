@@ -6973,33 +6973,10 @@ function updateCartBadge() {
     badge.classList.add("hidden");
   }
 }
-function showCheckoutOverlay() {
-  const el = document.getElementById("checkoutInvoiceOverlay");
-  if (!el) return;
-  el.classList.remove("hidden");
-  el.dataset.shownAt = Date.now();
-}
-
-function hideCheckoutOverlay() {
-  const el = document.getElementById("checkoutInvoiceOverlay");
-  if (!el) return;
-
-  const shownAt = Number(el.dataset.shownAt || 0);
-  const elapsed = Date.now() - shownAt;
-  const min = 120; // ms
-
-  if (elapsed >= min) {
-    el.classList.add("hidden");
-  } else {
-    setTimeout(() => {
-      el.classList.add("hidden");
-    }, min - elapsed);
-  }
-}
 
 async function openCheckout() {
 
-  // ✅ 0️⃣ Close drawer cart
+  // ✅ 0️⃣ FIRST — close drawer cart
   closeCartDrawer();
 
   // 🔒 Lock background scroll
@@ -7019,7 +6996,7 @@ async function openCheckout() {
   autofillMobileForLoggedIn();
   resetCheckoutFieldsDefault();
   document.getElementById("orderType").value = "";
-  hideAddressIfOrderTypeBlank();
+hideAddressIfOrderTypeBlank();
   setupAddressUIVisibility();
   loadPrimaryAddress();
 
@@ -7030,7 +7007,7 @@ async function openCheckout() {
   const modal = document.getElementById("checkoutModal");
   modal.style.display = "flex";
 
-  // 🔒 Logged-in user → hide mobile hint
+  // 🔒 FIX: Logged-in user → hide mobile hint
   if (isLoggedIn()) {
     const hint = document.getElementById("mobileHint");
     if (hint) hint.style.display = "none";
@@ -7039,26 +7016,20 @@ async function openCheckout() {
   // 🔁 Restore correct UI AFTER modal open
   setTimeout(() => {
     updateGuestFieldsVisibility();
+
     const orderType = document.getElementById("orderType")?.value;
-    if (orderType) toggleAddressField();
+    if (orderType) {
+      toggleAddressField();
+    }
   }, 0);
 
-  // ===============================
-  // 🔥 CHECKOUT INVOICE FLOW
-  // ===============================
 
-  // 1️⃣ Mount invoice ONCE
-  mountInvoiceIntoCheckout();
-
-  // 2️⃣ Show overlay
- showCheckoutOverlay();
-
-updateCheckoutInvoice().finally(() => {
-  hideCheckoutOverlay();
-});
-
+mountInvoiceIntoCheckout();
+  updateCheckoutInvoice();
+toggleAddressField();
 
 }
+
 
 
 
@@ -7687,7 +7658,7 @@ function finalizeCartUpdate(cartArr) {
 }
 
   function updateCart(itemId, variantId = "", action, meta = {}) {
-  window._cartUpdating = true;  
+
   itemId = String(itemId);
   variantId = String(variantId);
 
@@ -7731,22 +7702,15 @@ function finalizeCartUpdate(cartArr) {
   }
 
   // 🔥 SINGLE FINAL UPDATE (MOST IMPORTANT)
-if (cartChanged) {
-  setCart(cartArr);
+  if (cartChanged) {
+    setCart(cartArr);
 
-  try {
-    updateDrawerTotals();
-    refreshCouponMotivationHint();
-    toggleClaimRewardOnCart();
-  } catch (e) {}
-
-  // 🔒 cart now stable
-  window._cartUpdating = false;
-
-  // 🔥 refresh invoice only AFTER cart settled
-  updateCheckoutInvoice();
-}
-
+    try {
+      updateDrawerTotals();
+      refreshCouponMotivationHint();
+       toggleClaimRewardOnCart();
+    } catch (e) {}
+  }
 }
 
 
@@ -11498,60 +11462,51 @@ if (container.innerText.includes("Coupon")) return;
     container.appendChild(row);
   }
 }
-async function updateCheckoutInvoice() {
 
-  // 🔒 If cart updating → skip silently
-  if (window._cartUpdating) return;
+ async function updateCheckoutInvoice() {
+   document.getElementById("checkoutInvoiceOverlay")?.classList.remove("hidden");
 
-  // 🔒 Prevent re-entry
-  if (window._invoiceBusy) return;
-  window._invoiceBusy = true;
-
-  try {
-    if (window._cartSavePromise) {
-      await window._cartSavePromise;
-    }
-
-    toggleAddressField(); 
-    syncCouponFromDrawerForCheckout();
-
-    const inv = buildCheckoutPreviewInv();
-    renderInvoiceFromAPI(inv);
-
-    const root = document.getElementById("checkoutInvoiceContainer");
-    if (!root) return;
-
-    // Service
-    const serviceBox = root.querySelector("#invService");
-    if (serviceBox) {
-      inv.serviceAmt > 0
-        ? serviceBox.classList.remove("hidden")
-        : serviceBox.classList.add("hidden");
-    }
-
-    // Delivery
-    const deliveryBox = root.querySelector("#invDelivery");
-    if (deliveryBox) {
-      inv.deliveryCharge > 0
-        ? deliveryBox.classList.remove("hidden")
-        : deliveryBox.classList.add("hidden");
-    }
-
-    // Payment
-    const payBox = root.querySelector("#invPayment");
-    if (payBox) {
-      (!inv.paymentMethod || inv.paymentMethod.trim() === "")
-        ? payBox.classList.add("hidden")
-        : payBox.classList.remove("hidden");
-    }
-
-    injectCheckoutOfferDiscount(inv);
-
-  } finally {
-    window._invoiceBusy = false;
+     if (window._cartSavePromise) {
+    await window._cartSavePromise;
   }
+    toggleAddressField(); 
+  syncCouponFromDrawerForCheckout();
+  mountInvoiceIntoCheckout();
+
+  const inv = buildCheckoutPreviewInv();
+  renderInvoiceFromAPI(inv);
+document.getElementById("checkoutInvoiceOverlay")?.classList.add("hidden");
+
+  // 🔒 SINGLE CONTROL POINT
+  const root = document.getElementById("checkoutInvoiceContainer");
+
+  // Service
+const serviceBox = root.querySelector("#invService");
+if (inv.serviceAmt > 0) {
+  serviceBox.classList.remove("hidden");
+} else {
+  serviceBox.classList.add("hidden");
 }
 
+
+  // Delivery
+  const deliveryBox = root.querySelector("#invDelivery");
+  if (inv.deliveryCharge > 0) {
+    deliveryBox.classList.remove("hidden");
+  } else {
+    deliveryBox.classList.add("hidden");
+  }
+
+  // ✅ PAYMENT (checkout preview only)
+  const payBox = root.querySelector("#invPayment");
+  if (!inv.paymentMethod || inv.paymentMethod.trim() === "") {
+    payBox.classList.add("hidden");
+  } else {
+    payBox.classList.remove("hidden");
+  }
+
+  injectCheckoutOfferDiscount(inv);
+}
 
 
 
@@ -11977,10 +11932,6 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
-
-
-
-
 
 
 
