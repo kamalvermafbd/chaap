@@ -11477,15 +11477,21 @@ if (container.innerText.includes("Coupon")) return;
   }
 }
 
-  function lockCheckout(reason = "Updating cart…") {
+  function lockCheckout(text = "Updating cart…") {
   const btn = document.getElementById("checkoutBtn");
-  if (!btn) return;
+
+  // If drawer not open yet, try again on next frame
+  if (!btn) {
+    requestAnimationFrame(() => lockCheckout(text));
+    return;
+  }
 
   btn.disabled = true;
   btn.dataset.originalText = btn.innerText;
-  btn.innerText = reason;
+  btn.innerText = text;
   btn.classList.add("opacity-60", "cursor-not-allowed");
 }
+
 
 function unlockCheckout() {
   const btn = document.getElementById("checkoutBtn");
@@ -11965,6 +11971,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
