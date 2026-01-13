@@ -3005,13 +3005,12 @@ function renderCart() {
     "checkoutBtn:", document.getElementById("checkoutBtn")
   );
  
-
 if (blockRender) {
-  // still allow checkout button state update
-} else {
-  console.log("Rendering Cart...");
-  console.log(cart);
+  // 🔥 Only update checkout button state, don't rebuild cart DOM
+  syncCheckoutButton();
+  return;
 }
+
   const cartItemsContainer = document.querySelector('#cartItems');
 cartItemsContainer.innerHTML = '';
   const thead = document.querySelector('#cartTable thead tr');
@@ -12071,6 +12070,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
