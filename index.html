@@ -3280,8 +3280,8 @@ async function updateQty(index, newQty) {
   window._cartUpdating = true;
   window._cartLockStart = Date.now();
 
-  syncCheckoutButton?.();
-  renderCart();
+  renderCart();          // DOM recreate
+syncCheckoutButton(); // apply Processing state AFTER
 
   if (blockRender) {
     console.warn("⛔ blockRender = true");
@@ -12061,6 +12061,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
