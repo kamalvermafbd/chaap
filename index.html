@@ -2995,6 +2995,12 @@ function openCartPanel(cartArr = []) {
 }
 
 function renderCart() {
+   console.log(
+    "🧩 renderCart()",
+    "cartUpdating:", window._cartUpdating,
+    "blockRender:", blockRender,
+    "checkoutBtn:", document.getElementById("checkoutBtn")
+  );
   const checkoutBtn = document.getElementById("checkoutBtn");
 if (checkoutBtn) {
   if (window._cartUpdating) {
@@ -3292,16 +3298,21 @@ slot.innerHTML = `
 
 
 
-// Ultra-stable qty update handler (no debounce, no rollback)
 async function updateQty(index, newQty) {
+
+  console.log("🟡 updateQty CALLED", { index, newQty });
 
   // 🔒 TRANSACTION START
   window._cartUpdating = true;
-  window._cartLockStart = Date.now();   // 👈 for minimum lock time
-  syncCheckoutButton();
+  window._cartLockStart = Date.now();
+
+  syncCheckoutButton?.();
   renderCart();
 
-  if (blockRender) return;
+  if (blockRender) {
+    console.warn("⛔ blockRender = true");
+    return;
+  }
 
   // 1 — Validate qty
   newQty = Number(newQty);
@@ -3330,18 +3341,21 @@ async function updateQty(index, newQty) {
 
   // 5 — Backend save
   try {
+    console.log("📡 saveCartToBackend START");
     window._cartSavePromise = saveCartToBackend();
     await window._cartSavePromise;
+    console.log("✅ saveCartToBackend DONE");
   }
   finally {
 
-    // 🔓 ENSURE MINIMUM LOCK TIME (UX FIX)
+    // 🔓 ENSURE MINIMUM LOCK TIME
     const elapsed = Date.now() - window._cartLockStart;
-    const MIN_LOCK = 400;   // ms — human visible lock
+    const MIN_LOCK = 400;
 
     const unlock = () => {
+      console.log("🔓 UNLOCK checkout");
       window._cartUpdating = false;
-      syncCheckoutButton();
+      syncCheckoutButton?.();
       renderCart();
     };
 
@@ -3353,7 +3367,6 @@ async function updateQty(index, newQty) {
   }
 }
 
-    
 function loadPrimaryAddress() {
   // Logged-in users only
   if (!isLoggedIn()) return;
@@ -12041,6 +12054,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
