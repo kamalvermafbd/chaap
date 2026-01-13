@@ -7741,11 +7741,11 @@ function finalizeCartUpdate(cartArr) {
 }
 
   function updateCart(itemId, variantId = "", action, meta = {}) {
-  console.log("🟡 updateCart drawer called");
+  console.log("🟡 updateCart drawer");
 
   // 🔒 START LOCK
   window._cartUpdating = true;
-  renderCart();   // checkout button gray + disabled
+  syncCheckoutButton();   // 👈 ONLY button state change
 
   itemId = String(itemId);
   variantId = String(variantId);
@@ -7759,57 +7759,45 @@ function finalizeCartUpdate(cartArr) {
 
   let cartChanged = false;
 
-  // ---------- ADD ----------
   if (action === "add") {
-    if (existing) {
-      existing.qty++;
-    } else {
-      const newObj = buildCartObject(itemId, variantId, meta);
-      cartArr.push(newObj);
-    }
+    if (existing) existing.qty++;
+    else cartArr.push(buildCartObject(itemId, variantId, meta));
     cartChanged = true;
   }
 
-  // ---------- DEC ----------
   if (action === "dec") {
-
-    // 🔥 FIX — do NOT return without unlock
     if (!existing) {
-      setTimeout(() => {
-        window._cartUpdating = false;
-        renderCart();
-      }, 100);
+      unlockDrawer();
       return;
     }
 
-    if (existing.qty > 1) {
-      existing.qty--;
-      cartChanged = true;
-    } else {
+    if (existing.qty > 1) existing.qty--;
+    else {
       cartArr = cartArr.filter(c =>
         !(String(c.itemId) === itemId &&
           String(c.variantId || "") === variantId)
       );
-      cartChanged = true;
     }
+    cartChanged = true;
   }
 
-  // 🔥 SINGLE FINAL UPDATE
   if (cartChanged) {
     setCart(cartArr);
 
     try {
+      updateDrawerItemQty(itemId, variantId, existing?.qty || 0); // 🔥 no redraw
       updateDrawerTotals();
       refreshCouponMotivationHint();
       toggleClaimRewardOnCart();
     } catch (e) {}
   }
 
-  // 🔓 ALWAYS UNLOCK
-  setTimeout(() => {
-    window._cartUpdating = false;
-    renderCart();   // restore red checkout
-  }, 300);
+  setTimeout(unlockDrawer, 300);
+}
+
+function unlockDrawer() {
+  window._cartUpdating = false;
+  syncCheckoutButton();
 }
 
 
@@ -12069,6 +12057,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
