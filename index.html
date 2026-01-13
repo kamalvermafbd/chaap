@@ -3310,8 +3310,10 @@ syncCheckoutButton(); // apply Processing state AFTER
   }
 
   // 4 — Instant UI refresh
-  renderCart();
-  updateCartBadge();
+ renderCart();
+syncCheckoutButton();   // 🔥 re-apply Processing after redraw
+updateCartBadge();
+
 
   // 5 — Backend save
   try {
@@ -12061,6 +12063,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
