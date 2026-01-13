@@ -11487,9 +11487,12 @@ if (container.innerText.includes("Coupon")) return;
   btn.dataset.originalText = btn.innerText;
   btn.innerText = text;
 
-  // 👇 only visual cue needed
+  // 🔥 Visual lock
   btn.classList.add("opacity-40");
+  btn.style.backgroundColor = "#9ca3af";   // Tailwind gray-400
+  btn.style.cursor = "not-allowed";
 }
+
   
 function unlockCheckout() {
   const btn = document.getElementById("checkoutBtn");
@@ -11497,7 +11500,10 @@ function unlockCheckout() {
 
   btn.disabled = false;
   btn.innerText = btn.dataset.originalText || "Checkout";
+
   btn.classList.remove("opacity-40");
+  btn.style.backgroundColor = "";   // back to Tailwind red
+  btn.style.cursor = "";
 }
 
 
@@ -11971,6 +11977,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
