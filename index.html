@@ -7055,64 +7055,68 @@ function updateCartBadge() {
 
 async function openCheckout() {
 
+  if (window._checkoutOpening) return;
+  window._checkoutOpening = true;
+
+  try {
+
+    // ⛔ Cart must be stable
     if (window._cartUpdating) {
-    alert("Cart is still updating. Please wait…");
-    return;
-  }
-
-  // ✅ 0️⃣ FIRST — close drawer cart
-  closeCartDrawer();
-
-  // 🔒 Lock background scroll
-  document.body.style.overflow = "hidden";
-
-  const freshCart = getCart();
-  cart = freshCart;
-  window.cart = freshCart;
-
-  if (freshCart.length === 0) {
-    alert("Your cart is empty!");
-    document.body.style.overflow = "";
-    return;
-  }
-
-  // Autofill + reset
-  autofillMobileForLoggedIn();
-  resetCheckoutFieldsDefault();
-  document.getElementById("orderType").value = "";
-hideAddressIfOrderTypeBlank();
-  setupAddressUIVisibility();
-  loadPrimaryAddress();
-
-  refreshCheckout();
-  document.getElementById("changeAddressBtn")?.classList.add("hidden");
-
-  // ✅ Open modal
-  const modal = document.getElementById("checkoutModal");
-  modal.style.display = "flex";
-
-  // 🔒 FIX: Logged-in user → hide mobile hint
-  if (isLoggedIn()) {
-    const hint = document.getElementById("mobileHint");
-    if (hint) hint.style.display = "none";
-  }
-
-  // 🔁 Restore correct UI AFTER modal open
-  setTimeout(() => {
-    updateGuestFieldsVisibility();
-
-    const orderType = document.getElementById("orderType")?.value;
-    if (orderType) {
-      toggleAddressField();
+      alert("Cart is still updating. Please wait…");
+      return;
     }
-  }, 0);
 
+    if (window._cartSavePromise) {
+      try { await window._cartSavePromise; } catch(e){}
+    }
 
-mountInvoiceIntoCheckout();
-  updateCheckoutInvoice();
+    closeCartDrawer();
+    document.body.style.overflow = "hidden";
 
+    const freshCart = getCart();
+    cart = freshCart;
+    window.cart = freshCart;
+
+    if (freshCart.length === 0) {
+      alert("Your cart is empty!");
+      document.body.style.overflow = "";
+      return;
+    }
+
+    autofillMobileForLoggedIn();
+    resetCheckoutFieldsDefault();
+    document.getElementById("orderType").value = "";
+    hideAddressIfOrderTypeBlank();
+    setupAddressUIVisibility();
+    loadPrimaryAddress();
+
+    refreshCheckout();
+    document.getElementById("changeAddressBtn")?.classList.add("hidden");
+
+    const modal = document.getElementById("checkoutModal");
+    modal.style.display = "flex";
+
+    if (isLoggedIn()) {
+      const hint = document.getElementById("mobileHint");
+      if (hint) hint.style.display = "none";
+    }
+
+    setTimeout(() => {
+      updateGuestFieldsVisibility();
+      const orderType = document.getElementById("orderType")?.value;
+      if (orderType) toggleAddressField();
+    }, 0);
+
+    mountInvoiceIntoCheckout();
+    updateCheckoutInvoice();
+
+  } finally {
+    // 🔓 Always unlock checkout button
+    setTimeout(() => {
+      window._checkoutOpening = false;
+    }, 300);
+  }
 }
-
 
 
 
@@ -7739,14 +7743,14 @@ function finalizeCartUpdate(cartArr) {
 
   return;
 }
-
- async function updateCart(itemId, variantId = "", action, meta = {}) {
+async function updateCart(itemId, variantId = "", action, meta = {}) {
 
   console.log("🟡 updateCart drawer");
 
   // 🔒 START LOCK
   window._cartUpdating = true;
   syncCheckoutButton();
+  renderCart();   // show gray checkout immediately
 
   itemId = String(itemId);
   variantId = String(variantId);
@@ -7767,40 +7771,57 @@ function finalizeCartUpdate(cartArr) {
   }
 
   if (action === "dec") {
-    if (!existing) return unlockDrawer();
-    if (existing.qty > 1) existing.qty--;
-    else {
+    if (!existing) {
+      unlock();
+      return;
+    }
+
+    if (existing.qty > 1) {
+      existing.qty--;
+    } else {
       cartArr = cartArr.filter(c =>
         !(String(c.itemId) === itemId &&
           String(c.variantId || "") === variantId)
       );
     }
+
     cartChanged = true;
   }
 
-  if (!cartChanged) return unlockDrawer();
+  if (!cartChanged) {
+    unlock();
+    return;
+  }
 
-  // 🔥 save + UI refresh is one transaction
+  // 🔥 Persist cart
   setCart(cartArr);
 
   try {
-    updateDrawerItemQty(itemId, variantId, existing?.qty || 0);
+    // Update single row qty (if still exists)
+    const newItem = cartArr.find(c =>
+      String(c.itemId) === itemId &&
+      String(c.variantId || "") === variantId
+    );
 
-    await updateDrawerTotals();              // 🔒 wait totals
-    await refreshCouponMotivationHint();     // 🔒 wait coupon UI
-    await toggleClaimRewardOnCart();         // 🔒 wait reward UI
+    updateDrawerItemQty(itemId, variantId, newItem?.qty || 0);
+
+    updateDrawerTotals();
+    refreshCouponMotivationHint();
+    toggleClaimRewardOnCart();
 
   } finally {
-    unlockDrawer();
+    unlock();
+  }
+
+  function unlock() {
+    // minimum visible lock (UX)
+    setTimeout(() => {
+      window._cartUpdating = false;
+      syncCheckoutButton();
+      renderCart();
+    }, 300);
   }
 }
-
-
-function unlockDrawer() {
-  window._cartUpdating = false;
-  syncCheckoutButton();
-}
-
 
 
   
@@ -12058,6 +12079,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
