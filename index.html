@@ -7741,6 +7741,11 @@ function finalizeCartUpdate(cartArr) {
 }
 
   function updateCart(itemId, variantId = "", action, meta = {}) {
+  console.log("🟡 updateCart drawer called");
+
+  // 🔒 START LOCK
+  window._cartUpdating = true;
+  renderCart();   // checkout button gray + disabled
 
   itemId = String(itemId);
   variantId = String(variantId);
@@ -7756,21 +7761,26 @@ function finalizeCartUpdate(cartArr) {
 
   // ---------- ADD ----------
   if (action === "add") {
-
     if (existing) {
       existing.qty++;
     } else {
       const newObj = buildCartObject(itemId, variantId, meta);
       cartArr.push(newObj);
     }
-
     cartChanged = true;
   }
 
   // ---------- DEC ----------
   if (action === "dec") {
 
-    if (!existing) return;
+    // 🔥 FIX — do NOT return without unlock
+    if (!existing) {
+      setTimeout(() => {
+        window._cartUpdating = false;
+        renderCart();
+      }, 100);
+      return;
+    }
 
     if (existing.qty > 1) {
       existing.qty--;
@@ -7784,17 +7794,24 @@ function finalizeCartUpdate(cartArr) {
     }
   }
 
-  // 🔥 SINGLE FINAL UPDATE (MOST IMPORTANT)
+  // 🔥 SINGLE FINAL UPDATE
   if (cartChanged) {
     setCart(cartArr);
 
     try {
       updateDrawerTotals();
       refreshCouponMotivationHint();
-       toggleClaimRewardOnCart();
+      toggleClaimRewardOnCart();
     } catch (e) {}
   }
+
+  // 🔓 ALWAYS UNLOCK
+  setTimeout(() => {
+    window._cartUpdating = false;
+    renderCart();   // restore red checkout
+  }, 300);
 }
+
 
 
   
@@ -12052,6 +12069,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
