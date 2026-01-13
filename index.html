@@ -7916,9 +7916,17 @@ if (window._appliedCouponType === "reward") {
       msg += `<br><span class="text-sm">Login / Signup to avail this offer</span>`;
     }
 
-    hintBox.innerHTML = msg;
+     hintBox.innerHTML = msg;
     hintBox.style.display = "block";
+
+    // 🔒 re-apply checkout lock AFTER coupon hint repaint
+    if (window._cartUpdating) {
+      lockCheckout("Updating cart…");
+    }
+
   }, 150); // 🔑 debounce ONLY
+
+  
 }
 
 
@@ -11977,6 +11985,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
