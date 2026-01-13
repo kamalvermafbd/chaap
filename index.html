@@ -1359,18 +1359,12 @@ body::before {
 
 </div>
 
-const isLocked = window._cartUpdating === true;
-
-const checkoutHtml = `
 <button id="checkoutBtn"
-  onclick="openCheckout()"
-  ${isLocked ? "disabled" : ""}
-  class="mt-4 w-full text-white font-semibold py-2 rounded-lg
-    ${isLocked ? "bg-gray-400 cursor-not-allowed opacity-60"
-              : "bg-red-500 hover:bg-red-600"}">
-  ${isLocked ? "Updating cart…" : "Checkout"}
+        onclick="openCheckout()"
+        class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg">
+  Checkouttest
 </button>
-`;
+
 
 
 
@@ -12018,6 +12012,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
