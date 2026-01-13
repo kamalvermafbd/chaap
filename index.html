@@ -7015,6 +7015,7 @@ function updateCartBadge() {
 
 
 function syncCheckoutButton() {
+    console.log("SYNC → cartUpdating =", window._cartUpdating);
   if (typeof lockCheckout === "function" && typeof unlockCheckout === "function") {
     const btn = document.getElementById("checkoutBtn");
 
@@ -12093,6 +12094,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
