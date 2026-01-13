@@ -3262,6 +3262,10 @@ if (checkoutModal && checkoutModal.style.display === "flex") {
 // Ultra-stable qty update handler (no debounce, no rollback)
 async function updateQty(index, newQty) {
 
+  // 🔒 TRANSACTION START — user pressed + / −
+  window._cartUpdating = true;
+  lockCheckout("Updating cart…");
+
   // If backend save is running → skip UI update
   if (blockRender) return;
 
@@ -3272,14 +3276,11 @@ async function updateQty(index, newQty) {
   // ⭐ G3: REMOVE COUPON IF QTY CHANGES (only for onetime coupons)
   if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type === "regular"))  {
 
-      // remove coupon
       selectedCoupon = null;
       alreadyAppliedCouponId = "";
 
-      // show message to user
       showCouponError("Coupon removed because cart quantity changed. Please apply again.");
 
-      // hide coupon applied box
       const appliedBox = document.getElementById("bestOfferApplied");
       if (appliedBox) appliedBox.style.display = "none";
   }
@@ -3290,17 +3291,23 @@ async function updateQty(index, newQty) {
   // 3 — Save immediately to local storage
   if (!isLoggedIn()) {
     localStorage.setItem("guestCart", JSON.stringify(cart));
-  } else {
-    // logged-in → backend sync handled below
   }
 
-  // 4 — Re-render cart instantly (no delay, no flicker)
+  // 4 — Re-render cart instantly
   renderCart();
 
-  // 5 — Backend save (queued, safe, no double-event)
+  // 5 — Update badge
   updateCartBadge();
 
-  await saveCartToBackend();
+  // 6 — Backend save
+  try {
+    window._cartSavePromise = saveCartToBackend();
+    await window._cartSavePromise;
+  } finally {
+    // 🔓 TRANSACTION END
+    window._cartUpdating = false;
+    unlockCheckout();
+  }
 }
 
     
@@ -6976,6 +6983,11 @@ function updateCartBadge() {
 
 async function openCheckout() {
 
+    if (window._cartUpdating) {
+    alert("Cart is still updating. Please wait…");
+    return;
+  }
+
   // ✅ 0️⃣ FIRST — close drawer cart
   closeCartDrawer();
 
@@ -7026,7 +7038,6 @@ hideAddressIfOrderTypeBlank();
 
 mountInvoiceIntoCheckout();
   updateCheckoutInvoice();
-toggleAddressField();
 
 }
 
@@ -11463,6 +11474,25 @@ if (container.innerText.includes("Coupon")) return;
   }
 }
 
+  function lockCheckout(reason = "Updating cart…") {
+  const btn = document.getElementById("checkoutBtn");
+  if (!btn) return;
+
+  btn.disabled = true;
+  btn.dataset.originalText = btn.innerText;
+  btn.innerText = reason;
+  btn.classList.add("opacity-60", "cursor-not-allowed");
+}
+
+function unlockCheckout() {
+  const btn = document.getElementById("checkoutBtn");
+  if (!btn) return;
+
+  btn.disabled = false;
+  btn.innerText = btn.dataset.originalText || "Checkout";
+  btn.classList.remove("opacity-60", "cursor-not-allowed");
+}
+
  async function updateCheckoutInvoice() {
    document.getElementById("checkoutInvoiceOverlay")?.classList.remove("hidden");
 
@@ -11932,6 +11962,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
