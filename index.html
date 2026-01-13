@@ -1359,11 +1359,17 @@ body::before {
 
 </div>
 
-  <button id="checkoutBtn"
+<button id="checkoutBtn"
         onclick="openCheckout()"
-        class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg">
-  Checkouttest
+        class="mt-4 w-full text-white font-semibold py-2 rounded-lg"
+        style="
+          background: ${window._cartUpdating ? '#9ca3af' : '#ef4444'};
+          pointer-events: ${window._cartUpdating ? 'none' : 'auto'};
+          opacity: ${window._cartUpdating ? '0.6' : '1'};
+        ">
+  ${window._cartUpdating ? 'Updating cart…' : 'Checkout'}
 </button>
+
 
 </div>
 
@@ -11990,6 +11996,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
