@@ -3004,23 +3004,7 @@ function renderCart() {
     "blockRender:", blockRender,
     "checkoutBtn:", document.getElementById("checkoutBtn")
   );
-  const checkoutBtn = document.getElementById("checkoutBtn");
-if (checkoutBtn) {
-  if (window._cartUpdating) {
-    checkoutBtn.disabled = true;
-    checkoutBtn.innerText = "Updating cart…";
-
-    checkoutBtn.classList.remove("bg-red-500", "hover:bg-red-600");
-    checkoutBtn.classList.add("bg-gray-400", "cursor-not-allowed", "opacity-60");
-
-  } else {
-    checkoutBtn.disabled = false;
-    checkoutBtn.innerText = "Checkout";
-
-    checkoutBtn.classList.remove("bg-gray-400", "cursor-not-allowed", "opacity-60");
-    checkoutBtn.classList.add("bg-red-500", "hover:bg-red-600");
-  }
-}
+ 
 
 if (blockRender) {
   // still allow checkout button state update
@@ -12076,6 +12060,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
