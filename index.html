@@ -7733,13 +7733,14 @@ function finalizeCartUpdate(cartArr) {
 
   return;
 }
+  
 async function updateCart(itemId, variantId = "", action, meta = {}) {
 
   console.log("🟡 updateCart drawer");
 
   // 🔒 START LOCK
-window._cartUpdating = true;
-syncCheckoutButton(); // uske baad button ko lock + grey karo
+  window._cartUpdating = true;
+  syncCheckoutButton();   // grey + Processing...
 
   itemId = String(itemId);
   variantId = String(variantId);
@@ -7761,7 +7762,7 @@ syncCheckoutButton(); // uske baad button ko lock + grey karo
 
   if (action === "dec") {
     if (!existing) {
-      unlock();
+      await unlock();
       return;
     }
 
@@ -7778,12 +7779,19 @@ syncCheckoutButton(); // uske baad button ko lock + grey karo
   }
 
   if (!cartChanged) {
-    unlock();
+    await unlock();
     return;
   }
 
   // 🔥 Persist cart
   setCart(cartArr);
+
+  // 🔐 Cart save / backend promise
+  window._cartSavePromise = (async () => {
+    // future me yahin backend API / sheet save aayega
+    // abhi local only, but async contract ready hai
+    await Promise.resolve();
+  })();
 
   try {
     // Update single row qty (if still exists)
@@ -7793,25 +7801,25 @@ syncCheckoutButton(); // uske baad button ko lock + grey karo
     );
 
     updateDrawerItemQty(itemId, variantId, newItem?.qty || 0);
-
     updateDrawerTotals();
     refreshCouponMotivationHint();
     toggleClaimRewardOnCart();
 
   } finally {
-    unlock();
+    await unlock();
   }
 
-  function unlock() {
-    // minimum visible lock (UX)
-    setTimeout(() => {
-  window._cartUpdating = false;
-  syncCheckoutButton();  // phir enable
-}, 300);
-
+  async function unlock() {
+    try {
+      if (window._cartSavePromise) {
+        await window._cartSavePromise;   // ⏳ wait till backend/cart save done
+      }
+    } finally {
+      window._cartUpdating = false;
+      syncCheckoutButton();             // back to red Checkout
+    }
   }
 }
-
 
   
 function cleanCartInvalidItems(arr) {
@@ -12068,6 +12076,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
