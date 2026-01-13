@@ -7014,21 +7014,44 @@ function updateCartBadge() {
 }
 
 
-  function syncCheckoutButton() {
+  // -----------------------------
+// syncCheckoutButton helper
+// (place this after lockCheckout / unlockCheckout definitions)
+// -----------------------------
+function syncCheckoutButton() {
+  // Prefer existing lock/unlock helpers if present
+  if (typeof lockCheckout === "function" && typeof unlockCheckout === "function") {
+    if (window._cartUpdating) {
+      // show Processing... while locked (keeps original behaviour of lockCheckout)
+      lockCheckout("Processing...");
+    } else {
+      unlockCheckout();
+    }
+    return;
+  }
+
+  // Fallback (if lockCheckout/unlockCheckout not present for any reason)
   const btn = document.getElementById("checkoutBtn");
   if (!btn) return;
 
   if (window._cartUpdating) {
+    // save original text if not already saved
+    if (!btn.dataset.originalText) btn.dataset.originalText = btn.innerText || "Checkout";
     btn.disabled = true;
     btn.innerText = "Processing...";
-    btn.classList.add("opacity-50", "cursor-not-allowed");
+    btn.classList.remove("bg-red-500", "hover:bg-red-600");
+    btn.classList.add("bg-gray-400", "cursor-not-allowed", "opacity-60");
+    btn.style.backgroundColor = "#9ca3af"; // gray-400
+    btn.style.cursor = "not-allowed";
   } else {
     btn.disabled = false;
-    btn.innerText = "Checkout";
-    btn.classList.remove("opacity-50", "cursor-not-allowed");
+    btn.innerText = btn.dataset.originalText || "Checkout";
+    btn.classList.remove("bg-gray-400", "cursor-not-allowed", "opacity-60");
+    btn.classList.add("bg-red-500", "hover:bg-red-600");
+    btn.style.backgroundColor = "";
+    btn.style.cursor = "";
   }
 }
-
 
 async function openCheckout() {
 
@@ -12063,6 +12086,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
