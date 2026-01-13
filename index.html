@@ -3298,7 +3298,9 @@ async function updateQty(index, newQty) {
 
   // 4 — Re-render cart instantly
   renderCart();
-
+if (window._cartUpdating) {
+  lockCheckout("Updating cart…");
+}
   // 5 — Update badge
   updateCartBadge();
 
@@ -11971,6 +11973,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
