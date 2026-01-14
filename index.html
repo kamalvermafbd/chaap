@@ -4641,6 +4641,14 @@ console.log("🚀 ORDER PAYLOAD TO BACKEND:", JSON.stringify(orderData, null, 2)
 
 document.querySelectorAll('#checkoutForm input, #checkoutForm select')
   .forEach(el => el.disabled = true);
+console.log("🧪 FINAL ORDER PAYLOAD (before send)", {
+  couponDiscount: orderData.couponDiscount,
+  couponId: orderData.couponId,
+  couponType: orderData.couponType,
+  invCoupon: inv.couponAmount,
+  invReward: inv.rewardDiscount,
+  full: orderData
+});
 
   apiPost("placeOrder", orderData)
     .then(res => {
@@ -12195,6 +12203,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
