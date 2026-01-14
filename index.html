@@ -3920,6 +3920,7 @@ row.dataset.autoChecked = "1";
           changeBtn?.classList.remove("hidden");
  const locRow = document.getElementById("locationStatusRow");
   if (locRow) locRow.classList.remove("hidden");   //  FIX
+          
           addressField.required = true;
           updatePlaceOrderLockByLocation();
         } else {
@@ -3936,7 +3937,7 @@ if (locRow) locRow.classList.add("hidden");        // ⭐ hide for non-HD
           addressField.required = false;
           updatePlaceOrderLockByLocation();
         }
-
+  toggleMapByOrderType(orderType);
         overlay.style.display = "none";
         orderSelect.disabled = false;
 
@@ -4005,7 +4006,7 @@ if (locRow) locRow.classList.add("hidden");
   updatePlaceOrderLockByLocation();
 
 }
-
+toggleMapByOrderType(orderType);
   return;
 }
 
@@ -4091,7 +4092,7 @@ if (locRow) locRow.classList.add("hidden");
 
   addressField.required = false;
 }
-
+toggleMapByOrderType(orderType);
     })
     .catch(err => {
       console.error(err);
@@ -4118,6 +4119,25 @@ if (pincodeField.readOnly) return;
 
   }
 });
+
+    function toggleMapByOrderType(orderType) {
+  const mapBox = document.getElementById("mapPreviewBox");
+  const locRow = document.getElementById("locationStatusRow");
+
+  if (!mapBox) return;
+
+  if (orderType === "Home Delivery") {
+    mapBox.classList.remove("hidden");
+    if (locRow) locRow.classList.remove("hidden");
+  } else {
+    mapBox.classList.add("hidden");
+    if (locRow) locRow.classList.add("hidden");
+
+    // 🔓 Non-delivery orders don't need GPS
+    window._deliveryLocationReady = true;
+    updatePlaceOrderLockByLocation();
+  }
+}
 
     
 function normalizeCartForOrder(cart) {
@@ -12130,6 +12150,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
