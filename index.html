@@ -11646,7 +11646,10 @@ const paid   = Number(s.paidCouponDiscount || 0);
     orderId: "-",
     orderType,
     deliveryCharge: deliveryAmt,
-    deliveryChargeLabel,
+extraCharge: deliveryAmt,
+deliveryChargeLabel,
+chargeType: deliveryChargeLabel,
+
 
     // ===== CUSTOMER =====
     customerName: document.getElementById("customerName")?.value || "",
@@ -11769,8 +11772,10 @@ function unlockCheckout() {
     toggleAddressField(); 
   syncCouponFromDrawerForCheckout();
   mountInvoiceIntoCheckout();
+console.log("🧪 PREVIEW", buildCheckoutPreviewInv());
 
   const inv = buildCheckoutPreviewInv();
+   
   renderInvoiceFromAPI(inv);
 document.getElementById("checkoutInvoiceOverlay")?.classList.add("hidden");
 
@@ -12263,13 +12268,6 @@ function selectPayment(method) {
   
 </body>
 </html>
-
-
-
-
-
-
-
 
 
 
