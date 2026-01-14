@@ -4287,105 +4287,6 @@ const res = await apiPost("checkOrderEligibility", {
   orderAmount: amount,
   mobile
 });
-
-    console.log("🧠 FULL RES KEYS:", Object.keys(res));
-console.log("🧠 RES JSON:", JSON.stringify(res, null, 2));
-
-console.log("🧾 FRONTEND → BACKEND PAYLOAD:", {
-  orderType,
-  orderAmount: amount
-});
-
-console.log("🧪 BACKEND RESPONSE:", res);
-
-    console.log("🧪 ELIGIBILITY CHECK:", res);
-// 📍 Location based delivery errors → show under location box
-if (
-  res?.reason === "OUT_OF_DELIVERY_RADIUS" ||
-  res?.reason === "LOCATION_NOT_SET"
-) {
-  const row = document.getElementById("locationStatusRow");
-  const txt = document.getElementById("locationStatusText");
-
-  if (row && txt) {
-    row.classList.remove("hidden");
-    row.classList.remove("border-green-400", "bg-green-50", "text-green-700");
-    row.classList.add("border-red-400", "bg-red-50", "text-red-700");
-
-    txt.innerText = res.message || "Delivery not available for this location";
-  }
-
-  // also show small message near payment
-  showError(res.message || "Delivery not available for this location");
-  return false;
-}
-
-    if (!res || res.allowed !== true) {
-      showError(res?.message || "Order is not allowed at this time");
-      return false;
-    }
-async function canProceedPlaceOrder() {
-  // 🔥 Sync GPS from frontend memory (prevents false lock)
-if (window._deliveryLocation && window._deliveryLocation.lat && window._deliveryLocation.lng) {
-  window._deliveryLocationReady = true;
-}
-
-  const paymentError = document.getElementById("paymentError");
-
-  // helper functions (same UX everywhere)
-  const showError = (msg) => {
-    if (!paymentError) return;
-    paymentError.innerText = msg;
-    paymentError.classList.remove("hidden", "text-green-600");
-    paymentError.classList.add("text-red-600");
-     disablePlaceOrder(); 
-  };
-
-  const showSuccess = (msg) => {
-    if (!paymentError) return;
-    paymentError.innerText = msg;
-    paymentError.classList.remove("hidden", "text-red-600");
-    paymentError.classList.add("text-green-600");
-     enablePlaceOrder();
-  };
-
-  try {
-    window.orderEligibility = { allowed: false, extraCharge: 0, chargeType: "" };
-  const orderTypeNow = document.getElementById("orderType")?.value;
-
-if (
-  orderTypeNow === "Home Delivery" &&
-  !window._deliveryLocationReady
-) {
-  disablePlaceOrder();
-}
-  if (paymentError) paymentError.classList.add("hidden");
-
-    const orderType = document.getElementById("orderType")?.value.trim();
-
-  const amount = Number(window.cartSummary?.itemsSubtotal || 0);
-
-
-    // 🔴 GUARD 1: Order Type mandatory
-    if (!orderType) {
-      showError("⚠️ Please select Order Type");
-      return false;
-    }
-
-    // 🔴 GUARD 2: Cart must not be empty
-    if (amount <= 0) {
-      showError("⚠️ Cart is empty");
-      return false;
-    }
-
-    // 🔴 GUARD 3: Backend eligibility (final authority)
-    const mobile = document.getElementById("mobile")?.value.trim();
-
-const res = await apiPost("checkOrderEligibility", {
-  orderType,
-  orderAmount: amount,
-  mobile
-});
 // 🔒 ALWAYS capture backend delivery charge (even if user not eligible yet)
 window.orderEligibility = {
   allowed: false,   // permission later
@@ -12367,6 +12268,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
