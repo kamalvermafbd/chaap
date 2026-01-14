@@ -2035,7 +2035,7 @@ body::before {
   </label>
 
   <!-- Hidden input (same id so backend / placeOrder stays safe) -->
-  <input type="hidden" id="paymentMethod" value="">
+ <input type="hidden" id="paymentMethod" value="">
 
 <div class="flex gap-2">
   <button type="button"
@@ -2056,6 +2056,7 @@ body::before {
     Online
   </button>
 </div>
+
 
 <!-- 🔴 PAYMENT ERROR MESSAGE (PASTE HERE) -->
   <div id="paymentError"
@@ -11918,14 +11919,22 @@ function updatePlaceOrderLockByLocation() {
 
 function selectPayment(method) {
   window.selectedPaymentMethod = method;
+  document.getElementById("paymentMethod").value = method;
 
-  // UI toggle
+  // Remove active style from all
   document.querySelectorAll(".paymentBtn").forEach(b => {
-    b.classList.remove("active");
+    b.classList.remove("border-orange-500", "bg-orange-50", "text-orange-700");
+    b.classList.add("border-gray-300");
   });
-  document.getElementById("pay_" + method).classList.add("active");
 
-  // 🔥 FINAL eligibility re-check after payment selection
+  // Highlight selected
+  const btn = document.getElementById("pay_" + method);
+  if (btn) {
+    btn.classList.remove("border-gray-300");
+    btn.classList.add("border-orange-500", "bg-orange-50", "text-orange-700");
+  }
+
+  // 🔥 Final eligibility re-check
   setTimeout(() => {
     canProceedPlaceOrder();
   }, 50);
@@ -12171,6 +12180,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
