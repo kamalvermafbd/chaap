@@ -4612,10 +4612,13 @@ grandTotal: Number(inv.netPayable || 0),
 
     paymentMethod,
 
-    couponId: selectedCoupon ? selectedCoupon.id : "",
+  couponId: selectedCoupon
+  ? (selectedCoupon.id || selectedCoupon.couponCode || selectedCoupon.code || "")
+  : "",
+
     couponType: selectedCoupon ? selectedCoupon.type : "",
 
-couponDiscount: Number(inv.couponAmount || inv.signupDiscount || 0),
+couponDiscount: Number(inv.couponAmount || inv.rewardDiscount || 0),
 
     
     pincode,
@@ -12196,6 +12199,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
