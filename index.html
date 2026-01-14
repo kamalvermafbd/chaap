@@ -2041,8 +2041,8 @@ body::before {
   <button type="button"
           id="pay_Cash on Delivery"
           class="paymentBtn flex-1 px-4 py-2 rounded-xl text-sm font-semibold
-                 border border-orange-500 text-white bg-orange-500
-                 hover:opacity-90 transition"
+                 border border-gray-300 bg-white text-gray-800
+                 hover:border-orange-500 transition"
           onclick="selectPayment('Cash on Delivery')">
     Cash on Delivery
   </button>
@@ -2050,12 +2050,13 @@ body::before {
   <button type="button"
           id="pay_Online"
           class="paymentBtn flex-1 px-4 py-2 rounded-xl text-sm font-semibold
-                 border border-gray-300 text-gray-800 bg-white
+                 border border-gray-300 bg-white text-gray-800
                  hover:border-orange-500 transition"
           onclick="selectPayment('Online')">
     Online
   </button>
 </div>
+
 
 
 
@@ -11922,18 +11923,20 @@ function selectPayment(method) {
   window.selectedPaymentMethod = method;
   document.getElementById("paymentMethod").value = method;
 
-  document.querySelectorAll(".paymentBtn").forEach(b => {
-    b.classList.remove("bg-orange-500", "text-white", "border-orange-500");
-    b.classList.add("bg-white", "text-gray-800", "border-gray-300");
+  // remove active from all
+  document.querySelectorAll(".paymentBtn").forEach(btn => {
+    btn.classList.remove("bg-orange-500", "text-white", "border-orange-500");
+    btn.classList.add("bg-white", "text-gray-800", "border-gray-300");
   });
 
-  const btn = document.getElementById("pay_" + method);
-  if (btn) {
-    btn.classList.remove("bg-white", "text-gray-800", "border-gray-300");
-    btn.classList.add("bg-orange-500", "text-white", "border-orange-500");
+  // activate clicked
+  const activeBtn = document.getElementById("pay_" + method);
+  if (activeBtn) {
+    activeBtn.classList.remove("bg-white", "text-gray-800", "border-gray-300");
+    activeBtn.classList.add("bg-orange-500", "text-white", "border-orange-500");
   }
 
-  // 🔥 Final checkout readiness check
+  // 🔥 FINAL recheck
   setTimeout(() => {
     canProceedPlaceOrder();
   }, 50);
@@ -12179,6 +12182,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
