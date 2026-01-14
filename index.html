@@ -2035,27 +2035,28 @@ body::before {
   </label>
 
   <!-- Hidden input (same id so backend / placeOrder stays safe) -->
- <input type="hidden" id="paymentMethod" value="">
+<input type="hidden" id="paymentMethod" value="">
 
-<div class="flex gap-2">
+<div class="flex gap-3 mt-2">
   <button type="button"
           id="pay_Cash on Delivery"
-          class="paymentBtn flex-1 border border-gray-300 rounded-lg py-2 text-sm
-                 hover:border-orange-500"
-          data-value="Cash on Delivery"
+          class="paymentBtn flex-1 px-4 py-2 rounded-xl text-sm font-semibold
+                 border border-orange-500 text-white bg-orange-500
+                 hover:opacity-90 transition"
           onclick="selectPayment('Cash on Delivery')">
     Cash on Delivery
   </button>
 
   <button type="button"
           id="pay_Online"
-          class="paymentBtn flex-1 border border-gray-300 rounded-lg py-2 text-sm
-                 hover:border-orange-500"
-          data-value="Online"
+          class="paymentBtn flex-1 px-4 py-2 rounded-xl text-sm font-semibold
+                 border border-gray-300 text-gray-800 bg-white
+                 hover:border-orange-500 transition"
           onclick="selectPayment('Online')">
     Online
   </button>
 </div>
+
 
 
 <!-- 🔴 PAYMENT ERROR MESSAGE (PASTE HERE) -->
@@ -11921,20 +11922,18 @@ function selectPayment(method) {
   window.selectedPaymentMethod = method;
   document.getElementById("paymentMethod").value = method;
 
-  // Remove active style from all
   document.querySelectorAll(".paymentBtn").forEach(b => {
-    b.classList.remove("border-orange-500", "bg-orange-50", "text-orange-700");
-    b.classList.add("border-gray-300");
+    b.classList.remove("bg-orange-500", "text-white", "border-orange-500");
+    b.classList.add("bg-white", "text-gray-800", "border-gray-300");
   });
 
-  // Highlight selected
   const btn = document.getElementById("pay_" + method);
   if (btn) {
-    btn.classList.remove("border-gray-300");
-    btn.classList.add("border-orange-500", "bg-orange-50", "text-orange-700");
+    btn.classList.remove("bg-white", "text-gray-800", "border-gray-300");
+    btn.classList.add("bg-orange-500", "text-white", "border-orange-500");
   }
 
-  // 🔥 Final eligibility re-check
+  // 🔥 Final checkout readiness check
   setTimeout(() => {
     canProceedPlaceOrder();
   }, 50);
@@ -12180,6 +12179,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
