@@ -4356,7 +4356,7 @@ window.orderEligibility = {
 async function recheckEligibilityOnOrderTypeChange() {
   const ok = await canProceedPlaceOrder();
   if (ok) {
-    updateCheckoutInvoice(); // 🔥 eligibility set hone ke BAAD
+    await updateCheckoutInvoice(); // 🔥 eligibility set hone ke BAAD
   }
 }
 function buildOrderPayloadForDebug() {
@@ -12261,6 +12261,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
