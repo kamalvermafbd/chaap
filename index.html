@@ -3912,7 +3912,8 @@ row.dataset.autoChecked = "1";
           cityWrapper.style.display    = "block";
           stateWrapper.style.display   = "block";
           changeBtn?.classList.remove("hidden");
-
+ const locRow = document.getElementById("locationStatusRow");
+  if (locRow) locRow.classList.remove("hidden");   //  FIX
           addressField.required = true;
           updatePlaceOrderLockByLocation();
         } else {
@@ -3923,6 +3924,8 @@ row.dataset.autoChecked = "1";
           stateWrapper.style.display   = "none";
 
           changeBtn?.classList.add("hidden");
+const locRow = document.getElementById("locationStatusRow");
+if (locRow) locRow.classList.add("hidden");        // ⭐ hide for non-HD
 
           addressField.required = false;
           updatePlaceOrderLockByLocation();
@@ -3973,7 +3976,8 @@ if (orderType === "Home Delivery") {
   pincodeWrapper.style.display = "block";
   cityWrapper.style.display    = "block";
   stateWrapper.style.display   = "block";
-
+  const locRow = document.getElementById("locationStatusRow");
+  if (locRow) locRow.classList.remove("hidden");   //  FIX
   addressField.required = true;
   addressField.readOnly = false;
   updatePlaceOrderLockByLocation();
@@ -3983,6 +3987,8 @@ if (orderType === "Home Delivery") {
   pincodeWrapper.style.display = "none";
   cityWrapper.style.display    = "none";
   stateWrapper.style.display   = "none";
+const locRow = document.getElementById("locationStatusRow");
+if (locRow) locRow.classList.add("hidden");
 
   addressField.value = "";
   pincodeField.value = "";
@@ -4043,6 +4049,8 @@ console.log("🏠 Latest Home Delivery Address =", latestHD);
   pincodeWrapper.style.display = "block";
   cityWrapper.style.display    = "block";
   stateWrapper.style.display   = "block";
+const locRow = document.getElementById("locationStatusRow");
+if (locRow) locRow.classList.remove("hidden");
 
   addressField.required = true;
   addressField.readOnly = false;
@@ -4067,6 +4075,8 @@ stateField.classList.remove("cursor-not-allowed", "bg-gray-100");
   pincodeWrapper.style.display = "none";
   cityWrapper.style.display    = "none";
   stateWrapper.style.display   = "none";
+const locRow = document.getElementById("locationStatusRow");
+if (locRow) locRow.classList.add("hidden");
 
   addressField.value = "";
   pincodeField.value = "";
@@ -12092,6 +12102,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
