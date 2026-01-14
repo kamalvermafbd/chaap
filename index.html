@@ -4622,8 +4622,13 @@ couponDiscount: Number(inv.couponAmount || inv.signupDiscount || 0),
   city,
   state,
     userType,
-      lat: window._userLat || (window._deliveryLocation?.lat || 0),
-  lng: window._userLng || (window._deliveryLocation?.lng || 0),
+      lat: orderType === "Home Delivery"
+      ? (window._userLat || window._deliveryLocation?.lat || "")
+      : "",
+
+lng: orderType === "Home Delivery"
+      ? (window._userLng || window._deliveryLocation?.lng || "")
+      : "",
 
   deliveryCharges: Number(inv.deliveryCharge || 0),
   courierCharges: Number(inv.courierCharge || 0),
@@ -12191,6 +12196,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
