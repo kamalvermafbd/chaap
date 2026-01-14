@@ -4359,6 +4359,53 @@ async function recheckEligibilityOnOrderTypeChange() {
     updateCheckoutInvoice(); // 🔥 eligibility set hone ke BAAD
   }
 }
+function buildOrderPayloadForDebug() {
+  const inv = window._checkoutInvoice;
+  const drawer = window._drawerTotals || {};
+
+  const couponDiscFinal =
+    Number(drawer.offerDiscount || 0) +
+    Number(drawer.rewardDiscount || 0);
+
+  const payload = {
+    orderType: document.getElementById("orderType")?.value,
+    paymentMethod: document.getElementById("paymentMethod")?.value,
+    mobile: document.getElementById("mobile")?.value,
+    customerName: document.getElementById("customerName")?.value,
+    email: document.getElementById("email")?.value,
+
+    baseTotal: Number(inv?.itemsSubtotal || 0),
+    couponDiscount: couponDiscFinal,
+    signupDiscount: Number(inv?.signupDiscount || 0),
+
+    payableAfterDiscount:
+      Number(inv?.taxableAmount || 0) -
+      couponDiscFinal -
+      Number(inv?.signupDiscount || 0),
+
+    cgst: inv?.cgst,
+    sgst: inv?.sgst,
+    grandTotal: inv?.netPayable,
+
+    couponId: selectedCoupon
+      ? (selectedCoupon.id || selectedCoupon.couponCode || selectedCoupon.code)
+      : "",
+    couponType: selectedCoupon?.type || "",
+
+    lat:
+      document.getElementById("orderType")?.value === "Home Delivery"
+        ? (window._userLat || window._deliveryLocation?.lat || "")
+        : "",
+
+    lng:
+      document.getElementById("orderType")?.value === "Home Delivery"
+        ? (window._userLng || window._deliveryLocation?.lng || "")
+        : ""
+  };
+
+  console.log("🧪 ORDER DEBUG PAYLOAD", payload);
+  return payload;
+}
 
     
 async function placeOrder() {
@@ -4581,9 +4628,12 @@ if (!inv) {
 // 🔒 cart & totals checkout invoice se aayenge
 const safeCartItems = inv.items.map(i => ({ ...i }));
 
+const drawer = window._drawerTotals || {};
+
 const couponDiscFinal =
-  Number(inv.couponAmount || 0) +
-  Number(inv.rewardDiscount || 0);
+  Number(drawer.offerDiscount || 0) +
+  Number(drawer.rewardDiscount || 0);
+
 
   const orderData = {
     customerName,
@@ -4600,8 +4650,10 @@ const couponDiscFinal =
 signupDiscount: Number(inv.signupDiscount || 0),
 payableAfterDiscount: Number(
   (inv.taxableAmount || 0) -
-  (inv.couponAmount || inv.signupDiscount || 0)
+  couponDiscFinal -
+  Number(inv.signupDiscount || 0)
 ),
+
 
 serviceAmt: Number(inv.serviceCharge || 0),
 taxableAmount: Number(inv.taxableAmount || 0),
@@ -4617,7 +4669,8 @@ grandTotal: Number(inv.netPayable || 0),
 
     couponType: selectedCoupon ? selectedCoupon.type : "",
 
-couponDiscount: couponDiscFinal,
+couponDiscount: Number(couponDiscFinal || 0),
+
     pincode,
   city,
   state,
@@ -12203,6 +12256,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
