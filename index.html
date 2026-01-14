@@ -2037,21 +2037,26 @@ body::before {
   <!-- Hidden input (same id so backend / placeOrder stays safe) -->
   <input type="hidden" id="paymentMethod" value="">
 
-  <div class="flex gap-2">
-    <button type="button"
-            class="payment-btn flex-1 border border-gray-300 rounded-lg py-2 text-sm
-                   hover:border-orange-500"
-            data-value="Cash on Delivery">
-      Cash on Delivery
-    </button>
+<div class="flex gap-2">
+  <button type="button"
+          id="pay_Cash on Delivery"
+          class="paymentBtn flex-1 border border-gray-300 rounded-lg py-2 text-sm
+                 hover:border-orange-500"
+          data-value="Cash on Delivery"
+          onclick="selectPayment('Cash on Delivery')">
+    Cash on Delivery
+  </button>
 
-    <button type="button"
-            class="payment-btn flex-1 border border-gray-300 rounded-lg py-2 text-sm
-                   hover:border-orange-500"
-            data-value="Online">
-      Online
-    </button>
-  </div>
+  <button type="button"
+          id="pay_Online"
+          class="paymentBtn flex-1 border border-gray-300 rounded-lg py-2 text-sm
+                 hover:border-orange-500"
+          data-value="Online"
+          onclick="selectPayment('Online')">
+    Online
+  </button>
+</div>
+
 <!-- 🔴 PAYMENT ERROR MESSAGE (PASTE HERE) -->
   <div id="paymentError"
        class="hidden mt-2 text-red-600 font-bold text-base">
@@ -4323,7 +4328,7 @@ window.orderEligibility = {
 };
 
     // ✅ PASSED ALL CHECKS
-    showSuccess("✅ Eligible to place order");
+    showSuccess("✅ Great! Everything is ready — you may place your order now.");
     return true;
 
   } catch (err) {
@@ -11911,6 +11916,22 @@ function updatePlaceOrderLockByLocation() {
   btn.classList.remove("opacity-50", "cursor-not-allowed");
 }
 
+function selectPayment(method) {
+  window.selectedPaymentMethod = method;
+
+  // UI toggle
+  document.querySelectorAll(".paymentBtn").forEach(b => {
+    b.classList.remove("active");
+  });
+  document.getElementById("pay_" + method).classList.add("active");
+
+  // 🔥 FINAL eligibility re-check after payment selection
+  setTimeout(() => {
+    canProceedPlaceOrder();
+  }, 50);
+}
+
+  
 </script>
 
   <div id="cartHandle" onclick="expandDrawerCart()">
