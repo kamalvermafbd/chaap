@@ -11793,7 +11793,8 @@ if (inv.serviceAmt > 0) {
 
   // Delivery
   const deliveryBox = root.querySelector("#invDelivery");
-  if (inv.deliveryCharge > 0) {
+  if ((inv.deliveryCharge || inv.extraCharge || 0) > 0) {
+
     deliveryBox.classList.remove("hidden");
   } else {
     deliveryBox.classList.add("hidden");
@@ -12268,6 +12269,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
