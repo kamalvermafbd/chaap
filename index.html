@@ -11431,8 +11431,9 @@ document.getElementById("invoiceItems").innerHTML =
   // What customer pays before tax
   const afterAllDiscounts = grossValue - signup - reward - paid;
 
-  // 🔥 FINAL GST BASE
-  const gstBase = grossValue + serviceAmt + deliveryAmt;
+// 🔥 FINAL GST BASE
+const gstBase = grossValue + serviceAmt + deliveryAmt;
+
 
   /* ================= GST ================= */
   const cgstRate = Number(inv.cgstPercent || 0);
@@ -11444,9 +11445,13 @@ document.getElementById("invoiceItems").innerHTML =
   const igst = gstBase * igstRate / 100;
   const taxTotal = cgst + sgst + igst;
 
-  /* ================= NET ================= */
-  const netPayable =
-    (afterAllDiscounts + serviceAmt + deliveryAmt) + taxTotal;
+// Bill before reward / prepaid
+const billAmount = gstBase + taxTotal;
+
+  const postTaxDiscount = signup + reward + paid;
+
+// ✅ FINAL
+const netPayable = billAmount - postTaxDiscount;
 
   /* ================= RENDER TOTALS ================= */
   // 1️⃣ Items
@@ -11527,6 +11532,27 @@ if (signup > 0) {
 } else {
   signupBox.classList.add("hidden");
 }
+// 6️⃣ Reward Coupon
+const rewardBox = document.getElementById("invReward");
+if (reward > 0) {
+  rewardBox.classList.remove("hidden");
+  rewardBox.innerHTML = `
+    <div class="flex justify-between text-green-600">
+      <span>Reward Coupon</span>
+      <span>−${fmt(reward)}</span>
+    </div>`;
+} else rewardBox.classList.add("hidden");
+
+// 7️⃣ Prepaid Coupon
+const paidBox = document.getElementById("invPaid");
+if (paid > 0) {
+  paidBox.classList.remove("hidden");
+  paidBox.innerHTML = `
+    <div class="flex justify-between text-green-600">
+      <span>Prepaid Coupon</span>
+      <span>−${fmt(paid)}</span>
+    </div>`;
+} else paidBox.classList.add("hidden");
 
   document.getElementById("invNet").innerText = fmt(netPayable);
   document.getElementById("invPayment").innerText =
@@ -11578,11 +11604,11 @@ const reward = Number(s.rewardDiscount || 0);
 const paid   = Number(s.paidCouponDiscount || 0);
 
 
-  // Sale value after ONLY normal coupon
-  const grossValue = base - normalCoupon;
+  // Sale value after ONLY normal coupon (this is GST base)
+const grossValue = base - normalCoupon;
 
-  // What customer pays before tax
-  const afterAllDiscounts = grossValue - signup - reward - paid;
+// Post-tax discounts (wallet / prepaid / signup)
+const postTaxDiscount = signup + reward + paid;
 
   /* ======================
      SERVICE / DELIVERY (on GROSS VALUE)
@@ -11623,12 +11649,13 @@ const paid   = Number(s.paidCouponDiscount || 0);
   const sgst = gstBase * sgstRate;
   const igst = gstBase * igstRate;
   const taxTotal = cgst + sgst + igst;
+const billAmount = gstBase + taxTotal;
 
   /* ======================
      NET PAYABLE
   ====================== */
-  const netPayable =
-    (afterAllDiscounts + serviceAmt + deliveryAmt) + taxTotal;
+  const netPayable = billAmount - postTaxDiscount;
+
 
   console.log("🧪 PREVIEW DEBUG", {
     orderType,
@@ -11636,8 +11663,9 @@ const paid   = Number(s.paidCouponDiscount || 0);
     serviceAmt,
     deliveryAmt,
     gstBase,
-    afterAllDiscounts,
-    netPayable
+    postTaxDiscount,
+  billAmount,
+  netPayable
   });
 
   /* ======================
@@ -11669,7 +11697,8 @@ const paid   = Number(s.paidCouponDiscount || 0);
     sgstAmt: sgst,
     igstAmt: igst,
     taxTotal,
-    netPayable,
+    billAmount,
+netPayable,
 cgstPercent: window.cgstPercent,
 sgstPercent: window.sgstPercent,
 igstPercent: window.igstPercent,
@@ -12251,6 +12280,8 @@ function selectPayment(method) {
 
   <!-- Post-tax discounts -->
   <div id="invSignup" class="text-green-600 hidden"></div>
+    <div id="invReward" class="text-green-600 hidden"></div>
+<div id="invPaid" class="text-green-600 hidden"></div>
 </div>
 
 
@@ -12270,6 +12301,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
