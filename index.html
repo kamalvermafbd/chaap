@@ -3845,10 +3845,13 @@ console.log("overlay about to show");   //
           cityField.value    = res.city || "";
           stateField.value   = res.state || "";
           // 🔑 Location readiness (lat/lng)
-window._deliveryLocationReady =
-  !!(res.lat && res.lng);
-// 🗺️ If GPS already saved, show map preview also
 if (res.lat && res.lng) {
+  // 🔥 LOAD GPS FROM USER SHEET INTO FRONTEND MEMORY
+  window._deliveryLocation = { lat: Number(res.lat), lng: Number(res.lng) };
+  window._userLat = Number(res.lat);
+  window._userLng = Number(res.lng);
+  window._deliveryLocationReady = true;
+
   const mapBox = document.getElementById("mapPreviewBox");
   const mapFrame = document.getElementById("mapPreviewFrame");
 
@@ -3856,7 +3859,10 @@ if (res.lat && res.lng) {
     mapBox.classList.remove("hidden");
     mapFrame.src = `https://maps.google.com/maps?q=${res.lat},${res.lng}&z=16&output=embed`;
   }
+} else {
+  window._deliveryLocationReady = false;
 }
+
 // 🔥 If location already exists in user sheet, auto-validate it
 if (res.lat && res.lng) {
   apiPost("checkDeliveryDistance", { mobile })
@@ -12112,6 +12118,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
