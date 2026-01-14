@@ -11590,16 +11590,14 @@ const paid   = Number(s.paidCouponDiscount || 0);
   const servicePercent  = Number(window.servicePercent || 0) / 100;
   const deliveryPercent = Number(window.deliveryPercent || 0) / 100;
 
-  if (isOrderTypeChosen) {
   if (orderType === "Dine In") {
-    serviceAmt = grossValue * servicePercent;
-  }
-  else if (orderType === "Home Delivery" || orderType === "Courier") {
-    // 🔥 Delivery ALWAYS from backend eligibility
-   deliveryAmt = Number(window.orderEligibility?.extraCharge || 0);
-  deliveryChargeLabel = window.orderEligibility?.chargeType || "Delivery Charges";
-  }
+  serviceAmt = grossValue * servicePercent;
 }
+else if (orderType === "Home Delivery" || orderType === "Courier") {
+  deliveryAmt = Number(window.orderEligibility?.extraCharge || 0);
+  deliveryChargeLabel = window.orderEligibility?.chargeType || "Delivery Charges";
+}
+
 
 
   /* ======================
@@ -12269,6 +12267,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
