@@ -4293,6 +4293,8 @@ window.orderEligibility = {
   extraCharge: Number(res?.extraCharge || 0),
   chargeType: res?.chargeType || ""
 };
+// 🔥 Force preview refresh even if payment missing
+updateCheckoutInvoice();
 
     console.log("🧠 FULL RES KEYS:", Object.keys(res));
 console.log("🧠 RES JSON:", JSON.stringify(res, null, 2));
@@ -12268,6 +12270,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
