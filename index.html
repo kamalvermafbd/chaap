@@ -11404,9 +11404,15 @@ document.getElementById("invoiceItems").innerHTML =
 
   if (orderType === "Dine In") {
     serviceAmt = Number(inv.serviceAmt || 0);
-  } else if (orderType === "Home Delivery" || orderType === "Courier") {
-    deliveryAmt = Number(inv.deliveryCharge || 0);
   }
+  else if (orderType === "Home Delivery" || orderType === "Courier") {
+  deliveryAmt = Number(
+    inv.deliveryCharge ||
+    inv.extraCharge ||
+    0
+  );
+}
+
 
   /* ================= BASE & COUPONS ================= */
   const items = Number(inv.baseTotal || 0);
@@ -11472,7 +11478,8 @@ if (deliveryAmt > 0) {
   deliveryBox.classList.remove("hidden");
   deliveryBox.innerHTML = `
     <div class="flex justify-between">
-      <span>${inv.deliveryChargeLabel || "Delivery Charges"}</span>
+      <span>${inv.deliveryChargeLabel || inv.chargeType || "Delivery Charges"}</span>
+
       <span>${fmt(deliveryAmt)}</span>
     </div>`;
 } else deliveryBox.classList.add("hidden");
@@ -12256,6 +12263,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
