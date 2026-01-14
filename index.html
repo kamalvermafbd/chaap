@@ -2035,23 +2035,31 @@ body::before {
   </label>
 
   <!-- Hidden input (same id so backend / placeOrder stays safe) -->
-  <input type="hidden" id="paymentMethod" value="">
+<input type="hidden" id="paymentMethod" value="">
 
-  <div class="flex gap-2">
-    <button type="button"
-            class="payment-btn flex-1 border border-gray-300 rounded-lg py-2 text-sm
-                   hover:border-orange-500"
-            data-value="Cash on Delivery">
-      Cash on Delivery
-    </button>
+<div class="flex gap-3 mt-2">
+  <button type="button"
+          id="pay_Cash on Delivery"
+          class="paymentBtn flex-1 px-4 py-2 rounded-xl text-sm font-semibold
+                 border border-gray-300 bg-white text-gray-800
+                 hover:border-orange-500 transition"
+          onclick="selectPayment('Cash on Delivery')">
+    Cash on Delivery
+  </button>
 
-    <button type="button"
-            class="payment-btn flex-1 border border-gray-300 rounded-lg py-2 text-sm
-                   hover:border-orange-500"
-            data-value="Online">
-      Online
-    </button>
-  </div>
+  <button type="button"
+          id="pay_Online"
+          class="paymentBtn flex-1 px-4 py-2 rounded-xl text-sm font-semibold
+                 border border-gray-300 bg-white text-gray-800
+                 hover:border-orange-500 transition"
+          onclick="selectPayment('Online')">
+    Online
+  </button>
+</div>
+
+
+
+
 <!-- 🔴 PAYMENT ERROR MESSAGE (PASTE HERE) -->
   <div id="paymentError"
        class="hidden mt-2 text-red-600 font-bold text-base">
@@ -2485,7 +2493,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbzFuronV7SPVqfQO81NrfS3EHG1UdDAB5PsKqm3XtR0RjC_2qL1PnCgXfdMaeO2zK-IyQ/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbyyDwuiGV9re2AaC0f68i39a3_AQwaL06PIu1YIESUAtjeD8PnIFjKHSWWEY2skrTpYPQ/exec";
 
 // ===============================
 // API HELPER
@@ -3845,10 +3853,13 @@ console.log("overlay about to show");   //
           cityField.value    = res.city || "";
           stateField.value   = res.state || "";
           // 🔑 Location readiness (lat/lng)
-window._deliveryLocationReady =
-  !!(res.lat && res.lng);
-// 🗺️ If GPS already saved, show map preview also
 if (res.lat && res.lng) {
+  // 🔥 LOAD GPS FROM USER SHEET INTO FRONTEND MEMORY
+  window._deliveryLocation = { lat: Number(res.lat), lng: Number(res.lng) };
+  window._userLat = Number(res.lat);
+  window._userLng = Number(res.lng);
+  window._deliveryLocationReady = true;
+
   const mapBox = document.getElementById("mapPreviewBox");
   const mapFrame = document.getElementById("mapPreviewFrame");
 
@@ -3856,7 +3867,10 @@ if (res.lat && res.lng) {
     mapBox.classList.remove("hidden");
     mapFrame.src = `https://maps.google.com/maps?q=${res.lat},${res.lng}&z=16&output=embed`;
   }
+} else {
+  window._deliveryLocationReady = false;
 }
+
 // 🔥 If location already exists in user sheet, auto-validate it
 if (res.lat && res.lng) {
   apiPost("checkDeliveryDistance", { mobile })
@@ -3912,7 +3926,9 @@ row.dataset.autoChecked = "1";
           cityWrapper.style.display    = "block";
           stateWrapper.style.display   = "block";
           changeBtn?.classList.remove("hidden");
-
+ const locRow = document.getElementById("locationStatusRow");
+  if (locRow) locRow.classList.remove("hidden");   //  FIX
+          
           addressField.required = true;
           updatePlaceOrderLockByLocation();
         } else {
@@ -3923,11 +3939,13 @@ row.dataset.autoChecked = "1";
           stateWrapper.style.display   = "none";
 
           changeBtn?.classList.add("hidden");
+const locRow = document.getElementById("locationStatusRow");
+if (locRow) locRow.classList.add("hidden");        // ⭐ hide for non-HD
 
           addressField.required = false;
           updatePlaceOrderLockByLocation();
         }
-
+  toggleMapByOrderType(orderType);
         overlay.style.display = "none";
         orderSelect.disabled = false;
 
@@ -3973,7 +3991,8 @@ if (orderType === "Home Delivery") {
   pincodeWrapper.style.display = "block";
   cityWrapper.style.display    = "block";
   stateWrapper.style.display   = "block";
-
+  const locRow = document.getElementById("locationStatusRow");
+  if (locRow) locRow.classList.remove("hidden");   //  FIX
   addressField.required = true;
   addressField.readOnly = false;
   updatePlaceOrderLockByLocation();
@@ -3983,6 +4002,8 @@ if (orderType === "Home Delivery") {
   pincodeWrapper.style.display = "none";
   cityWrapper.style.display    = "none";
   stateWrapper.style.display   = "none";
+const locRow = document.getElementById("locationStatusRow");
+if (locRow) locRow.classList.add("hidden");
 
   addressField.value = "";
   pincodeField.value = "";
@@ -3993,7 +4014,7 @@ if (orderType === "Home Delivery") {
   updatePlaceOrderLockByLocation();
 
 }
-
+toggleMapByOrderType(orderType);
   return;
 }
 
@@ -4043,6 +4064,8 @@ console.log("🏠 Latest Home Delivery Address =", latestHD);
   pincodeWrapper.style.display = "block";
   cityWrapper.style.display    = "block";
   stateWrapper.style.display   = "block";
+const locRow = document.getElementById("locationStatusRow");
+if (locRow) locRow.classList.remove("hidden");
 
   addressField.required = true;
   addressField.readOnly = false;
@@ -4067,6 +4090,8 @@ stateField.classList.remove("cursor-not-allowed", "bg-gray-100");
   pincodeWrapper.style.display = "none";
   cityWrapper.style.display    = "none";
   stateWrapper.style.display   = "none";
+const locRow = document.getElementById("locationStatusRow");
+if (locRow) locRow.classList.add("hidden");
 
   addressField.value = "";
   pincodeField.value = "";
@@ -4075,7 +4100,7 @@ stateField.classList.remove("cursor-not-allowed", "bg-gray-100");
 
   addressField.required = false;
 }
-
+toggleMapByOrderType(orderType);
     })
     .catch(err => {
       console.error(err);
@@ -4102,6 +4127,25 @@ if (pincodeField.readOnly) return;
 
   }
 });
+
+    function toggleMapByOrderType(orderType) {
+  const mapBox = document.getElementById("mapPreviewBox");
+  const locRow = document.getElementById("locationStatusRow");
+
+  if (!mapBox) return;
+
+  if (orderType === "Home Delivery") {
+    mapBox.classList.remove("hidden");
+    if (locRow) locRow.classList.remove("hidden");
+  } else {
+    mapBox.classList.add("hidden");
+    if (locRow) locRow.classList.add("hidden");
+
+    // 🔓 Non-delivery orders don't need GPS
+    window._deliveryLocationReady = true;
+    updatePlaceOrderLockByLocation();
+  }
+}
 
     
 function normalizeCartForOrder(cart) {
@@ -4182,6 +4226,11 @@ function enablePlaceOrder() {
 }
 
 async function canProceedPlaceOrder() {
+  // 🔥 Sync GPS from frontend memory (prevents false lock)
+if (window._deliveryLocation && window._deliveryLocation.lat && window._deliveryLocation.lng) {
+  window._deliveryLocationReady = true;
+}
+
   const paymentError = document.getElementById("paymentError");
 
   // helper functions (same UX everywhere)
@@ -4203,7 +4252,14 @@ async function canProceedPlaceOrder() {
 
   try {
     window.orderEligibility = { allowed: false, extraCharge: 0, chargeType: "" };
+  const orderTypeNow = document.getElementById("orderType")?.value;
+
+if (
+  orderTypeNow === "Home Delivery" &&
+  !window._deliveryLocationReady
+) {
   disablePlaceOrder();
+}
   if (paymentError) paymentError.classList.add("hidden");
 
     const orderType = document.getElementById("orderType")?.value.trim();
@@ -4268,6 +4324,15 @@ if (
       showError(res?.message || "Order is not allowed at this time");
       return false;
     }
+
+    // 🔴 FINAL GUARD — Payment method must be selected
+const payment = document.getElementById("paymentMethod")?.value;
+
+if (!payment) {
+  showError("⚠️ Please select a payment method");
+  return false;
+}
+
 window.orderEligibility = {
   allowed: true,
   extraCharge: Number(res.extraCharge || 0),
@@ -4275,7 +4340,7 @@ window.orderEligibility = {
 };
 
     // ✅ PASSED ALL CHECKS
-    showSuccess("✅ Eligible to place order");
+    showSuccess("✅ Great! Everything is ready — you may place your order now.");
     return true;
 
   } catch (err) {
@@ -4293,6 +4358,53 @@ async function recheckEligibilityOnOrderTypeChange() {
   if (ok) {
     updateCheckoutInvoice(); // 🔥 eligibility set hone ke BAAD
   }
+}
+function buildOrderPayloadForDebug() {
+  const inv = window._checkoutInvoice;
+  const drawer = window._drawerTotals || {};
+
+  const couponDiscFinal =
+    Number(drawer.offerDiscount || 0) +
+    Number(drawer.rewardDiscount || 0);
+
+  const payload = {
+    orderType: document.getElementById("orderType")?.value,
+    paymentMethod: document.getElementById("paymentMethod")?.value,
+    mobile: document.getElementById("mobile")?.value,
+    customerName: document.getElementById("customerName")?.value,
+    email: document.getElementById("email")?.value,
+
+    baseTotal: Number(inv?.itemsSubtotal || 0),
+    couponDiscount: couponDiscFinal,
+    signupDiscount: Number(inv?.signupDiscount || 0),
+
+    payableAfterDiscount:
+      Number(inv?.taxableAmount || 0) -
+      couponDiscFinal -
+      Number(inv?.signupDiscount || 0),
+
+    cgst: inv?.cgst,
+    sgst: inv?.sgst,
+    grandTotal: inv?.netPayable,
+
+    couponId: selectedCoupon
+      ? (selectedCoupon.id || selectedCoupon.couponCode || selectedCoupon.code)
+      : "",
+    couponType: selectedCoupon?.type || "",
+
+    lat:
+      document.getElementById("orderType")?.value === "Home Delivery"
+        ? (window._userLat || window._deliveryLocation?.lat || "")
+        : "",
+
+    lng:
+      document.getElementById("orderType")?.value === "Home Delivery"
+        ? (window._userLng || window._deliveryLocation?.lng || "")
+        : ""
+  };
+
+  console.log("🧪 ORDER DEBUG PAYLOAD", payload);
+  return payload;
 }
 
     
@@ -4516,6 +4628,12 @@ if (!inv) {
 // 🔒 cart & totals checkout invoice se aayenge
 const safeCartItems = inv.items.map(i => ({ ...i }));
 
+const drawer = window._drawerTotals || {};
+
+const couponDiscFinal =
+  Number(drawer.offerDiscount || 0) +
+  Number(drawer.rewardDiscount || 0);
+
 
   const orderData = {
     customerName,
@@ -4528,37 +4646,42 @@ const safeCartItems = inv.items.map(i => ({ ...i }));
 
     baseTotal: Number(inv.itemsSubtotal || 0),
 
-offerDiscount: Number(inv.couponAmount || 0),
+
 signupDiscount: Number(inv.signupDiscount || 0),
 payableAfterDiscount: Number(
   (inv.taxableAmount || 0) -
-  (inv.couponAmount || inv.signupDiscount || 0)
+  couponDiscFinal -
+  Number(inv.signupDiscount || 0)
 ),
+
 
 serviceAmt: Number(inv.serviceCharge || 0),
 taxableAmount: Number(inv.taxableAmount || 0),
-
 cgstAmt: Number(inv.cgst || 0),
 sgstAmt: Number(inv.sgst || 0),
 igstAmt: Number(inv.igst || 0),
-
 grandTotal: Number(inv.netPayable || 0),
-
-
     paymentMethod,
 
-    couponId: selectedCoupon ? selectedCoupon.id : "",
+  couponId: selectedCoupon
+  ? (selectedCoupon.id || selectedCoupon.couponCode || selectedCoupon.code || "")
+  : "",
+
     couponType: selectedCoupon ? selectedCoupon.type : "",
 
-couponDiscount: Number(inv.couponAmount || inv.signupDiscount || 0),
+couponDiscount: Number(couponDiscFinal || 0),
 
-    
     pincode,
   city,
   state,
     userType,
-      lat: window._userLat || (window._deliveryLocation?.lat || 0),
-  lng: window._userLng || (window._deliveryLocation?.lng || 0),
+      lat: orderType === "Home Delivery"
+      ? (window._userLat || window._deliveryLocation?.lat || "")
+      : "",
+
+lng: orderType === "Home Delivery"
+      ? (window._userLng || window._deliveryLocation?.lng || "")
+      : "",
 
   deliveryCharges: Number(inv.deliveryCharge || 0),
   courierCharges: Number(inv.courierCharge || 0),
@@ -4571,6 +4694,14 @@ console.log("🚀 ORDER PAYLOAD TO BACKEND:", JSON.stringify(orderData, null, 2)
 
 document.querySelectorAll('#checkoutForm input, #checkoutForm select')
   .forEach(el => el.disabled = true);
+console.log("🧪 FINAL ORDER PAYLOAD (before send)", {
+  couponDiscount: orderData.couponDiscount,
+  couponId: orderData.couponId,
+  couponType: orderData.couponType,
+  invCoupon: inv.couponAmount,
+  invReward: inv.rewardDiscount,
+  full: orderData
+});
 
   apiPost("placeOrder", orderData)
     .then(res => {
@@ -11273,9 +11404,15 @@ document.getElementById("invoiceItems").innerHTML =
 
   if (orderType === "Dine In") {
     serviceAmt = Number(inv.serviceAmt || 0);
-  } else if (orderType === "Home Delivery" || orderType === "Courier") {
-    deliveryAmt = Number(inv.deliveryCharge || 0);
   }
+  else if (orderType === "Home Delivery" || orderType === "Courier") {
+  deliveryAmt = Number(
+    inv.deliveryCharge ||
+    inv.extraCharge ||
+    0
+  );
+}
+
 
   /* ================= BASE & COUPONS ================= */
   const items = Number(inv.baseTotal || 0);
@@ -11341,7 +11478,8 @@ if (deliveryAmt > 0) {
   deliveryBox.classList.remove("hidden");
   deliveryBox.innerHTML = `
     <div class="flex justify-between">
-      <span>${inv.deliveryChargeLabel || "Delivery Charges"}</span>
+      <span>${inv.deliveryChargeLabel || inv.chargeType || "Delivery Charges"}</span>
+
       <span>${fmt(deliveryAmt)}</span>
     </div>`;
 } else deliveryBox.classList.add("hidden");
@@ -11414,8 +11552,6 @@ if (signup > 0) {
 }
 
 
-
-
   function buildCheckoutPreviewInv() {
 console.log("🚚 ELIGIBILITY USED:", window.orderEligibility);
 
@@ -11454,16 +11590,14 @@ const paid   = Number(s.paidCouponDiscount || 0);
   const servicePercent  = Number(window.servicePercent || 0) / 100;
   const deliveryPercent = Number(window.deliveryPercent || 0) / 100;
 
-  if (isOrderTypeChosen) {
   if (orderType === "Dine In") {
-    serviceAmt = grossValue * servicePercent;
-  }
-  else if (orderType === "Home Delivery" || orderType === "Courier") {
-    // 🔥 Delivery ALWAYS from backend eligibility
-   deliveryAmt = Number(window.orderEligibility?.extraCharge || 0);
-  deliveryChargeLabel = window.orderEligibility?.chargeType || "Delivery Charges";
-  }
+  serviceAmt = grossValue * servicePercent;
 }
+else if (orderType === "Home Delivery" || orderType === "Courier") {
+  deliveryAmt = Number(window.orderEligibility?.extraCharge || 0);
+  deliveryChargeLabel = window.orderEligibility?.chargeType || "Delivery Charges";
+}
+
 
 
   /* ======================
@@ -11510,7 +11644,10 @@ const paid   = Number(s.paidCouponDiscount || 0);
     orderId: "-",
     orderType,
     deliveryCharge: deliveryAmt,
-    deliveryChargeLabel,
+extraCharge: deliveryAmt,
+deliveryChargeLabel,
+chargeType: deliveryChargeLabel,
+
 
     // ===== CUSTOMER =====
     customerName: document.getElementById("customerName")?.value || "",
@@ -11547,6 +11684,7 @@ normalCoupon: Number(s.couponAmount || 0),
     paymentMethod: document.getElementById("paymentMethod")?.value || ""
   };
 }
+
 
 function syncCouponFromDrawerForCheckout() {
   if (!window.cartSummary) return;
@@ -11632,8 +11770,10 @@ function unlockCheckout() {
     toggleAddressField(); 
   syncCouponFromDrawerForCheckout();
   mountInvoiceIntoCheckout();
+console.log("🧪 PREVIEW", buildCheckoutPreviewInv());
 
   const inv = buildCheckoutPreviewInv();
+   
   renderInvoiceFromAPI(inv);
 document.getElementById("checkoutInvoiceOverlay")?.classList.add("hidden");
 
@@ -11651,7 +11791,8 @@ if (inv.serviceAmt > 0) {
 
   // Delivery
   const deliveryBox = root.querySelector("#invDelivery");
-  if (inv.deliveryCharge > 0) {
+  if ((inv.deliveryCharge || inv.extraCharge || 0) > 0) {
+
     deliveryBox.classList.remove("hidden");
   } else {
     deliveryBox.classList.add("hidden");
@@ -11772,10 +11913,15 @@ function captureDeliveryLocation() {
       .then(res => {
         if (res && res.success) {
 
+          // 🔥 STORE GPS IN FRONTEND MEMORY (CRITICAL FIX)
+          window._deliveryLocation = { lat: Number(lat), lng: Number(lng) };
+          window._userLat = Number(lat);
+          window._userLng = Number(lng);
+
           // 🔑 authoritative flag
           window._deliveryLocationReady = true;
 
-          // 🔑 SINGLE SOURCE OF TRUTH → controls Place Order button
+          // 🔑 controls Place Order button
           updatePlaceOrderLockByLocation();
 
           // 🗺️ Show mini map preview
@@ -11785,13 +11931,18 @@ function captureDeliveryLocation() {
           if (mapBox && mapFrame) {
             mapBox.classList.remove("hidden");
             mapFrame.src = `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
-            // 🔁 Re-check full backend eligibility now that GPS is saved
-setTimeout(() => {
-  if (typeof canProceedPlaceOrder === "function") {
-    canProceedPlaceOrder();
-  }
-}, 300);
-}
+          }
+
+          // 🔁 Re-check backend delivery eligibility
+          setTimeout(() => {
+            if (typeof canProceedPlaceOrder === "function") {
+              canProceedPlaceOrder();
+            }
+          }, 300);
+
+          // 🟢 UI success
+          icon.innerText = "📍";
+          txt.innerText  = "Location saved";
 
         } else {
           icon.innerText = "⚠️";
@@ -11853,6 +12004,30 @@ function updatePlaceOrderLockByLocation() {
   btn.classList.remove("opacity-50", "cursor-not-allowed");
 }
 
+function selectPayment(method) {
+  window.selectedPaymentMethod = method;
+  document.getElementById("paymentMethod").value = method;
+
+  // remove active from all
+  document.querySelectorAll(".paymentBtn").forEach(btn => {
+    btn.classList.remove("bg-orange-500", "text-white", "border-orange-500");
+    btn.classList.add("bg-white", "text-gray-800", "border-gray-300");
+  });
+
+  // activate clicked
+  const activeBtn = document.getElementById("pay_" + method);
+  if (activeBtn) {
+    activeBtn.classList.remove("bg-white", "text-gray-800", "border-gray-300");
+    activeBtn.classList.add("bg-orange-500", "text-white", "border-orange-500");
+  }
+
+  // 🔥 FINAL recheck
+  setTimeout(() => {
+    canProceedPlaceOrder();
+  }, 50);
+}
+
+  
 </script>
 
   <div id="cartHandle" onclick="expandDrawerCart()">
@@ -12092,6 +12267,20 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
