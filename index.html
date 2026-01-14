@@ -11782,10 +11782,15 @@ function captureDeliveryLocation() {
       .then(res => {
         if (res && res.success) {
 
+          // 🔥 STORE GPS IN FRONTEND MEMORY (CRITICAL FIX)
+          window._deliveryLocation = { lat: Number(lat), lng: Number(lng) };
+          window._userLat = Number(lat);
+          window._userLng = Number(lng);
+
           // 🔑 authoritative flag
           window._deliveryLocationReady = true;
 
-          // 🔑 SINGLE SOURCE OF TRUTH → controls Place Order button
+          // 🔑 controls Place Order button
           updatePlaceOrderLockByLocation();
 
           // 🗺️ Show mini map preview
@@ -11795,13 +11800,18 @@ function captureDeliveryLocation() {
           if (mapBox && mapFrame) {
             mapBox.classList.remove("hidden");
             mapFrame.src = `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
-            // 🔁 Re-check full backend eligibility now that GPS is saved
-setTimeout(() => {
-  if (typeof canProceedPlaceOrder === "function") {
-    canProceedPlaceOrder();
-  }
-}, 300);
-}
+          }
+
+          // 🔁 Re-check backend delivery eligibility
+          setTimeout(() => {
+            if (typeof canProceedPlaceOrder === "function") {
+              canProceedPlaceOrder();
+            }
+          }, 300);
+
+          // 🟢 UI success
+          icon.innerText = "📍";
+          txt.innerText  = "Location saved";
 
         } else {
           icon.innerText = "⚠️";
@@ -12102,6 +12112,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
