@@ -11404,15 +11404,9 @@ document.getElementById("invoiceItems").innerHTML =
 
   if (orderType === "Dine In") {
     serviceAmt = Number(inv.serviceAmt || 0);
+  } else if (orderType === "Home Delivery" || orderType === "Courier") {
+    deliveryAmt = Number(inv.deliveryCharge || 0);
   }
-  else if (orderType === "Home Delivery" || orderType === "Courier") {
-  deliveryAmt = Number(
-    inv.deliveryCharge ||
-    inv.extraCharge ||
-    0
-  );
-}
-
 
   /* ================= BASE & COUPONS ================= */
   const items = Number(inv.baseTotal || 0);
@@ -11478,8 +11472,7 @@ if (deliveryAmt > 0) {
   deliveryBox.classList.remove("hidden");
   deliveryBox.innerHTML = `
     <div class="flex justify-between">
-      <span>${inv.deliveryChargeLabel || inv.chargeType || "Delivery Charges"}</span>
-
+      <span>${inv.deliveryChargeLabel || "Delivery Charges"}</span>
       <span>${fmt(deliveryAmt)}</span>
     </div>`;
 } else deliveryBox.classList.add("hidden");
@@ -11552,6 +11545,8 @@ if (signup > 0) {
 }
 
 
+
+
   function buildCheckoutPreviewInv() {
 console.log("🚚 ELIGIBILITY USED:", window.orderEligibility);
 
@@ -11590,14 +11585,16 @@ const paid   = Number(s.paidCouponDiscount || 0);
   const servicePercent  = Number(window.servicePercent || 0) / 100;
   const deliveryPercent = Number(window.deliveryPercent || 0) / 100;
 
+  if (isOrderTypeChosen) {
   if (orderType === "Dine In") {
-  serviceAmt = grossValue * servicePercent;
-}
-else if (orderType === "Home Delivery" || orderType === "Courier") {
-  deliveryAmt = Number(window.orderEligibility?.extraCharge || 0);
+    serviceAmt = grossValue * servicePercent;
+  }
+  else if (orderType === "Home Delivery" || orderType === "Courier") {
+    // 🔥 Delivery ALWAYS from backend eligibility
+   deliveryAmt = Number(window.orderEligibility?.extraCharge || 0);
   deliveryChargeLabel = window.orderEligibility?.chargeType || "Delivery Charges";
+  }
 }
-
 
 
   /* ======================
@@ -11644,10 +11641,7 @@ else if (orderType === "Home Delivery" || orderType === "Courier") {
     orderId: "-",
     orderType,
     deliveryCharge: deliveryAmt,
-extraCharge: deliveryAmt,
-deliveryChargeLabel,
-chargeType: deliveryChargeLabel,
-
+    deliveryChargeLabel,
 
     // ===== CUSTOMER =====
     customerName: document.getElementById("customerName")?.value || "",
@@ -12267,6 +12261,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
