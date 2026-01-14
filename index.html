@@ -4324,6 +4324,15 @@ if (
       showError(res?.message || "Order is not allowed at this time");
       return false;
     }
+
+    // 🔴 FINAL GUARD — Payment method must be selected
+const payment = document.getElementById("paymentMethod")?.value;
+
+if (!payment) {
+  showError("⚠️ Please select a payment method");
+  return false;
+}
+
 window.orderEligibility = {
   allowed: true,
   extraCharge: Number(res.extraCharge || 0),
@@ -12182,6 +12191,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
