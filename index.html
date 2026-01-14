@@ -4556,7 +4556,14 @@ couponDiscount: Number(inv.couponAmount || inv.signupDiscount || 0),
     pincode,
   city,
   state,
-    userType
+    userType,
+      lat: window._userLat || (window._deliveryLocation?.lat || 0),
+  lng: window._userLng || (window._deliveryLocation?.lng || 0),
+
+  deliveryCharges: Number(inv.deliveryCharge || 0),
+  courierCharges: Number(inv.courierCharge || 0),
+  extraChargeReason: String(inv.chargeType || "")
+
   };
   console.log("👤 userType:", userType);
 
@@ -12085,6 +12092,7 @@ function updatePlaceOrderLockByLocation() {
   
 </body>
 </html>
+
 
 
 
