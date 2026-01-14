@@ -4581,6 +4581,9 @@ if (!inv) {
 // 🔒 cart & totals checkout invoice se aayenge
 const safeCartItems = inv.items.map(i => ({ ...i }));
 
+const couponDiscFinal =
+  Number(inv.couponAmount || 0) +
+  Number(inv.rewardDiscount || 0);
 
   const orderData = {
     customerName,
@@ -4593,7 +4596,7 @@ const safeCartItems = inv.items.map(i => ({ ...i }));
 
     baseTotal: Number(inv.itemsSubtotal || 0),
 
-offerDiscount: Number(inv.couponAmount || 0),
+
 signupDiscount: Number(inv.signupDiscount || 0),
 payableAfterDiscount: Number(
   (inv.taxableAmount || 0) -
@@ -4602,14 +4605,10 @@ payableAfterDiscount: Number(
 
 serviceAmt: Number(inv.serviceCharge || 0),
 taxableAmount: Number(inv.taxableAmount || 0),
-
 cgstAmt: Number(inv.cgst || 0),
 sgstAmt: Number(inv.sgst || 0),
 igstAmt: Number(inv.igst || 0),
-
 grandTotal: Number(inv.netPayable || 0),
-
-
     paymentMethod,
 
   couponId: selectedCoupon
@@ -4618,9 +4617,7 @@ grandTotal: Number(inv.netPayable || 0),
 
     couponType: selectedCoupon ? selectedCoupon.type : "",
 
-couponDiscount: Number(inv.couponAmount || inv.rewardDiscount || 0),
-
-    
+couponDiscount: couponDiscFinal,
     pincode,
   city,
   state,
@@ -12199,6 +12196,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
