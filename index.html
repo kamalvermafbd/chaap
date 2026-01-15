@@ -9966,6 +9966,8 @@ function applyRewardCoupon(couponCode, rewardAmount) {
     offerLoadingText.style.fontSize = "14px";
     offerLoadingText.style.fontWeight = "600";
   }
+  // 🔁 re-render coupons so applied state becomes visible
+  renderAvailableUserCoupons(window.availableUserCoupons || []);
 }
 
 
@@ -12302,6 +12304,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
