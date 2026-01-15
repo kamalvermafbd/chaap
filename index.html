@@ -8063,16 +8063,8 @@ function toggleClaimRewardOnCart(cartList) {
     hintBox.innerHTML = "";
   }
 
-  const couponsBox = document.getElementById("availableCouponsBox");
-  if (couponsBox) {
-    couponsBox.style.pointerEvents = "none";
-    couponsBox.style.opacity = "0.5";
-  }
+  
 }
-
-
-
-
 
 function showCouponHintPlaceholder() {
   const hintBox = document.getElementById("couponHintBox");
@@ -9765,6 +9757,10 @@ function showRewardBox(data, alreadyClaimed) {
   box.classList.remove("hidden");
 
   // 🔁 cart ke hisaab se final decision
+if (!window._rewardAlreadyClaimed) {
+  markAppliedCouponUI();   // sirf UI sync
+}
+toggleClaimRewardOnCart(getCart());
 
 }
 
@@ -12396,6 +12392,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
