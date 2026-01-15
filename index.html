@@ -7358,9 +7358,10 @@ if (selectedCoupon && selectedCoupon.type === "onetime") {
   // 4) Update totals + badge
   try { updateDrawerTotals(); } catch(e){}
   try { updateCartBadge(); } catch(e){}
-  checkAndShowMonthlyReward();
- fetchAndRenderUserCouponsForCart();
-refreshMonthlySpendAndReward();
+  await refreshMonthlySpendAndReward();   // 🔥 rebuild MonthlySpend first
+await checkAndShowMonthlyReward();      // 🔥 now check eligibility on fresh data
+fetchAndRenderUserCouponsForCart();     // coupons can be async
+
 
 }
 
@@ -12395,6 +12396,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
