@@ -11722,19 +11722,11 @@ function syncCouponFromDrawerForCheckout() {
   if (!window.cartSummary) return;
   if (!window._drawerTotals) return;
 
-  // agar cartSummary me coupon missing hai
-  if (
-    (!window.cartSummary.couponAmount || window.cartSummary.couponAmount === 0) &&
-    window._drawerTotals.offerDiscount > 0
-  ) {
-    window.cartSummary = {
-      ...window.cartSummary,
-      couponAmount: window._drawerTotals.offerDiscount,
-      totalDiscount:
-        Number(window._drawerTotals.offerDiscount || 0) +
-        Number(window.cartSummary.signupDiscount || 0)
-    };
-  }
+ 
+  // ❌ DO NOT mix reward into normal coupon
+window.cartSummary.couponAmount = Number(window._drawerTotals.offerDiscount || 0);
+window.cartSummary.rewardDiscount = Number(window._drawerTotals.rewardDiscount || 0);
+
 }
 
 function injectCheckoutOfferDiscount(inv) {
@@ -12301,6 +12293,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
