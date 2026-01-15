@@ -9400,11 +9400,15 @@ ${offerDiscount > 0
          </div>`
       : ``}
 
-    <div class="border-t my-2"></div>
-    <div class="flex justify-between items-center font-semibold text-base sm:text-lg text-gray-900 whitespace-nowrap">
-      <span>Amt after coupon adj</span>
-      <span>${fmt(subtotal - offerDiscount - signupDiscount - rewardDiscount)}</span>
-    </div>
+    ${(offerDiscount > 0 || signupDiscount > 0 || rewardDiscount > 0) ? `
+  <div class="border-t my-2"></div>
+
+  <div class="flex justify-between items-center font-semibold text-base sm:text-lg text-gray-900 whitespace-nowrap">
+    <span>Amt after coupon adj</span>
+    <span>${fmt(subtotal - offerDiscount - signupDiscount - rewardDiscount)}</span>
+  </div>
+` : ``}
+
 <div class="text-xs text-gray-500 mt-1 text-right">
   Final amount will be calculated at checkout.
 </div>
@@ -12288,6 +12292,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
