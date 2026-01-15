@@ -1345,6 +1345,15 @@ body::before {
   <div id="availableCouponsList" class="space-y-2"></div>
 </div>
 
+<div id="couponLoadingText"
+     class="text-sm text-gray-500 mb-2">
+  Please wait, fetching your coupons...
+</div>
+
+<div id="couponEmptyText"
+     class="hidden text-sm text-gray-500 mb-2">
+  No coupons available for this cart
+</div>
   
 <div class="mt-4 border-t pt-3 flex justify-between text-lg font-bold">
   <span>Base Total:</span>
@@ -8693,14 +8702,23 @@ if (btn) {
 }
 
 async function fetchAndRenderUserCouponsForCart() {
+  const loading = document.getElementById("couponLoadingText");
+  const empty = document.getElementById("couponEmptyText");
+
   try {
+    // 🔄 show loading
+    if (loading) loading.classList.remove("hidden");
+    if (empty) empty.classList.add("hidden");
+
     const mobile =
       localStorage.getItem("userMobile") ||
       localStorage.getItem("mobile");
 
-    // ❌ not logged in → hide box
+    // ❌ not logged in → no coupons
     if (!mobile) {
       renderAvailableUserCoupons([]);
+      if (loading) loading.classList.add("hidden");
+      if (empty) empty.classList.remove("hidden");
       return;
     }
 
@@ -8714,13 +8732,31 @@ async function fetchAndRenderUserCouponsForCart() {
 
     if (!data || data.success !== true) {
       renderAvailableUserCoupons([]);
+      if (loading) loading.classList.add("hidden");
+      if (empty) empty.classList.remove("hidden");
       return;
     }
 
-    renderAvailableUserCoupons(data.coupons || []);
+    const coupons = data.coupons || [];
+
+    renderAvailableUserCoupons(coupons);
+
+    // 🔄 hide loading
+    if (loading) loading.classList.add("hidden");
+
+    // 🧾 show empty if needed
+    if (coupons.length === 0) {
+      if (empty) empty.classList.remove("hidden");
+    } else {
+      if (empty) empty.classList.add("hidden");
+    }
   } catch (err) {
     console.error("Failed to load user coupons", err);
+
     renderAvailableUserCoupons([]);
+
+    if (loading) loading.classList.add("hidden");
+    if (empty) empty.classList.remove("hidden");
   }
 }
 
@@ -12339,6 +12375,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
