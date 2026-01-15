@@ -9378,11 +9378,6 @@ netPayable = Number(netPayable.toFixed(2));
   <div class="text-right text-gray-700 space-y-1.5">
 
     <div class="flex justify-between">
-      <span>Base Total:</span>
-      <span>${fmt(subtotal)}</span>
-    </div>
-
-    <div class="flex justify-between">
       <span>Offer Discount:</span>
       <span>- ${fmt(offerDiscount)}</span>
     </div>
@@ -9403,9 +9398,12 @@ netPayable = Number(netPayable.toFixed(2));
 
     <div class="border-t my-2"></div>
     <div class="flex justify-between items-center font-semibold text-base sm:text-lg text-gray-900 whitespace-nowrap">
-      <span>At after coupon adj.</span>
+      <span>Amt after coupon adj</span>
       <span>${fmt(subtotal - offerDiscount - signupDiscount - rewardDiscount)}</span>
     </div>
+<div class="text-xs text-gray-500 mt-1 text-right">
+  Final amount will be calculated at checkout.
+</div>
 
   </div>
 `;
@@ -12285,6 +12283,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
