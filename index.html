@@ -9919,20 +9919,31 @@ function markAppliedCouponUI() {
     const code = codeEl.innerText.trim();
 
     if (code === alreadyAppliedCouponId) {
-      card.classList.add("coupon-applied");
+  card.classList.add("coupon-applied");
 
-      const title = card.querySelector(".font-semibold");
-      if (title && !title.innerText.includes("Applied")) {
-        title.innerHTML +=
-          `<span class="ml-2 text-xs text-green-600">(Applied)</span>`;
-      }
+  const title = card.querySelector(".font-semibold");
+  if (title && !title.innerText.includes("Applied")) {
+    title.innerHTML +=
+      `<span class="ml-2 text-xs text-green-600">(Applied)</span>`;
+  }
 
-      const btn = card.querySelector("button");
-      if (btn) {
-        btn.classList.add("disabled-btn");
-        btn.innerText = "Applied";
-      }
-    }
+  const btn = card.querySelector("button");
+  if (btn) {
+    btn.classList.add("hidden");   // Apply hide
+  }
+
+  // 🔴 Add Remove button only here
+  if (!card.querySelector(".remove-coupon-btn")) {
+    const removeBtn = document.createElement("button");
+    removeBtn.className =
+      "remove-coupon-btn px-3 py-1 text-sm bg-red-500 text-white rounded";
+    removeBtn.innerText = "Remove";
+    removeBtn.onclick = removeAppliedCoupon;
+
+    card.appendChild(removeBtn);
+  }
+}
+
   }
 }
 
@@ -12328,6 +12339,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
