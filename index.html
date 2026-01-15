@@ -1340,8 +1340,21 @@ body::before {
   </div>
 </div>
 
-  <div id="availableCouponsBox" class="mt-3 hidden">
-  <div class="font-semibold mb-2">🎟 Available Coupons</div>
+<div id="availableCouponsBox" class="mt-3 hidden">
+  <div class="text-base font-bold text-gray-800 mb-2 tracking-wide flex items-center gap-2">
+    <svg xmlns="http://www.w3.org/2000/svg"
+         class="w-5 h-5 text-orange-500"
+         fill="none"
+         viewBox="0 0 24 24"
+         stroke="currentColor"
+         stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 8c1.657 0 3-1.343 3-3S13.657 2 12 2 9 3.343 9 5s1.343 3 3 3zm0 0v14m-7-7h14"/>
+    </svg>
+    <span>Available Coupons</span>
+  </div>
+
+  <!-- 👇 yahin coupons aayenge -->
   <div id="availableCouponsList" class="space-y-2"></div>
 </div>
 
@@ -12375,6 +12388,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
