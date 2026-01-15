@@ -1189,7 +1189,11 @@ body::before {
   z-index: 5;
 }
 
-    
+    .coupon-applied {
+  border: 2px solid #22c55e !important;
+  background: #ecfdf5 !important;
+}
+
   </style>
 </head>
 <body>
@@ -8642,6 +8646,8 @@ if (
     const div = document.createElement("div");
     div.className =
       "flex justify-between items-center p-2 border rounded bg-white";
+const isApplied = alreadyAppliedCouponId === c.couponcode;
+if (isApplied) div.classList.add("coupon-applied");
 
    const label =
   c.couponType === "reward"
@@ -8653,7 +8659,11 @@ if (
 
     div.innerHTML = `
       <div>
-        <div class="font-semibold">${label}</div>
+       <div class="font-semibold">
+  ${label}
+  ${isApplied ? `<span class="ml-2 text-xs text-green-600">(Applied)</span>` : ``}
+</div>
+
         <div class="text-sm text-gray-600">
           ₹${c.flat} OFF · Code: <b>${c.couponcode}</b>
         </div>
@@ -12292,6 +12302,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
