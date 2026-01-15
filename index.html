@@ -8857,6 +8857,7 @@ function setCart(updatedCart) {
 
   return updatedCart;
 }
+  
 function refreshUI() {
   try { updateCartBadge(); } catch(e){}
   try { refreshCartDrawer(); } catch(e){}
@@ -9171,6 +9172,7 @@ function updateDrawerTotals() {
     const priceAfterDisc = mrp - (mrp * disc / 100);
     subtotal += priceAfterDisc * qty;
   });
+
   subtotal = Number(subtotal.toFixed(2));
 
   // ⭐ If cart is empty → force all values to zero
@@ -9222,6 +9224,7 @@ if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type 
         showCouponError("Coupon removed due to quantity/value change.");
     }
 }
+
   // =====================================================
   // ⭐⭐ RESTORE COUPON ON REFRESH (MAIN FIX)
   // =====================================================
@@ -9231,19 +9234,23 @@ if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type 
       if (found) selectedCoupon = found;
     }
   } catch (e) {}
+
+
   // =====================================================
   // ========== 2) COUPON & OFFER LOGIC ==================
   // =====================================================
-let offerDiscount = 0;   // normal coupon
+  let offerDiscount = 0;   // normal coupon
 let rewardDiscount = 0; // 🔥 reward wallet
 let appliedOfferText = "";
 let rewardHint = "";
 
-const mode = (window.couponMode || "").toLowerCase();
+  const mode = (window.couponMode || "").toLowerCase();
 
   // ------------ MANUAL MODE ---------------
   if (mode === "manualcoupon") {
 // ⭐ STEP-3B: Reward partial usage hint
+
+
 if (selectedCoupon && selectedCoupon.type === "reward") {
   const rewardValue = Number(selectedCoupon.flat || 0);
 
@@ -9255,6 +9262,7 @@ if (selectedCoupon && selectedCoupon.type === "reward") {
     rewardHint = `Reward coupon fully applied`;
   }
 }
+
     if (selectedCoupon) {
       const o = selectedCoupon;
 
@@ -9289,6 +9297,7 @@ if (o.flat) {
       appliedOfferText = `🎉 ${best.text} (Saved ${fmt(offerDiscount)})`;
     }
   }
+
   // Update Offer Message Box
   const appliedBox = document.getElementById("bestOfferApplied");
  if (appliedBox) {
@@ -9307,10 +9316,13 @@ if (o.flat) {
     appliedBox.style.display = "none";
   }
 }
-// ========== Subtotal after NORMAL coupon ==========
+
+  // ========== Subtotal after offer ==========
+ // ========== Subtotal after NORMAL coupon ==========
 let payable = subtotal - offerDiscount;   // GST base
 if (payable < 0) payable = 0;
 payable = Number(payable.toFixed(2));
+
 // =====================================================
 // ⭐⭐ 3) WALLET (after tax) discounts
 // =====================================================
@@ -9322,16 +9334,23 @@ try {
     if (isNaN(signupDiscount)) signupDiscount = 0;
   }
 } catch (e) {}
+
 const afterTaxWallet = signupDiscount + rewardDiscount;   // 🔥 reward included
+
+
+
   // =====================================================
   // ========== 4) TAX + SERVICE CHARGE ==================
   // =====================================================
   const t = restaurantTax || {};
+
   let serviceAmt = 0;
   if (t.servicePercent > 0) {
     serviceAmt = payable * (t.servicePercent / 100);
   }
+
   let taxable = payable + serviceAmt;
+
   let cgstAmt = taxable * ((t.cgstPercent || 0) / 100);
   let sgstAmt = taxable * ((t.sgstPercent || 0) / 100);
   let igstAmt = taxable * ((t.igstPercent || 0) / 100);
@@ -9340,12 +9359,15 @@ const afterTaxWallet = signupDiscount + rewardDiscount;   // 🔥 reward include
 let netPayable = grandTotal - afterTaxWallet;
 if (netPayable < 0) netPayable = 0;
 netPayable = Number(netPayable.toFixed(2));
+
   serviceAmt  = Number(serviceAmt.toFixed(2));
   taxable     = Number(taxable.toFixed(2));
   cgstAmt     = Number(cgstAmt.toFixed(2));
   sgstAmt     = Number(sgstAmt.toFixed(2));
   igstAmt     = Number(igstAmt.toFixed(2));
   grandTotal  = Number(grandTotal.toFixed(2));
+
+
   // ========== UPDATE UI ==========
   const totalEl = document.getElementById("drawerTotalAmount");
   if (totalEl) totalEl.textContent = fmt(subtotal);
@@ -9353,55 +9375,47 @@ netPayable = Number(netPayable.toFixed(2));
   const taxBox = document.getElementById("taxSummary");
   if (taxBox) {
 
-   const finalAfterCoupon =
-  subtotal - offerDiscount - signupDiscount - rewardDiscount;
+    taxBox.innerHTML = `
+  <div class="text-right text-gray-700 space-y-1.5">
 
-const showOffer = offerDiscount > 0;
-const showSignup = signupDiscount > 0;
-const showReward = rewardDiscount > 0;
-const showAfterCoupon = finalAfterCoupon !== subtotal;
+    <div class="flex justify-between">
+      <span>Offer Discount:</span>
+      <span>- ${fmt(offerDiscount)}</span>
+    </div>
 
-taxBox.innerHTML = `
-<div class="text-right text-gray-700 space-y-1.5">
+    ${signupDiscount > 0 
+      ? `<div class="flex justify-between text-green-600">
+           <span>Signup Discount:</span>
+           <span>- ${fmt(signupDiscount)}</span>
+         </div>`
+      : ``}
 
-  ${showOffer ? `
-  <div class="flex justify-between">
-    <span>Offer Discount:</span>
-    <span>- ${fmt(offerDiscount)}</span>
-  </div>` : ``}
+    ${rewardDiscount > 0 
+      ? `<div class="flex justify-between text-green-600">
+           <span>Reward Coupon:</span>
+           <span>- ${fmt(rewardDiscount)}</span>
+         </div>`
+      : ``}
 
-  ${showSignup ? `
-  <div class="flex justify-between text-green-600">
-    <span>Signup Discount:</span>
-    <span>- ${fmt(signupDiscount)}</span>
-  </div>` : ``}
-
-  ${showReward ? `
-  <div class="flex justify-between text-green-600">
-    <span>Reward Coupon:</span>
-    <span>- ${fmt(rewardDiscount)}</span>
-  </div>` : ``}
-
-  ${showAfterCoupon ? `
     <div class="border-t my-2"></div>
-    <div class="flex justify-between items-center font-semibold text-base sm:text-lg whitespace-nowrap">
-      <span>Amt after coupon adj.</span>
-      <span>${fmt(finalAfterCoupon)}</span>
+    <div class="flex justify-between items-center font-semibold text-base sm:text-lg text-gray-900 whitespace-nowrap">
+      <span>Amt after coupon adj</span>
+      <span>${fmt(subtotal - offerDiscount - signupDiscount - rewardDiscount)}</span>
     </div>
-    <div class="text-xs text-gray-500 mt-1 text-right">
-      Final amount will be calculated at checkout.
-    </div>
-  ` : ``}
-
+<div class="text-xs text-gray-500 mt-1 text-right">
+  Final amount will be calculated at checkout.
 </div>
+
+  </div>
 `;
 
+  }
 window._drawerTotals = {
   baseTotal: subtotal,
   offerDiscount: offerDiscount,
   rewardDiscount: rewardDiscount,
   signupDiscount: signupDiscount,
- payableAfterDiscount: finalAfterCoupon,
+  payableAfterDiscount: netPayable,   // 🔥 FIX
   serviceAmt: serviceAmt,
   taxableAmount: taxable,
   cgstAmt: cgstAmt,
@@ -9413,6 +9427,7 @@ window._drawerTotals = {
    refreshCouponMotivationHint();
 
 }
+
 
 async function fetchSignupDiscount(mobile) {
   try {
@@ -12270,6 +12285,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
