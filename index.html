@@ -9819,18 +9819,7 @@ async function onClaimRewardClick() {
     window._couponLocked = false;
 
     // 🔥 AUTO APPLY REWARD (MINIMAL)
-selectedCoupon = {
-  id: couponCode,
-  type: "reward",
-  flat: rewardAmount,
-  min: 0,
-  text: `Reward ₹${rewardAmount} OFF`,
-  active: true
-};
 
-alreadyAppliedCouponId = couponCode;
-window._appliedCouponType = "reward";
-window._couponLocked = true;
 
     // 🔄 FULL drawer refresh (cart + coupons + reward)
    openCartDrawer();
@@ -12392,6 +12381,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
