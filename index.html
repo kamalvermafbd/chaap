@@ -9160,10 +9160,8 @@ function refreshCheckoutCart() {
 }
 
 function updateDrawerTotals() {
-
   const cartArr = getCart();
   let subtotal = 0;
-
   // ========== 1) Base Subtotal ==========
   cartArr.forEach(ci => {
     const mrp = Number(ci.rate || 0);
@@ -9212,13 +9210,11 @@ if (cartArr.length === 0) {
   };
   return;
 }
-
   // ----------------------------------------
 // ⭐ G4: REVALIDATE COUPON on totals update
 // ----------------------------------------
 if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type === "regular"))
  {
-
     const min = Number(selectedCoupon.min || 0);
 
     if (subtotal < min) {
@@ -9227,7 +9223,6 @@ if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type 
         showCouponError("Coupon removed due to quantity/value change.");
     }
 }
-
 
   // =====================================================
   // ⭐⭐ RESTORE COUPON ON REFRESH (MAIN FIX)
@@ -9378,51 +9373,43 @@ netPayable = Number(netPayable.toFixed(2));
 
   const taxBox = document.getElementById("taxSummary");
   if (taxBox) {
-   taxBox.innerHTML = `
-      <div class="text-right text-gray-700 space-y-1.5">
 
-        <div class="flex justify-between">
-        <span>Offer Discount:</span>
-        <span>- ${fmt(offerDiscount)}</span></div>
+    taxBox.innerHTML = `
+  <div class="text-right text-gray-700 space-y-1.5">
 
-       
+    <div class="flex justify-between">
+      <span>Base Total:</span>
+      <span>${fmt(subtotal)}</span>
+    </div>
 
-        <div class="flex justify-between"><span>Total after discount:</span>
-        <span>${fmt(Number((subtotal - offerDiscount).toFixed(2)))}</span>
-        </div>
+    <div class="flex justify-between">
+      <span>Offer Discount:</span>
+      <span>- ${fmt(offerDiscount)}</span>
+    </div>
 
-        <div class="flex justify-between"><span>Service Charge (${t.servicePercent}%):</span>
-        <span>${fmt(serviceAmt)}</span></div>
+    ${signupDiscount > 0 
+      ? `<div class="flex justify-between text-green-600">
+           <span>Signup Discount:</span>
+           <span>- ${fmt(signupDiscount)}</span>
+         </div>`
+      : ``}
 
-        <div class="flex justify-between"><span>Total after charges:</span>
-        <span>${fmt(Number((payable + serviceAmt).toFixed(2)))}</span></div>
+    ${rewardDiscount > 0 
+      ? `<div class="flex justify-between text-green-600">
+           <span>Reward Coupon:</span>
+           <span>- ${fmt(rewardDiscount)}</span>
+         </div>`
+      : ``}
 
-    <div class="flex justify-between"><span>CGST (${t.cgstPercent}%):</span> 
-    <span>${fmt(cgstAmt)}</span></div>
+    <div class="border-t my-2"></div>
 
-    <div class="flex justify-between"><span>SGST (${t.sgstPercent}%): </span>
-    <span>${fmt(sgstAmt)}</span></div>
+    <div class="flex justify-between font-semibold text-lg">
+      <span>Amount after coupon adjustment</span>
+      <span>${fmt(subtotal - offerDiscount - signupDiscount - rewardDiscount)}</span>
+    </div>
 
-    <div class="flex justify-between"><span>IGST (${t.igstPercent}%): </span>
-    <span>${fmt(igstAmt)}</span></div>
-    
- ${signupDiscount > 0 
-          ? `<div class="flex justify-between"><span>Signup Discount:</span><span>- ${fmt(signupDiscount)}</span>
-          </div>`
-          : ``}
-          
-${rewardDiscount > 0 
-  ? `<div class="flex justify-between text-green-600">
-       <span>Reward Coupon:</span>
-       <span>- ${fmt(rewardDiscount)}</span>
-     </div>`
-  : ``}
-  
-    <div class="flex justify-between font-bold text-lg"><span>Net Payable: </span>
-    <span>${fmt(netPayable)}</span></div>
-
-      </div>
-    `;
+  </div>
+`;
 
   }
 window._drawerTotals = {
@@ -12299,6 +12286,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
