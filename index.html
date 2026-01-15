@@ -8635,13 +8635,7 @@ function renderAvailableUserCoupons(coupons = []) {
 
   coupons.forEach(c => {
     // 🚫 skip already-applied reward coupon ONLY
-if (
-  c.couponType === "reward" &&
-  window._appliedCouponType === "reward" &&
-  alreadyAppliedCouponId === c.couponcode
-) {
-  return;
-}
+
 
     const div = document.createElement("div");
     div.className =
