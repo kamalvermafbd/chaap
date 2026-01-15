@@ -9243,9 +9243,11 @@ if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type 
   // =====================================================
   // ========== 2) COUPON & OFFER LOGIC ==================
   // =====================================================
-  let offerDiscount = 0;
-  let appliedOfferText = "";
+  let offerDiscount = 0;   // normal coupon
+let rewardDiscount = 0; // 🔥 reward wallet
+let appliedOfferText = "";
 let rewardHint = "";
+
   const mode = (window.couponMode || "").toLowerCase();
 
   // ------------ MANUAL MODE ---------------
@@ -9275,17 +9277,12 @@ if (selectedCoupon && selectedCoupon.type === "reward") {
         }
 
 if (o.flat) {
-
-  // ⭐ STEP-3A: CAP reward discount to cart subtotal
   if (o.type === "reward") {
-    offerDiscount = Math.min(Number(o.flat), subtotal);
+    rewardDiscount = Math.min(Number(o.flat), subtotal);   // ✅ wallet
   } else {
-    offerDiscount = Number(o.flat);
+    offerDiscount = Number(o.flat);                        // normal coupon
   }
-
 }
-
-
         offerDiscount = Number(offerDiscount.toFixed(2));
         appliedOfferText = `🎁 ${o.text} applied`;
 
@@ -9304,7 +9301,6 @@ if (o.flat) {
       appliedOfferText = `🎉 ${best.text} (Saved ${fmt(offerDiscount)})`;
     }
   }
-
 
   // Update Offer Message Box
   const appliedBox = document.getElementById("bestOfferApplied");
@@ -9325,30 +9321,26 @@ if (o.flat) {
   }
 }
 
-
-
   // ========== Subtotal after offer ==========
-  let payable = subtotal - offerDiscount;
-  if (payable < 0) payable = 0;
-  payable = Number(payable.toFixed(2));
+ // ========== Subtotal after NORMAL coupon ==========
+let payable = subtotal - offerDiscount;   // GST base
+if (payable < 0) payable = 0;
+payable = Number(payable.toFixed(2));
 
+// =====================================================
+// ⭐⭐ 3) WALLET (after tax) discounts
+// =====================================================
+let signupDiscount = 0;
+try {
+  const mobile = localStorage.getItem("userMobile");
+  if (mobile) {
+    signupDiscount = Number(window.signupDiscount);
+    if (isNaN(signupDiscount)) signupDiscount = 0;
+  }
+} catch (e) {}
 
-  // =====================================================
-  // ⭐⭐ 3) SIGNUP DISCOUNT APPLY (UI SIDE)
-  // =====================================================
-  let signupDiscount = 0;
-  try {
-    const mobile = localStorage.getItem("userMobile");
-    if (mobile) {
-      signupDiscount = Number(window.signupDiscount);
-if (isNaN(signupDiscount)) signupDiscount = 0;
+const afterTaxWallet = signupDiscount + rewardDiscount;   // 🔥 reward included
 
-    }
-  } catch (e) {}
-
-  payable = payable - signupDiscount;
-  if (payable < 0) payable = 0;
-  payable = Number(payable.toFixed(2));
 
 
   // =====================================================
@@ -9368,6 +9360,9 @@ if (isNaN(signupDiscount)) signupDiscount = 0;
   let igstAmt = taxable * ((t.igstPercent || 0) / 100);
 
   let grandTotal = taxable + cgstAmt + sgstAmt + igstAmt;
+let netPayable = grandTotal - afterTaxWallet;
+if (netPayable < 0) netPayable = 0;
+netPayable = Number(netPayable.toFixed(2));
 
   serviceAmt  = Number(serviceAmt.toFixed(2));
   taxable     = Number(taxable.toFixed(2));
@@ -9395,7 +9390,7 @@ if (isNaN(signupDiscount)) signupDiscount = 0;
           : ``}
 
         <div class="flex justify-between"><span>Total after discount:</span>
-        <span>${fmt(Number((subtotal - offerDiscount - signupDiscount).toFixed(2)))}</span></div>
+        <span>${fmt(Number((subtotal - offerDiscount).toFixed(2)))}</span>
 
         <div class="flex justify-between"><span>Service Charge (${t.servicePercent}%):</span>
         <span>${fmt(serviceAmt)}</span></div>
@@ -9420,18 +9415,18 @@ if (isNaN(signupDiscount)) signupDiscount = 0;
 
   }
 window._drawerTotals = {
-    baseTotal: subtotal,
-    offerDiscount: offerDiscount,
-    signupDiscount: signupDiscount,
-    payableAfterDiscount: payable,
-    serviceAmt: serviceAmt,
-    taxableAmount: taxable,
-    cgstAmt: cgstAmt,
-    sgstAmt: sgstAmt,
-    igstAmt: igstAmt,
-    grandTotal: grandTotal
-  };
-
+  baseTotal: subtotal,
+  offerDiscount: offerDiscount,
+  rewardDiscount: rewardDiscount,
+  signupDiscount: signupDiscount,
+  payableAfterDiscount: netPayable,   // 🔥 FIX
+  serviceAmt: serviceAmt,
+  taxableAmount: taxable,
+  cgstAmt: cgstAmt,
+  sgstAmt: sgstAmt,
+  igstAmt: igstAmt,
+  grandTotal: netPayable              // 🔥 FIX
+};
   try { updateCartBadge(); } catch(e){}
    refreshCouponMotivationHint();
 
@@ -12293,6 +12288,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
