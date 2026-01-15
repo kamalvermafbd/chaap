@@ -9397,6 +9397,7 @@ ${rewardDiscount > 0
 
         <div class="flex justify-between"><span>Total after discount:</span>
         <span>${fmt(Number((subtotal - offerDiscount).toFixed(2)))}</span>
+        </div>
 
         <div class="flex justify-between"><span>Service Charge (${t.servicePercent}%):</span>
         <span>${fmt(serviceAmt)}</span></div>
@@ -9413,8 +9414,8 @@ ${rewardDiscount > 0
     <div class="flex justify-between"><span>IGST (${t.igstPercent}%): </span>
     <span>${fmt(igstAmt)}</span></div>
 
-    <div class="flex justify-between font-bold text-lg"><span>Grand Total: </span>
-    <span>${fmt(grandTotal)}</span></div>
+    <div class="flex justify-between font-bold text-lg"><span>Net Payable: </span>
+    <span>${fmt(netPayable)}</span></div>
 
       </div>
     `;
@@ -12294,6 +12295,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
