@@ -9905,6 +9905,36 @@ console.log("🟡 getUserCoupons response =", res);
     box.classList.add("hidden");
   }
 }
+function markAppliedCouponUI() {
+  const list = document.getElementById("availableCouponsList");
+  if (!list) return;
+
+  const cards = list.children;
+
+  for (let i = 0; i < cards.length; i++) {
+    const card = cards[i];
+    const codeEl = card.querySelector("b"); // couponcode inside <b>CODE</b>
+    if (!codeEl) continue;
+
+    const code = codeEl.innerText.trim();
+
+    if (code === alreadyAppliedCouponId) {
+      card.classList.add("coupon-applied");
+
+      const title = card.querySelector(".font-semibold");
+      if (title && !title.innerText.includes("Applied")) {
+        title.innerHTML +=
+          `<span class="ml-2 text-xs text-green-600">(Applied)</span>`;
+      }
+
+      const btn = card.querySelector("button");
+      if (btn) {
+        btn.classList.add("disabled-btn");
+        btn.innerText = "Applied";
+      }
+    }
+  }
+}
 
 function applyRewardCoupon(couponCode, rewardAmount) {
 
@@ -9960,8 +9990,8 @@ function applyRewardCoupon(couponCode, rewardAmount) {
     offerLoadingText.style.fontSize = "14px";
     offerLoadingText.style.fontWeight = "600";
   }
-  // 🔁 re-render coupons so applied state becomes visible
-  renderAvailableUserCoupons(window.availableUserCoupons || []);
+  markAppliedCouponUI();
+
 }
 
 
@@ -12298,6 +12328,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
