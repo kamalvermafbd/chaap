@@ -8720,7 +8720,13 @@ async function fetchAndRenderUserCouponsForCart() {
 
   try {
     // 🔄 show loading
-    if (loading) loading.classList.remove("hidden");
+  // 🔄 show loading only first time
+if (loading && !window._couponsLoadedOnce) {
+  loading.classList.remove("hidden");
+} else if (loading) {
+  loading.classList.add("hidden");
+}
+
     if (empty) empty.classList.add("hidden");
 
     const mobile =
@@ -8751,6 +8757,7 @@ async function fetchAndRenderUserCouponsForCart() {
     }
 
     const coupons = data.coupons || [];
+window._couponsLoadedOnce = true;
 
     renderAvailableUserCoupons(coupons);
 
@@ -12388,6 +12395,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
