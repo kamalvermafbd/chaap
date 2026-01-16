@@ -8708,68 +8708,39 @@ if (btn) {
 }
 
 async function fetchAndRenderUserCouponsForCart() {
+
   const loading = document.getElementById("couponLoadingText");
   const empty = document.getElementById("couponEmptyText");
+  const list = document.getElementById("couponList"); // agar hai
+
+  /* ================= START FETCH ================= */
+
+  // 🔁 Reset UI
+  if (loading) loading.classList.remove("hidden"); // ⏳ ON
+  if (empty) empty.classList.add("hidden");        // 🚫 OFF
+  if (list) list.innerHTML = "";
+
+  let coupons = [];
 
   try {
-    // 🔄 show loading
-  // 🔄 show loading only first time
-if (loading && !window._couponsLoadedOnce) {
-  loading.classList.remove("hidden");
-} else if (loading) {
-  loading.classList.add("hidden");
-}
-
-    if (empty) empty.classList.add("hidden");
-
-    const mobile =
-      localStorage.getItem("userMobile") ||
-      localStorage.getItem("mobile");
-
-    // ❌ not logged in → no coupons
-    if (!mobile) {
-      renderAvailableUserCoupons([]);
-      if (loading) loading.classList.add("hidden");
-      if (empty) empty.classList.remove("hidden");
-      return;
-    }
-
-    const res = await fetch(
-      API_BASE +
-        "?api=getUserCouponsForCart&mobile=" +
-        encodeURIComponent(mobile)
-    );
-
-    const data = await res.json();
-
-    if (!data || data.success !== true) {
-      renderAvailableUserCoupons([]);
-      if (loading) loading.classList.add("hidden");
-      if (empty) empty.classList.remove("hidden");
-      return;
-    }
-
-    const coupons = data.coupons || [];
-window._couponsLoadedOnce = true;
-
-    renderAvailableUserCoupons(coupons);
-
-    // 🔄 hide loading
-    
-    // 🧾 show empty if needed
-    if (coupons.length === 0) {
-      if (empty) empty.classList.remove("hidden");
-    } else {
-      if (empty) empty.classList.add("hidden");
-    }
-  } catch (err) {
-    console.error("Failed to load user coupons", err);
-
-    renderAvailableUserCoupons([]);
-
-    if (loading) loading.classList.add("hidden");
-    if (empty) empty.classList.remove("hidden");
+    coupons = await fetchCouponsForCart(); // tumhara existing API
+  } catch (e) {
+    coupons = [];
   }
+
+  /* ================= FETCH COMPLETE ================= */
+
+  // ✅ ALWAYS hide loader once result is known
+  if (loading) loading.classList.add("hidden");
+
+  // 🚫 Empty state
+  if (!coupons || coupons.length === 0) {
+    if (empty) empty.classList.remove("hidden");
+    return;
+  }
+
+  // 🎉 Coupons found
+  renderAvailableUserCoupons(coupons);
 }
 
   
@@ -12393,6 +12364,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
