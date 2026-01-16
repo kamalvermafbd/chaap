@@ -8712,14 +8712,8 @@ async function fetchAndRenderUserCouponsForCart() {
   const empty = document.getElementById("couponEmptyText");
 
   try {
-    // 🔄 show loading
-  // 🔄 show loading only first time
-if (loading && !window._couponsLoadedOnce) {
-  loading.classList.remove("hidden");
-} else if (loading) {
-  loading.classList.add("hidden");
-}
-
+    // 🔄 show loader at fetch start
+    if (loading) loading.classList.remove("hidden");
     if (empty) empty.classList.add("hidden");
 
     const mobile =
@@ -8729,8 +8723,11 @@ if (loading && !window._couponsLoadedOnce) {
     // ❌ not logged in → no coupons
     if (!mobile) {
       renderAvailableUserCoupons([]);
-      if (loading) loading.classList.add("hidden");
-      if (empty) empty.classList.remove("hidden");
+
+      requestAnimationFrame(() => {
+        if (loading) loading.classList.add("hidden");
+        if (empty) empty.classList.remove("hidden");
+      });
       return;
     }
 
@@ -8744,34 +8741,42 @@ if (loading && !window._couponsLoadedOnce) {
 
     if (!data || data.success !== true) {
       renderAvailableUserCoupons([]);
-      if (loading) loading.classList.add("hidden");
-      if (empty) empty.classList.remove("hidden");
+
+      requestAnimationFrame(() => {
+        if (loading) loading.classList.add("hidden");
+        if (empty) empty.classList.remove("hidden");
+      });
       return;
     }
 
     const coupons = data.coupons || [];
-window._couponsLoadedOnce = true;
 
+    // 🎉 render coupons first
     renderAvailableUserCoupons(coupons);
 
-    // 🔄 hide loading
-    if (loading) loading.classList.add("hidden");
+    // 🧠 hide loader AFTER browser paints the list
+    requestAnimationFrame(() => {
+      if (loading) loading.classList.add("hidden");
 
-    // 🧾 show empty if needed
-    if (coupons.length === 0) {
-      if (empty) empty.classList.remove("hidden");
-    } else {
-      if (empty) empty.classList.add("hidden");
-    }
+      if (coupons.length === 0) {
+        if (empty) empty.classList.remove("hidden");
+      } else {
+        if (empty) empty.classList.add("hidden");
+      }
+    });
+
   } catch (err) {
     console.error("Failed to load user coupons", err);
 
     renderAvailableUserCoupons([]);
 
-    if (loading) loading.classList.add("hidden");
-    if (empty) empty.classList.remove("hidden");
+    requestAnimationFrame(() => {
+      if (loading) loading.classList.add("hidden");
+      if (empty) empty.classList.remove("hidden");
+    });
   }
 }
+
 
   
 // =====================================================
@@ -12394,6 +12399,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
