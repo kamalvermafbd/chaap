@@ -8706,41 +8706,72 @@ if (btn) {
 
   box.classList.remove("hidden");
 }
-  
-async function fetchAndRenderUserCouponsForCart() {
 
+async function fetchAndRenderUserCouponsForCart() {
   const loading = document.getElementById("couponLoadingText");
   const empty = document.getElementById("couponEmptyText");
 
-  let coupons = [];
-
   try {
-    coupons = await fetchCouponsForCart(); // existing API
-  } catch (e) {
-    coupons = [];
-  }
-
-  // 🔚 fetch complete → loader OFF
-  if (loading) loading.classList.add("hidden");
-
-  // 🛑 IMPORTANT GUARD
-  // reward just generate hua hai → empty message mat dikhao
-  if ((!coupons || coupons.length === 0) && window._rewardJustGenerated) {
-    window._rewardJustGenerated = false; // reset flag
-    return;
-  }
-
-  // 🚫 truly empty final state
-  if (!coupons || coupons.length === 0) {
-    if (empty) empty.classList.remove("hidden");
-    return;
-  }
-
-  // 🎉 coupons found
-  if (empty) empty.classList.add("hidden");
-  renderAvailableUserCoupons(coupons);
+    // 🔄 show loading
+  // 🔄 show loading only first time
+if (loading && !window._couponsLoadedOnce) {
+  loading.classList.remove("hidden");
+} else if (loading) {
+  loading.classList.add("hidden");
 }
 
+    if (empty) empty.classList.add("hidden");
+
+    const mobile =
+      localStorage.getItem("userMobile") ||
+      localStorage.getItem("mobile");
+
+    // ❌ not logged in → no coupons
+    if (!mobile) {
+      renderAvailableUserCoupons([]);
+      if (loading) loading.classList.add("hidden");
+      if (empty) empty.classList.remove("hidden");
+      return;
+    }
+
+    const res = await fetch(
+      API_BASE +
+        "?api=getUserCouponsForCart&mobile=" +
+        encodeURIComponent(mobile)
+    );
+
+    const data = await res.json();
+
+    if (!data || data.success !== true) {
+      renderAvailableUserCoupons([]);
+      if (loading) loading.classList.add("hidden");
+      if (empty) empty.classList.remove("hidden");
+      return;
+    }
+
+    const coupons = data.coupons || [];
+window._couponsLoadedOnce = true;
+
+    renderAvailableUserCoupons(coupons);
+
+    // 🔄 hide loading
+    if (loading) loading.classList.add("hidden");
+
+    // 🧾 show empty if needed
+    if (coupons.length === 0) {
+      if (empty) empty.classList.remove("hidden");
+    } else {
+      if (empty) empty.classList.add("hidden");
+    }
+  } catch (err) {
+    console.error("Failed to load user coupons", err);
+
+    renderAvailableUserCoupons([]);
+
+    if (loading) loading.classList.add("hidden");
+    if (empty) empty.classList.remove("hidden");
+  }
+}
 
   
 // =====================================================
@@ -8777,7 +8808,6 @@ function removeCouponIfNeeded() {
     refreshCouponMotivationHint();
   }
 }
-  
 function removeAppliedCoupon() {
   // 1️⃣ reset coupon state
   selectedCoupon = null;
@@ -9768,22 +9798,16 @@ if (empty) empty.classList.add("hidden");
 
     // ❌ failed
     if (!data.success) {
-  status.classList.remove("hidden");
-  status.innerText = data.reason || "Unable to claim reward";
-
-  if (loading) loading.classList.add("hidden");
-  if (empty) empty.classList.add("hidden");
-
-  btn.disabled = false;
-  btn.innerText = "Claim Reward";
-  return;
-}
-
+      status.classList.remove("hidden");
+      status.innerText = data.reason || "Unable to claim reward";
+      if (loading) loading.classList.add("hidden");
+      btn.disabled = false;
+      btn.innerText = "Claim Reward";
+      
+      return;
+    }
 
     // ✅ SUCCESS UI
-    // 🟢 tell coupon fetch: reward just generated
-window._rewardJustGenerated = true;
-
     const couponCode = data.couponcode;
     const rewardAmount = Number(data.amount || 0);
     const expiry = data.expiry_date;
@@ -9809,15 +9833,13 @@ if (loading) loading.classList.add("hidden");
 
 
     // 🔄 FULL drawer refresh (cart + coupons + reward)
-  
-// 🔥 FORCE coupon fetch + render after claim
-fetchAndRenderUserCouponsForCart();
+   openCartDrawer();
+
   } catch (err) {
     console.error(err);
     if (loading) loading.classList.add("hidden");
-if (empty) empty.classList.add("hidden");
-alert("Something went wrong");
 
+    alert("Something went wrong");
   }
 }
 
@@ -12372,62 +12394,6 @@ function selectPayment(method) {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
