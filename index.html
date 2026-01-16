@@ -9808,8 +9808,9 @@ if (loading) loading.classList.add("hidden");
 
 
     // 🔄 FULL drawer refresh (cart + coupons + reward)
-   openCartDrawer();
-
+  
+// 🔥 FORCE coupon fetch + render after claim
+fetchAndRenderUserCouponsForCart();
   } catch (err) {
     console.error(err);
     if (loading) loading.classList.add("hidden");
@@ -12370,6 +12371,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
