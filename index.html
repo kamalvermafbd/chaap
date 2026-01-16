@@ -9777,6 +9777,14 @@ async function onClaimRewardClick() {
 
     const btn = document.getElementById("claimRewardBtn");
     const status = document.getElementById("rewardStatus");
+const loading = document.getElementById("couponLoadingText");
+const empty = document.getElementById("couponEmptyText");
+
+if (loading) {
+  loading.innerText = "⏳ Generating your reward coupon, please wait...";
+  loading.classList.remove("hidden");
+}
+if (empty) empty.classList.add("hidden");
 
     btn.disabled = true;
     btn.innerText = "Claiming...";
@@ -9792,8 +9800,10 @@ async function onClaimRewardClick() {
     if (!data.success) {
       status.classList.remove("hidden");
       status.innerText = data.reason || "Unable to claim reward";
+      if (loading) loading.classList.add("hidden");
       btn.disabled = false;
       btn.innerText = "Claim Reward";
+      
       return;
     }
 
@@ -9806,6 +9816,7 @@ async function onClaimRewardClick() {
     status.innerHTML =
       `🎉 Coupon <b>${couponCode}</b> of ₹${rewardAmount} generated.<br>
        Valid till ${new Date(expiry).toLocaleDateString()}`;
+if (loading) loading.classList.add("hidden");
 
     // 🔒 mark reward claimed (UI logic)
     window._rewardAlreadyClaimed = true;
@@ -9826,6 +9837,8 @@ async function onClaimRewardClick() {
 
   } catch (err) {
     console.error(err);
+    if (loading) loading.classList.add("hidden");
+
     alert("Something went wrong");
   }
 }
@@ -12381,6 +12394,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
