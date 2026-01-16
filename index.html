@@ -9821,7 +9821,6 @@ if (empty) empty.classList.add("hidden");
     status.innerHTML =
       `🎉 Coupon <b>${couponCode}</b> of ₹${rewardAmount} generated.<br>
        Valid till ${new Date(expiry).toLocaleDateString()}`;
-if (loading) loading.classList.add("hidden");
 
     // 🔒 mark reward claimed (UI logic)
     window._rewardAlreadyClaimed = true;
@@ -12399,6 +12398,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
