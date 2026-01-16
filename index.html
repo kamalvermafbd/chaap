@@ -8755,8 +8755,7 @@ window._couponsLoadedOnce = true;
     renderAvailableUserCoupons(coupons);
 
     // 🔄 hide loading
-    if (loading) loading.classList.add("hidden");
-
+    
     // 🧾 show empty if needed
     if (coupons.length === 0) {
       if (empty) empty.classList.remove("hidden");
@@ -9800,7 +9799,7 @@ if (empty) empty.classList.add("hidden");
     if (!data.success) {
       status.classList.remove("hidden");
       status.innerText = data.reason || "Unable to claim reward";
-      if (loading) loading.classList.add("hidden");
+      
       btn.disabled = false;
       btn.innerText = "Claim Reward";
       
@@ -12394,6 +12393,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
