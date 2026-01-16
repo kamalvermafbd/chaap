@@ -8144,9 +8144,24 @@ if (window._appliedCouponType === "reward") {
       .sort((a, b) => a.min - b.min)[0];
 
     if (!future || (future.type === "onetime" && future._usedOnce === true)) {
-      hintBox.style.display = "none";
-      return;
-    }
+
+  // ===============================
+  // 🔥 REWARD MOTIVATION (ONLY IF NORMAL COUPON APPLIED)
+  // ===============================
+  if (
+    window._appliedCouponType === "normal" &&
+    typeof window._rewardMotivation === "string" &&
+    window._rewardMotivation
+  ) {
+    hintBox.innerHTML = window._rewardMotivation;
+    hintBox.style.display = "block";
+    return;
+  }
+
+  // nothing to show
+  hintBox.style.display = "none";
+  return;
+}
 
     let msg = `Add items worth <b>${fmt(future.min - subtotal)}</b> more to unlock <b>${future.text}</b>`;
     const ua = String(future.userApplicable || "all user").toLowerCase();
@@ -12156,6 +12171,49 @@ function selectPayment(method) {
   }, 50);
 }
 
+  function updateCouponMotivationUI() {
+  const box = document.getElementById("couponHintBox");
+  if (!box) return;
+
+  box.style.display = "none";
+  box.innerText = "";
+
+  // 1️⃣ Normal coupon NOT applied
+  if (!appliedCoupon && normalMotivation) {
+    box.innerText = normalMotivation;
+    box.style.display = "block";
+    return;
+  }
+
+  // 2️⃣ Normal coupon applied → show reward motivation
+  if (appliedCoupon && rewardMotivation) {
+    box.innerText = rewardMotivation;
+    box.style.display = "block";
+    return;
+  }
+
+  // 3️⃣ Else → nothing
+}
+
+async function fetchRewardMotivationForCart() {
+  if (!isUserLoggedIn()) {
+    window._rewardMotivation = "";
+    return;
+  }
+
+  const mobile = getLoggedInMobile();
+  if (!mobile) {
+    window._rewardMotivation = "";
+    return;
+  }
+
+  try {
+    const res = await apiGet("getRewardMotivation", { mobile });
+    window._rewardMotivation = res?.motivationMessage || "";
+  } catch (e) {
+    window._rewardMotivation = "";
+  }
+}
   
 </script>
 
@@ -12398,6 +12456,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
