@@ -8736,7 +8736,8 @@ async function fetchAndRenderUserCouponsForCart() {
     return;
   }
 
-  // 🎉 coupons available
+  // 🎉 coupons found
+  if (empty) empty.classList.add("hidden");
   renderAvailableUserCoupons(coupons);
 }
 
@@ -12371,6 +12372,7 @@ function selectPayment(method) {
   
 </body>
 </html>
+
 
 
 
