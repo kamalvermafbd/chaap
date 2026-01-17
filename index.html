@@ -1273,7 +1273,12 @@ body::before {
                transition">
     🎁 View Offers
   </button>
-  
+  <!-- 🔥 Reward Motivation Hint (drawer cart) -->
+<div
+  id="rewardMotivationHint"
+  class="hidden mt-2 px-3 py-2 rounded-lg text-sm bg-yellow-50 text-yellow-800 border border-yellow-200">
+</div>
+
   
  <!-- 🔥 Alert message goes HERE -->
   
@@ -7362,8 +7367,7 @@ if (selectedCoupon && selectedCoupon.type === "onetime") {
 await checkAndShowMonthlyReward();      // 🔥 now check eligibility on fresh data
 fetchAndRenderUserCouponsForCart();     // coupons can be async
 await fetchRewardMotivationForCart();
-refreshCouponMotivationHint();
-
+renderRewardMotivationHintInDrawer();  
 // 🔥 ADD THIS LINE (MANDATORY)
 toggleClaimRewardOnCart(getCart());
 }
@@ -8587,11 +8591,15 @@ cleanupCouponUI(loadingText, offerList);
   showCouponSuccess(`🎉 ${o.text} applied successfully!`);
 if (!String(couponId).startsWith("RW-")) {
   window._appliedCouponType = "normal";
-  await fetchRewardMotivationForCart();
-  refreshCouponMotivationHint();
+
+  await fetchRewardMotivationForCart();      // 🔥 get latest reward hint
+  renderRewardMotivationHintInDrawer();      // 🔥 SHOW yellow hint
 }
  if (String(couponId).startsWith("RW-")) {
   window._appliedCouponType = "reward";
+
+    const rewardHintBox = document.getElementById("rewardMotivationHint");
+  if (rewardHintBox) rewardHintBox.classList.add("hidden");
 }
  
 // 🔒 Lock ONLY if reward coupon (extra safety)
@@ -8625,7 +8633,7 @@ cleanupCouponUI(loadingText, offerList);
 
   // close list fully
   closeCouponList();
-   return { success: false };
+   return { success: true };
 }
 
 function applyUserCouponFromList(couponCode, couponType = "") {
@@ -12178,29 +12186,7 @@ function selectPayment(method) {
   }, 50);
 }
 
-  function updateCouponMotivationUI() {
-  const box = document.getElementById("couponHintBox");
-  if (!box) return;
-
-  box.style.display = "none";
-  box.innerText = "";
-
-  // 1️⃣ Normal coupon NOT applied
-  if (!appliedCoupon && normalMotivation) {
-    box.innerText = normalMotivation;
-    box.style.display = "block";
-    return;
-  }
-
-  // 2️⃣ Normal coupon applied → show reward motivation
-  if (appliedCoupon && rewardMotivation) {
-    box.innerText = rewardMotivation;
-    box.style.display = "block";
-    return;
-  }
-
-  // 3️⃣ Else → nothing
-}
+  
 
 async function fetchRewardMotivationForCart() {
   const mobile =
@@ -12220,7 +12206,22 @@ async function fetchRewardMotivationForCart() {
     window._rewardMotivation = "";
   }
 }
-  
+  function renderRewardMotivationHintInDrawer() {
+  const box = document.getElementById("rewardMotivationHint");
+  if (!box) return;
+
+  const msg = window._rewardMotivation || "";
+
+  if (!msg) {
+    box.classList.add("hidden");
+    box.innerText = "";
+    return;
+  }
+
+  box.innerText = msg;
+  box.classList.remove("hidden");
+}
+
 </script>
 
   <div id="cartHandle" onclick="expandDrawerCart()">
@@ -12462,6 +12463,7 @@ async function fetchRewardMotivationForCart() {
   
 </body>
 </html>
+
 
 
 
