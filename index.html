@@ -2524,7 +2524,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbzCJCQU6DXOwuC-XqCN-StfzoqzPO4JslFjS6DR0knZVHDHoyxjsVqYZa8qsAycOJnxMw/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbzUcmqY5N7YTqq4QL1AxjcbvxgSxeFPQsOZoeGZCNrsQJwicahqdFHU6pw0U0-JEK1S9w/exec";
 
 // ===============================
 // API HELPER
@@ -12194,33 +12194,59 @@ async function fetchRewardMotivationForCart() {
     localStorage.getItem("mobile");
 
   if (!mobile) {
-    window._rewardMotivation = "";
+    window._rewardMotivation = null;
     return;
   }
 
   try {
     const res = await apiGet("getRewardMotivation", { mobile });
-    window._rewardMotivation = res?.motivationMessage || "";
+    window._rewardMotivation = res?.motivationMessage || null;
   } catch (e) {
     console.error("Reward motivation fetch failed", e);
-    window._rewardMotivation = "";
+    window._rewardMotivation = null;
   }
 }
+
   function renderRewardMotivationHintInDrawer() {
   const box = document.getElementById("rewardMotivationHint");
   if (!box) return;
 
-  const msg = window._rewardMotivation || "";
-
-  if (!msg) {
+  const data = window._rewardMotivation;
+  if (!data || !data.remainingToUnlock) {
     box.classList.add("hidden");
     box.innerText = "";
     return;
   }
 
-  box.innerText = msg;
+  // 🔹 Cart subtotal (net of item discounts)
+  const cartSubtotal = getCart().reduce((sum, ci) => {
+    const mrp  = Number(ci.rate || 0);
+    const disc = Number(ci.discPercent || 0);
+    const qty  = Number(ci.qty || 1);
+    return sum + (mrp - (mrp * disc / 100)) * qty;
+  }, 0);
+
+  // 🔹 Adjust remaining based on cart
+  const remaining = Math.max(
+    data.remainingToUnlock - cartSubtotal,
+    0
+  );
+
+  // 🔹 Sentence builder
+  let text =
+    `Spend ₹${remaining.toFixed(2)} more to unlock your ` +
+    `${data.nextSlabId} reward`;
+
+  if (data.claimedRewardValue > 0) {
+    text += ` and get coupon of worth ₹${data.claimedRewardValue}`;
+  }
+
+  text += ".";
+
+  box.innerText = text;
   box.classList.remove("hidden");
 }
+
 
 </script>
 
@@ -12463,6 +12489,7 @@ async function fetchRewardMotivationForCart() {
   
 </body>
 </html>
+
 
 
 
