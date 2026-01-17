@@ -7299,6 +7299,12 @@ mountInvoiceIntoCheckout();
 
 
 async function openCartDrawer() {
+// 🔥 Show reward hint placeholder immediately
+const rewardBox = document.getElementById("rewardMotivationHint");
+if (rewardBox) {
+  rewardBox.innerText = "Checking your reward eligibility…";
+  rewardBox.classList.remove("hidden");
+}
 
  closeCheckout();
   showCouponHintPlaceholder(); // 👈 STEP-1 placeholder
@@ -7311,7 +7317,7 @@ async function openCartDrawer() {
   fetchOffersFromBackend().then(() => {
   try {
     updateDrawerTotals();           // totals recalc
-    refreshCouponMotivationHint();  // 🔥 NOW hint will show
+  
   } catch (e) {}
 });
 
@@ -12501,6 +12507,7 @@ function renderRewardMotivationHintInDrawer() {
   
 </body>
 </html>
+
 
 
 
