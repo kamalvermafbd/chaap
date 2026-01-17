@@ -7364,7 +7364,8 @@ fetchAndRenderUserCouponsForCart();     // coupons can be async
 await fetchRewardMotivationForCart();
 refreshCouponMotivationHint();
 
-
+// 🔥 ADD THIS LINE (MANDATORY)
+toggleClaimRewardOnCart(getCart());
 }
 
 
@@ -12462,6 +12463,7 @@ async function fetchRewardMotivationForCart() {
   
 </body>
 </html>
+
 
 
 
