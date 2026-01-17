@@ -12210,8 +12210,7 @@ async function fetchRewardMotivationForCart() {
     window._rewardMotivation = null;
   }
 }
-
-  function renderRewardMotivationHintInDrawer() {
+function renderRewardMotivationHintInDrawer() {
   const box = document.getElementById("rewardMotivationHint");
   if (!box) return;
 
@@ -12236,17 +12235,25 @@ async function fetchRewardMotivationForCart() {
     0
   );
 
-  // 🔹 Sentence builder
+  // 🎉 TARGET ACHIEVED → PROFESSIONAL MESSAGE
+  if (remaining <= 0) {
+    box.innerText =
+      `🎉 Congratulations! You’ve unlocked your ${data.nextSlabId} reward.\n` +
+      `Complete this order successfully to claim your reward.`;
+    box.classList.remove("hidden");
+    return;
+  }
+
+  // 🔹 Motivation message (before unlock)
   let text =
-  `Spend ${fmt(remaining)} more to unlock your ` +
-  `${data.nextSlabId} reward`;
+    `Spend ${fmt(remaining)} more to unlock your ` +
+    `${data.nextSlabId} reward`;
 
-if (data.claimedRewardValue > 0) {
-  text += ` and get coupon of worth ${fmt(data.claimedRewardValue, 0)}`;
-}
+  if (data.claimedRewardValue > 0) {
+    text += ` and get coupon of worth ${fmt(data.claimedRewardValue, 0)}`;
+  }
 
-text += ".";
-
+  text += ".";
 
   box.innerText = text;
   box.classList.remove("hidden");
@@ -12494,5 +12501,6 @@ text += ".";
   
 </body>
 </html>
+
 
 
