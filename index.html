@@ -7320,7 +7320,7 @@ if (rewardBox) {
   
   } catch (e) {}
 });
-
+const rewardPromise = fetchRewardMotivationForCart();
   // 1) Always get latest cart (master engine)
   let freshCart = getCart();
 
@@ -7375,7 +7375,7 @@ if (selectedCoupon && selectedCoupon.type === "onetime") {
   try { updateCartBadge(); } catch(e){}
 
   // 🔥 start reward fetch EARLY (parallel)
-const rewardPromise = fetchRewardMotivationForCart();
+
   
   await refreshMonthlySpendAndReward();   // 🔥 rebuild MonthlySpend first
 await checkAndShowMonthlyReward();      // 🔥 now check eligibility on fresh data
@@ -12514,6 +12514,7 @@ function renderRewardMotivationHintInDrawer() {
   
 </body>
 </html>
+
 
 
 
