@@ -7373,10 +7373,16 @@ if (selectedCoupon && selectedCoupon.type === "onetime") {
   // 4) Update totals + badge
   try { updateDrawerTotals(); } catch(e){}
   try { updateCartBadge(); } catch(e){}
+
+  // 🔥 start reward fetch EARLY (parallel)
+const rewardPromise = fetchRewardMotivationForCart();
+  
   await refreshMonthlySpendAndReward();   // 🔥 rebuild MonthlySpend first
 await checkAndShowMonthlyReward();      // 🔥 now check eligibility on fresh data
-fetchAndRenderUserCouponsForCart();     // coupons can be async
-await fetchRewardMotivationForCart();
+
+  fetchAndRenderUserCouponsForCart();     // coupons can be async
+
+  await rewardPromise;
 renderRewardMotivationHintInDrawer();  
 // 🔥 ADD THIS LINE (MANDATORY)
 toggleClaimRewardOnCart(getCart());
@@ -12216,6 +12222,7 @@ async function fetchRewardMotivationForCart() {
     window._rewardMotivation = null;
   }
 }
+  
 function renderRewardMotivationHintInDrawer() {
   const box = document.getElementById("rewardMotivationHint");
   if (!box) return;
@@ -12507,6 +12514,7 @@ function renderRewardMotivationHintInDrawer() {
   
 </body>
 </html>
+
 
 
 
