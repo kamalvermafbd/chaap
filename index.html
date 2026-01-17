@@ -7361,6 +7361,8 @@ if (selectedCoupon && selectedCoupon.type === "onetime") {
   await refreshMonthlySpendAndReward();   // 🔥 rebuild MonthlySpend first
 await checkAndShowMonthlyReward();      // 🔥 now check eligibility on fresh data
 fetchAndRenderUserCouponsForCart();     // coupons can be async
+await fetchRewardMotivationForCart();
+refreshCouponMotivationHint();
 
 
 }
@@ -8582,7 +8584,11 @@ cleanupCouponUI(loadingText, offerList);
   // ✔ APPLY COUPON
   selectedCoupon = o;
   showCouponSuccess(`🎉 ${o.text} applied successfully!`);
-
+if (!String(couponId).startsWith("RW-")) {
+  window._appliedCouponType = "normal";
+  await fetchRewardMotivationForCart();
+  refreshCouponMotivationHint();
+}
  if (String(couponId).startsWith("RW-")) {
   window._appliedCouponType = "reward";
 }
@@ -12456,6 +12462,7 @@ async function fetchRewardMotivationForCart() {
   
 </body>
 </html>
+
 
 
 
