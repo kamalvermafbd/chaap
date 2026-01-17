@@ -12203,12 +12203,10 @@ function selectPayment(method) {
 }
 
 async function fetchRewardMotivationForCart() {
-  if (!isUserLoggedIn()) {
-    window._rewardMotivation = "";
-    return;
-  }
+  const mobile =
+    localStorage.getItem("userMobile") ||
+    localStorage.getItem("mobile");
 
-  const mobile = getLoggedInMobile();
   if (!mobile) {
     window._rewardMotivation = "";
     return;
@@ -12218,6 +12216,7 @@ async function fetchRewardMotivationForCart() {
     const res = await apiGet("getRewardMotivation", { mobile });
     window._rewardMotivation = res?.motivationMessage || "";
   } catch (e) {
+    console.error("Reward motivation fetch failed", e);
     window._rewardMotivation = "";
   }
 }
@@ -12463,6 +12462,7 @@ async function fetchRewardMotivationForCart() {
   
 </body>
 </html>
+
 
 
 
