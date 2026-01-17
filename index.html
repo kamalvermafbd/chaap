@@ -3330,6 +3330,10 @@ slot.innerHTML = `
   </button>
 `;
 
+// 🔥 Keep reward motivation hint in sync with cart changes
+try {
+  renderRewardMotivationHintInDrawer();
+} catch (e) {}
 
 }
 
@@ -12490,4 +12494,5 @@ text += ".";
   
 </body>
 </html>
+
 
