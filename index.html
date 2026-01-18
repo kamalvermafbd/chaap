@@ -8187,15 +8187,10 @@ if (window._appliedCouponType === "reward") {
   // ===============================
   // 🔥 REWARD MOTIVATION (ONLY IF NORMAL COUPON APPLIED)
   // ===============================
-  if (
-    window._appliedCouponType === "normal" &&
-    typeof window._rewardMotivation === "string" &&
-    window._rewardMotivation
-  ) {
-    hintBox.innerHTML = window._rewardMotivation;
-    hintBox.style.display = "block";
-    return;
-  }
+ // 🔒 If no future offer → hide normal coupon hint
+hintBox.style.display = "none";
+return;
+
 
   // nothing to show
   hintBox.style.display = "none";
@@ -12225,6 +12220,7 @@ async function fetchRewardMotivationForCart() {
     localStorage.getItem("userMobile") ||
     localStorage.getItem("mobile");
 
+  // 🔒 HARD RESET if no user
   if (!mobile) {
     window._rewardMotivation = null;
     return;
@@ -12232,18 +12228,30 @@ async function fetchRewardMotivationForCart() {
 
   try {
     const res = await apiGet("getRewardMotivation", { mobile });
+
+    // 🔒 API may return { success:true, motivationMessage:null }
     window._rewardMotivation = res?.motivationMessage || null;
+
   } catch (e) {
     console.error("Reward motivation fetch failed", e);
     window._rewardMotivation = null;
   }
 }
+
   
 function renderRewardMotivationHintInDrawer() {
   const box = document.getElementById("rewardMotivationHint");
   if (!box) return;
 
+  // 🔒 ONLY when normal coupon is applied
+  if (window._appliedCouponType !== "normal") {
+    box.classList.add("hidden");
+    box.innerText = "";
+    return;
+  }
+
   const data = window._rewardMotivation;
+
   if (!data || !data.remainingToUnlock) {
     box.classList.add("hidden");
     box.innerText = "";
@@ -12258,13 +12266,12 @@ function renderRewardMotivationHintInDrawer() {
     return sum + (mrp - (mrp * disc / 100)) * qty;
   }, 0);
 
-  // 🔹 Adjust remaining based on cart
   const remaining = Math.max(
     data.remainingToUnlock - cartSubtotal,
     0
   );
 
-  // 🎉 TARGET ACHIEVED → PROFESSIONAL MESSAGE
+  // 🎉 TARGET ACHIEVED
   if (remaining <= 0) {
     box.innerText =
       `🎉 Congratulations! You’ve unlocked your ${data.nextSlabId} reward.\n` +
@@ -12273,7 +12280,7 @@ function renderRewardMotivationHintInDrawer() {
     return;
   }
 
-  // 🔹 Motivation message (before unlock)
+  // 🔹 Motivation (before unlock)
   let text =
     `Spend ${fmt(remaining)} more to unlock your ` +
     `${data.nextSlabId} reward`;
@@ -12287,6 +12294,7 @@ function renderRewardMotivationHintInDrawer() {
   box.innerText = text;
   box.classList.remove("hidden");
 }
+
 
 
 </script>
@@ -12530,6 +12538,7 @@ function renderRewardMotivationHintInDrawer() {
   
 </body>
 </html>
+
 
 
 
