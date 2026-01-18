@@ -8183,19 +8183,11 @@ if (window._appliedCouponType === "reward") {
       .sort((a, b) => a.min - b.min)[0];
 
     if (!future || (future.type === "onetime" && future._usedOnce === true)) {
-
-  // ===============================
-  // 🔥 REWARD MOTIVATION (ONLY IF NORMAL COUPON APPLIED)
-  // ===============================
- // 🔒 If no future offer → hide normal coupon hint
-hintBox.style.display = "none";
-return;
-
-
-  // nothing to show
+  // no normal coupon motivation
   hintBox.style.display = "none";
   return;
 }
+
 
     let msg = `Add items worth <b>${fmt(future.min - subtotal)}</b> more to unlock <b>${future.text}</b>`;
     const ua = String(future.userApplicable || "all user").toLowerCase();
@@ -8617,11 +8609,21 @@ cleanupCouponUI(loadingText, offerList);
   selectedCoupon = o;
   showCouponSuccess(`🎉 ${o.text} applied successfully!`);
 if (!String(couponId).startsWith("RW-")) {
+  // 🔑 NORMAL COUPON APPLIED
   window._appliedCouponType = "normal";
 
-  await fetchRewardMotivationForCart();      // 🔥 get latest reward hint
-  renderRewardMotivationHintInDrawer();      // 🔥 SHOW yellow hint
+  // ❌ hide normal coupon hint immediately
+  const couponHintBox = document.getElementById("couponHintBox");
+  if (couponHintBox) {
+    couponHintBox.style.display = "none";
+    couponHintBox.innerHTML = "";
+  }
+
+  // 🔥 fetch + show reward motivation
+  await fetchRewardMotivationForCart();
+  renderRewardMotivationHintInDrawer();
 }
+
  if (String(couponId).startsWith("RW-")) {
   window._appliedCouponType = "reward";
 
@@ -12538,6 +12540,7 @@ function renderRewardMotivationHintInDrawer() {
   
 </body>
 </html>
+
 
 
 
