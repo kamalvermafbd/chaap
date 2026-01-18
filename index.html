@@ -7312,14 +7312,14 @@ mountInvoiceIntoCheckout();
 }
 
 
-
-
 async function openCartDrawer() {
 // 🔥 Show reward hint placeholder immediately
 const rewardBox = document.getElementById("rewardMotivationHint");
 if (rewardBox) {
   rewardBox.innerText = "Checking your reward eligibility…";
   rewardBox.classList.remove("hidden");
+    // ✅ THIS WAS MISSING
+  renderRewardMotivationHintInDrawer();
 }
 
  closeCheckout();
@@ -8627,7 +8627,7 @@ if (!String(couponId).startsWith("RW-")) {
 
   // 🔥 fetch + show reward motivation
   await fetchRewardMotivationForCart();
-  
+   renderRewardMotivationHintInDrawer();
 }
 
  if (String(couponId).startsWith("RW-")) {
@@ -12541,6 +12541,7 @@ function renderRewardMotivationHintInDrawer() {
   
 </body>
 </html>
+
 
 
 
