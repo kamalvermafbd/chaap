@@ -8539,7 +8539,6 @@ if (offer) {
   loadingText.style.fontWeight = "600";       // bold
   }
  
-
 if (offerList) {
   offerList.style.pointerEvents = "none"; // disable clicks
   offerList.style.opacity = "1";        // visual feedback
@@ -8554,8 +8553,6 @@ couponItems.forEach(el => {
 
   // 🔑 1️⃣ Fresh backend truth
   await fetchOffersFromBackend();
-
-
   const offers = window.liveOffers || [];
 
   // 🔑 2️⃣ Coupon still active?
@@ -8630,7 +8627,7 @@ if (!String(couponId).startsWith("RW-")) {
 
   // 🔥 fetch + show reward motivation
   await fetchRewardMotivationForCart();
-  renderRewardMotivationHintInDrawer();
+  
 }
 
  if (String(couponId).startsWith("RW-")) {
@@ -12225,13 +12222,11 @@ function selectPayment(method) {
 }
 
   
-
 async function fetchRewardMotivationForCart() {
   const mobile =
     localStorage.getItem("userMobile") ||
     localStorage.getItem("mobile");
 
-  // 🔒 HARD RESET if no user
   if (!mobile) {
     window._rewardMotivation = null;
     return;
@@ -12239,12 +12234,14 @@ async function fetchRewardMotivationForCart() {
 
   try {
     const res = await apiGet("getRewardMotivation", { mobile });
-
-    // 🔒 API may return { success:true, motivationMessage:null }
     window._rewardMotivation = res?.motivationMessage || null;
 
+    // 🔥 AUTO re-render if normal coupon already applied
+    if (window._appliedCouponType === "normal") {
+      renderRewardMotivationHintInDrawer();
+    }
+
   } catch (e) {
-    console.error("Reward motivation fetch failed", e);
     window._rewardMotivation = null;
   }
 }
@@ -12254,7 +12251,7 @@ function renderRewardMotivationHintInDrawer() {
   const box = document.getElementById("rewardMotivationHint");
   if (!box) return;
 
-  // 🔒 ONLY when normal coupon is applied
+  // 🔒 RULE: only after NORMAL coupon applied
   if (window._appliedCouponType !== "normal") {
     box.classList.add("hidden");
     box.innerText = "";
@@ -12262,14 +12259,12 @@ function renderRewardMotivationHintInDrawer() {
   }
 
   const data = window._rewardMotivation;
-
   if (!data || !data.remainingToUnlock) {
     box.classList.add("hidden");
     box.innerText = "";
     return;
   }
 
-  // 🔹 Cart subtotal (net of item discounts)
   const cartSubtotal = getCart().reduce((sum, ci) => {
     const mrp  = Number(ci.rate || 0);
     const disc = Number(ci.discPercent || 0);
@@ -12291,17 +12286,14 @@ function renderRewardMotivationHintInDrawer() {
     return;
   }
 
-  // 🔹 Motivation (before unlock)
   let text =
-    `Spend ${fmt(remaining)} more to unlock your ` +
-    `${data.nextSlabId} reward`;
+    `Spend ${fmt(remaining)} more to unlock your ${data.nextSlabId} reward`;
 
   if (data.claimedRewardValue > 0) {
     text += ` and get coupon of worth ${fmt(data.claimedRewardValue, 0)}`;
   }
 
   text += ".";
-
   box.innerText = text;
   box.classList.remove("hidden");
 }
@@ -12549,6 +12541,7 @@ function renderRewardMotivationHintInDrawer() {
   
 </body>
 </html>
+
 
 
 
