@@ -7357,6 +7357,11 @@ function decideCartMotivation() {
 }
 
 async function openCartDrawer() {
+  // 🔑 HARD DEFAULT — REQUIRED
+if (!window._appliedCouponType) {
+  window._appliedCouponType = "normal";
+}
+
 // 🔥 Show reward hint placeholder immediately
 const rewardBox = document.getElementById("rewardMotivationHint");
 if (rewardBox) {
@@ -12275,8 +12280,7 @@ function selectPayment(method) {
   }, 50);
 }
 
-  
-async function fetchRewardMotivationForCart() {
+  async function fetchRewardMotivationForCart() {
   const mobile =
     localStorage.getItem("userMobile") ||
     localStorage.getItem("mobile");
@@ -12290,7 +12294,12 @@ async function fetchRewardMotivationForCart() {
     const res = await apiGet("getRewardMotivation", { mobile });
     window._rewardMotivation = res?.motivationMessage || null;
 
-    // 🔥 AUTO re-render if normal coupon already applied
+    // 🔑 SAFE DEFAULT FIRST
+    if (!window._appliedCouponType) {
+      window._appliedCouponType = "normal";
+    }
+
+    // 🔥 AUTO re-render if normal coupon state
     if (window._appliedCouponType === "normal") {
       renderRewardMotivationHintInDrawer();
     }
@@ -12299,6 +12308,7 @@ async function fetchRewardMotivationForCart() {
     window._rewardMotivation = null;
   }
 }
+
 
   
 function renderRewardMotivationHintInDrawer() {
@@ -12605,6 +12615,7 @@ console.log(
   
 </body>
 </html>
+
 
 
 
