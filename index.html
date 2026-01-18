@@ -8126,6 +8126,15 @@ if (window._appliedCouponType === "reward") {
   return;
 }
 
+  // 🔒 Normal coupon applied → NEVER show normal coupon hint
+  if (window._appliedCouponType === "normal") {
+    const hintBox = document.getElementById("couponHintBox");
+    if (hintBox) {
+      hintBox.style.display = "none";
+      hintBox.innerHTML = "";
+    }
+    return;
+  }
   if (typeof window._rewardAlreadyClaimed !== "boolean") {
     window._rewardAlreadyClaimed = false;
   }
@@ -12540,6 +12549,7 @@ function renderRewardMotivationHintInDrawer() {
   
 </body>
 </html>
+
 
 
 
