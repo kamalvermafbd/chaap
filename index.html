@@ -7357,12 +7357,6 @@ function decideCartMotivation() {
 }
 
 async function openCartDrawer() {
-  console.log("🧪 DRAWER OPEN");
-console.log("appliedCouponType:", window._appliedCouponType);
-console.log("rewardMotivation:", window._rewardMotivation);
-console.log("rewardBox exists:", !!document.getElementById("rewardMotivationHint"));
-
-
 // 🔥 Show reward hint placeholder immediately
 const rewardBox = document.getElementById("rewardMotivationHint");
 if (rewardBox) {
@@ -7469,6 +7463,15 @@ function closeCartDrawer() {
   }
 
   document.body.style.overflow = "auto";
+
+  console.log("===== CART MOTIVATION DEBUG =====");
+console.log("_appliedCouponType:", window._appliedCouponType);
+console.log("_rewardMotivation:", window._rewardMotivation);
+console.log("_allOffersRaw:", window._allOffersRaw);
+console.log("selectedCoupon:", selectedCoupon);
+console.log("alreadyAppliedCouponId:", alreadyAppliedCouponId);
+console.log("================================");
+
 }
 
 
@@ -12602,6 +12605,7 @@ console.log(
   
 </body>
 </html>
+
 
 
 
