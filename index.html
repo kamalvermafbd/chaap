@@ -7313,6 +7313,14 @@ mountInvoiceIntoCheckout();
 
 
 async function openCartDrawer() {
+  console.log("🧪 DRAWER OPEN");
+console.log("appliedCouponType:", window._appliedCouponType);
+console.log("rewardMotivation:", window._rewardMotivation);
+console.log("rewardBox exists:", !!document.getElementById("rewardMotivationHint"));
+if (!window._appliedCouponType) {
+  window._appliedCouponType = "normal";
+}
+
 // 🔥 Show reward hint placeholder immediately
 const rewardBox = document.getElementById("rewardMotivationHint");
 if (rewardBox) {
@@ -12248,8 +12256,18 @@ async function fetchRewardMotivationForCart() {
 
   
 function renderRewardMotivationHintInDrawer() {
+  
+  console.log("🟢 renderRewardMotivationHintInDrawer CALLED");
+console.log("appliedCouponType:", window._appliedCouponType);
+console.log("rewardMotivation inside render:", window._rewardMotivation);
+
   const box = document.getElementById("rewardMotivationHint");
   if (!box) return;
+console.log(
+  "CHECK TYPE:",
+  window._appliedCouponType,
+  "should be normal"
+);
 
   // 🔒 RULE: only after NORMAL coupon applied
   if (window._appliedCouponType !== "normal") {
@@ -12541,6 +12559,7 @@ function renderRewardMotivationHintInDrawer() {
   
 </body>
 </html>
+
 
 
 
