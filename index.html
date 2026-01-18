@@ -2316,8 +2316,6 @@ window.CURRENCY = window.CURRENCY || "₹";
 
 
     // ===== GLOBAL INIT =====
-window._rewardMotivation = null;
-window._rewardCoupons = null;
 
 
 function fmt(amount, digits = 2) {
@@ -5356,6 +5354,8 @@ function logoutUser() {
   // CLEAN OVERLAYS
   // =========================
   forceClearOverlays();
+window._rewardMotivation = null;
+window._rewardCoupons = null;
 
   // =========================
   // FINAL HARD RESET
