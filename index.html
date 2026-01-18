@@ -7311,15 +7311,43 @@ mountInvoiceIntoCheckout();
 
 }
 
+function decideCartMotivation() {
+  const normalBox = document.getElementById("couponHintBox");
+  const rewardBox = document.getElementById("rewardMotivationHint");
+
+  // hard reset UI
+  if (normalBox) {
+    normalBox.style.display = "none";
+    normalBox.innerHTML = "";
+  }
+  if (rewardBox) {
+    rewardBox.classList.add("hidden");
+    rewardBox.innerText = "";
+  }
+
+  // 🔑 RULE 1:
+  // Normal coupon NOT applied → show normal coupon motivation
+  if (window._appliedCouponType !== "normal") {
+    refreshCouponMotivationHint();
+    return;
+  }
+
+  // 🔑 RULE 2:
+  // Normal coupon APPLIED → show reward motivation (ONLY if available)
+  if (window._rewardMotivation) {
+    renderRewardMotivationHintInDrawer();
+  }
+
+  // 🔑 RULE 3:
+  // Reward scheme not available → show nothing
+}
 
 async function openCartDrawer() {
   console.log("🧪 DRAWER OPEN");
 console.log("appliedCouponType:", window._appliedCouponType);
 console.log("rewardMotivation:", window._rewardMotivation);
 console.log("rewardBox exists:", !!document.getElementById("rewardMotivationHint"));
-if (!window._appliedCouponType) {
-  window._appliedCouponType = "normal";
-}
+
 
 // 🔥 Show reward hint placeholder immediately
 const rewardBox = document.getElementById("rewardMotivationHint");
@@ -7327,7 +7355,7 @@ if (rewardBox) {
   rewardBox.innerText = "Checking your reward eligibility…";
   rewardBox.classList.remove("hidden");
     // ✅ THIS WAS MISSING
-  renderRewardMotivationHintInDrawer();
+  
 }
 
  closeCheckout();
@@ -7407,7 +7435,8 @@ await checkAndShowMonthlyReward();      // 🔥 now check eligibility on fresh d
   fetchAndRenderUserCouponsForCart();     // coupons can be async
 
   await rewardPromise;
-renderRewardMotivationHintInDrawer();  
+decideCartMotivation();
+
 // 🔥 ADD THIS LINE (MANDATORY)
 toggleClaimRewardOnCart(getCart());
 }
@@ -12559,6 +12588,7 @@ console.log(
   
 </body>
 </html>
+
 
 
 
