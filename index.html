@@ -2315,6 +2315,11 @@ window.signupDiscount = Number(localStorage.getItem("signupDiscount") || 0);
 window.CURRENCY = window.CURRENCY || "₹";
 
 
+    // ===== GLOBAL INIT =====
+window._rewardMotivation = null;
+window._rewardCoupons = null;
+
+
 function fmt(amount, digits = 2) {
   if (amount === null || amount === undefined) amount = 0;
   const n = Number(amount) || 0;
@@ -2770,6 +2775,7 @@ renderIndex++;
    setTimeout(() => {
        restoreFullCartUI();
        preloadRewardMotivation();
+     preloadUserCoupons();   // 👈 NEW (reward + normal coupons)
    }, 50);
 }
 async function preloadRewardMotivation() {
@@ -2785,6 +2791,27 @@ async function preloadRewardMotivation() {
   } catch (e) {
     console.error("Preload reward motivation failed", e);
     window._rewardMotivation = null;
+  }
+}
+async function preloadUserCoupons() {
+  const mobile =
+    localStorage.getItem("userMobile") ||
+    localStorage.getItem("mobile");
+
+  if (!mobile) return;
+
+  try {
+    const res = await apiGet("getUserCoupons", { mobile });
+
+    if (res?.success) {
+      // 🔥 cache coupons globally
+      window._preloadedCoupons = res.coupons || [];
+    } else {
+      window._preloadedCoupons = [];
+    }
+  } catch (e) {
+    console.error("Preload coupons failed", e);
+    window._preloadedCoupons = [];
   }
 }
 
@@ -12530,6 +12557,7 @@ function renderRewardMotivationHintInDrawer() {
   
 </body>
 </html>
+
 
 
 
