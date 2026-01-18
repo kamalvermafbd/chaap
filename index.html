@@ -7325,21 +7325,35 @@ function decideCartMotivation() {
     rewardBox.innerText = "";
   }
 
-  // 🔑 RULE 1:
-  // Normal coupon NOT applied → show normal coupon motivation
-  if (window._appliedCouponType !== "normal") {
-    refreshCouponMotivationHint();
+  // 🔑 CHECK: is any normal coupon AVAILABLE?
+  const allOffers = window._allOffersRaw || [];
+  const normalCouponsAvailable = allOffers.some(o =>
+    o.active === true &&
+    !String(o.id).startsWith("RW-") &&
+    !(o.type === "onetime" && o._usedOnce === true)
+  );
+
+  // 🔑 CASE 1: Normal coupon EXISTS
+  if (normalCouponsAvailable) {
+    if (window._appliedCouponType !== "normal") {
+      // Normal coupon not applied → show normal coupon motivation
+      refreshCouponMotivationHint();
+      return;
+    }
+
+    // Normal coupon applied → show reward motivation (if any)
+    if (window._rewardMotivation) {
+      renderRewardMotivationHintInDrawer();
+    }
     return;
   }
 
-  // 🔑 RULE 2:
-  // Normal coupon APPLIED → show reward motivation (ONLY if available)
+  // 🔑 CASE 2: Normal coupon DOES NOT EXIST
   if (window._rewardMotivation) {
     renderRewardMotivationHintInDrawer();
   }
 
-  // 🔑 RULE 3:
-  // Reward scheme not available → show nothing
+  // 🔑 CASE 3: Nothing available → show nothing
 }
 
 async function openCartDrawer() {
@@ -12588,6 +12602,7 @@ console.log(
   
 </body>
 </html>
+
 
 
 
