@@ -12337,11 +12337,16 @@ console.log(
 );
 
   // 🔒 RULE: only after NORMAL coupon applied
-  if (window._appliedCouponType !== "normal") {
-    box.classList.add("hidden");
-    box.innerText = "";
-    return;
-  }
+  // hide reward ONLY when normal coupon exists but not applied
+if (
+  hasNormalCouponAvailable() &&
+  window._appliedCouponType !== "normal"
+) {
+  box.classList.add("hidden");
+  box.innerText = "";
+  return;
+}
+
 
   const data = window._rewardMotivation;
   if (!data || !data.remainingToUnlock) {
@@ -12626,6 +12631,7 @@ console.log(
   
 </body>
 </html>
+
 
 
 
