@@ -7310,12 +7310,18 @@ mountInvoiceIntoCheckout();
   updateCheckoutInvoice();
 
 }
+function isNormalCouponApplied() {
+  return (
+    selectedCoupon &&
+    !String(selectedCoupon.id).startsWith("RW-")
+  );
+}
 
 function decideCartMotivation() {
   const normalBox = document.getElementById("couponHintBox");
   const rewardBox = document.getElementById("rewardMotivationHint");
 
-  // 🔒 hard reset UI
+  // hard reset
   if (normalBox) {
     normalBox.style.display = "none";
     normalBox.innerHTML = "";
@@ -7327,50 +7333,43 @@ function decideCartMotivation() {
 
   const allOffers = window._allOffersRaw || [];
 
-  // 🔑 check if ANY normal coupon exists
-  const normalCouponAvailable = allOffers.some(o =>
+  // 🔑 any NORMAL coupon exists?
+  const normalCouponsAvailable = allOffers.some(o =>
     o.active === true &&
     !String(o.id).startsWith("RW-") &&
     !(o.type === "onetime" && o._usedOnce === true)
   );
 
-  // ===============================
-  // CASE 1: Normal coupon AVAILABLE
-  // ===============================
-  if (normalCouponAvailable) {
+  const normalApplied = isNormalCouponApplied();
 
-    // Normal coupon NOT applied
-    if (window._appliedCouponType !== "normal") {
+  // =============================
+  // CASE 1: normal coupon EXISTS
+  // =============================
+  if (normalCouponsAvailable) {
+    if (!normalApplied) {
+      // ❗ normal coupon NOT applied
       refreshCouponMotivationHint();
       return;
     }
 
-    // Normal coupon applied → show reward motivation
+    // normal applied → show reward motivation
     if (window._rewardMotivation) {
       renderRewardMotivationHintInDrawer();
     }
     return;
   }
 
-  // ===============================
-  // CASE 2: Normal coupon NOT available
-  // ===============================
+  // =============================
+  // CASE 2: no normal coupon exists
+  // =============================
   if (window._rewardMotivation) {
     renderRewardMotivationHintInDrawer();
-    return;
   }
-
-  // ===============================
-  // CASE 3: Nothing available → show nothing
-  // ===============================
 }
+
 
 async function openCartDrawer() {
-  // 🔑 HARD DEFAULT — REQUIRED
-if (!window._appliedCouponType) {
-  window._appliedCouponType = "normal";
-}
-
+  
 // 🔥 Show reward hint placeholder immediately
 const rewardBox = document.getElementById("rewardMotivationHint");
 if (rewardBox) {
@@ -12624,6 +12623,7 @@ console.log(
   
 </body>
 </html>
+
 
 
 
