@@ -12316,9 +12316,7 @@ function selectPayment(method) {
     const res = await apiGet("getRewardMotivation", { mobile });
     window._rewardMotivation = res?.motivationMessage || null;
     // 🔥 AUTO re-render if normal coupon state
-    if (window._appliedCouponType === "normal") {
-      renderRewardMotivationHintInDrawer();
-    }
+   
   } catch (e) {
     window._rewardMotivation = null;
   }
@@ -12628,6 +12626,7 @@ console.log(
   
 </body>
 </html>
+
 
 
 
