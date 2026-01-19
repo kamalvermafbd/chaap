@@ -3348,7 +3348,7 @@ slot.innerHTML = `
 
 // 🔥 Keep reward motivation hint in sync with cart changes
 try {
-  renderRewardMotivationHintInDrawer();
+renderRewardMotivationHintInDrawer();
 } catch (e) {}
 
 }
@@ -7315,7 +7315,7 @@ function decideCartMotivation() {
   const normalBox = document.getElementById("couponHintBox");
   const rewardBox = document.getElementById("rewardMotivationHint");
 
-  // hard reset UI
+  // 🔒 hard reset UI
   if (normalBox) {
     normalBox.style.display = "none";
     normalBox.innerHTML = "";
@@ -7325,35 +7325,44 @@ function decideCartMotivation() {
     rewardBox.innerText = "";
   }
 
-  // 🔑 CHECK: is any normal coupon AVAILABLE?
   const allOffers = window._allOffersRaw || [];
-  const normalCouponsAvailable = allOffers.some(o =>
+
+  // 🔑 check if ANY normal coupon exists
+  const normalCouponAvailable = allOffers.some(o =>
     o.active === true &&
     !String(o.id).startsWith("RW-") &&
     !(o.type === "onetime" && o._usedOnce === true)
   );
 
-  // 🔑 CASE 1: Normal coupon EXISTS
-  if (normalCouponsAvailable) {
+  // ===============================
+  // CASE 1: Normal coupon AVAILABLE
+  // ===============================
+  if (normalCouponAvailable) {
+
+    // Normal coupon NOT applied
     if (window._appliedCouponType !== "normal") {
-      // Normal coupon not applied → show normal coupon motivation
       refreshCouponMotivationHint();
       return;
     }
 
-    // Normal coupon applied → show reward motivation (if any)
+    // Normal coupon applied → show reward motivation
     if (window._rewardMotivation) {
       renderRewardMotivationHintInDrawer();
     }
     return;
   }
 
-  // 🔑 CASE 2: Normal coupon DOES NOT EXIST
+  // ===============================
+  // CASE 2: Normal coupon NOT available
+  // ===============================
   if (window._rewardMotivation) {
     renderRewardMotivationHintInDrawer();
+    return;
   }
 
-  // 🔑 CASE 3: Nothing available → show nothing
+  // ===============================
+  // CASE 3: Nothing available → show nothing
+  // ===============================
 }
 
 async function openCartDrawer() {
@@ -12615,6 +12624,7 @@ console.log(
   
 </body>
 </html>
+
 
 
 
