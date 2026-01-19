@@ -8796,12 +8796,15 @@ function renderAvailableUserCoupons(coupons = []) {
 
   coupons.forEach(c => {
     // 🚫 skip already-applied reward coupon ONLY
-
-
     const div = document.createElement("div");
     div.className =
       "flex justify-between items-center p-2 border rounded bg-white";
 const isApplied = alreadyAppliedCouponId === c.couponcode;
+    if (isApplied) {
+  div.style.opacity = "0.6";
+  div.style.pointerEvents = "none";
+}
+
 if (isApplied) div.classList.add("coupon-applied");
 
    const label =
@@ -8846,7 +8849,6 @@ if (btn) {
   btn.style.pointerEvents = "auto";
   btn.style.opacity = "1";
 }
-
     list.appendChild(div);
   });
 
@@ -12640,6 +12642,7 @@ if (
   
 </body>
 </html>
+
 
 
 
