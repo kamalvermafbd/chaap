@@ -9636,6 +9636,11 @@ window._drawerTotals = {
 };
   try { updateCartBadge(); } catch(e){}
    refreshCouponMotivationHint();
+// 🔥 ALWAYS keep View Offers visible
+const viewBtn = document.getElementById("applyCouponBtn");
+if (viewBtn) {
+  viewBtn.style.display = "block";
+}
 
 }
 
@@ -12631,6 +12636,7 @@ if (
   
 </body>
 </html>
+
 
 
 
