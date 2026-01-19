@@ -7387,10 +7387,12 @@ async function openCartDrawer() {
   document.body.style.overflow = "hidden";
 
   // Fetch offers in background (NO await)
- await fetchOffersFromBackend();
-try {
-  updateDrawerTotals();
-} catch (e) {}
+
+fetchOffersFromBackend().then(() => {
+  try {
+    updateDrawerTotals();
+  } catch (e) {}
+});
 
 const rewardPromise = fetchRewardMotivationForCart();
   // 1) Always get latest cart (master engine)
@@ -12612,6 +12614,7 @@ console.log(
   
 </body>
 </html>
+
 
 
 
