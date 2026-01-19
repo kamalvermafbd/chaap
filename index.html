@@ -7327,6 +7327,11 @@ function isNormalCouponApplied() {
 }
 
 function decideCartMotivation() {
+    // ⛔ ADD THIS GUARD
+  if (!window._offersReady) {
+    console.log("⏳ offers not ready, skip decideCartMotivation");
+    return;
+  }
   const normalBox = document.getElementById("couponHintBox");
   const rewardBox = document.getElementById("rewardMotivationHint");
 
@@ -7378,7 +7383,8 @@ function decideCartMotivation() {
 
   
 async function openCartDrawer() {
-
+ window._offersReady = false;
+const rewardPromise = fetchRewardMotivationForCart();
  closeCheckout();
   showCouponHintPlaceholder(); // 👈 STEP-1 placeholder
   //  OPEN DRAWER INSTANTLY (NO DELAY)
@@ -7389,12 +7395,11 @@ async function openCartDrawer() {
   // Fetch offers in background (NO await)
 
 fetchOffersFromBackend().then(() => {
-  try {
-    updateDrawerTotals();
-  } catch (e) {}
+  window._offersReady = true;
+  updateDrawerTotals();
 });
 
-const rewardPromise = fetchRewardMotivationForCart();
+
   // 1) Always get latest cart (master engine)
   let freshCart = getCart();
 
@@ -7457,7 +7462,6 @@ decideCartMotivation();
   reward: window._rewardMotivation,
   offers: window._lastOffersResponse?.offers
 });
-
 
 // 🔥 ADD THIS LINE (MANDATORY)
 toggleClaimRewardOnCart(getCart());
@@ -12614,6 +12618,7 @@ console.log(
   
 </body>
 </html>
+
 
 
 
