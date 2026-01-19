@@ -8799,11 +8799,6 @@ function renderAvailableUserCoupons(coupons = []) {
     const div = document.createElement("div");
     div.className =
       "flex justify-between items-center p-2 border rounded bg-white";
-const isApplied = alreadyAppliedCouponId === c.couponcode;
-    if (isApplied) {
-  div.style.opacity = "0.6";
-  div.style.pointerEvents = "none";
-}
 
 if (isApplied) div.classList.add("coupon-applied");
 
@@ -12642,6 +12637,7 @@ if (
   
 </body>
 </html>
+
 
 
 
