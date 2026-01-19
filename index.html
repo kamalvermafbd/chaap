@@ -7304,12 +7304,21 @@ hideAddressIfOrderTypeBlank();
       toggleAddressField();
     }
   }, 0);
-
-
 mountInvoiceIntoCheckout();
   updateCheckoutInvoice();
-
 }
+
+  function hasNormalCouponAvailable() {
+  const offers = window._lastOffersResponse?.offers || [];
+
+  return offers.some(o =>
+    o.active === true &&
+    o.type !== "signup" &&
+    !String(o.id).startsWith("RW-") &&
+    !(o.type === "onetime" && o._usedOnce === true)
+  );
+}
+
 function isNormalCouponApplied() {
   return (
     selectedCoupon &&
@@ -7321,7 +7330,7 @@ function decideCartMotivation() {
   const normalBox = document.getElementById("couponHintBox");
   const rewardBox = document.getElementById("rewardMotivationHint");
 
-  // hard reset
+  // 🔒 hard reset UI
   if (normalBox) {
     normalBox.style.display = "none";
     normalBox.innerHTML = "";
@@ -7331,41 +7340,41 @@ function decideCartMotivation() {
     rewardBox.innerText = "";
   }
 
-  const allOffers = window._allOffersRaw || [];
-
-  // 🔑 any NORMAL coupon exists?
-  const normalCouponsAvailable = allOffers.some(o =>
-    o.active === true &&
-    !String(o.id).startsWith("RW-") &&
-    !(o.type === "onetime" && o._usedOnce === true)
-  );
-
-  const normalApplied = isNormalCouponApplied();
+  const normalAvailable = hasNormalCouponAvailable();
+  const normalApplied   = isNormalCouponApplied();
+  const rewardAvailable = !!window._rewardMotivation;
 
   // =============================
-  // CASE 1: normal coupon EXISTS
+  // CASE 1: Normal coupon EXISTS
   // =============================
-  if (normalCouponsAvailable) {
+  if (normalAvailable) {
     if (!normalApplied) {
-      // ❗ normal coupon NOT applied
+      // 👉 Normal coupon NOT applied
       refreshCouponMotivationHint();
       return;
     }
 
-    // normal applied → show reward motivation
-    if (window._rewardMotivation) {
+    // 👉 Normal coupon applied
+    if (rewardAvailable) {
       renderRewardMotivationHintInDrawer();
     }
     return;
   }
 
   // =============================
-  // CASE 2: no normal coupon exists
+  // CASE 2: Normal coupon DOES NOT exist
   // =============================
-  if (window._rewardMotivation) {
+  if (rewardAvailable) {
     renderRewardMotivationHintInDrawer();
+    return;
   }
+
+  // =============================
+  // CASE 3: Nothing available
+  // =============================
+  // show nothing
 }
+
 
   
 async function openCartDrawer() {
@@ -7378,11 +7387,11 @@ async function openCartDrawer() {
   document.body.style.overflow = "hidden";
 
   // Fetch offers in background (NO await)
-  fetchOffersFromBackend().then(() => {
-  try {
-    updateDrawerTotals();       
-  } catch (e) {}
-});
+ await fetchOffersFromBackend();
+try {
+  updateDrawerTotals();
+} catch (e) {}
+
 const rewardPromise = fetchRewardMotivationForCart();
   // 1) Always get latest cart (master engine)
   let freshCart = getCart();
@@ -7397,7 +7406,6 @@ const rewardPromise = fetchRewardMotivationForCart();
   // 3) Rebuild drawer UI
   openCartPanel(freshCart);
   renderCart();
-
   // ----------------------------------------
   // ⭐ FIXED RESTORE: coupon should restore ONLY if valid
   // ----------------------------------------
@@ -7414,7 +7422,6 @@ const rewardPromise = fetchRewardMotivationForCart();
       selectedCoupon = null;
     }
   }
-
   // ----------------------------------------
 // ⭐ G4: REVALIDATE COUPON on drawer open
 // ----------------------------------------
@@ -7426,7 +7433,6 @@ if (selectedCoupon && selectedCoupon.type === "onetime") {
         const qty  = Number(ci.qty || 1);
         return sum + (mrp - (mrp * disc / 100)) * qty;
     }, 0);
-
     if (subtotal < Number(selectedCoupon.min || 0)) {
         selectedCoupon = null;
         alreadyAppliedCouponId = "";
@@ -7443,12 +7449,13 @@ await checkAndShowMonthlyReward();      // 🔥 now check eligibility on fresh d
   await rewardPromise;
 decideCartMotivation();
   // 🔍 DEBUG (TEMP)
-  console.log({
+ console.log({
   applied: selectedCoupon,
   appliedType: window._appliedCouponType,
   reward: window._rewardMotivation,
-  offers: window._allOffersRaw?.length
+  offers: window._lastOffersResponse?.offers
 });
+
 
 // 🔥 ADD THIS LINE (MANDATORY)
 toggleClaimRewardOnCart(getCart());
@@ -12605,6 +12612,7 @@ console.log(
   
 </body>
 </html>
+
 
 
 
