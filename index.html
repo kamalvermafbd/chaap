@@ -7327,6 +7327,16 @@ function isNormalCouponApplied() {
 }
 
 function decideCartMotivation() {
+  // 🔥 DERIVE applied coupon type from API-selected coupon
+if (selectedCoupon) {
+  window._appliedCouponType =
+    String(selectedCoupon.id).startsWith("RW-")
+      ? "reward"
+      : "normal";
+} else {
+  window._appliedCouponType = null;
+}
+
     // ⛔ ADD THIS GUARD
   if (!window._offersReady) {
     console.log("⏳ offers not ready, skip decideCartMotivation");
@@ -12618,6 +12628,7 @@ console.log(
   
 </body>
 </html>
+
 
 
 
