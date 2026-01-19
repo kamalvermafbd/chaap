@@ -7327,25 +7327,27 @@ function isNormalCouponApplied() {
 }
 
 function decideCartMotivation() {
-  // 🔥 DERIVE applied coupon type from API-selected coupon
-if (selectedCoupon) {
-  window._appliedCouponType =
-    String(selectedCoupon.id).startsWith("RW-")
-      ? "reward"
-      : "normal";
-} else {
-  window._appliedCouponType = null;
-}
 
-    // ⛔ ADD THIS GUARD
+  // 🔥 derive applied coupon type
+  if (selectedCoupon) {
+    window._appliedCouponType =
+      String(selectedCoupon.id).startsWith("RW-")
+        ? "reward"
+        : "normal";
+  } else {
+    window._appliedCouponType = null;
+  }
+
+  // ⛔ guard
   if (!window._offersReady) {
     console.log("⏳ offers not ready, skip decideCartMotivation");
     return;
   }
+
   const normalBox = document.getElementById("couponHintBox");
   const rewardBox = document.getElementById("rewardMotivationHint");
 
-  // 🔒 hard reset UI
+  // 🔒 reset UI
   if (normalBox) {
     normalBox.style.display = "none";
     normalBox.innerHTML = "";
@@ -7355,26 +7357,42 @@ if (selectedCoupon) {
     rewardBox.innerText = "";
   }
 
-  const normalAvailable = hasNormalCouponAvailable();
+  // 🔥 IMPORTANT: use LET (not const)
+  let normalAvailable = hasNormalCouponAvailable();
   const normalApplied   = isNormalCouponApplied();
   const rewardAvailable = !!window._rewardMotivation;
+
+  // 🔥 FIX: auto-applied normal coupon exhausted → treat as NO normal
+  if (normalApplied && !hasNormalCouponAvailable()) {
+    normalAvailable = false;
+  }
 
   // =============================
   // CASE 1: Normal coupon EXISTS
   // =============================
   if (normalAvailable) {
     if (!normalApplied) {
-      // 👉 Normal coupon NOT applied
       refreshCouponMotivationHint();
       return;
     }
 
-    // 👉 Normal coupon applied
     if (rewardAvailable) {
       renderRewardMotivationHintInDrawer();
     }
     return;
   }
+
+  // =============================
+  // CASE 2: Normal coupon DOES NOT exist
+  // =============================
+  if (rewardAvailable) {
+    renderRewardMotivationHintInDrawer();
+    return;
+  }
+
+  // CASE 3: nothing
+}
+
 
   // =============================
   // CASE 2: Normal coupon DOES NOT exist
@@ -12642,6 +12660,7 @@ if (
   
 </body>
 </html>
+
 
 
 
