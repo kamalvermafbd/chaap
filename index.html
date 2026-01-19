@@ -9500,6 +9500,7 @@ if (o.flat) {
     const best = getBestOffer(subtotal);
 
     if (best) {
+       alreadyAppliedCouponId = best.id;   
       offerDiscount = Number(best.value || 0);
       appliedOfferText = `🎉 ${best.text} (Saved ${fmt(offerDiscount)})`;
     }
@@ -9543,8 +9544,6 @@ try {
 } catch (e) {}
 
 const afterTaxWallet = signupDiscount + rewardDiscount;   // 🔥 reward included
-
-
 
   // =====================================================
   // ========== 4) TAX + SERVICE CHARGE ==================
@@ -12643,6 +12642,7 @@ if (
   
 </body>
 </html>
+
 
 
 
