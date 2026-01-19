@@ -7366,19 +7366,14 @@ function decideCartMotivation() {
     renderRewardMotivationHintInDrawer();
   }
 }
-
-
 async function openCartDrawer() {
-  
 // 🔥 Show reward hint placeholder immediately
 const rewardBox = document.getElementById("rewardMotivationHint");
 if (rewardBox) {
   rewardBox.innerText = "Checking your reward eligibility…";
   rewardBox.classList.remove("hidden");
     // ✅ THIS WAS MISSING
-  
 }
-
  closeCheckout();
   showCouponHintPlaceholder(); // 👈 STEP-1 placeholder
   //  OPEN DRAWER INSTANTLY (NO DELAY)
@@ -7446,22 +7441,15 @@ if (selectedCoupon && selectedCoupon.type === "onetime") {
   // 4) Update totals + badge
   try { updateDrawerTotals(); } catch(e){}
   try { updateCartBadge(); } catch(e){}
-
   // 🔥 start reward fetch EARLY (parallel)
-
-  
   await refreshMonthlySpendAndReward();   // 🔥 rebuild MonthlySpend first
 await checkAndShowMonthlyReward();      // 🔥 now check eligibility on fresh data
-
   fetchAndRenderUserCouponsForCart();     // coupons can be async
-
   await rewardPromise;
 decideCartMotivation();
-
 // 🔥 ADD THIS LINE (MANDATORY)
 toggleClaimRewardOnCart(getCart());
 }
-
 
 function closeCartDrawer() {
   const backdrop = document.getElementById("cartBackdrop");
@@ -12301,24 +12289,15 @@ function selectPayment(method) {
   try {
     const res = await apiGet("getRewardMotivation", { mobile });
     window._rewardMotivation = res?.motivationMessage || null;
-
-    // 🔑 SAFE DEFAULT FIRST
-    if (!window._appliedCouponType) {
-      window._appliedCouponType = "normal";
-    }
-
     // 🔥 AUTO re-render if normal coupon state
     if (window._appliedCouponType === "normal") {
       renderRewardMotivationHintInDrawer();
     }
-
   } catch (e) {
     window._rewardMotivation = null;
   }
 }
 
-
-  
 function renderRewardMotivationHintInDrawer() {
   
   console.log("🟢 renderRewardMotivationHintInDrawer CALLED");
@@ -12623,6 +12602,7 @@ console.log(
   
 </body>
 </html>
+
 
 
 
