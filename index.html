@@ -12328,6 +12328,10 @@ function selectPayment(method) {
 }
 
 function renderRewardMotivationHintInDrawer() {
+ // ⛔ WAIT until normal coupon decision is ready
+  if (!window._offersReady) {
+    return;
+  }
   
   console.log("🟢 renderRewardMotivationHintInDrawer CALLED");
 console.log("appliedCouponType:", window._appliedCouponType);
@@ -12636,6 +12640,7 @@ if (
   
 </body>
 </html>
+
 
 
 
