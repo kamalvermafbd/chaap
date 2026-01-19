@@ -7366,14 +7366,10 @@ function decideCartMotivation() {
     renderRewardMotivationHintInDrawer();
   }
 }
+
+  
 async function openCartDrawer() {
-// 🔥 Show reward hint placeholder immediately
-const rewardBox = document.getElementById("rewardMotivationHint");
-if (rewardBox) {
-  rewardBox.innerText = "Checking your reward eligibility…";
-  rewardBox.classList.remove("hidden");
-    // ✅ THIS WAS MISSING
-}
+
  closeCheckout();
   showCouponHintPlaceholder(); // 👈 STEP-1 placeholder
   //  OPEN DRAWER INSTANTLY (NO DELAY)
@@ -7384,8 +7380,7 @@ if (rewardBox) {
   // Fetch offers in background (NO await)
   fetchOffersFromBackend().then(() => {
   try {
-    updateDrawerTotals();           // totals recalc
-  
+    updateDrawerTotals();       
   } catch (e) {}
 });
 const rewardPromise = fetchRewardMotivationForCart();
@@ -7447,6 +7442,14 @@ await checkAndShowMonthlyReward();      // 🔥 now check eligibility on fresh d
   fetchAndRenderUserCouponsForCart();     // coupons can be async
   await rewardPromise;
 decideCartMotivation();
+  // 🔍 DEBUG (TEMP)
+  console.log({
+  applied: selectedCoupon,
+  appliedType: window._appliedCouponType,
+  reward: window._rewardMotivation,
+  offers: window._allOffersRaw?.length
+});
+
 // 🔥 ADD THIS LINE (MANDATORY)
 toggleClaimRewardOnCart(getCart());
 }
@@ -12602,6 +12605,7 @@ console.log(
   
 </body>
 </html>
+
 
 
 
