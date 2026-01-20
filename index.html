@@ -9528,14 +9528,20 @@ if (o.flat) {
 
   // ------------ AUTO MODE -----------------
   else {
+
+  // 🔒 DO NOT auto-apply best offer if manual coupon is active
+  if (window._appliedCouponType) {
+    // skip best offer completely
+  } else {
     const best = getBestOffer(subtotal);
 
     if (best) {
-       alreadyAppliedCouponId = best.id;   
+      alreadyAppliedCouponId = best.id;
       offerDiscount = Number(best.value || 0);
       appliedOfferText = `🎉 ${best.text} (Saved ${fmt(offerDiscount)})`;
     }
   }
+}
 
   // Update Offer Message Box
   const appliedBox = document.getElementById("bestOfferApplied");
@@ -10209,7 +10215,7 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   // 🔒 lock coupons (reward wins)
   window._couponLocked = true;
   window._appliedCouponType = "reward";
-
+window.couponMode = "manualcoupon";
   // ❌ REMOVE any previously applied coupon
   selectedCoupon = null;
   alreadyAppliedCouponId = "";
@@ -12887,6 +12893,7 @@ function buildRewardBannerHTML(data) {
   
 </body>
 </html>
+
 
 
 
