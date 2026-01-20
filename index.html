@@ -12550,6 +12550,14 @@ async function fetchRewardMotivationData() {
 
     if (!mobile) return null;
 
+    // 🔄 IMPORTANT: refresh monthly spend (same as cart drawer)
+    await fetch(
+      API_BASE +
+        "?api=refreshMonthlySpend&mobile=" +
+        encodeURIComponent(mobile)
+    );
+
+    // 🎁 now fetch reward motivation (fresh data)
     const res = await fetch(
       API_BASE +
         "?api=getRewardMotivation&mobile=" +
@@ -12560,13 +12568,14 @@ async function fetchRewardMotivationData() {
 
     if (!data.success || !data.motivationMessage) return null;
 
-    return data.motivationMessage; // 👈 PURE DATA ONLY
+    return data.motivationMessage; // 👈 PURE, UPDATED DATA
 
   } catch (err) {
     console.error("Reward motivation fetch failed", err);
     return null;
   }
 }
+
 
 function buildRewardBannerHTML(data) {
   const tier  = data.nextSlabId || "Reward";
@@ -12870,6 +12879,7 @@ function buildRewardBannerHTML(data) {
   
 </body>
 </html>
+
 
 
 
