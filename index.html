@@ -12473,9 +12473,9 @@ if (!banner || !slider) return;
   }
 
   // 🧱 build UI (BANNER STYLE)
-const slider = document.getElementById("loginOfferSlider");
+const loginSlider = document.getElementById("loginOfferSlider");
 
-slider.innerHTML = eligible.map(o => `
+loginSlider.innerHTML = eligible.map(o => `
   <div class="
     min-w-full
     h-[220px]
@@ -12768,6 +12768,7 @@ startLoginOfferSlider(); // 👈 add this
   
 </body>
 </html>
+
 
 
 
