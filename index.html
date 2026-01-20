@@ -1580,30 +1580,35 @@ body::before {
 </div>
 
 <!-- LOGIN USER OFFER BANNER -->
+<!-- LOGIN USER OFFER BANNER -->
 <div
   id="loginOfferBanner"
-  class="relative rounded-2xl overflow-hidden mt-4">
+  class="relative mt-4 rounded-2xl overflow-hidden pb-[120px]">
 
-  <!-- SLIDER -->
+  <!-- SLIDER / CONTENT -->
   <div
     id="loginOfferSlider"
     class="flex transition-transform duration-700 relative z-10">
+    <!-- JS yaha slides inject karega -->
   </div>
 
-  <!-- SVG WAVE (BOTTOM) -->
+  <!-- SVG WAVE (BOTTOM CUT) -->
   <svg
     viewBox="0 0 1440 120"
     preserveAspectRatio="none"
-    class="absolute bottom-0 left-0 w-full h-[120px] z-0">
+    class="absolute bottom-0 left-0 w-full h-[120px] z-0 pointer-events-none">
     <path
-      d="M0,40 C120,80 240,120 360,100 480,80 600,0 720,0
-         840,0 960,80 1080,100 1200,120 1320,80 1440,40 L1440,120 L0,120 Z"
-      fill="white"
-      opacity="1"
-    />
+      d="M0,40
+         C120,80 240,120 360,100
+         480,80 600,0 720,0
+         840,0 960,80 1080,100
+         1200,120 1320,80 1440,40
+         L1440,120 L0,120 Z"
+      fill="#ffffff"/>
   </svg>
 
 </div>
+
 
 
 
@@ -12460,19 +12465,15 @@ function showLoginUserOfferBanner() {
   if (!isUserLoggedIn()) return;
 
   const banner = document.getElementById("loginOfferBanner");
-const slider = document.getElementById("loginOfferSlider");
-
-if (!banner || !slider) return;
-
+  const slider = document.getElementById("loginOfferSlider");
+  if (!banner || !slider) return;
 
   const offers = window._promoOffers || [];
 
-  // 🔍 filter usable offers (NO signup)
   const eligible = offers.filter(o => {
     if (!o.active) return false;
     if (String(o.type).toLowerCase() === "signup") return false;
 
-    // date check
     const today = new Date(new Date().toDateString());
     const start = new Date(new Date(o.startDate).toDateString());
     const end   = new Date(new Date(o.endDate).toDateString());
@@ -12481,65 +12482,47 @@ if (!banner || !slider) return;
     return true;
   });
 
-  // ❌ nothing to show
   if (eligible.length === 0) {
     banner.style.display = "none";
     return;
   }
 
-  // 🧱 build UI (BANNER STYLE)
-const loginSlider = document.getElementById("loginOfferSlider");
-
-loginSlider.innerHTML = eligible.map(o => `
-  <div class="
-    min-w-full
-    h-[220px]
-    sm:h-[260px]
-    rounded-2xl
-    p-8
-    flex
-    flex-col
-    justify-between
-    shadow-lg
-    bg-gradient-to-br
-    ${o.flat > 0 ? 'from-orange-500 to-orange-600'
-                : o.discount >= 20 ? 'from-green-500 to-green-600'
-                : 'from-indigo-500 to-indigo-600'}
-    text-white
-  ">
-
-    <div>
-      <div class="text-3xl font-extrabold">
-        ${o.text}
+  slider.innerHTML = eligible.map(o => `
+    <div class="
+      min-w-full
+      h-[220px]
+      sm:h-[260px]
+      rounded-2xl
+      p-8
+      flex
+      flex-col
+      justify-between
+      shadow-lg
+      bg-gradient-to-br
+      ${o.flat > 0 ? 'from-orange-500 to-orange-600'
+                  : o.discount >= 20 ? 'from-green-500 to-green-600'
+                  : 'from-indigo-500 to-indigo-600'}
+      text-white
+    ">
+      <div>
+        <div class="text-3xl font-extrabold">${o.text}</div>
+        <div class="text-lg opacity-90 mt-2">
+          Min order ${fmt(o.min)}
+        </div>
       </div>
-      <div class="text-lg opacity-90 mt-2">
-        Min order ${fmt(o.min)}
-      </div>
+
+      <button
+        onclick="scrollToMenu()"
+        class="bg-white text-gray-900 px-8 py-3 rounded-full font-semibold">
+        Shop Now →
+      </button>
     </div>
+  `).join("");
 
-    <button
-      onclick="scrollToMenu()"
-      class="
-        self-start
-        bg-white
-        text-gray-900
-        px-8
-        py-3
-        rounded-full
-        font-semibold
-        text-base
-        hover:scale-105
-        transition
-      ">
-      Shop Now →
-    </button>
-  </div>
-`).join("");
-
-banner.style.display = "block";
-startLoginOfferSlider(); // 👈 add this
-
+  banner.style.display = "block";
+  startLoginOfferSlider();
 }
+
 
 
 </script>
@@ -12783,6 +12766,7 @@ startLoginOfferSlider(); // 👈 add this
   
 </body>
 </html>
+
 
 
 
