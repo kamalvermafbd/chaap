@@ -12458,7 +12458,6 @@ function startLoginOfferSlider() {
 // ===============================
 async function showLoginUserOfferBanner() {
 
-  // ✅ only logged-in users
   if (!isUserLoggedIn()) return;
 
   const banner = document.getElementById("loginOfferBanner");
@@ -12479,86 +12478,68 @@ async function showLoginUserOfferBanner() {
     return true;
   });
 
-  if (eligible.length === 0) {
-    banner.style.display = "none";
-    return;
-  }
-
+  // 🔹 clear slider
   slider.innerHTML = eligible.map(o => `
-  <div class="
-    relative
-    min-w-full
-    h-[240px]
-    sm:h-[280px]
-    rounded-2xl
-    overflow-hidden
-     px-8 pt-8 pb-6
-    flex
-    flex-col
-    justify-between
-    shadow-lg
-    bg-gradient-to-br
-    ${o.flat > 0 ? 'from-orange-500 to-orange-600'
-                : o.discount >= 20 ? 'from-green-500 to-green-600'
-                : 'from-indigo-500 to-indigo-600'}
-    text-white
-  ">
+    <div class="
+      relative
+      min-w-full
+      h-[240px]
+      sm:h-[280px]
+      rounded-2xl
+      overflow-hidden
+      px-8 pt-8 pb-6
+      flex
+      flex-col
+      justify-between
+      shadow-lg
+      bg-gradient-to-br
+      ${o.flat > 0 ? 'from-orange-500 to-orange-600'
+                  : o.discount >= 20 ? 'from-green-500 to-green-600'
+                  : 'from-indigo-500 to-indigo-600'}
+      text-white
+    ">
+      <div class="relative z-10">
+        <div class="text-3xl font-extrabold">${o.text}</div>
+        <div class="text-lg opacity-90 mt-2">Min order ${fmt(o.min)}</div>
+      </div>
 
-    <!-- CONTENT -->
-    <div class="relative z-10">
-      <div class="text-3xl font-extrabold">
-        ${o.text}
-      </div>
-      <div class="text-lg opacity-90 mt-2">
-        Min order ${fmt(o.min)}
-      </div>
+      <button
+        onclick="scrollToMenu()"
+        class="mt-4 bg-white/90 text-gray-900 px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-white transition">
+        Shop Now →
+      </button>
+
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"
+           class="absolute bottom-0 left-0 w-full h-[120px]">
+        <path d="M0,40 C120,80 240,120 360,100
+                 480,80 600,0 720,0
+                 840,0 960,80 1080,100
+                 1200,120 1320,80 1440,40
+                 L1440,120 L0,120 Z"
+              fill="rgba(255,255,255,0.25)" />
+      </svg>
     </div>
+  `).join("");
 
-    <button
-  onclick="scrollToMenu()"
-  class="
-    mt-4
-    bg-white/90
-    text-gray-900
-    px-5 py-2.5
-    rounded-full
-    text-sm
-    font-semibold
-    tracking-wide
-    hover:bg-white
-    transition
-  ">
-  Shop Now →
-</button>
-
-    <!-- SVG WAVE (INSIDE CARD) -->
-    <svg
-      viewBox="0 0 1440 120"
-      preserveAspectRatio="none"
-      class="absolute bottom-0 left-0 w-full h-[120px]">
-      <path
-        d="M0,40 C120,80 240,120 360,100
-           480,80 600,0 720,0
-           840,0 960,80 1080,100
-           1200,120 1320,80 1440,40
-           L1440,120 L0,120 Z"
-        fill="rgba(255,255,255,0.25)"
-      />
-    </svg>
-
-  </div>
-`).join("");
-
- // 🔹 2️⃣ Inject reward banner (NON-BREAKING)
+  // 🔹 reward banner
   const rewardData = await fetchRewardMotivationData();
-  if (rewardData) {
-    const rewardSlide = buildRewardBannerHTML(rewardData);
-    slider.insertAdjacentHTML("afterbegin", rewardSlide);
+  if (rewardData && !slider.dataset.rewardAdded) {
+    slider.insertAdjacentHTML(
+      "afterbegin",
+      buildRewardBannerHTML(rewardData)
+    );
+    slider.dataset.rewardAdded = "1";
   }
-  
-  banner.style.display = "block";
-  startLoginOfferSlider();
+
+  // 🔹 show / hide
+  if (slider.children.length > 0) {
+    banner.style.display = "block";
+    startLoginOfferSlider();
+  } else {
+    banner.style.display = "none";
+  }
 }
+
 
   
 async function fetchRewardMotivationData() {
@@ -12567,29 +12548,25 @@ async function fetchRewardMotivationData() {
       localStorage.getItem("userMobile") ||
       localStorage.getItem("mobile");
 
-    if (!mobile) {
-      console.log("❌ rewardMotivation: mobile missing");
-      return null;
-    }
+    if (!mobile) return null;
 
     const res = await fetch(
       API_BASE +
-        "?api=getRewardMotivationMessage&mobile=" +
+        "?api=getRewardMotivation&mobile=" +
         encodeURIComponent(mobile)
     );
 
     const data = await res.json();
 
-    // 🔍 PURE DEBUG (NO LOGIC)
-    console.log("🧪 rewardMotivation API DATA:", data);
+    if (!data.success || !data.motivationMessage) return null;
 
-    return data;
+    return data.motivationMessage; // 👈 PURE DATA ONLY
+
   } catch (err) {
-    console.error("❌ rewardMotivation fetch failed", err);
+    console.error("Reward motivation fetch failed", err);
     return null;
   }
 }
-
 
 
 function buildRewardBannerHTML(data) {
@@ -12889,6 +12866,7 @@ function buildRewardBannerHTML(data) {
   
 </body>
 </html>
+
 
 
 
