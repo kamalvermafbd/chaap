@@ -12415,11 +12415,30 @@ if (
   box.innerText = text;
   box.classList.remove("hidden");
 }
+  
 function scrollToMenu() {
   const menu = document.getElementById("menu");
   if (menu) {
     menu.scrollIntoView({ behavior: "smooth" });
   }
+}
+
+  let loginOfferIndex = 0;
+let loginOfferTimer = null;
+
+function startLoginOfferSlider() {
+  const slider = document.getElementById("loginOfferSlider");
+  if (!slider || slider.children.length <= 1) return;
+
+  clearInterval(loginOfferTimer);
+
+  loginOfferTimer = setInterval(() => {
+    loginOfferIndex =
+      (loginOfferIndex + 1) % slider.children.length;
+
+    slider.style.transform =
+      `translateX(-${loginOfferIndex * 100}%)`;
+  }, 3500);
 }
 
 // ===============================
@@ -12458,55 +12477,57 @@ function showLoginUserOfferBanner() {
   }
 
   // 🧱 build UI (BANNER STYLE)
-list.innerHTML = eligible.map(o => `
-  <div
-    class="
-      min-w-[260px]
-      rounded-2xl
-      p-4
-      text-white
-      shadow-lg
-      flex flex-col justify-between
-    "
-    style="
-      background: linear-gradient(135deg,
-        ${o.flat > 0 ? '#f97316, #fb923c' :
-        o.discount >= 20 ? '#22c55e, #16a34a' :
-        '#6366f1, #4f46e5'}
-      );
-    "
-  >
+const slider = document.getElementById("loginOfferSlider");
+
+slider.innerHTML = eligible.map(o => `
+  <div class="
+    min-w-full
+    h-[220px]
+    sm:h-[260px]
+    rounded-2xl
+    p-8
+    flex
+    flex-col
+    justify-between
+    shadow-lg
+    bg-gradient-to-br
+    ${o.flat > 0 ? 'from-orange-500 to-orange-600'
+                : o.discount >= 20 ? 'from-green-500 to-green-600'
+                : 'from-indigo-500 to-indigo-600'}
+    text-white
+  ">
+
     <div>
-      <div class="text-lg font-extrabold leading-snug">
+      <div class="text-3xl font-extrabold">
         ${o.text}
       </div>
-
-      <div class="text-sm opacity-90 mt-1">
+      <div class="text-lg opacity-90 mt-2">
         Min order ${fmt(o.min)}
       </div>
     </div>
 
     <button
-  onclick="scrollToMenu()"
-  class="
-    mt-4
-    bg-white/90
-    text-gray-900
-    px-5 py-2.5
-    rounded-full
-    text-sm
-    font-semibold
-    tracking-wide
-    hover:bg-white
-    transition
-  ">
-  Shop Now →
-</button>
-
+      onclick="scrollToMenu()"
+      class="
+        self-start
+        bg-white
+        text-gray-900
+        px-8
+        py-3
+        rounded-full
+        font-semibold
+        text-base
+        hover:scale-105
+        transition
+      ">
+      Shop Now →
+    </button>
   </div>
 `).join("");
 
-  banner.style.display = "block";
+banner.style.display = "block";
+startLoginOfferSlider(); // 👈 add this
+
 }
 
 
@@ -12751,6 +12772,7 @@ list.innerHTML = eligible.map(o => `
   
 </body>
 </html>
+
 
 
 
