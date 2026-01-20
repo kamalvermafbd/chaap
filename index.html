@@ -12445,9 +12445,10 @@ function showLoginUserOfferBanner() {
   if (!isUserLoggedIn()) return;
 
   const banner = document.getElementById("loginOfferBanner");
-  const list   = document.getElementById("loginOfferList");
+const slider = document.getElementById("loginOfferSlider");
 
-  if (!banner || !list) return;
+if (!banner || !slider) return;
+
 
   const offers = window._promoOffers || [];
 
@@ -12767,6 +12768,7 @@ startLoginOfferSlider(); // 👈 add this
   
 </body>
 </html>
+
 
 
 
