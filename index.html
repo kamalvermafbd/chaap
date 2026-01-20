@@ -1580,16 +1580,31 @@ body::before {
 </div>
 
 <!-- LOGIN USER OFFER BANNER -->
-<div id="loginOfferBanner" class="hidden mt-6">
-  <div class="font-bold text-xl mb-3">Offers for you</div>
+<div
+  id="loginOfferBanner"
+  class="relative rounded-2xl overflow-hidden mt-4">
 
-  <div class="relative overflow-hidden">
-    <div
-      id="loginOfferSlider"
-      class="flex transition-transform duration-700 ease-in-out">
-    </div>
+  <!-- SLIDER -->
+  <div
+    id="loginOfferSlider"
+    class="flex transition-transform duration-700 relative z-10">
   </div>
+
+  <!-- SVG WAVE (BOTTOM) -->
+  <svg
+    viewBox="0 0 1440 120"
+    preserveAspectRatio="none"
+    class="absolute bottom-0 left-0 w-full h-[120px] z-0">
+    <path
+      d="M0,40 C120,80 240,120 360,100 480,80 600,0 720,0
+         840,0 960,80 1080,100 1200,120 1320,80 1440,40 L1440,120 L0,120 Z"
+      fill="white"
+      opacity="1"
+    />
+  </svg>
+
 </div>
+
 
 
 <!-- LEFT NAVIGATION PANEL -->
@@ -12768,6 +12783,7 @@ startLoginOfferSlider(); // 👈 add this
   
 </body>
 </html>
+
 
 
 
