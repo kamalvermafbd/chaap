@@ -1588,7 +1588,13 @@ body::before {
     Offers for you
   </div>
 
-  <div id="loginOfferList" class="space-y-2"></div>
+  <div
+  id="loginOfferList"
+  class="flex gap-4 overflow-x-auto pb-2">
+</div>
+
+
+
 </div>
 
 <!-- LEFT NAVIGATION PANEL -->
@@ -12445,23 +12451,52 @@ function showLoginUserOfferBanner() {
     return;
   }
 
-  // 🧱 build UI
-  list.innerHTML = eligible.map(o => `
-    <div class="p-3 border rounded-lg bg-orange-50 flex justify-between items-center">
-      <div>
-        <div class="font-semibold text-gray-900">${o.text}</div>
-        <div class="text-sm text-gray-600">
-          Min order ${fmt(o.min)}
-        </div>
+  // 🧱 build UI (BANNER STYLE)
+list.innerHTML = eligible.map(o => `
+  <div
+    class="
+      min-w-[260px]
+      rounded-2xl
+      p-4
+      text-white
+      shadow-lg
+      flex flex-col justify-between
+    "
+    style="
+      background: linear-gradient(135deg,
+        ${o.flat > 0 ? '#f97316, #fb923c' :
+        o.discount >= 20 ? '#22c55e, #16a34a' :
+        '#6366f1, #4f46e5'}
+      );
+    "
+  >
+    <div>
+      <div class="text-lg font-extrabold leading-snug">
+        ${o.text}
       </div>
 
-      <button
-        class="px-4 py-1.5 bg-orange-600 text-white text-sm rounded"
-        onclick="applyCoupon('${o.id}')">
-        Apply
-      </button>
+      <div class="text-sm opacity-90 mt-1">
+        Min order ${fmt(o.min)}
+      </div>
     </div>
-  `).join("");
+
+    <button
+      onclick="applyCoupon('${o.id}')"
+      class="
+        mt-4
+        bg-white/90
+        text-gray-900
+        px-4 py-2
+        rounded-full
+        text-sm
+        font-semibold
+        hover:bg-white
+        transition
+      ">
+      Apply
+    </button>
+  </div>
+`).join("");
 
   banner.style.display = "block";
 }
@@ -12708,6 +12743,7 @@ function showLoginUserOfferBanner() {
   
 </body>
 </html>
+
 
 
 
