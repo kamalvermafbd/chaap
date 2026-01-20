@@ -12563,7 +12563,7 @@ async function fetchRewardMotivationData() {
   try {
     if (!isUserLoggedIn()) return null;
 
-    // ✅ FIX: use existing stable login storage
+    // ✅ existing stable login storage
     const mobile = localStorage.getItem("userMobile");
     if (!mobile) return null;
 
@@ -12571,7 +12571,16 @@ async function fetchRewardMotivationData() {
       `/exec?action=getRewardMotivationMessage&mobile=${mobile}`
     );
 
-    const data = await res.json();
+    // 🔒 IMPORTANT: read as text first
+    const text = await res.text();
+
+    // ❌ Agar HTML aaya (<!DOCTYPE ...), silently skip
+    if (text.trim().startsWith("<")) {
+      console.warn("Reward motivation API returned HTML, not JSON");
+      return null;
+    }
+
+    const data = JSON.parse(text);
 
     // safety
     if (!data || !data.nextSlabReward) return null;
@@ -12880,6 +12889,7 @@ function buildRewardBannerHTML(data) {
   
 </body>
 </html>
+
 
 
 
