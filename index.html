@@ -12559,23 +12559,23 @@ async function showLoginUserOfferBanner() {
   banner.style.display = "block";
   startLoginOfferSlider();
 }
-async function fetchRewardMotivationData() {
+
+  
+function fetchRewardMotivationData() {
   try {
-    if (!isUserLoggedIn()) return null;
-
-    const mobile = localStorage.getItem("userMobile");
-    if (!mobile) return null;
-
-    // ✅ SAME PIPELINE AS COUPONS
-    const data = await apiGet("getRewardMotivationMessage", { mobile });
+    // 🔒 reward data already fetched via coupon API
+    const data =
+      window._rewardHintData ||
+      window._rewardMotivationData ||
+      null;
 
     if (!data || !data.nextSlabReward) return null;
 
-    console.log("🎁 Reward motivation data:", data);
+    console.log("🎁 Reward motivation data (from existing API):", data);
     return data;
 
   } catch (err) {
-    console.error("Reward motivation fetch failed", err);
+    console.error("Reward motivation read failed", err);
     return null;
   }
 }
@@ -12879,6 +12879,7 @@ function buildRewardBannerHTML(data) {
   
 </body>
 </html>
+
 
 
 
