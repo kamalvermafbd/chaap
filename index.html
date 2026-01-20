@@ -8830,21 +8830,21 @@ function renderAvailableUserCoupons(coupons = []) {
   }
 
   coupons.forEach(c => {
-    const isApplied = false;
+  const isApplied = false; // ✅ FIX: define it (default)
 
-    // 🚫 skip already-applied reward coupon ONLY
-    const div = document.createElement("div");
-    div.className =
-      "flex justify-between items-center p-2 border rounded bg-white";
+  const div = document.createElement("div");
+  div.className =
+    "flex justify-between items-center p-2 border rounded bg-white";
 
-if (isApplied) div.classList.add("coupon-applied");
+  if (isApplied) div.classList.add("coupon-applied");
 
-   const label =
-  c.couponType === "reward"
-    ? "🎁 Reward Coupon"
-    : c.couponType === "paid"
-    ? "💰 Paid Coupon"
-    : "🏷 Coupon";
+  const label =
+    c.couponType === "reward"
+      ? "🎁 Reward Coupon"
+      : c.couponType === "paid"
+      ? "💰 Paid Coupon"
+      : "🏷 Coupon";
+
 
 
     div.innerHTML = `
@@ -12881,6 +12881,7 @@ function buildRewardBannerHTML(data) {
   
 </body>
 </html>
+
 
 
 
