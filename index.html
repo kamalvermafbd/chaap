@@ -1580,22 +1580,17 @@ body::before {
 </div>
 
 <!-- LOGIN USER OFFER BANNER -->
-<div
-  id="loginOfferBanner"
-  class="hidden p-4 bg-white rounded-xl shadow mt-4">
+<div id="loginOfferBanner" class="hidden mt-6">
+  <div class="font-bold text-xl mb-3">Offers for you</div>
 
-  <div class="font-bold text-lg mb-2">
-    Offers for you
+  <div class="relative overflow-hidden">
+    <div
+      id="loginOfferSlider"
+      class="flex transition-transform duration-700 ease-in-out">
+    </div>
   </div>
-
-  <div
-  id="loginOfferList"
-  class="flex gap-4 overflow-x-auto pb-2">
 </div>
 
-
-
-</div>
 
 <!-- LEFT NAVIGATION PANEL -->
 <!-- LEFT NAVIGATION PANEL -->
@@ -12772,6 +12767,7 @@ startLoginOfferSlider(); // 👈 add this
   
 </body>
 </html>
+
 
 
 
