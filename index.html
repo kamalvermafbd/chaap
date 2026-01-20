@@ -10200,6 +10200,12 @@ function applyRewardCoupon(couponCode, rewardAmount) {
     return;
   }
 
+  // 🔥 CLEAR BEST OFFER (TEMPORARY, THIS CART ONLY)
+  if (selectedCoupon && selectedCoupon.type === "offer") {
+    selectedCoupon = null;
+  }
+  window._couponLocked = false;
+  
   // 🔒 lock coupons (reward wins)
   window._couponLocked = true;
   window._appliedCouponType = "reward";
@@ -12881,6 +12887,7 @@ function buildRewardBannerHTML(data) {
   
 </body>
 </html>
+
 
 
 
