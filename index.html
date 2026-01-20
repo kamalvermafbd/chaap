@@ -12568,11 +12568,11 @@ async function fetchRewardMotivationData() {
   }
 }
 
-
 function buildRewardBannerHTML(data) {
   const tier  = data.nextSlabId || "Reward";
   const total = Math.round(data.nextSlabReward || 0);
   const used  = Math.round(data.claimedRewardValue || 0);
+  const more  = Math.ceil(data.remainingToUnlock || 0);
 
   return `
   <div class="
@@ -12600,11 +12600,16 @@ function buildRewardBannerHTML(data) {
       <div class="text-lg opacity-90 mt-2">
         Get a reward worth <b>₹${total}</b> on eligible orders.
       </div>
+
+      <!-- 🔥 MAIN CTA LINE -->
+      <div class="mt-3 text-lg font-extrabold">
+        Spend ₹${more} more to avail this offer
+      </div>
     </div>
 
     <div class="relative z-10 text-xs opacity-80 leading-snug">
       ₹${used} of this reward has already been used.<br>
-      Remaining benefit will be applied on eligible orders as per program terms.
+      Reward validity as per program terms.
     </div>
 
     <svg
@@ -12623,7 +12628,6 @@ function buildRewardBannerHTML(data) {
 
   </div>`;
 }
-
 
 </script>
 
@@ -12866,6 +12870,7 @@ function buildRewardBannerHTML(data) {
   
 </body>
 </html>
+
 
 
 
