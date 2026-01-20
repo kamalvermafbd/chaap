@@ -12415,6 +12415,12 @@ if (
   box.innerText = text;
   box.classList.remove("hidden");
 }
+function scrollToMenu() {
+  const menu = document.getElementById("menu");
+  if (menu) {
+    menu.scrollIntoView({ behavior: "smooth" });
+  }
+}
 
 // ===============================
 // LOGIN USER OFFER BANNER (NEW)
@@ -12745,6 +12751,7 @@ list.innerHTML = eligible.map(o => `
   
 </body>
 </html>
+
 
 
 
