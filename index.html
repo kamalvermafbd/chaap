@@ -12488,36 +12488,65 @@ function showLoginUserOfferBanner() {
   }
 
   slider.innerHTML = eligible.map(o => `
-    <div class="
-      min-w-full
-      h-[220px]
-      sm:h-[260px]
-      rounded-2xl
-      p-8
-      flex
-      flex-col
-      justify-between
-      shadow-lg
-      bg-gradient-to-br
-      ${o.flat > 0 ? 'from-orange-500 to-orange-600'
-                  : o.discount >= 20 ? 'from-green-500 to-green-600'
-                  : 'from-indigo-500 to-indigo-600'}
-      text-white
-    ">
-      <div>
-        <div class="text-3xl font-extrabold">${o.text}</div>
-        <div class="text-lg opacity-90 mt-2">
-          Min order ${fmt(o.min)}
-        </div>
-      </div>
+  <div class="
+    relative
+    min-w-full
+    h-[240px]
+    sm:h-[280px]
+    rounded-2xl
+    overflow-hidden
+    p-8
+    flex
+    flex-col
+    justify-between
+    shadow-lg
+    bg-gradient-to-br
+    ${o.flat > 0 ? 'from-orange-500 to-orange-600'
+                : o.discount >= 20 ? 'from-green-500 to-green-600'
+                : 'from-indigo-500 to-indigo-600'}
+    text-white
+  ">
 
-      <button
-        onclick="scrollToMenu()"
-        class="bg-white text-gray-900 px-8 py-3 rounded-full font-semibold">
-        Shop Now →
-      </button>
+    <!-- CONTENT -->
+    <div class="relative z-10">
+      <div class="text-3xl font-extrabold">
+        ${o.text}
+      </div>
+      <div class="text-lg opacity-90 mt-2">
+        Min order ${fmt(o.min)}
+      </div>
     </div>
-  `).join("");
+
+    <button
+  onclick="scrollToMenu()"
+  class="relative z-10
+         bg-white text-gray-900
+         px-6 py-2
+         rounded-full
+         font-semibold text-sm
+         hover:bg-gray-100
+         transition">
+  Shop Now →
+</button>
+
+
+    <!-- SVG WAVE (INSIDE CARD) -->
+    <svg
+      viewBox="0 0 1440 120"
+      preserveAspectRatio="none"
+      class="absolute bottom-0 left-0 w-full h-[120px]">
+      <path
+        d="M0,40 C120,80 240,120 360,100
+           480,80 600,0 720,0
+           840,0 960,80 1080,100
+           1200,120 1320,80 1440,40
+           L1440,120 L0,120 Z"
+        fill="rgba(255,255,255,0.25)"
+      />
+    </svg>
+
+  </div>
+`).join("");
 
   banner.style.display = "block";
   startLoginOfferSlider();
@@ -12766,15 +12795,4 @@ function showLoginUserOfferBanner() {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
 
