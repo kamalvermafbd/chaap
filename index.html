@@ -12563,7 +12563,8 @@ async function fetchRewardMotivationData() {
   try {
     if (!isUserLoggedIn()) return null;
 
-    const mobile = getLoggedInMobile?.();
+    // ✅ FIX: use existing stable login storage
+    const mobile = localStorage.getItem("userMobile");
     if (!mobile) return null;
 
     const res = await fetch(
@@ -12581,6 +12582,7 @@ async function fetchRewardMotivationData() {
     return null;
   }
 }
+
 function buildRewardBannerHTML(data) {
   const tier  = data.nextSlabId || "Reward";
   const total = Math.round(data.nextSlabReward || 0);
@@ -12635,7 +12637,6 @@ function buildRewardBannerHTML(data) {
 
   </div>`;
 }
-
 
 
 </script>
@@ -12879,5 +12880,6 @@ function buildRewardBannerHTML(data) {
   
 </body>
 </html>
+
 
 
