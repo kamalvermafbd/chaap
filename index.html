@@ -12566,21 +12566,20 @@ async function fetchRewardMotivationData() {
     const mobile = localStorage.getItem("userMobile");
     if (!mobile) return null;
 
-    // ✅ SAME PATTERN AS OTHER APIs
-    const res = await fetch(
-      API_URL + "?action=getRewardMotivationMessage&mobile=" + mobile
-    );
+    // ✅ SAME PIPELINE AS COUPONS
+    const data = await apiGet("getRewardMotivationMessage", { mobile });
 
-    const data = await res.json();
+    if (!data || !data.nextSlabReward) return null;
 
-    if (!data) return null;
-
+    console.log("🎁 Reward motivation data:", data);
     return data;
+
   } catch (err) {
     console.error("Reward motivation fetch failed", err);
     return null;
   }
 }
+
 
 
 function buildRewardBannerHTML(data) {
@@ -12880,6 +12879,7 @@ function buildRewardBannerHTML(data) {
   
 </body>
 </html>
+
 
 
 
