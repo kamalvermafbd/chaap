@@ -8830,6 +8830,8 @@ function renderAvailableUserCoupons(coupons = []) {
   }
 
   coupons.forEach(c => {
+    const isApplied = false;
+
     // 🚫 skip already-applied reward coupon ONLY
     const div = document.createElement("div");
     div.className =
@@ -12879,6 +12881,7 @@ function buildRewardBannerHTML(data) {
   
 </body>
 </html>
+
 
 
 
