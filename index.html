@@ -12561,21 +12561,31 @@ async function showLoginUserOfferBanner() {
 }
 
   
-function fetchRewardMotivationData() {
+async function fetchRewardMotivationData() {
   try {
-    // 🔒 reward data already fetched via coupon API
-    const data =
-      window._rewardHintData ||
-      window._rewardMotivationData ||
-      null;
+    const mobile =
+      localStorage.getItem("userMobile") ||
+      localStorage.getItem("mobile");
 
-    if (!data || !data.nextSlabReward) return null;
+    if (!mobile) {
+      console.log("❌ rewardMotivation: mobile missing");
+      return null;
+    }
 
-    console.log("🎁 Reward motivation data (from existing API):", data);
+    const res = await fetch(
+      API_BASE +
+        "?api=getRewardMotivationMessage&mobile=" +
+        encodeURIComponent(mobile)
+    );
+
+    const data = await res.json();
+
+    // 🔍 PURE DEBUG (NO LOGIC)
+    console.log("🧪 rewardMotivation API DATA:", data);
+
     return data;
-
   } catch (err) {
-    console.error("Reward motivation read failed", err);
+    console.error("❌ rewardMotivation fetch failed", err);
     return null;
   }
 }
@@ -12879,6 +12889,7 @@ function buildRewardBannerHTML(data) {
   
 </body>
 </html>
+
 
 
 
