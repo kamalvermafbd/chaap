@@ -12563,27 +12563,17 @@ async function fetchRewardMotivationData() {
   try {
     if (!isUserLoggedIn()) return null;
 
-    // ✅ existing stable login storage
     const mobile = localStorage.getItem("userMobile");
     if (!mobile) return null;
 
+    // ✅ SAME PATTERN AS OTHER APIs
     const res = await fetch(
-      `/exec?action=getRewardMotivationMessage&mobile=${mobile}`
+      API_URL + "?action=getRewardMotivationMessage&mobile=" + mobile
     );
 
-    // 🔒 IMPORTANT: read as text first
-    const text = await res.text();
+    const data = await res.json();
 
-    // ❌ Agar HTML aaya (<!DOCTYPE ...), silently skip
-    if (text.trim().startsWith("<")) {
-      console.warn("Reward motivation API returned HTML, not JSON");
-      return null;
-    }
-
-    const data = JSON.parse(text);
-
-    // safety
-    if (!data || !data.nextSlabReward) return null;
+    if (!data) return null;
 
     return data;
   } catch (err) {
@@ -12591,6 +12581,7 @@ async function fetchRewardMotivationData() {
     return null;
   }
 }
+
 
 function buildRewardBannerHTML(data) {
   const tier  = data.nextSlabId || "Reward";
@@ -12889,6 +12880,7 @@ function buildRewardBannerHTML(data) {
   
 </body>
 </html>
+
 
 
 
