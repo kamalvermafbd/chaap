@@ -12456,7 +12456,7 @@ function startLoginOfferSlider() {
 // ===============================
 // LOGIN USER OFFER BANNER (NEW)
 // ===============================
-function showLoginUserOfferBanner() {
+async function showLoginUserOfferBanner() {
 
   // ✅ only logged-in users
   if (!isUserLoggedIn()) return;
@@ -12549,8 +12549,91 @@ function showLoginUserOfferBanner() {
   </div>
 `).join("");
 
+ // 🔹 2️⃣ Inject reward banner (NON-BREAKING)
+  const rewardData = await fetchRewardMotivationData();
+  if (rewardData) {
+    const rewardSlide = buildRewardBannerHTML(rewardData);
+    slider.insertAdjacentHTML("afterbegin", rewardSlide);
+  }
+  
   banner.style.display = "block";
   startLoginOfferSlider();
+}
+async function fetchRewardMotivationData() {
+  try {
+    if (!isUserLoggedIn()) return null;
+
+    const mobile = getLoggedInMobile?.();
+    if (!mobile) return null;
+
+    const res = await fetch(
+      `/exec?action=getRewardMotivationMessage&mobile=${mobile}`
+    );
+
+    const data = await res.json();
+
+    // safety
+    if (!data || !data.nextSlabReward) return null;
+
+    return data;
+  } catch (err) {
+    console.error("Reward motivation fetch failed", err);
+    return null;
+  }
+}
+function buildRewardBannerHTML(data) {
+  const tier  = data.nextSlabId || "Reward";
+  const total = Math.round(data.nextSlabReward || 0);
+  const used  = Math.round(data.claimedRewardValue || 0);
+
+  return `
+  <div class="
+    relative
+    min-w-full
+    h-[240px]
+    sm:h-[280px]
+    rounded-2xl
+    overflow-hidden
+    px-8 pt-8 pb-6
+    flex
+    flex-col
+    justify-between
+    shadow-lg
+    bg-gradient-to-br
+    from-indigo-600 to-indigo-700
+    text-white
+  ">
+
+    <div class="relative z-10">
+      <div class="text-3xl font-extrabold">
+        🎁 ${tier} Reward Available
+      </div>
+
+      <div class="text-lg opacity-90 mt-2">
+        Get a reward worth <b>₹${total}</b> on eligible orders.
+      </div>
+    </div>
+
+    <div class="relative z-10 text-xs opacity-80 leading-snug">
+      ₹${used} of this reward has already been used.<br>
+      Remaining benefit will be applied on eligible orders as per program terms.
+    </div>
+
+    <svg
+      viewBox="0 0 1440 120"
+      preserveAspectRatio="none"
+      class="absolute bottom-0 left-0 w-full h-[120px]">
+      <path
+        d="M0,40 C120,80 240,120 360,100
+           480,80 600,0 720,0
+           840,0 960,80 1080,100
+           1200,120 1320,80 1440,40
+           L1440,120 L0,120 Z"
+        fill="rgba(255,255,255,0.25)"
+      />
+    </svg>
+
+  </div>`;
 }
 
 
@@ -12796,7 +12879,5 @@ function showLoginUserOfferBanner() {
   
 </body>
 </html>
-
-
 
 
