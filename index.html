@@ -4749,17 +4749,15 @@ emailEl.querySelector("#invOrderType") &&
   (emailEl.querySelector("#invOrderType").innerHTML =
     `<b>${orderType}</b>`);
   invoiceHtml = emailEl.innerHTML;
-// ✅ FINAL SAFETY SNAPSHOT (MOST IMPORTANT)
-invoiceHtml = invoiceHtml || document.getElementById("checkoutInvoiceContainer")?.innerHTML.trim() || "";
+// ✅ FINAL FALLBACK: agar email template empty ho
+invoiceHtml = invoiceHtml || document.getElementById("invoiceEmailTemplate")?.innerHTML.trim() || "";
 
   invoiceHtml = `
   <div style="max-width:600px;margin:auto;background:#ffffff;padding:12px">
     ${invoiceHtml}
   </div>
 `;
-
 }
-
 
 if (!inv) {
   alert("Invoice not ready. Please reopen checkout.");
@@ -4769,13 +4767,10 @@ if (!inv) {
 
 // 🔒 cart & totals checkout invoice se aayenge
 const safeCartItems = inv.items.map(i => ({ ...i }));
-
 const drawer = window._drawerTotals || {};
-
 const couponDiscFinal =
   Number(drawer.offerDiscount || 0) +
   Number(drawer.rewardDiscount || 0);
-
 
   const orderData = {
     customerName,
@@ -4881,7 +4876,6 @@ try { refreshCouponMotivationHint(); } catch(e){}
         closeCheckout();
         renderMenu(window.menuItems || []);
 
-
       setTimeout(async () => {
   await fetchOffersFromBackend();
 
@@ -4941,7 +4935,6 @@ if (mobileInput) {
 mobileInput._internalTrigger = true;
 mobileInput.dispatchEvent(new Event("input"));
 mobileInput._internalTrigger = false;
-
   });
 }
 
@@ -13323,6 +13316,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
