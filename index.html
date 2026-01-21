@@ -4695,7 +4695,6 @@ if (orderType) {
     }
     resetPlaceOrderBtn();
     console.log("↩️ returning due to name validation");
-
     return;
   }
 }
@@ -4703,8 +4702,6 @@ if (orderType) {
 // -----------------------------
 // STEP 2: Guest user – visible fields mandatory
 // -----------------------------
-
-
   const addressError = document.getElementById("addressError");
 
 if (orderType === "Home Delivery" && !address) {
@@ -4729,6 +4726,27 @@ if (orderType === "Home Delivery" && !address) {
 // clear error if valid
 
   const inv = window._checkoutInvoice;
+// 🔑 STEP-4.4(A): Capture checkout invoice HTML for email
+const invoiceEl = document.getElementById("invoiceTemplate");
+const emailEl   = document.getElementById("invoiceEmailTemplate");
+let invoiceHtml = "";
+
+if (invoiceEl && emailEl) {
+  emailEl.innerHTML = invoiceEl.innerHTML;
+
+  // ❌ remove close button for email
+  emailEl.querySelectorAll("button").forEach(b => b.remove());
+
+  invoiceHtml = emailEl.innerHTML;
+
+  invoiceHtml = `
+  <div style="max-width:600px;margin:auto;background:#ffffff;padding:12px">
+    ${invoiceHtml}
+  </div>
+`;
+
+}
+
 
 if (!inv) {
   alert("Invoice not ready. Please reopen checkout.");
@@ -4788,12 +4806,11 @@ lng: orderType === "Home Delivery"
   deliveryCharges: Number(inv.deliveryCharge || 0),
   courierCharges: Number(inv.courierCharge || 0),
   extraChargeReason: String(inv.chargeType || ""),
+    invoiceHtml: invoiceHtml,
  invoiceSnapshot: window._checkoutInvoice
   };
   console.log("👤 userType:", userType);
-
 console.log("🚀 ORDER PAYLOAD TO BACKEND:", JSON.stringify(orderData, null, 2));
-
 document.querySelectorAll('#checkoutForm input, #checkoutForm select')
   .forEach(el => el.disabled = true);
 console.log("🧪 FINAL ORDER PAYLOAD (before send)", {
@@ -13033,7 +13050,17 @@ if (paid > 0) {
   };
 
   console.log("🔐 CHECKOUT SNAPSHOT LOCKED:", window._checkoutInvoice);
+
+// ===============================
+// STEP-4.2 — CLONE CHECKOUT INVOICE FOR EMAIL
+// ===============================
+const emailTpl = document.getElementById("invoiceEmailTemplate");
+const uiTpl = document.getElementById("invoiceTemplate");
+
+if (emailTpl && uiTpl) {
+  emailTpl.innerHTML = uiTpl.innerHTML;
 }
+  }
 
 </script>
 
@@ -13270,19 +13297,19 @@ if (paid > 0) {
 
     <div class="mt-2 text-xs text-gray-600" id="invPayment"></div>
 </div>
+
+    <!-- EMAIL INVOICE CLONE (for email only) -->
+<div
+  id="invoiceEmailTemplate"
+  style="display:none; max-width:600px; font-family:Arial, sans-serif;">
+</div>
+
   </div>
 </div>
   
   
 </body>
 </html>
-
-
-
-
-
-
-
 
 
 
