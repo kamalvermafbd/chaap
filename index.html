@@ -11581,7 +11581,8 @@ if (orderTypeBox) {
       throw new Error("API failed");
     }
 
-    renderInvoiceFromAPI(data.invoice);
+    renderInvoiceFromOrderAPI(data.invoice);
+
 
   } catch (err) {
     console.error("Invoice load error:", err);
@@ -12658,6 +12659,285 @@ function buildRewardBannerHTML(data) {
   </div>`;
 }
 
+function renderInvoiceFromOrderAPI(inv) {
+  console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
+
+  /* ================= HEADER ================= */
+  const orderDt = new Date(inv.orderDate).toLocaleString();
+  document.getElementById("invoiceHeader").innerText =
+    `${inv.orderNumber} • ${orderDt}`;
+
+  const orderIdBox = document.getElementById("invOrderId");
+  if (orderIdBox) {
+    if (inv.orderId && String(inv.orderId).trim() !== "" && inv.orderId !== "-") {
+      orderIdBox.classList.remove("hidden");
+      orderIdBox.innerText = `Order ID: ${inv.orderId}`;
+    } else {
+      orderIdBox.classList.add("hidden");
+      orderIdBox.innerText = "";
+    }
+  }
+
+  const orderTypeBox = document.getElementById("invOrderType");
+  if (orderTypeBox && inv.orderType) {
+    orderTypeBox.classList.remove("hidden");
+    orderTypeBox.innerHTML = `
+      <div class="grid grid-cols-[140px_auto] gap-1 mt-1">
+        <span class="font-semibold">Order Type</span>
+        <span>: ${inv.orderType}</span>
+      </div>`;
+  }
+
+  /* ================= CUSTOMER ================= */
+  document.getElementById("invCustomer").innerHTML = `
+    <div class="grid grid-cols-[140px_auto] gap-1">
+      <span class="font-semibold">Name</span>
+      <span>: ${inv.customerName || ""}</span>
+    </div>`;
+
+  document.getElementById("invContact").innerHTML = `
+    <div class="grid grid-cols-[140px_auto] gap-1">
+      <span class="font-semibold">Mobile / Email</span>
+      <span>: ${inv.mobile || ""} / ${inv.email || ""}</span>
+    </div>`;
+
+  const addrBox = document.getElementById("invAddress");
+  if (inv.address) {
+    addrBox.classList.remove("hidden");
+    addrBox.innerHTML = `
+      <div class="grid grid-cols-[140px_auto] gap-1">
+        <span class="font-semibold">Address</span>
+        <span>: ${inv.address}</span>
+      </div>`;
+  } else addrBox.classList.add("hidden");
+
+/* ================= ITEMS ================= */
+document.getElementById("invoiceItems").innerHTML =
+  (inv.items || []).map((i, idx) => {
+
+    const qty = Number(i.qty || 0);
+    const rate = Number(i.rate || 0);
+    const discPercent = Number(i.discPercent || 0);
+
+    const gross = qty * rate;
+
+    // 🔥 SAME FORMULA AS DRAWER
+    const perUnitDiscount = rate * discPercent / 100;
+    const netRate = rate - perUnitDiscount;
+    const net = netRate * qty;
+    const discAmt = gross - net;
+
+    return `
+      <div class="border-b pb-2 mb-2">
+        <div class="font-semibold">
+          ${idx + 1}. ${i.name}
+          <span class="text-xs text-gray-500">(${i.unit})</span>
+        </div>
+
+        ${
+          discPercent > 0
+            ? `
+              <div class="text-xs text-gray-600">
+                Qty ${qty} × ${fmt(rate)} = ${fmt(gross)}
+              </div>
+              <div class="text-xs text-green-600">
+                Discount: ${discPercent}% on ${fmt(gross)} i.e. ${fmt(discAmt)}
+              </div>
+              <div class="text-xs text-gray-600">
+                Net Rate: ${fmt(gross)} − ${fmt(discAmt)} = ${fmt(net)}
+              </div>
+            `
+            : `
+              <div class="text-xs text-gray-600">
+                Qty ${qty} × ${fmt(rate)} = ${fmt(gross)}
+              </div>
+            `
+        }
+
+        <div class="flex justify-between text-sm font-medium mt-0.5">
+          <span>Item Total</span>
+          <span>${fmt(net)}</span>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  /* ================= ORDER TYPE CHARGES ================= */
+  const orderType = inv.orderType || "";
+  let serviceAmt = 0;
+  let deliveryAmt = 0;
+
+  if (orderType === "Dine In") {
+    serviceAmt = Number(inv.serviceAmt || 0);
+  } else if (orderType === "Home Delivery" || orderType === "Courier") {
+    deliveryAmt = Number(inv.deliveryCharge || 0);
+  }
+
+  /* ================= BASE & COUPONS ================= */
+  const items = Number(inv.itemsSubtotal || inv.baseTotal || 0);
+const couponType = (inv.couponType || "").toLowerCase();
+
+let normalCoupon = 0;
+let reward = 0;
+
+if (couponType === "reward") {
+  reward = Number(inv.couponAmount || 0);
+} else {
+  normalCoupon = Number(inv.couponAmount || 0);
+}
+
+  const signup = Number(inv.signupDiscount || 0);
+
+  const paid = Number(inv.paidCouponDiscount || 0);
+
+  // Actual selling price
+  const grossValue = items - normalCoupon;
+
+  // What customer pays before tax
+  const afterAllDiscounts = grossValue - signup - reward - paid;
+
+// 🔥 FINAL GST BASE
+const gstBase = Number(inv.taxableAmount || 0);
+const cgst = Number(inv.cgst || 0);
+const sgst = Number(inv.sgst || 0);
+const igst = Number(inv.igst || 0);
+const taxTotal = cgst + sgst + igst;
+const billAmount = Number(inv.billAmount || 0);
+
+const postTaxDiscount = signup + reward + paid;
+
+// ✅ FINAL
+const netPayable = Number(inv.netPayable || inv.billAmount || 0);
+
+  /* ================= RENDER TOTALS ================= */
+  // 1️⃣ Items
+document.getElementById("invBase").innerHTML = `
+  <div class="flex justify-between font-semibold">
+    <span>Items Subtotal</span>
+    <span>${fmt(items)}</span>
+  </div>`;
+
+// 2️⃣ Normal Coupon + Gross
+const c = document.getElementById("invCoupon");
+if (normalCoupon > 0) {
+  c.classList.remove("hidden");
+  c.innerHTML = `
+    <div class="flex justify-between text-green-600">
+      <span>Normal Coupon</span>
+      <span>−${fmt(normalCoupon)}</span>
+    </div>
+    <div class="flex justify-between font-semibold text-gray-900">
+      <span>Gross Value</span>
+      <span>${fmt(grossValue)}</span>
+    </div>`;
+} else {
+  c.classList.add("hidden");
+}
+
+// 3️⃣ Service / Delivery
+const deliveryBox = document.getElementById("invDelivery");
+const serviceBox  = document.getElementById("invService");
+
+if (deliveryAmt > 0) {
+  deliveryBox.classList.remove("hidden");
+  deliveryBox.innerHTML = `
+    <div class="flex justify-between">
+      <span>${inv.deliveryChargeLabel || "Delivery Charges"}</span>
+      <span>${fmt(deliveryAmt)}</span>
+    </div>`;
+} else deliveryBox.classList.add("hidden");
+
+if (serviceAmt > 0) {
+  serviceBox.classList.remove("hidden");
+  serviceBox.innerHTML = `
+    <div class="flex justify-between">
+      <span>Service Charges</span>
+      <span>${fmt(serviceAmt)}</span>
+    </div>`;
+} else serviceBox.classList.add("hidden");
+
+// 4️⃣ Tax block
+const taxBox = document.getElementById("invTax");
+taxBox.innerHTML = `
+  <div class="flex justify-between font-semibold">
+    <span>Taxable Amount</span>
+    <span>${fmt(gstBase)}</span>
+  </div>
+  <div class="flex justify-between">
+    <span>CGST</span>
+    <span>${fmt(cgst)}</span>
+  </div>
+  <div class="flex justify-between">
+    <span>SGST</span>
+    <span>${fmt(sgst)}</span>
+  </div>
+  <div class="flex justify-between font-semibold">
+    <span>Bill Amount</span>
+    <span>${fmt(gstBase + taxTotal)}</span>
+  </div>`;
+
+// 5️⃣ Signup Discount (after Bill)
+const signupBox = document.getElementById("invSignup");
+if (signup > 0) {
+  signupBox.classList.remove("hidden");
+  signupBox.innerHTML = `
+    <div class="flex justify-between text-green-600">
+      <span>Signup Discount</span>
+      <span>−${fmt(signup)}</span>
+    </div>`;
+} else {
+  signupBox.classList.add("hidden");
+}
+// 6️⃣ Reward Coupon
+const rewardBox = document.getElementById("invReward");
+if (reward > 0) {
+  rewardBox.classList.remove("hidden");
+  rewardBox.innerHTML = `
+    <div class="flex justify-between text-green-600">
+      <span>Reward Coupon</span>
+      <span>−${fmt(reward)}</span>
+    </div>`;
+} else rewardBox.classList.add("hidden");
+
+// 7️⃣ Prepaid Coupon
+const paidBox = document.getElementById("invPaid");
+if (paid > 0) {
+  paidBox.classList.remove("hidden");
+  paidBox.innerHTML = `
+    <div class="flex justify-between text-green-600">
+      <span>Prepaid Coupon</span>
+      <span>−${fmt(paid)}</span>
+    </div>`;
+} else paidBox.classList.add("hidden");
+
+  document.getElementById("invNet").innerText = fmt(netPayable);
+  document.getElementById("invPayment").innerText =
+    `Payment: ${inv.paymentMethod || ""}`;
+
+  /* ================= SNAPSHOT ================= */
+  window._checkoutInvoice = {
+    items: (inv.items || []).map(i => ({ ...i })),
+    itemsSubtotal: items,
+    serviceCharge: serviceAmt,
+    deliveryCharge: deliveryAmt,
+    normalCoupon,
+    signupDiscount: signup,
+    rewardDiscount: reward,
+    paidCouponDiscount: paid,
+    taxableAmount: gstBase,
+    cgst, sgst, igst,
+    taxTotal,
+    netPayable,
+    couponId: inv.couponId || "",
+    paymentMethod: inv.paymentMethod || ""
+  };
+
+  console.log("🔐 CHECKOUT SNAPSHOT LOCKED:", window._checkoutInvoice);
+}
+
+
+
+
 </script>
 
   <div id="cartHandle" onclick="expandDrawerCart()">
@@ -12899,6 +13179,7 @@ function buildRewardBannerHTML(data) {
   
 </body>
 </html>
+
 
 
 
