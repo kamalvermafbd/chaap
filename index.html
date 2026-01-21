@@ -12764,21 +12764,28 @@ document.getElementById("invoiceItems").innerHTML =
 
   
 /* ================= BASE & COUPONS ================= */
-const items        = Number(inv.itemsSubtotal || 0);
-const serviceAmt   = Number(inv.serviceCharge || 0);
-const deliveryAmt  = Number(inv.deliveryCharge || 0);
+/* ================= BASE & COUPONS ================= */
+
+// ✅ correct mapping from order sheet
+const items       = Number(inv.itemsSubtotal ?? inv.baseTotal ?? 0);
+const serviceAmt  = Number(inv.serviceCharge ?? inv.serviceCharges ?? 0);
+const deliveryAmt = Number(inv.deliveryCharge || 0);
 
 const signup = Number(inv.signupDiscount || 0);
 const paid   = Number(inv.paidCouponDiscount || 0);
-const reward = Number(inv.rewardDiscount || 0);
+const reward = Number(inv.rewardDiscount || inv.couponAmount || 0);
 
-const gstBase    = Number(inv.taxableAmount || 0);
-const cgst       = Number(inv.cgst || 0);
-const sgst       = Number(inv.sgst || 0);
-const igst       = Number(inv.igst || 0);
-const taxTotal   = cgst + sgst + igst;
+// order sheet only has total tax
+const taxTotal = Number(inv.taxTotal || 0);
 
-const billAmount = Number(inv.billAmount || 0);
+// 👉 display purpose split (not recalculation of bill)
+const cgst = +(taxTotal / 2).toFixed(2);
+const sgst = +(taxTotal / 2).toFixed(2);
+
+// taxable & bill are not stored separately
+const gstBase    = items + serviceAmt + deliveryAmt;
+const billAmount = gstBase + taxTotal;
+
 const netPayable = Number(inv.netPayable || 0);
 
 
@@ -13148,6 +13155,7 @@ if (paid > 0) {
   
 </body>
 </html>
+
 
 
 
