@@ -12660,12 +12660,11 @@ function buildRewardBannerHTML(data) {
 }
 
 function renderInvoiceFromOrderAPI(inv) {
-  // ✅ clear old invoice error (VERY IMPORTANT)
-const invErr = document.getElementById("invoiceError");
-if (invErr) {
-  invErr.innerText = "";
-  invErr.classList.add("hidden");
-}
+
+  // ✅ CLEAR ERROR / LOADING LEFTOVERS
+  const itemsBox = document.getElementById("invoiceItems");
+  if (itemsBox) itemsBox.innerHTML = "";
+
 
   console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
 
@@ -13162,6 +13161,7 @@ if (paid > 0) {
   
 </body>
 </html>
+
 
 
 
