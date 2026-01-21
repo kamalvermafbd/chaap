@@ -2802,6 +2802,10 @@ renderIndex++;
   // ⭐ CORRECT PLACE
    setTimeout(() => {
        restoreFullCartUI();
+ // 🔥 IMPORTANT: refresh monthly spend on page/menu load
+  await refreshMonthlySpendAndReward();   // 🔁 recalculates MonthlySpend
+  await checkAndShowMonthlyReward();      // 🔁 updates reward eligibility
+     
        preloadRewardMotivation();
    }, 50);
 }
@@ -12893,6 +12897,7 @@ function buildRewardBannerHTML(data) {
   
 </body>
 </html>
+
 
 
 
