@@ -11562,6 +11562,14 @@ async function openInvoiceModal(orderId) {
   document.getElementById("invCoupon").innerHTML = "";
   document.getElementById("invNet").innerText = "";
   document.getElementById("invPayment").innerText = "";
+// ✅ FORCE RESET DISCOUNT ROWS (VERY IMPORTANT)
+["invSignup", "invReward", "invPaid"].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.innerHTML = "";
+    el.classList.add("hidden");
+  }
+});
 
   const itemsBox = document.getElementById("invoiceItems");
   if (itemsBox) {
@@ -13163,6 +13171,7 @@ if (paid > 0) {
   
 </body>
 </html>
+
 
 
 
