@@ -11625,7 +11625,7 @@ async function openInvoiceModal(orderId) {
   // 🔴 CLEAR OLD INVOICE DATA
   document.getElementById("invoiceHeader").innerText = "Loading...";
   document.getElementById("invOrderId").innerText = "";
-  document.getElementById("invInvoiceMeta").innerHTML = "";
+  
 
   const orderTypeBox = document.getElementById("invOrderType");
   if (orderTypeBox) orderTypeBox.innerHTML = "";
@@ -13223,9 +13223,9 @@ if (paid > 0) {
         Invoice
       </div>
       
-      <div class="text-xs text-gray-500" id="invOrderId"></div>
-      <div id="invOrderType"></div>
+      <div class="text-xs text-gray-500" id="invOrderId"></div> 
       <div class="text-xs text-gray-700 mt-1" id="invInvoiceMeta"></div>
+       <div id="invOrderType"></div>
     </div>
 
     <!-- CUSTOMER -->
@@ -13280,6 +13280,7 @@ if (paid > 0) {
   
 </body>
 </html>
+
 
 
 
