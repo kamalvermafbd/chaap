@@ -11530,26 +11530,28 @@ function renderMyDispatchedOrders(orders = []) {
   });
 }
 
-
 async function openInvoiceModal(orderId) {
   console.log("🧾 View Invoice clicked:", orderId);
 
   const modal = document.getElementById("invoiceModal");
-  if (!modal) {
-    console.error("invoiceModal not found");
-    return;
-  }
+  if (!modal) return;
 
   modal.classList.remove("hidden");
 
-  // 🔴 CLEAR OLD INVOICE DATA (CRITICAL FIX)
+  // ✅ CLEAR OLD ERROR (VERY IMPORTANT)
+  const errBox = document.getElementById("invoiceError");
+  if (errBox) {
+    errBox.innerText = "";
+    errBox.classList.add("hidden");
+  }
+
+  // 🔴 CLEAR OLD INVOICE DATA
   document.getElementById("invoiceHeader").innerText = "Loading...";
   document.getElementById("invOrderId").innerText = "";
   document.getElementById("invInvoiceMeta").innerHTML = "";
-const orderTypeBox = document.getElementById("invOrderType");
-if (orderTypeBox) {
-  orderTypeBox.innerHTML = "";
-}
+
+  const orderTypeBox = document.getElementById("invOrderType");
+  if (orderTypeBox) orderTypeBox.innerHTML = "";
 
   document.getElementById("invCustomer").innerText = "";
   document.getElementById("invContact").innerText = "";
@@ -11560,7 +11562,6 @@ if (orderTypeBox) {
   document.getElementById("invCoupon").innerHTML = "";
   document.getElementById("invNet").innerText = "";
   document.getElementById("invPayment").innerText = "";
-  document.querySelectorAll(".inv-tax-row").forEach(e => e.remove());
 
   const itemsBox = document.getElementById("invoiceItems");
   if (itemsBox) {
@@ -11581,18 +11582,19 @@ if (orderTypeBox) {
       throw new Error("API failed");
     }
 
+    // ✅ SUCCESS → render invoice
     renderInvoiceFromOrderAPI(data.invoice);
-
 
   } catch (err) {
     console.error("Invoice load error:", err);
-    if (itemsBox) {
-      itemsBox.innerHTML =
-        "<div class='text-red-500 text-sm'>Failed to load invoice</div>";
+
+    // ✅ SHOW ERROR ONLY HERE
+    if (errBox) {
+      errBox.innerText = "Failed to load invoice";
+      errBox.classList.remove("hidden");
     }
   }
 }
-
 
   function closeInvoiceModal() {
   const modal = document.getElementById("invoiceModal");
@@ -13161,6 +13163,7 @@ if (paid > 0) {
   
 </body>
 </html>
+
 
 
 
