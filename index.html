@@ -4725,39 +4725,26 @@ if (orderType === "Home Delivery" && !address) {
 
 // clear error if valid
 
-  const inv = window._checkoutInvoice;
-// 🔑 STEP-4.4(A): Capture checkout invoice HTML for email
-const invoiceEl = document.getElementById("invoiceTemplate");
-const emailEl   = document.getElementById("invoiceEmailTemplate");
-let invoiceHtml = "";
+  // 🔑 STEP-4.4(A): Capture checkout invoice HTML for email (FINAL FIX)
+const inv = window._checkoutInvoice;
 
-if (invoiceEl && emailEl) {
-  emailEl.innerHTML = invoiceEl.innerHTML;
+const invoiceEl = document.getElementById("checkoutInvoiceContainer");
+let invoiceHtml = invoiceEl ? invoiceEl.innerHTML.trim() : "";
 
-  // ❌ remove close button for email
-  emailEl.querySelectorAll("button").forEach(b => b.remove());
-// 🔑 inject order meta for email
-emailEl.querySelector("#invoiceHeader") &&
-  (emailEl.querySelector("#invoiceHeader").innerText = "Invoice");
-const orderIdText =
-  invoiceEl.querySelector("#invOrderId")?.innerText || "";
+// 🛑 HARD GUARD – invoice must exist before placing order
+if (!invoiceHtml || invoiceHtml.length < 50) {
+  alert("Invoice not ready. Please reopen checkout.");
+  resetPlaceOrderBtn();
+  return;
+}
 
-emailEl.querySelector("#invOrderId") &&
-  (emailEl.querySelector("#invOrderId").innerText = orderIdText);
-
-emailEl.querySelector("#invOrderType") &&
-  (emailEl.querySelector("#invOrderType").innerHTML =
-    `<b>${orderType}</b>`);
-  invoiceHtml = emailEl.innerHTML;
-// ✅ FINAL FALLBACK: agar email template empty ho
-invoiceHtml = invoiceHtml || document.getElementById("invoiceEmailTemplate")?.innerHTML.trim() || "";
-
-  invoiceHtml = `
+// 📧 Email-safe wrapper
+invoiceHtml = `
   <div style="max-width:600px;margin:auto;background:#ffffff;padding:12px">
     ${invoiceHtml}
   </div>
 `;
-}
+
 
 if (!inv) {
   alert("Invoice not ready. Please reopen checkout.");
@@ -13316,6 +13303,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
