@@ -4745,12 +4745,12 @@ const orderIdText =
 emailEl.querySelector("#invOrderId") &&
   (emailEl.querySelector("#invOrderId").innerText = orderIdText);
 
-
 emailEl.querySelector("#invOrderType") &&
   (emailEl.querySelector("#invOrderType").innerHTML =
     `<b>${orderType}</b>`);
-
   invoiceHtml = emailEl.innerHTML;
+// ✅ FINAL SAFETY SNAPSHOT (MOST IMPORTANT)
+invoiceHtml = invoiceHtml || document.getElementById("checkoutInvoiceContainer")?.innerHTML.trim() || "";
 
   invoiceHtml = `
   <div style="max-width:600px;margin:auto;background:#ffffff;padding:12px">
@@ -13323,6 +13323,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
