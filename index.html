@@ -12762,39 +12762,25 @@ document.getElementById("invoiceItems").innerHTML =
     `;
   }).join("");
 
-  /* ================= ORDER TYPE CHARGES ================= */
-  const orderType = inv.orderType || "";
-  let serviceAmt = 0;
-  let deliveryAmt = 0;
+  
+/* ================= BASE & COUPONS ================= */
+const items        = Number(inv.itemsSubtotal || 0);
+const serviceAmt   = Number(inv.serviceCharge || 0);
+const deliveryAmt  = Number(inv.deliveryCharge || 0);
 
-  if (orderType === "Dine In") {
-    serviceAmt = Number(inv.serviceAmt || 0);
-  } else if (orderType === "Home Delivery" || orderType === "Courier") {
-    deliveryAmt = Number(inv.deliveryCharge || 0);
-  }
+const signup = Number(inv.signupDiscount || 0);
+const paid   = Number(inv.paidCouponDiscount || 0);
+const reward = Number(inv.rewardDiscount || 0);
 
-  /* ================= BASE & COUPONS ================= */
-  const items = Number(inv.itemsSubtotal || inv.baseTotal || 0);
+const gstBase    = Number(inv.taxableAmount || 0);
+const cgst       = Number(inv.cgst || 0);
+const sgst       = Number(inv.sgst || 0);
+const igst       = Number(inv.igst || 0);
+const taxTotal   = cgst + sgst + igst;
 
-
-  const signup = Number(inv.signupDiscount || 0);
-
-  const paid = Number(inv.paidCouponDiscount || 0);
-  const reward = Number(inv.rewardDiscount || 0);
-
-
-// 🔥 FINAL GST BASE
-const gstBase = Number(inv.taxableAmount || 0);
-const cgst = Number(inv.cgst || 0);
-const sgst = Number(inv.sgst || 0);
-const igst = Number(inv.igst || 0);
-const taxTotal = cgst + sgst + igst;
 const billAmount = Number(inv.billAmount || 0);
+const netPayable = Number(inv.netPayable || 0);
 
-const postTaxDiscount = signup + reward + paid;
-
-// ✅ FINAL
-const netPayable = Number(inv.netPayable || inv.billAmount || 0);
 
   /* ================= RENDER TOTALS ================= */
   // 1️⃣ Items
@@ -12807,7 +12793,6 @@ document.getElementById("invBase").innerHTML = `
 // 2️⃣ Normal Coupon + Gross
 const c = document.getElementById("invCoupon");
 if (inv.couponType === "normal" && inv.couponAmount > 0) {
-
   c.classList.remove("hidden");
   c.innerHTML = `
     <div class="flex justify-between text-green-600">
@@ -12846,19 +12831,19 @@ const taxBox = document.getElementById("invTax");
 taxBox.innerHTML = `
   <div class="flex justify-between font-semibold">
     <span>Taxable Amount</span>
-    <span>${fmt(inv.taxableAmount || 0)}</span>
+    <span>${fmt(gstBase)}</span>
   </div>
   <div class="flex justify-between">
     <span>CGST</span>
-    <span>${fmt(inv.cgst || 0)}</span>
+    <span>${fmt(cgst)}</span>
   </div>
   <div class="flex justify-between">
     <span>SGST</span>
-    <span>${fmt(inv.sgst || 0)}</span>
+    <span>${fmt(sgst)}</span>
   </div>
   <div class="flex justify-between font-semibold">
     <span>Bill Amount</span>
-    <span>${fmt(inv.billAmount || 0)}</span>
+    <span>${fmt(billAmount)}</span>
   </div>
 `;
 
@@ -12921,9 +12906,6 @@ if (paid > 0) {
 
   console.log("🔐 CHECKOUT SNAPSHOT LOCKED:", window._checkoutInvoice);
 }
-
-
-
 
 </script>
 
@@ -13166,6 +13148,7 @@ if (paid > 0) {
   
 </body>
 </html>
+
 
 
 
