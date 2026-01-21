@@ -12775,26 +12775,13 @@ document.getElementById("invoiceItems").innerHTML =
 
   /* ================= BASE & COUPONS ================= */
   const items = Number(inv.itemsSubtotal || inv.baseTotal || 0);
-const couponType = (inv.couponType || "").toLowerCase();
 
-let normalCoupon = 0;
-let reward = 0;
-
-if (couponType === "reward") {
-  reward = Number(inv.couponAmount || 0);
-} else {
-  normalCoupon = Number(inv.couponAmount || 0);
-}
 
   const signup = Number(inv.signupDiscount || 0);
 
   const paid = Number(inv.paidCouponDiscount || 0);
+  const reward = Number(inv.rewardDiscount || 0);
 
-  // Actual selling price
-  const grossValue = items - normalCoupon;
-
-  // What customer pays before tax
-  const afterAllDiscounts = grossValue - signup - reward - paid;
 
 // 🔥 FINAL GST BASE
 const gstBase = Number(inv.taxableAmount || 0);
@@ -12819,17 +12806,15 @@ document.getElementById("invBase").innerHTML = `
 
 // 2️⃣ Normal Coupon + Gross
 const c = document.getElementById("invCoupon");
-if (normalCoupon > 0) {
+if (inv.couponType === "normal" && inv.couponAmount > 0) {
+
   c.classList.remove("hidden");
   c.innerHTML = `
     <div class="flex justify-between text-green-600">
       <span>Normal Coupon</span>
-      <span>−${fmt(normalCoupon)}</span>
+      <span>−${fmt(inv.couponAmount)}</span>
     </div>
-    <div class="flex justify-between font-semibold text-gray-900">
-      <span>Gross Value</span>
-      <span>${fmt(grossValue)}</span>
-    </div>`;
+  `;
 } else {
   c.classList.add("hidden");
 }
@@ -12861,20 +12846,21 @@ const taxBox = document.getElementById("invTax");
 taxBox.innerHTML = `
   <div class="flex justify-between font-semibold">
     <span>Taxable Amount</span>
-    <span>${fmt(gstBase)}</span>
+    <span>${fmt(inv.taxableAmount || 0)}</span>
   </div>
   <div class="flex justify-between">
     <span>CGST</span>
-    <span>${fmt(cgst)}</span>
+    <span>${fmt(inv.cgst || 0)}</span>
   </div>
   <div class="flex justify-between">
     <span>SGST</span>
-    <span>${fmt(sgst)}</span>
+    <span>${fmt(inv.sgst || 0)}</span>
   </div>
   <div class="flex justify-between font-semibold">
     <span>Bill Amount</span>
-    <span>${fmt(gstBase + taxTotal)}</span>
-  </div>`;
+    <span>${fmt(inv.billAmount || 0)}</span>
+  </div>
+`;
 
 // 5️⃣ Signup Discount (after Bill)
 const signupBox = document.getElementById("invSignup");
@@ -12920,7 +12906,8 @@ if (paid > 0) {
     itemsSubtotal: items,
     serviceCharge: serviceAmt,
     deliveryCharge: deliveryAmt,
-    normalCoupon,
+   normalCoupon: inv.couponType === "normal" ? Number(inv.couponAmount || 0) : 0,
+
     signupDiscount: signup,
     rewardDiscount: reward,
     paidCouponDiscount: paid,
@@ -13179,6 +13166,7 @@ if (paid > 0) {
   
 </body>
 </html>
+
 
 
 
