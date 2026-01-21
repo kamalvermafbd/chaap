@@ -4753,19 +4753,13 @@ const couponDiscFinal =
     orderType,
     address: finalAddress,
     cartItems: normalizeCartForOrder(safeCartItems),
-
-
     baseTotal: Number(inv.itemsSubtotal || 0),
-
-
 signupDiscount: Number(inv.signupDiscount || 0),
 payableAfterDiscount: Number(
   (inv.taxableAmount || 0) -
   couponDiscFinal -
   Number(inv.signupDiscount || 0)
 ),
-
-
 serviceAmt: Number(inv.serviceCharge || 0),
 taxableAmount: Number(inv.taxableAmount || 0),
 cgstAmt: Number(inv.cgst || 0),
@@ -4773,13 +4767,10 @@ sgstAmt: Number(inv.sgst || 0),
 igstAmt: Number(inv.igst || 0),
 grandTotal: Number(inv.netPayable || 0),
     paymentMethod,
-
   couponId: selectedCoupon
   ? (selectedCoupon.id || selectedCoupon.couponCode || selectedCoupon.code || "")
   : "",
-
     couponType: selectedCoupon ? selectedCoupon.type : "",
-
 couponDiscount: Number(couponDiscFinal || 0),
 
     pincode,
@@ -4796,8 +4787,8 @@ lng: orderType === "Home Delivery"
 
   deliveryCharges: Number(inv.deliveryCharge || 0),
   courierCharges: Number(inv.courierCharge || 0),
-  extraChargeReason: String(inv.chargeType || "")
-
+  extraChargeReason: String(inv.chargeType || ""),
+ invoiceSnapshot: window._checkoutInvoice
   };
   console.log("👤 userType:", userType);
 
@@ -13285,6 +13276,7 @@ if (paid > 0) {
   
 </body>
 </html>
+
 
 
 
