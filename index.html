@@ -4736,6 +4736,19 @@ if (invoiceEl && emailEl) {
 
   // ❌ remove close button for email
   emailEl.querySelectorAll("button").forEach(b => b.remove());
+// 🔑 inject order meta for email
+emailEl.querySelector("#invoiceHeader") &&
+  (emailEl.querySelector("#invoiceHeader").innerText = "Invoice");
+const orderIdText =
+  invoiceEl.querySelector("#invOrderId")?.innerText || "";
+
+emailEl.querySelector("#invOrderId") &&
+  (emailEl.querySelector("#invOrderId").innerText = orderIdText);
+
+
+emailEl.querySelector("#invOrderType") &&
+  (emailEl.querySelector("#invOrderType").innerHTML =
+    `<b>${orderType}</b>`);
 
   invoiceHtml = emailEl.innerHTML;
 
@@ -13310,6 +13323,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
