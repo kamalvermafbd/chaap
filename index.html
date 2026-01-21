@@ -11373,18 +11373,23 @@ async function loadMyOrdersSection() {
 
   const activeBox = document.getElementById("activeOrdersSection");
   const dispatchedBox = document.getElementById("dispatchedOrdersSection");
-  if (!activeBox || !dispatchedBox) return;
+  const completedBox = document.getElementById("completedOrdersSection"); // ✅ ADD
 
-  // 🔥 SHOW LOADING ON BOTH
+  if (!activeBox || !dispatchedBox || !completedBox) return;
+
+  // 🔥 SHOW LOADING ON ALL
   activeBox.innerHTML =
     "<div class='text-center text-gray-400 py-6'>Loading orders...</div>";
   dispatchedBox.innerHTML =
     "<div class='text-center text-gray-400 py-6'>Loading orders...</div>";
+  completedBox.innerHTML =
+    "<div class='text-center text-gray-400 py-6'>Loading orders...</div>"; // ✅ ADD
 
   if (!mobile) {
     activeBox.innerHTML =
       "<p class='text-gray-500'>Please login to view orders</p>";
     dispatchedBox.innerHTML = "";
+    completedBox.innerHTML = ""; // ✅ ADD
     return;
   }
 
@@ -11401,10 +11406,9 @@ async function loadMyOrdersSection() {
       throw new Error("Order fetch failed");
     }
 
-   renderMyActiveOrders(data.activeOrders || []);
-renderMyDispatchedOrders(data.dispatchedOrders || []);
-renderMyCompletedOrders(data.completedOrders || []);
-
+    renderMyActiveOrders(data.activeOrders || []);
+    renderMyDispatchedOrders(data.dispatchedOrders || []);
+    renderMyCompletedOrders(data.completedOrders || []);
 
   } catch (err) {
     console.error("My Orders error:", err);
@@ -11412,8 +11416,11 @@ renderMyCompletedOrders(data.completedOrders || []);
       "<p class='text-red-500'>Failed to load orders</p>";
     dispatchedBox.innerHTML =
       "<p class='text-red-500'>Failed to load orders</p>";
+    completedBox.innerHTML =
+      "<p class='text-red-500'>Failed to load orders</p>"; // ✅ ADD
   }
 }
+
   
 function renderMyCompletedOrders(orders = []) {
   const box = document.getElementById("completedOrdersSection");
@@ -13241,6 +13248,7 @@ if (paid > 0) {
   
 </body>
 </html>
+
 
 
 
