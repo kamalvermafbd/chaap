@@ -11629,6 +11629,11 @@ async function openInvoiceModal(orderId) {
 
   const orderTypeBox = document.getElementById("invOrderType");
   if (orderTypeBox) orderTypeBox.innerHTML = "";
+const metaBox = document.getElementById("invInvoiceMeta");
+if (metaBox) {
+  metaBox.innerHTML = "";
+  metaBox.classList.add("hidden");
+}
 
   document.getElementById("invCustomer").innerText = "";
   document.getElementById("invContact").innerText = "";
@@ -12771,6 +12776,31 @@ function renderInvoiceFromOrderAPI(inv) {
     }
   }
 
+// ================= INVOICE NO + DATE =================
+const metaBox = document.getElementById("invInvoiceMeta");
+if (metaBox) {
+  const invNo = inv.invno;
+  const invDt = inv.invdt;
+
+  if (invNo && invDt) {
+    metaBox.classList.remove("hidden");
+
+    // format: 14-Jan-2026
+    const d = new Date(invDt);
+    const fmtDate = d.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    });
+
+    metaBox.innerHTML = `Inv No.: ${invNo}, ${fmtDate}`;
+  } else {
+    metaBox.classList.add("hidden");
+    metaBox.innerHTML = "";
+  }
+}
+
+  
   const orderTypeBox = document.getElementById("invOrderType");
   if (orderTypeBox && inv.orderType) {
     orderTypeBox.classList.remove("hidden");
@@ -12780,6 +12810,8 @@ function renderInvoiceFromOrderAPI(inv) {
         <span>: ${inv.orderType}</span>
       </div>`;
   }
+
+  
 
   /* ================= CUSTOMER ================= */
   document.getElementById("invCustomer").innerHTML = `
@@ -13248,27 +13280,6 @@ if (paid > 0) {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
