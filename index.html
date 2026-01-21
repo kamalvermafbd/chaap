@@ -2800,15 +2800,17 @@ renderIndex++;
   });
      
   // ⭐ CORRECT PLACE
-   setTimeout(() => {
+ setTimeout(async () => {
+
        restoreFullCartUI();
- // 🔥 IMPORTANT: refresh monthly spend on page/menu load
-  await refreshMonthlySpendAndReward();   // 🔁 recalculates MonthlySpend
-  await checkAndShowMonthlyReward();      // 🔁 updates reward eligibility
+ 
+  await refreshMonthlySpendAndReward();   
+  await checkAndShowMonthlyReward();      
      
        preloadRewardMotivation();
    }, 50);
 }
+    
 async function preloadRewardMotivation() {
   const mobile =
     localStorage.getItem("userMobile") ||
@@ -12897,6 +12899,7 @@ function buildRewardBannerHTML(data) {
   
 </body>
 </html>
+
 
 
 
