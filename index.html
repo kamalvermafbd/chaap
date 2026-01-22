@@ -4062,23 +4062,15 @@ if (locRow) locRow.classList.add("hidden");        // ⭐ hide for non-HD
 
     return; // STOP HERE — DO NOT TOUCH GUEST LOGIC
   }
-
-
   // ==========================================================
   //                GUEST USER LOGIC (UNTOUCHED)
   // ==========================================================
-
-
   nameField.readOnly = false;
   emailField.readOnly = false;
   addressField.readOnly = false;
-
-
   if (addressLookupRunning) return;
 addressLookupRunning = true;
-
   console.log("📞 Guest lookup API CALL, mobile =", mobile);
-
 apiGet("getCustomerDetailsByMobile", { mobile })
   .then(rows => {
     console.log("📦 Guest lookup RAW rows =", rows);
@@ -4102,6 +4094,15 @@ if (orderType === "Home Delivery") {
   stateWrapper.style.display   = "block";
   const locRow = document.getElementById("locationStatusRow");
   if (locRow) locRow.classList.remove("hidden");   //  FIX
+
+  // 👤 Guest + Home Delivery → ask for location update (once)
+if (!isLoggedIn() && orderType === "Home Delivery" && !window._deliveryLocationReady) {
+  const ok = confirm(
+    "📍 Do you want to use your current location as the delivery location?"
+  );
+  if (ok) captureDeliveryLocation();
+}
+
   addressField.required = true;
   addressField.readOnly = false;
     pincodeField.readOnly = false;
@@ -13344,6 +13345,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
