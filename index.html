@@ -3936,15 +3936,14 @@ if (!orderType) return;
   emailField.closest("div").style.display = "block";
   paymentField.style.display = "block";
 console.log("overlay about to show");   //
-  // --- 4) Always show overlay (both cases) ---
-  overlay.style.display = "flex";
-  orderSelect.disabled = true;
+
 
   // ==========================================================
   //                LOGGED-IN USER LOGIC
   // ==========================================================
   if (isLoggedIn()) {
-
+overlay.style.display = "flex";
+  orderSelect.disabled = true;
     nameField.readOnly = true;
     emailField.readOnly = true;
     addressField.readOnly = true;
@@ -4087,14 +4086,14 @@ apiGet("getCustomerDetailsByMobile", { mobile })
     let orders = Array.isArray(rows) ? rows : [];
     console.log("🧾 Orders array length =", orders.length, orders);
 
-     if (orders.length === 0) {
-  nameField.value = "";
-  emailField.value = "";
+//     if (orders.length === 0) {
+//  nameField.value = "";
+//  emailField.value = "";
 
-  addressField.value = "";
-  pincodeField.value = "";
-  cityField.value    = "";
-  stateField.value   = "";
+//  addressField.value = "";
+//  pincodeField.value = "";
+//  cityField.value    = "";
+//  stateField.value   = "";
 
 if (orderType === "Home Delivery") {
   addressWrapper.style.display = "block";
@@ -13309,6 +13308,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
