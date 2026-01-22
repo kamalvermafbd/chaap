@@ -1194,6 +1194,14 @@ body::before {
   background: #ecfdf5 !important;
 }
 
+    /* ✅ Invoice amount perfect right alignment (preview + email) */
+#checkoutInvoiceContainer .flex.justify-between > :last-child {
+  text-align: right;
+  min-width: 90px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
   </style>
 </head>
 <body>
@@ -13303,6 +13311,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
