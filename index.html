@@ -4104,6 +4104,14 @@ if (orderType === "Home Delivery") {
   if (locRow) locRow.classList.remove("hidden");   //  FIX
   addressField.required = true;
   addressField.readOnly = false;
+    pincodeField.readOnly = false;
+  cityField.readOnly    = false;
+  stateField.readOnly   = false;
+
+  pincodeField.classList.remove("bg-gray-100", "cursor-not-allowed");
+  cityField.classList.remove("bg-gray-100", "cursor-not-allowed");
+  stateField.classList.remove("bg-gray-100", "cursor-not-allowed");
+
   updatePlaceOrderLockByLocation();
 
 } else {
@@ -13308,6 +13316,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
