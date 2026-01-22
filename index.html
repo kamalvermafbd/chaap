@@ -2630,7 +2630,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (isUserLoggedIn()) return;   // 👤 guest only
 
   fetchGuestPromoOffers().then(() => {
-    showPromoBannerFromSheet();
+    showGuestPromoBanner();
+
   });
 });
 
@@ -10343,6 +10344,68 @@ function hideClaimRewardBox() {
 }
 
 
+  // ===============================
+// GUEST PROMO BANNER RENDER (NEW)
+// ===============================
+function showGuestPromoBanner() {
+  const banner = document.getElementById("promoBanner");
+  const slidesWrap = document.getElementById("promoSlides");
+
+  if (!banner || !slidesWrap) return;
+
+  const offers = window._promoOffers || [];
+  slidesWrap.innerHTML = "";
+  promoIndex = 0;
+
+  if (!offers.length) {
+    banner.style.display = "none";
+    return;
+  }
+
+  offers.forEach(o => {
+    const slide = document.createElement("div");
+    slide.className =
+      "min-w-full rounded-2xl bg-[#fffdfb] border border-transparent";
+
+    slide.innerHTML = `
+      <div class="p-5 min-h-[180px] flex items-center gap-4">
+        <div class="w-16 h-16 rounded-2xl bg-orange-100 flex items-center justify-center shadow-md">
+          <div class="w-8 h-8 text-orange-600">
+            ${String(o.type).toLowerCase() === "signup"
+              ? PROMO_SVGS.signup
+              : o.flat > 0
+                ? PROMO_SVGS.flat
+                : PROMO_SVGS.percent}
+          </div>
+        </div>
+
+        <div class="flex-1">
+          <div class="text-xl font-extrabold text-gray-900">
+            ${o.text}
+          </div>
+          <div class="text-sm text-gray-600 mt-1">
+            ${o.min > 0 ? `Valid on orders above ${fmt(o.min)}` : "Limited time offer"}
+          </div>
+
+          <button
+            onclick="${o.type === "signup" ? "openSignup()" : "openLogin()"}"
+            class="mt-4 bg-orange-100 text-orange-600 px-6 py-2.5 rounded-full font-semibold text-sm shadow-md">
+            ${o.type === "signup" ? "Signup" : "Login & Save"}
+          </button>
+        </div>
+
+        <div class="w-24 h-24 rounded-2xl overflow-hidden bg-gray-100">
+          <img src="${o.imageUrl || ""}" class="w-full h-full object-cover"/>
+        </div>
+      </div>
+    `;
+    slidesWrap.appendChild(slide);
+  });
+
+  banner.style.display = "block";
+  startPromoSlider();
+}
+
 // ===============================
 // PROMO BANNER – SHOW LOGIC
 // ===============================
@@ -13361,6 +13424,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
