@@ -4402,8 +4402,11 @@ if (
 const res = await apiPost("checkOrderEligibility", {
   orderType,
   orderAmount: amount,
-  mobile
+  mobile,
+  lat: window._deliveryLocation?.lat || "",
+  lng: window._deliveryLocation?.lng || ""
 });
+
 // 🔒 ALWAYS capture backend delivery charge (even if user not eligible yet)
 window.orderEligibility = {
   allowed: false,   // permission later
@@ -13338,6 +13341,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
