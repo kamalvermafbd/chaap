@@ -2573,7 +2573,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbx5oXBj-6aC3B1cojITmthq7_r1e7Lf4HwwyVKlk9w9V3rPAR1C69eiKuX0iKPIRCkwvQ/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbwDQRzd8tNvHGnifIKuk4E15ZGk1-G4pxbHLLrF3C_iQE3_-srYlSLZ9W39kTqRTfzV3w/exec";
 
 // ===============================
 // API HELPER
@@ -2608,21 +2608,40 @@ async function fetchOffersForPromoBanner() {
     return [];
   }
 }
+// ===============================
+// GUEST PROMO BANNER FETCH (NEW) FOR GUEST USER
+// ===============================
+async function fetchGuestPromoOffers() {
+  try {
+    const res = await apiGet("getGuestPromoOffers");
+    window._promoOffers = res.offers || [];
+    return window._promoOffers;
+  } catch (e) {
+    window._promoOffers = [];
+    return [];
+  }
+}
 
 
 // ===============================
 // PROMO BANNER CALL (SITE OPEN)
 // ===============================
 document.addEventListener("DOMContentLoaded", () => {
-  fetchOffersForPromoBanner().then(() => {
+  if (isUserLoggedIn()) return;   // 👤 guest only
+
+  fetchGuestPromoOffers().then(() => {
     showPromoBannerFromSheet();
   });
 });
+
 document.addEventListener("DOMContentLoaded", () => {
+  if (!isUserLoggedIn()) return;  // 🔐 login only
+
   fetchOffersForPromoBanner().then(() => {
     showLoginUserOfferBanner();
   });
 });
+
 // ===============================
 // MENU LOAD
 // ===============================
@@ -13342,6 +13361,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
