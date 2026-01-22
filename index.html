@@ -4374,16 +4374,13 @@ if (window._deliveryLocation && window._deliveryLocation.lat && window._delivery
     window.orderEligibility = { allowed: false, extraCharge: 0, chargeType: "" };
   const orderTypeNow = document.getElementById("orderType")?.value;
 
-if (
-  orderTypeNow === "Home Delivery" &&
-  !window._deliveryLocationReady
-) {
-  disablePlaceOrder();
+if (orderTypeNow === "Home Delivery" && !window._deliveryLocationReady) {
+  showError("📍 Please set your delivery location");
+  return false;
 }
+
   if (paymentError) paymentError.classList.add("hidden");
-
     const orderType = document.getElementById("orderType")?.value.trim();
-
   const amount = Number(window.cartSummary?.itemsSubtotal || 0);
 
 
@@ -4398,6 +4395,13 @@ if (
       showError("⚠️ Cart is empty");
       return false;
     }
+// 🔴 GUARD 2.5 — Payment required BEFORE eligibility check (guest-safe)
+const payment = document.getElementById("paymentMethod")?.value;
+
+if (!payment) {
+  showError("⚠️ Please select a payment method");
+  return false;
+}
 
     // 🔴 GUARD 3: Backend eligibility (final authority)
     const mobile = document.getElementById("mobile")?.value.trim();
@@ -4458,14 +4462,6 @@ if (
       showError(res?.message || "Order is not allowed at this time");
       return false;
     }
-
-    // 🔴 FINAL GUARD — Payment method must be selected
-const payment = document.getElementById("paymentMethod")?.value;
-
-if (!payment) {
-  showError("⚠️ Please select a payment method");
-  return false;
-}
 
 window.orderEligibility = {
   allowed: true,
@@ -13347,6 +13343,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
