@@ -4399,10 +4399,13 @@ if (
     // 🔴 GUARD 3: Backend eligibility (final authority)
     const mobile = document.getElementById("mobile")?.value.trim();
 
+const userType = isUserLoggedIn() ? "logged" : "guest";
+
 const res = await apiPost("checkOrderEligibility", {
   orderType,
   orderAmount: amount,
   mobile,
+  userType, // 🔥 MOST IMPORTANT
   lat: window._deliveryLocation?.lat || "",
   lng: window._deliveryLocation?.lng || ""
 });
@@ -13341,6 +13344,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
