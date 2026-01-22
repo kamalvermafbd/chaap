@@ -4070,8 +4070,10 @@ if (locRow) locRow.classList.add("hidden");        // ⭐ hide for non-HD
   emailField.readOnly = false;
   addressField.readOnly = false;
 
-if (window._lastPromptOrderType === orderType) return;
-window._lastPromptOrderType = orderType;
+if (orderType !== "Home Delivery") {
+  window._guestLocationPromptShown = false;
+}
+
   // 👤 Guest + Home Delivery → ask location ONCE
 if (
   !isLoggedIn() &&
@@ -4173,8 +4175,7 @@ if (type === "home delivery" && hd !== "") {
 }
 }
 console.log("🏠 Latest Home Delivery Address =", latestHD);
-
-      // ----- Show/hide based on order type -----
+// ----- Show/hide based on order type -----
      if (orderType === "Home Delivery") {
   addressWrapper.style.display = "block";
   pincodeWrapper.style.display = "block";
@@ -4187,7 +4188,7 @@ if (locRow) locRow.classList.remove("hidden");
 pincodeField.readOnly = false;
   cityField.readOnly    = false;
   stateField.readOnly   = false;
-       addressField.classList.remove("cursor-not-allowed", "bg-gray-100");
+  addressField.classList.remove("cursor-not-allowed", "bg-gray-100");
 pincodeField.classList.remove("cursor-not-allowed", "bg-gray-100");
 cityField.classList.remove("cursor-not-allowed", "bg-gray-100");
 stateField.classList.remove("cursor-not-allowed", "bg-gray-100");
@@ -4210,7 +4211,6 @@ if (locRow) locRow.classList.add("hidden");
   pincodeField.value = "";
   cityField.value    = "";
   stateField.value   = "";
-
   addressField.required = false;
 }
 toggleMapByOrderType(orderType);
@@ -4224,6 +4224,14 @@ toggleMapByOrderType(orderType);
       overlay.style.display = "none";
       orderSelect.disabled = false;
     });
+  // ✅ FINAL ELIGIBILITY CHECK (guest safe)
+setTimeout(() => {
+  const payment = document.getElementById("paymentMethod")?.value;
+  if (payment) {
+    canProceedPlaceOrder();
+  }
+}, 0);
+
 }
 const pincodeField = document.getElementById("pincode");
 pincodeField.addEventListener("input", () => {
@@ -13337,6 +13345,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
