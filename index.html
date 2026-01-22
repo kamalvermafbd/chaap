@@ -12334,6 +12334,30 @@ function captureDeliveryLocation() {
         txt.innerText  = "Mobile not found";
         return;
       }
+// 🚫 GUEST USER → DO NOT SAVE LOCATION TO USER SHEET
+if (!isLoggedIn()) {
+
+  // store location ONLY in frontend memory
+  window._deliveryLocation = { lat: Number(lat), lng: Number(lng) };
+  window._userLat = Number(lat);
+  window._userLng = Number(lng);
+  window._deliveryLocationReady = true;
+
+  updatePlaceOrderLockByLocation();
+
+  // 🗺️ Show map preview
+  const mapBox   = document.getElementById("mapPreviewBox");
+  const mapFrame = document.getElementById("mapPreviewFrame");
+  if (mapBox && mapFrame) {
+    mapBox.classList.remove("hidden");
+    mapFrame.src = `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
+  }
+
+  icon.innerText = "📍";
+  txt.innerText  = "Location set";
+
+  return; // ⛔ STOP here for guest
+}
 
       // 🔒 Send ONLY lat/lng (never address)
       apiPost("saveUserLocation", {
@@ -13316,6 +13340,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
