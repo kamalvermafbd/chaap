@@ -3898,6 +3898,8 @@ let addressLookupRunning = false;
 
 let guestPincodeEdited = false;
 let guestAutoFilling  = false;
+// 🔐 Guest location prompt guard
+window._guestLocationPromptShown = false;
     
 function toggleAddressField() {
 console.log("toggleAddressField fired");
@@ -4021,8 +4023,6 @@ row.dataset.autoChecked = "1";
       console.error("Distance auto check failed", err);
     });
 }
-
-
         }
       })
       .finally(() => {
@@ -4057,7 +4057,6 @@ if (locRow) locRow.classList.add("hidden");        // ⭐ hide for non-HD
   toggleMapByOrderType(orderType);
         overlay.style.display = "none";
         orderSelect.disabled = false;
-
       });
 
     return; // STOP HERE — DO NOT TOUCH GUEST LOGIC
@@ -4065,9 +4064,29 @@ if (locRow) locRow.classList.add("hidden");        // ⭐ hide for non-HD
   // ==========================================================
   //                GUEST USER LOGIC (UNTOUCHED)
   // ==========================================================
+  
+
   nameField.readOnly = false;
   emailField.readOnly = false;
   addressField.readOnly = false;
+
+if (window._lastPromptOrderType === orderType) return;
+window._lastPromptOrderType = orderType;
+  // 👤 Guest + Home Delivery → ask location ONCE
+if (
+  !isLoggedIn() &&
+  orderType === "Home Delivery" &&
+  !window._deliveryLocationReady &&
+  !window._guestLocationPromptShown
+) {
+  window._guestLocationPromptShown = true;
+
+  const ok = confirm(
+    "📍 Do you want to use your current location as the delivery location?"
+  );
+  if (ok) captureDeliveryLocation();
+}
+
   if (addressLookupRunning) return;
 addressLookupRunning = true;
   console.log("📞 Guest lookup API CALL, mobile =", mobile);
@@ -4077,7 +4096,6 @@ apiGet("getCustomerDetailsByMobile", { mobile })
 
     let orders = Array.isArray(rows) ? rows : [];
     console.log("🧾 Orders array length =", orders.length, orders);
-
      if (orders.length === 0) {
 //  nameField.value = "";
 //  emailField.value = "";
@@ -4086,7 +4104,6 @@ apiGet("getCustomerDetailsByMobile", { mobile })
 //  pincodeField.value = "";
 //  cityField.value    = "";
 //  stateField.value   = "";
-
 if (orderType === "Home Delivery") {
   addressWrapper.style.display = "block";
   pincodeWrapper.style.display = "block";
@@ -4096,25 +4113,16 @@ if (orderType === "Home Delivery") {
   if (locRow) locRow.classList.remove("hidden");   //  FIX
 
   // 👤 Guest + Home Delivery → ask for location update (once)
-if (!isLoggedIn() && orderType === "Home Delivery" && !window._deliveryLocationReady) {
-  const ok = confirm(
-    "📍 Do you want to use your current location as the delivery location?"
-  );
-  if (ok) captureDeliveryLocation();
-}
-
   addressField.required = true;
   addressField.readOnly = false;
-    pincodeField.readOnly = false;
+  pincodeField.readOnly = false;
   cityField.readOnly    = false;
   stateField.readOnly   = false;
 
   pincodeField.classList.remove("bg-gray-100", "cursor-not-allowed");
   cityField.classList.remove("bg-gray-100", "cursor-not-allowed");
   stateField.classList.remove("bg-gray-100", "cursor-not-allowed");
-
   updatePlaceOrderLockByLocation();
-
 } else {
   addressWrapper.style.display = "none";
   pincodeWrapper.style.display = "none";
@@ -4130,18 +4138,14 @@ if (locRow) locRow.classList.add("hidden");
 
   addressField.required = false;
   updatePlaceOrderLockByLocation();
-
 }
 toggleMapByOrderType(orderType);
   return;
 }
-
-
-      // ----- Pick latest row -----
+  // ----- Pick latest row -----
       let latest = orders.reduce((max, row) =>
         row.rowNumber > max.rowNumber ? row : max
       );
-
       // Fill name/email
       nameField.value = latest.name || "";
       emailField.value = latest.email || "";
@@ -4151,8 +4155,6 @@ toggleMapByOrderType(orderType);
 let latestPin = "";
 let latestCity = "";
 let latestState = "";
-
-    
       for (let i = orders.length - 1; i >= 0; i--) {
         const row = orders[i];
         const hd =
@@ -4161,9 +4163,7 @@ let latestState = "";
           row.Address1?.trim() ||
           row.Address2?.trim() ||
           "";
-
         const type = String(row.orderType || "").trim().toLowerCase();
-
 if (type === "home delivery" && hd !== "") {
   latestHD    = hd;
   latestPin   = row.pincode || "";
@@ -4171,9 +4171,7 @@ if (type === "home delivery" && hd !== "") {
   latestState = row.state || "";
   break;
 }
-
-
-      }
+}
 console.log("🏠 Latest Home Delivery Address =", latestHD);
 
       // ----- Show/hide based on order type -----
@@ -4184,7 +4182,6 @@ console.log("🏠 Latest Home Delivery Address =", latestHD);
   stateWrapper.style.display   = "block";
 const locRow = document.getElementById("locationStatusRow");
 if (locRow) locRow.classList.remove("hidden");
-
   addressField.required = true;
   addressField.readOnly = false;
 pincodeField.readOnly = false;
@@ -4194,8 +4191,7 @@ pincodeField.readOnly = false;
 pincodeField.classList.remove("cursor-not-allowed", "bg-gray-100");
 cityField.classList.remove("cursor-not-allowed", "bg-gray-100");
 stateField.classList.remove("cursor-not-allowed", "bg-gray-100");
-
-       
+      
   guestAutoFilling = true;
   addressField.value = latestHD || "";
   pincodeField.value = latestPin || "";
@@ -4210,7 +4206,6 @@ stateField.classList.remove("cursor-not-allowed", "bg-gray-100");
   stateWrapper.style.display   = "none";
 const locRow = document.getElementById("locationStatusRow");
 if (locRow) locRow.classList.add("hidden");
-
   addressField.value = "";
   pincodeField.value = "";
   cityField.value    = "";
@@ -4229,7 +4224,6 @@ toggleMapByOrderType(orderType);
       overlay.style.display = "none";
       orderSelect.disabled = false;
     });
-
 }
 const pincodeField = document.getElementById("pincode");
 pincodeField.addEventListener("input", () => {
@@ -4238,15 +4232,13 @@ pincodeField.addEventListener("input", () => {
   if (isLoggedIn()) return;          // safety: login ignore
 if (pincodeField.readOnly) return;
   guestPincodeEdited = true;
-
   const pin = pincodeField.value.trim();
   if (pin.length === 6) {
     onCheckoutPincodeChange();
-
   }
 });
 
-    function toggleMapByOrderType(orderType) {
+function toggleMapByOrderType(orderType) {
   const mapBox = document.getElementById("mapPreviewBox");
   const locRow = document.getElementById("locationStatusRow");
 
@@ -13345,6 +13337,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
