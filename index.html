@@ -12335,12 +12335,22 @@ function captureDeliveryLocation() {
         return;
       }
 // 🚫 GUEST USER → DO NOT SAVE LOCATION TO USER SHEET
+// 🚫 GUEST USER → DO NOT SAVE LOCATION TO USER SHEET
 if (!isLoggedIn()) {
 
-  // store location ONLY in frontend memory
-  window._deliveryLocation = { lat: Number(lat), lng: Number(lng) };
-  window._userLat = Number(lat);
-  window._userLng = Number(lng);
+  const loc = {
+    lat: Number(lat),
+    lng: Number(lng),
+    ts: Date.now()
+  };
+
+  // ✅ SAVE FOR GUEST (PERSISTENT)
+  localStorage.setItem("guestDeliveryLocation", JSON.stringify(loc));
+
+  // ✅ FRONTEND MEMORY
+  window._deliveryLocation = loc;
+  window._userLat = loc.lat;
+  window._userLng = loc.lng;
   window._deliveryLocationReady = true;
 
   updatePlaceOrderLockByLocation();
@@ -12350,7 +12360,7 @@ if (!isLoggedIn()) {
   const mapFrame = document.getElementById("mapPreviewFrame");
   if (mapBox && mapFrame) {
     mapBox.classList.remove("hidden");
-    mapFrame.src = `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
+    mapFrame.src = `https://maps.google.com/maps?q=${loc.lat},${loc.lng}&z=16&output=embed`;
   }
 
   icon.innerText = "📍";
@@ -12359,55 +12369,43 @@ if (!isLoggedIn()) {
   return; // ⛔ STOP here for guest
 }
 
+
       // 🔒 Send ONLY lat/lng (never address)
       apiPost("saveUserLocation", {
         mobile,
         lat,
         lng
       })
-      .then(res => {
-        if (res && res.success) {
+     .then(res => {
+  if (res && res.success) {
 
-          // 🔥 STORE GPS IN FRONTEND MEMORY (CRITICAL FIX)
-          window._deliveryLocation = { lat: Number(lat), lng: Number(lng) };
-          window._userLat = Number(lat);
-          window._userLng = Number(lng);
+    window._deliveryLocation = { lat: Number(lat), lng: Number(lng) };
+    window._userLat = Number(lat);
+    window._userLng = Number(lng);
+    window._deliveryLocationReady = true;
 
-          // 🔑 authoritative flag
-          window._deliveryLocationReady = true;
+    updatePlaceOrderLockByLocation();
 
-          // 🔑 controls Place Order button
-          updatePlaceOrderLockByLocation();
+    const mapBox   = document.getElementById("mapPreviewBox");
+    const mapFrame = document.getElementById("mapPreviewFrame");
+    if (mapBox && mapFrame) {
+      mapBox.classList.remove("hidden");
+      mapFrame.src = `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
+    }
 
-          // 🗺️ Show mini map preview
-          const mapBox   = document.getElementById("mapPreviewBox");
-          const mapFrame = document.getElementById("mapPreviewFrame");
+    icon.innerText = "📍";
+    txt.innerText  = "Location saved";
 
-          if (mapBox && mapFrame) {
-            mapBox.classList.remove("hidden");
-            mapFrame.src = `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
-          }
+  } else if (isLoggedIn()) {
+    icon.innerText = "⚠️";
+    txt.innerText  = "Failed to save location";
+  }
+})
+.catch(() => {
+  icon.innerText = "⚠️";
+  txt.innerText  = "Server error while saving";
+});
 
-          // 🔁 Re-check backend delivery eligibility
-          setTimeout(() => {
-            if (typeof canProceedPlaceOrder === "function") {
-              canProceedPlaceOrder();
-            }
-          }, 300);
-
-          // 🟢 UI success
-          icon.innerText = "📍";
-          txt.innerText  = "Location saved";
-
-        } else {
-          icon.innerText = "⚠️";
-          txt.innerText  = "Failed to save location";
-        }
-      })
-      .catch(() => {
-        icon.innerText = "⚠️";
-        txt.innerText  = "Server error while saving";
-      });
     },
     err => {
       icon.innerText = "⚠️";
@@ -13340,6 +13338,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
