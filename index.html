@@ -4589,7 +4589,6 @@ if (orderType === "Home Delivery" && !window._deliveryLocationReady) {
   if (!orderType) {
   alert("Please select Order Type");
   resetPlaceOrderBtn();
-
   return;
 }
 const paymentError = document.getElementById("paymentError");
@@ -4730,30 +4729,22 @@ if (orderType === "Home Delivery" && !address) {
   window._orderSubmitting = true; // ✅ ADD THIS
   overlay.innerText = "Processing your order... Please wait...";
   overlay.style.display = "flex";
-
-// clear error if valid
-
-  // 🔑 STEP-4.4(A): Capture checkout invoice HTML for email (FINAL FIX)
-const inv = window._checkoutInvoice;
-
-const invoiceEl = document.getElementById("checkoutInvoiceContainer");
-let invoiceHtml = invoiceEl ? invoiceEl.innerHTML.trim() : "";
-
-// 🛑 HARD GUARD – invoice must exist before placing order
-if (!invoiceHtml || invoiceHtml.length < 50) {
-  alert("Invoice not ready. Please reopen checkout.");
+// 🖼️ STEP-IMAGE: Capture invoice as image (email-safe)
+const invoiceNode = document.getElementById("checkoutInvoiceContainer");
+if (!invoiceNode) {
+  alert("Invoice not found");
   resetPlaceOrderBtn();
   return;
 }
 
-// 📧 Email-safe wrapper
-invoiceHtml = `
-  <div style="max-width:600px;margin:auto;background:#ffffff;padding:12px">
-    ${invoiceHtml}
-  </div>
-`;
+const canvas = await html2canvas(invoiceNode, {
+  scale: 2,
+  backgroundColor: "#ffffff"
+});
+const invoiceImageBase64 = canvas.toDataURL("image/png");
+const inv = window._checkoutInvoice;
 
-
+// clear error if valid
 if (!inv) {
   alert("Invoice not ready. Please reopen checkout.");
   resetPlaceOrderBtn();
@@ -4809,7 +4800,7 @@ lng: orderType === "Home Delivery"
   deliveryCharges: Number(inv.deliveryCharge || 0),
   courierCharges: Number(inv.courierCharge || 0),
   extraChargeReason: String(inv.chargeType || ""),
-    invoiceHtml: invoiceHtml,
+    invoiceImage: invoiceImageBase64,
  invoiceSnapshot: window._checkoutInvoice
   };
   console.log("👤 userType:", userType);
@@ -13064,6 +13055,7 @@ if (emailTpl && uiTpl) {
   }
 
 </script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <div id="cartHandle" onclick="expandDrawerCart()">
   ›
@@ -13311,13 +13303,6 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
-
-
-
-
-
-
-
 
 
 
