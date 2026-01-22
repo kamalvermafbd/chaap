@@ -4069,7 +4069,9 @@ if (locRow) locRow.classList.add("hidden");        // ⭐ hide for non-HD
   nameField.readOnly = false;
   emailField.readOnly = false;
   addressField.readOnly = false;
-
+if (window._lastPromptOrderType === orderType) return; 
+  window._lastPromptOrderType = orderType;
+  
 if (orderType !== "Home Delivery") {
   window._guestLocationPromptShown = false;
 }
@@ -13345,6 +13347,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
