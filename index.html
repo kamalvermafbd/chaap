@@ -12339,10 +12339,9 @@ function captureDeliveryLocation() {
         txt.innerText  = "Mobile not found";
         return;
       }
-// 🚫 GUEST USER → DO NOT SAVE LOCATION TO USER SHEET
+
 // 🚫 GUEST USER → DO NOT SAVE LOCATION TO USER SHEET
 if (!isLoggedIn()) {
-
   const loc = {
     lat: Number(lat),
     lng: Number(lng),
@@ -12357,8 +12356,8 @@ if (!isLoggedIn()) {
   window._userLat = loc.lat;
   window._userLng = loc.lng;
   window._deliveryLocationReady = true;
-
   updatePlaceOrderLockByLocation();
+canProceedPlaceOrder();   // 🔥 UI state refresh
 
   // 🗺️ Show map preview
   const mapBox   = document.getElementById("mapPreviewBox");
@@ -13343,6 +13342,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
