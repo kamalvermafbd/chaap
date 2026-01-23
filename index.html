@@ -8571,6 +8571,18 @@ function getBestOffer(total) {
   return best;
 }
  
+function syncCouponApplyLock() {
+  const mode = (window.couponMode || "").toLowerCase();
+  const isBest = mode === "best offer" || mode === "bestoffer";
+
+  document.querySelectorAll(
+    "#offerList button, #offerList input[type=radio]"
+  ).forEach(el => {
+    el.disabled = isBest;
+    el.style.pointerEvents = isBest ? "none" : "";
+    el.style.opacity = isBest ? "0.6" : "";
+  });
+}
 
 // STEP 2A – Apply Coupon button (open offer list)
 async function openCouponList() {
@@ -8645,6 +8657,10 @@ const activeOffers = apiOffers.filter(o => {
       </div>
     `).join("");
 
+
+// 🔒 BEST OFFER GUARD (YAHI CALL HOGA)
+  syncCouponApplyLock();
+  
   } catch (err) {
     console.error("openCouponList ERROR:", err);
   }
@@ -13439,6 +13455,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
