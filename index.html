@@ -9492,6 +9492,21 @@ if (cartArr.length === 0) {
     igstAmt: 0,
     grandTotal: 0
   };
+
+  // 🔒 NEW: GUEST-ONLY UI CLEANUP (SAFE)
+  if (!isUserLoggedIn()) {
+    const cBox = document.getElementById("couponHintBox");
+    if (cBox) {
+      cBox.style.display = "none";
+      cBox.innerHTML = "";
+    }
+
+    const rBox = document.getElementById("rewardMotivationHint");
+    if (rBox) {
+      rBox.classList.add("hidden");
+      rBox.innerText = "";
+    }
+  }
   return;
 }
   // ----------------------------------------
@@ -13488,6 +13503,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
