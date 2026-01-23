@@ -8575,14 +8575,20 @@ function syncCouponApplyLock() {
   const mode = (window.couponMode || "").toLowerCase();
   const isBest = mode === "best offer" || mode === "bestoffer";
 
-  document.querySelectorAll(
-    "#offerList button, #offerList input[type=radio]"
-  ).forEach(el => {
-    el.disabled = isBest;
-    el.style.pointerEvents = isBest ? "none" : "";
-    el.style.opacity = isBest ? "0.6" : "";
+  // 🔒 LOCK COUPON CLICK ITEMS (DIVs with onclick)
+  document.querySelectorAll("#offerList [onclick]").forEach(el => {
+    if (isBest) {
+      el.style.pointerEvents = "none";
+      el.style.opacity = "0.6";
+      el.style.cursor = "not-allowed";
+    } else {
+      el.style.pointerEvents = "";
+      el.style.opacity = "";
+      el.style.cursor = "pointer";
+    }
   });
 }
+
 
 // STEP 2A – Apply Coupon button (open offer list)
 async function openCouponList() {
@@ -13455,6 +13461,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
