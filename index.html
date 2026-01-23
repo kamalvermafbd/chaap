@@ -3293,18 +3293,28 @@ ${disc > 0 ? `
     class="w-8 h-8 flex items-center justify-center border border-gray-400 rounded-full text-xl"
   >+</button>
 </div>
+
   </div>
+
+ 
+
+
  <div class="font-semibold text-lg text-gray-800">
     ${fmt(total)}
 </div>
+
+ 
   <button class="text-red-500" onclick="removeItem(${idx})">Delete</button>
 `;
 cartItemsContainer.appendChild(card);
+
+
   });
 
   // ===== FINAL TOTAL SET =====
   let baseTotal = parseFloat(grandTotal.toFixed(2));
   document.getElementById("cartTotal").innerText = fmt(baseTotal);
+
 
   // TAX BLOCK unchanged
   // ===== TAX CALCULATION (FINAL & SAFE) =====
@@ -3417,7 +3427,7 @@ slot.innerHTML = `
 
 // 🔥 Keep reward motivation hint in sync with cart changes
 try {
-refreshDrawerCouponHint();
+renderRewardMotivationHintInDrawer();
 } catch (e) {}
 
 }
@@ -8267,11 +8277,6 @@ function showCouponHintPlaceholder() {
 window._couponHintTimer = null;
   
 function refreshCouponMotivationHint() {
-
-  // 🛑 GUEST HARD STOP — FINAL FIX
-  if (!isUserLoggedIn()) {
-    return;
-  }
 if (window._appliedCouponType === "reward") {
   const hintBox = document.getElementById("couponHintBox");
   if (hintBox) {
@@ -9492,21 +9497,6 @@ if (cartArr.length === 0) {
     igstAmt: 0,
     grandTotal: 0
   };
-
-  // 🔒 NEW: GUEST-ONLY UI CLEANUP (SAFE)
-  if (!isUserLoggedIn()) {
-    const cBox = document.getElementById("couponHintBox");
-    if (cBox) {
-      cBox.style.display = "none";
-      cBox.innerHTML = "";
-    }
-
-    const rBox = document.getElementById("rewardMotivationHint");
-    if (rBox) {
-      rBox.classList.add("hidden");
-      rBox.innerText = "";
-    }
-  }
   return;
 }
   // ----------------------------------------
@@ -9733,14 +9723,8 @@ window._drawerTotals = {
   igstAmt: igstAmt,
   grandTotal: netPayable              // 🔥 FIX
 };
-  try { 
-  updateCartBadge(); 
-} catch(e){}
-
-try {
-  refreshDrawerCouponHint();
-} catch (e) {}
-
+  try { updateCartBadge(); } catch(e){}
+   refreshCouponMotivationHint();
 // 🔥 ALWAYS keep View Offers visible
 const viewBtn = document.getElementById("applyCouponBtn");
 if (viewBtn) {
@@ -12583,12 +12567,6 @@ function selectPayment(method) {
 }
 
   async function fetchRewardMotivationForCart() {
-  
-     // 🛑 STEP-1: Guest hard stop
-  if (!isUserLoggedIn()) {
-    window._rewardMotivation = null;
-    return;
-  }
   const mobile =
     localStorage.getItem("userMobile") ||
     localStorage.getItem("mobile");
@@ -12607,64 +12585,7 @@ function selectPayment(method) {
     window._rewardMotivation = null;
   }
 }
-async function renderGuestCouponHintInDrawer() {
-  const box = document.getElementById("rewardMotivationHint");
-  if (!box) return;
 
-  // Guest-only guard (extra safety)
-  if (isUserLoggedIn()) {
-    box.classList.add("hidden");
-    box.innerText = "";
-    return;
-  }
-
-  // Get guest offers (sheet-driven)
-  const offers = await handleGetGuestPromoOffers();
-  if (!Array.isArray(offers) || offers.length === 0) {
-    box.classList.add("hidden");
-    box.innerText = "";
-    return;
-  }
-
-  // Cart subtotal (net)
-  const cartSubtotal = getCart().reduce((sum, ci) => {
-    const mrp  = Number(ci.rate || 0);
-    const disc = Number(ci.discPercent || 0);
-    const qty  = Number(ci.qty || 1);
-    return sum + (mrp - (mrp * disc / 100)) * qty;
-  }, 0);
-
-  // Next eligible offer (min > subtotal)
-  const next = offers
-    .filter(o => Number(o.min || 0) > cartSubtotal)
-    .sort((a, b) => Number(a.min) - Number(b.min))[0];
-
-  if (!next) {
-    box.classList.add("hidden");
-    box.innerText = "";
-    return;
-  }
-
-  const remaining = Math.max(Number(next.min) - cartSubtotal, 0);
-  box.innerText = `Add items worth ${fmt(remaining)} more to unlock ${next.text}`;
-  box.classList.remove("hidden");
-}
-
-function refreshDrawerCouponHint() {
-  // Safety: box exist?
-  const box = document.getElementById("rewardMotivationHint");
-  if (!box) return;
-
-  if (isUserLoggedIn()) {
-    // 🔵 LOGIN USER (existing behavior)
-    renderRewardMotivationHintInDrawer();
-  } else {
-    // 🟢 GUEST USER (new behavior)
-    renderGuestCouponHintInDrawer();
-  }
-}
-
-  
 function renderRewardMotivationHintInDrawer() {
  // ⛔ WAIT until normal coupon decision is ready
   if (!window._offersReady) {
@@ -13503,28 +13424,5 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
