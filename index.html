@@ -9605,6 +9605,14 @@ if (o.flat) {
   }
 }
 
+  // 🔁 SYNC OPEN COUPON LIST UI (AUTO APPLY FIX)
+const offerList = document.getElementById("offerList");
+if (offerList && offerList.style.display !== "none") {
+  try {
+    renderCouponList();   // re-render list with new applied state
+  } catch (e) {}
+}
+
   // Update Offer Message Box
   const appliedBox = document.getElementById("bestOfferApplied");
  if (appliedBox) {
@@ -13437,6 +13445,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
