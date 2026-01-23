@@ -9732,8 +9732,10 @@ window._drawerTotals = {
     document.getElementById("offerList")?.style.display !== "none"
   ) {
     window._autoCouponJustChanged = false;
+    setTimeout(() => {
     openCouponList();
-    reRunAutoApplyAfterUI(subtotal);
+  }, 0);
+   
   }
 
   try { updateCartBadge(); } catch(e){}
@@ -9746,17 +9748,6 @@ if (viewBtn) {
 
 }
 
-function reRunAutoApplyAfterUI(subtotal) {
-  const mode = (window.couponMode || "").toLowerCase();
-  if (!mode.includes("best")) return;
-
-  const best = getBestOffer(subtotal);
-  if (!best) return;
-
-  alreadyAppliedCouponId = best.id;
-  window._autoOfferDiscount = Number(best.value || 0);
-  window._autoOfferText = `🎉 ${best.text} (Saved ${fmt(window._autoOfferDiscount)})`;
-}
 
 async function fetchSignupDiscount(mobile) {
   try {
@@ -13448,6 +13439,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
