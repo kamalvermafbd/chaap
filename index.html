@@ -4828,7 +4828,7 @@ sgstAmt: Number(inv.sgst || 0),
 igstAmt: Number(inv.igst || 0),
 grandTotal: Number(inv.netPayable || 0),
     paymentMethod,
- const inv = window._checkoutInvoice || {};
+ const inv = window._checkoutInvoice || {},
 
 orderData.couponId =
   inv.couponId ||
@@ -13508,6 +13508,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
