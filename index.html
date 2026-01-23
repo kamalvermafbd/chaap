@@ -9599,21 +9599,24 @@ if (o.flat) {
 
     if (best) {
       alreadyAppliedCouponId = best.id;
-        // 🔥 ADD THIS (CRITICAL)
-  selectedCoupon = best;
       offerDiscount = Number(best.value || 0);
       appliedOfferText = `🎉 ${best.text} (Saved ${fmt(offerDiscount)})`;
     }
   }
 }
 
-  // 🔁 SYNC OPEN COUPON LIST UI (AUTO APPLY FIX)
 const offerList = document.getElementById("offerList");
-if (offerList && offerList.style.display !== "none") {
-  try {
-    renderCouponList();   // re-render list with new applied state
-  } catch (e) {}
+if (
+  offerList &&
+  offerList.style.display !== "none" &&
+  !window._autoOfferUiRefreshing
+) {
+  window._autoOfferUiRefreshing = true;
+  offerList.click();
+  setTimeout(() => (window._autoOfferUiRefreshing = false), 0);
 }
+
+
 
   // Update Offer Message Box
   const appliedBox = document.getElementById("bestOfferApplied");
@@ -13447,6 +13450,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
