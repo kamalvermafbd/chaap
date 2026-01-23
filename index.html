@@ -4366,6 +4366,20 @@ function enablePlaceOrder() {
 }
 
 async function canProceedPlaceOrder() {
+
+  // 🔐 LOGGED-IN USER LOCATION AUTO-READY FIX
+if (isUserLoggedIn()) {
+  // agar user sheet se location aa chuki hai
+  if (
+    window._userLocation &&
+    window._userLocation.lat &&
+    window._userLocation.lng
+  ) {
+    window._deliveryLocation = window._userLocation;
+    window._deliveryLocationReady = true;
+  }
+}
+
   // 🔥 Sync GPS from frontend memory (prevents false lock)
 if (window._deliveryLocation && window._deliveryLocation.lat && window._deliveryLocation.lng) {
   window._deliveryLocationReady = true;
@@ -13461,6 +13475,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
