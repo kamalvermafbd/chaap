@@ -4023,7 +4023,10 @@ if (res.lat && res.lng) {
         icon.innerText = "📍";
         txt.innerText  = `Location verified (${dist.distanceKm} km)`;
 row.dataset.autoChecked = "1";
-
+// 🔥 🔥 🔥 FINAL FIX — AUTO RECHECK ELIGIBILITY
+  setTimeout(() => {
+    canProceedPlaceOrder();
+  }, 0);
       } else {
         // location exists but outside radius
         window._deliveryLocationReady = false;
@@ -13475,6 +13478,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
