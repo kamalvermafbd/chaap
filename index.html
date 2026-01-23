@@ -9595,44 +9595,25 @@ if (o.flat) {
  if (mode === "best offer" || mode === "bestoffer") {
     const best = getBestOffer(subtotal);
 
-    if (best) {
-  const prevAuto = window._lastAutoCouponId;
+   if (best) {
+      const prevAuto = window._lastAutoCouponId;
 
-  alreadyAppliedCouponId = best.id;
-  offerDiscount = Number(best.value || 0);
-  appliedOfferText = `🎉 ${best.text} (Saved ${fmt(offerDiscount)})`;
+      alreadyAppliedCouponId = best.id;
+      offerDiscount = Number(best.value || 0);
+      appliedOfferText = `🎉 ${best.text} (Saved ${fmt(offerDiscount)})`;
 
-  // 🔁 AUTO APPLY → refresh open coupon list
-  if (
-    prevAuto !== best.id &&
-    document.getElementById("offerList")?.style.display !== "none"
-  ) {
-    openCouponList();   // ✅ same as clicking "View Offers"
-  }
-
-  window._lastAutoCouponId = best.id;
-}
-
-  }
-}
-
-  // Update Offer Message Box
-  const appliedBox = document.getElementById("bestOfferApplied");
- if (appliedBox) {
-   appliedBox.style.display = offerDiscount > 0 ? "block" : "none";
-  if (offerDiscount > 0) {
-    appliedBox.innerHTML = `
-      <div>${appliedOfferText}</div>
-      ${
-        rewardHint
-          ? `<div class="text-sm text-red-600 mt-1">${rewardHint}</div>`
-          : ``
+      // 🔴🔴 CHANGE-1: ONLY MARK AUTO CHANGE (NO UI CALL HERE)
+      if (prevAuto !== best.id) {
+        window._autoCouponJustChanged = true;
       }
-    `;
-  } else {
-    appliedBox.style.display = "none";
+
+      window._lastAutoCouponId = best.id;
+    }
+
   }
 }
+
+  
 
   // ========== Subtotal after offer ==========
  // ========== Subtotal after NORMAL coupon ==========
@@ -9745,9 +9726,17 @@ window._drawerTotals = {
   igstAmt: igstAmt,
   grandTotal: netPayable              // 🔥 FIX
 };
-   
+
+  if (
+    window._autoCouponJustChanged &&
+    document.getElementById("offerList")?.style.display !== "none"
+  ) {
+    window._autoCouponJustChanged = false;
+    openCouponList();
+  }
+
   try { updateCartBadge(); } catch(e){}
-   refreshCouponMotivationHint();
+ 
 // 🔥 ALWAYS keep View Offers visible
 const viewBtn = document.getElementById("applyCouponBtn");
 if (viewBtn) {
@@ -13447,6 +13436,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
