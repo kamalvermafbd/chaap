@@ -9599,6 +9599,8 @@ if (o.flat) {
 
     if (best) {
       alreadyAppliedCouponId = best.id;
+        // 🔥 ADD THIS (CRITICAL)
+  selectedCoupon = best;
       offerDiscount = Number(best.value || 0);
       appliedOfferText = `🎉 ${best.text} (Saved ${fmt(offerDiscount)})`;
     }
@@ -13445,6 +13447,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
