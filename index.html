@@ -8446,6 +8446,8 @@ if (window._appliedCouponType === "reward") {
       setTimeout(() => {
         try {
           refreshCouponMotivationHint();
+          // 🔓 FINAL: offers + auto-apply + totals DONE
+    window._offersReady = true;
         } catch (e) {}
       }, 0);
       
@@ -9505,8 +9507,7 @@ if (cartArr.length === 0) {
     grandTotal: 0
   };
 
-    // ✅ ADD THIS LINE (FINAL STATE EVEN IF CART EMPTY)
-  window._offersReady = true;
+   
   
   return;
 }
@@ -9734,8 +9735,6 @@ window._drawerTotals = {
   igstAmt: igstAmt,
   grandTotal: netPayable              // 🔥 FIX
 };
-  // ✅ ADD THIS LINE (FINAL STATE EVEN IF CART EMPTY)
-  window._offersReady = true;
    
   try { updateCartBadge(); } catch(e){}
    refreshCouponMotivationHint();
@@ -13438,6 +13437,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
