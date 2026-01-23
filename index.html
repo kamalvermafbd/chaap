@@ -7336,7 +7336,13 @@ function updateCartBadge() {
 
 async function openCheckout() {
 
-    if (window._cartUpdating) {
+// 🛑 NEW GUARD: wait until offers are fully applied
+if (!window._offersReady) {
+  alert("⏳ Applying best offers… please wait a moment.");
+  return;
+}
+
+  if (window._cartUpdating) {
     alert("Cart is still updating. Please wait…");
     return;
   }
@@ -8381,7 +8387,8 @@ if (window._appliedCouponType === "reward") {
 
 
   async function fetchOffersFromBackend() {
-  try {
+ window._offersReady = false;
+    try {
     window.liveOffers = [];
     window._allOffersRaw = [];
 
@@ -9497,6 +9504,10 @@ if (cartArr.length === 0) {
     igstAmt: 0,
     grandTotal: 0
   };
+
+    // ✅ ADD THIS LINE (FINAL STATE EVEN IF CART EMPTY)
+  window._offersReady = true;
+  
   return;
 }
   // ----------------------------------------
@@ -9723,6 +9734,9 @@ window._drawerTotals = {
   igstAmt: igstAmt,
   grandTotal: netPayable              // 🔥 FIX
 };
+  // ✅ ADD THIS LINE (FINAL STATE EVEN IF CART EMPTY)
+  window._offersReady = true;
+   
   try { updateCartBadge(); } catch(e){}
    refreshCouponMotivationHint();
 // 🔥 ALWAYS keep View Offers visible
@@ -13424,5 +13438,6 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
