@@ -4828,9 +4828,14 @@ sgstAmt: Number(inv.sgst || 0),
 igstAmt: Number(inv.igst || 0),
 grandTotal: Number(inv.netPayable || 0),
     paymentMethod,
-  couponId: selectedCoupon
-  ? (selectedCoupon.id || selectedCoupon.couponCode || selectedCoupon.code || "")
-  : "",
+ const inv = window._checkoutInvoice || {};
+
+orderData.couponId =
+  inv.couponId ||
+  selectedCoupon?.id ||
+  alreadyAppliedCouponId ||
+  "";
+
     couponType: selectedCoupon ? selectedCoupon.type : "",
 couponDiscount: Number(couponDiscFinal || 0),
 
@@ -4864,6 +4869,12 @@ console.log("🧪 FINAL ORDER PAYLOAD (before send)", {
   invReward: inv.rewardDiscount,
   full: orderData
 });
+// 🔒 HARD GUARD: coupon discount hai par couponId missing
+if (orderData.couponDiscount > 0 && !orderData.couponId) {
+  alert("⚠️ Coupon error. Please reapply the offer.");
+  resetPlaceOrderBtn();
+  return;
+}
 
   apiPost("placeOrder", orderData)
     .then(res => {
@@ -12125,6 +12136,19 @@ if (paid > 0) {
   };
 
   console.log("🔐 CHECKOUT SNAPSHOT LOCKED:", window._checkoutInvoice);
+  // 🧪 STEP-3: Invoice safety check (DEBUG ONLY)
+if (
+  (window._checkoutInvoice.normalCoupon > 0 ||
+   window._checkoutInvoice.rewardDiscount > 0 ||
+   window._checkoutInvoice.paidCouponDiscount > 0) &&
+  !window._checkoutInvoice.couponId
+) {
+  console.warn(
+    "⚠️ Invoice has discount but no couponId",
+    window._checkoutInvoice
+  );
+}
+
 }
 
 
@@ -12379,6 +12403,7 @@ if (inv.serviceAmt > 0) {
   }
 
   injectCheckoutOfferDiscount(inv);
+    window._couponApplying = false;
 }
 
 
@@ -12641,6 +12666,11 @@ function selectPayment(method) {
 }
 
 function renderRewardMotivationHintInDrawer() {
+  // 🔒 STEP-4C: skip render while auto coupon is applying
+  if (window._couponApplying) {
+    return;
+  }
+
  // ⛔ WAIT until normal coupon decision is ready
   if (!window._offersReady) {
     return;
@@ -13478,6 +13508,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
