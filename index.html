@@ -9598,10 +9598,23 @@ if (o.flat) {
     const best = getBestOffer(subtotal);
 
     if (best) {
-      alreadyAppliedCouponId = best.id;
-      offerDiscount = Number(best.value || 0);
-      appliedOfferText = `🎉 ${best.text} (Saved ${fmt(offerDiscount)})`;
-    }
+  const prevAuto = window._lastAutoCouponId;
+
+  alreadyAppliedCouponId = best.id;
+  offerDiscount = Number(best.value || 0);
+  appliedOfferText = `🎉 ${best.text} (Saved ${fmt(offerDiscount)})`;
+
+  // 🔁 AUTO APPLY → refresh open coupon list
+  if (
+    prevAuto !== best.id &&
+    document.getElementById("offerList")?.style.display !== "none"
+  ) {
+    openCouponList();   // ✅ same as clicking "View Offers"
+  }
+
+  window._lastAutoCouponId = best.id;
+}
+
   }
 }
 
@@ -13437,6 +13450,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
