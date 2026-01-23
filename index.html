@@ -9593,28 +9593,31 @@ if (o.flat) {
 
   // 🔒 DO NOT auto-apply best offer if manual coupon is active
   if (window._appliedCouponType) {
-    // skip best offer completely
-  } else {
-    const best = getBestOffer(subtotal);
+  // skip best offer completely
+} else {
+  const best = getBestOffer(subtotal);
 
-    if (best) {
-      alreadyAppliedCouponId = best.id;
-      offerDiscount = Number(best.value || 0);
-      appliedOfferText = `🎉 ${best.text} (Saved ${fmt(offerDiscount)})`;
+  if (best) {
+
+    // 🔑 detect auto-applied coupon change
+    const prevAuto = window._lastAutoCouponId;
+
+    alreadyAppliedCouponId = best.id;
+    offerDiscount = Number(best.value || 0);
+    appliedOfferText = `🎉 ${best.text} (Saved ${fmt(offerDiscount)})`;
+
+    // ✅ ONLY if auto coupon changed
+    if (
+      prevAuto !== best.id &&
+      document.getElementById("offerList")?.style.display !== "none"
+    ) {
+      openCouponList();
     }
+
+    window._lastAutoCouponId = best.id;
   }
 }
 
-const offerList = document.getElementById("offerList");
-if (
-  offerList &&
-  offerList.style.display !== "none" &&
-  !window._autoOfferUiRefreshing
-) {
-  window._autoOfferUiRefreshing = true;
-  offerList.click();
-  setTimeout(() => (window._autoOfferUiRefreshing = false), 0);
-}
 
 
 
@@ -13450,6 +13453,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
