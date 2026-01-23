@@ -9592,9 +9592,7 @@ if (o.flat) {
   else {
 
   // 🔒 DO NOT auto-apply best offer if manual coupon is active
-  if (window._appliedCouponType) {
-    // skip best offer completely
-  } else {
+ if (mode === "best offer" || mode === "bestoffer") {
     const best = getBestOffer(subtotal);
 
     if (best) {
@@ -9621,9 +9619,8 @@ if (o.flat) {
   // Update Offer Message Box
   const appliedBox = document.getElementById("bestOfferApplied");
  if (appliedBox) {
+   appliedBox.style.display = offerDiscount > 0 ? "block" : "none";
   if (offerDiscount > 0) {
-    appliedBox.style.display = "block";
-
     appliedBox.innerHTML = `
       <div>${appliedOfferText}</div>
       ${
@@ -13450,6 +13447,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
