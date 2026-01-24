@@ -13258,12 +13258,14 @@ if (emailTpl && uiTpl) {
   }
 
   function invalidateAppliedCoupon(reason = "") {
-  console.warn("🚫 invalidateAppliedCoupon called", {
-    reason,
+
+  console.group("🚫 invalidateAppliedCoupon START");
+
+  console.log("🧪 BEFORE REMOVE SNAPSHOT", {
     appliedType: window._appliedCouponType,
-    appliedCoupon: window._appliedCoupon,
-    selectedCoupon,
-    alreadyAppliedCouponId
+    couponMode: window.couponMode,
+    disableBest: window._disableBestOffer,
+    normalCoupon: window._checkoutInvoice?.normalCoupon
   });
 
   const appliedType = window._appliedCouponType || "";
@@ -13272,54 +13274,101 @@ if (emailTpl && uiTpl) {
    * 🟢 CASE 1: BEST OFFER AUTO-APPLIED
    * ===================================== */
   if (appliedType === "best") {
-    console.warn("🧹 Removing BEST OFFER safely");
 
-    // 🔒 GUEST-ONLY: stop auto best offer WITHOUT touching drawer logic
-    if (!isUserLoggedIn()) {
-      window._disableBestOffer = true; // session guard
-      window.couponMode = "";          // 🔥 AUTO MODE OFF
-      console.warn("🚫 Best Offer auto-apply disabled for GUEST session");
-    }
+    console.log("🟢 BEST OFFER detected → removing");
 
+    // 🔥 HARD RESET (console-proven)
+    window.couponMode = "";
+    window._disableBestOffer = true;
+
+    console.log("🔒 HARD RESET DONE", {
+      couponMode: window.couponMode,
+      disableBest: window._disableBestOffer
+    });
+
+    // clear best-offer state
     window._appliedCouponType = null;
     window._appliedCoupon = null;
     window._appliedCouponId = "";
     window._appliedCouponDiscount = 0;
 
+    // clear invoice snapshot
     if (window._checkoutInvoice) {
       window._checkoutInvoice.couponId = "";
       window._checkoutInvoice.couponAmount = 0;
       window._checkoutInvoice.couponDiscount = 0;
       window._checkoutInvoice.normalCoupon = 0;
+
+      console.log("🧾 INVOICE CLEARED", {
+        couponAmount: window._checkoutInvoice.couponAmount,
+        normalCoupon: window._checkoutInvoice.normalCoupon
+      });
     }
 
     const bestBox = document.getElementById("bestOfferApplied");
-    if (bestBox) bestBox.style.display = "none";
+    if (bestBox) {
+      bestBox.style.display = "none";
+      console.log("🖥️ Best Offer UI hidden");
+    }
   }
 
   /* =====================================
    * 🟡 CASE 2: MANUAL COUPON
    * ===================================== */
   else {
-    console.warn("🧹 Removing MANUAL coupon safely");
+
+    console.log("🟡 MANUAL coupon detected → removing");
 
     selectedCoupon = null;
     alreadyAppliedCouponId = "";
     window._couponLocked = false;
 
     const manualBox = document.getElementById("manualCouponApplied");
-    if (manualBox) manualBox.style.display = "none";
+    if (manualBox) {
+      manualBox.style.display = "none";
+      console.log("🖥️ Manual Coupon UI hidden");
+    }
   }
 
   /* =====================================
    * 🔄 COMMON REFRESH
    * ===================================== */
-  try { updateDrawerTotals(); } catch (e) {}
-  try { refreshCouponMotivationHint(); } catch (e) {}
+  console.log("🔄 Triggering recalculation");
+
+  try {
+    updateDrawerTotals();
+    console.log("✅ updateDrawerTotals DONE");
+  } catch (e) {
+    console.error("❌ updateDrawerTotals FAILED", e);
+  }
+
+  try {
+    refreshCouponMotivationHint();
+    console.log("✅ refreshCouponMotivationHint DONE");
+  } catch (e) {
+    console.error("❌ refreshCouponMotivationHint FAILED", e);
+  }
 
   if (typeof updateCheckoutInvoice === "function") {
-    try { updateCheckoutInvoice(); } catch (e) {}
+    try {
+      updateCheckoutInvoice();
+      console.log("✅ updateCheckoutInvoice DONE");
+    } catch (e) {
+      console.error("❌ updateCheckoutInvoice FAILED", e);
+    }
   }
+
+  /* =====================================
+   * 🔍 FINAL SNAPSHOT
+   * ===================================== */
+  console.log("🧪 AFTER REMOVE SNAPSHOT", {
+    appliedType: window._appliedCouponType,
+    couponMode: window.couponMode,
+    disableBest: window._disableBestOffer,
+    normalCoupon: window._checkoutInvoice?.normalCoupon
+  });
+
+  console.groupEnd();
 
   /* =====================================
    * ⚠️ USER MESSAGE
@@ -13644,6 +13693,7 @@ async function validateAppliedCouponForMobile(mobile) {
   
 </body>
 </html>
+
 
 
 
