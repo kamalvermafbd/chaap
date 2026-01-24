@@ -2371,12 +2371,8 @@ function fmt(amount, digits = 2) {
 
 }
 
-function isBestOfferApplied() {
-  return (
-    window._appliedCouponType === "best" ||
-    window._checkoutInvoice?.normalCoupon > 0
-  );
-}
+window._disableBestOffer = false;
+
 
     
 function fmtNoSymbol(amount, digits = 2) {
@@ -13261,8 +13257,7 @@ if (emailTpl && uiTpl) {
 }
   }
 
-  
-function invalidateAppliedCoupon(reason = "") {
+  function invalidateAppliedCoupon(reason = "") {
   console.warn("🚫 invalidateAppliedCoupon called", {
     reason,
     appliedType: window._appliedCouponType,
@@ -13278,6 +13273,13 @@ function invalidateAppliedCoupon(reason = "") {
    * ===================================== */
   if (appliedType === "best") {
     console.warn("🧹 Removing BEST OFFER safely");
+
+    // 🔒 GUEST-ONLY: stop auto best offer WITHOUT touching drawer logic
+    if (!isUserLoggedIn()) {
+      window._disableBestOffer = true; // session guard
+      window.couponMode = "";          // 🔥 AUTO MODE OFF
+      console.warn("🚫 Best Offer auto-apply disabled for GUEST session");
+    }
 
     window._appliedCouponType = null;
     window._appliedCoupon = null;
@@ -13326,6 +13328,7 @@ function invalidateAppliedCoupon(reason = "") {
     alert(reason);
   }
 }
+
 
 async function validateAppliedCouponForMobile(mobile) {
   console.log("🧪 validateAppliedCouponForMobile HIT", mobile);
@@ -13641,6 +13644,7 @@ async function validateAppliedCouponForMobile(mobile) {
   
 </body>
 </html>
+
 
 
 
