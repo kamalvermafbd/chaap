@@ -3855,6 +3855,7 @@ function onMobileChanged() {
   guestAutoFilling   = false;
 }
 
+    let _lastCheckedMobile = null;
  function checkCustomerByMobile() {
   const mobile = document.getElementById("mobile").value.trim();
   const hint = document.getElementById("mobileHint");
@@ -3900,12 +3901,16 @@ function onMobileChanged() {
     pincodeWrapper.style.display = "none";
     cityWrapper.style.display    = "none";
     stateWrapper.style.display   = "none";
-
+ _lastCheckedMobile = null; // reset guard
     return;
   }
 
   /* ✅ MOBILE = 10 DIGITS */
   hint.style.display = "none";
+   // 🔒 prevent repeat API calls for same number
+  if (_lastCheckedMobile === mobile) return;
+  _lastCheckedMobile = mobile;
+   
 validateAppliedCouponForMobile(mobile);
 
   // show only order type
@@ -13251,7 +13256,7 @@ if (emailTpl && uiTpl) {
 
   async function validateAppliedCouponForMobile(mobile) {
   try {
-    // 🛑 No coupon applied → nothing to validate
+    // 🛑 agar coupon hi apply nahi hai → kuch mat karo
     if (!window._appliedCoupon || !window._appliedCoupon.id) return;
 
     const couponId = window._appliedCoupon.id;
@@ -13263,15 +13268,23 @@ if (emailTpl && uiTpl) {
       "&couponId=" + encodeURIComponent(couponId);
 
     const res = await fetch(url);
-    const data = await res.json();
+    const result = await res.json();
 
-    // 🔥 Coupon already used → remove + warn
-    if (data && data.used === true) {
-      removeAppliedCoupon(); // existing logic
-      showCouponWarning(
-        "Ye coupon aap is period me pehle use kar chuke ho, isliye remove kar diya gaya hai."
+    console.log("Coupon check result:", result);
+
+    // 🔥 RESULT HANDLE YAHAN HOTA HAI
+    if (result && result.used === true) {
+
+      // 1️⃣ coupon remove
+      removeAppliedCoupon();
+
+      // 2️⃣ user ko message
+      alert(
+        "Ye coupon is period me pehle hi use ho chuka hai, isliye remove kar diya gaya hai."
       );
-      recalcCartTotals(); // refresh final amount
+
+      // 3️⃣ totals refresh
+      recalcCartTotals();
     }
 
   } catch (err) {
@@ -13534,6 +13547,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
