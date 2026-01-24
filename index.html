@@ -2573,7 +2573,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbwRg3p0FyobXGyR-qinikC6j_RwJDCLi3p_PdieZZpazNb1MqZ5nBV3wWGPqpiJKg6JOg/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbwH61h1VBele-ZcWIbDQqGdfQE2J-q3X0rVemdHCUZL9KLJ3kwgaK9K3xK4XAg1tu3v6Q/exec";
 
 // ===============================
 // API HELPER
@@ -3906,6 +3906,7 @@ function onMobileChanged() {
 
   /* ✅ MOBILE = 10 DIGITS */
   hint.style.display = "none";
+validateAppliedCouponForMobile(mobile);
 
   // show only order type
   if (orderTypeBox) orderTypeBox.style.display = "block";
@@ -13247,6 +13248,37 @@ if (emailTpl && uiTpl) {
 }
   }
 
+
+  async function validateAppliedCouponForMobile(mobile) {
+  try {
+    // 🛑 No coupon applied → nothing to validate
+    if (!window._appliedCoupon || !window._appliedCoupon.id) return;
+
+    const couponId = window._appliedCoupon.id;
+
+    const url =
+      API_BASE_URL +
+      "?api=checkOneTimeCouponUsage" +
+      "&mobile=" + encodeURIComponent(mobile) +
+      "&couponId=" + encodeURIComponent(couponId);
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    // 🔥 Coupon already used → remove + warn
+    if (data && data.used === true) {
+      removeAppliedCoupon(); // existing logic
+      showCouponWarning(
+        "Ye coupon aap is period me pehle use kar chuke ho, isliye remove kar diya gaya hai."
+      );
+      recalcCartTotals(); // refresh final amount
+    }
+
+  } catch (err) {
+    console.error("Coupon validation failed", err);
+  }
+}
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
@@ -13502,6 +13534,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
