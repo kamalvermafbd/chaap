@@ -2371,6 +2371,14 @@ function fmt(amount, digits = 2) {
 
 }
 
+function isBestOfferApplied() {
+  return (
+    window._appliedCouponType === "best" ||
+    window._checkoutInvoice?.normalCoupon > 0
+  );
+}
+
+    
 function fmtNoSymbol(amount, digits = 2) {
   const n = Number(amount) || 0;
   return n.toFixed(digits);
@@ -13253,6 +13261,72 @@ if (emailTpl && uiTpl) {
 }
   }
 
+  
+function invalidateAppliedCoupon(reason = "") {
+  console.warn("🚫 invalidateAppliedCoupon called", {
+    reason,
+    appliedType: window._appliedCouponType,
+    appliedCoupon: window._appliedCoupon,
+    selectedCoupon,
+    alreadyAppliedCouponId
+  });
+
+  const appliedType = window._appliedCouponType || "";
+
+  /* =====================================
+   * 🟢 CASE 1: BEST OFFER AUTO-APPLIED
+   * ===================================== */
+  if (appliedType === "best") {
+    console.warn("🧹 Removing BEST OFFER safely");
+
+    window._appliedCouponType = null;
+    window._appliedCoupon = null;
+    window._appliedCouponId = "";
+    window._appliedCouponDiscount = 0;
+
+    if (window._checkoutInvoice) {
+      window._checkoutInvoice.couponId = "";
+      window._checkoutInvoice.couponAmount = 0;
+      window._checkoutInvoice.couponDiscount = 0;
+      window._checkoutInvoice.normalCoupon = 0;
+    }
+
+    const bestBox = document.getElementById("bestOfferApplied");
+    if (bestBox) bestBox.style.display = "none";
+  }
+
+  /* =====================================
+   * 🟡 CASE 2: MANUAL COUPON
+   * ===================================== */
+  else {
+    console.warn("🧹 Removing MANUAL coupon safely");
+
+    selectedCoupon = null;
+    alreadyAppliedCouponId = "";
+    window._couponLocked = false;
+
+    const manualBox = document.getElementById("manualCouponApplied");
+    if (manualBox) manualBox.style.display = "none";
+  }
+
+  /* =====================================
+   * 🔄 COMMON REFRESH
+   * ===================================== */
+  try { updateDrawerTotals(); } catch (e) {}
+  try { refreshCouponMotivationHint(); } catch (e) {}
+
+  if (typeof updateCheckoutInvoice === "function") {
+    try { updateCheckoutInvoice(); } catch (e) {}
+  }
+
+  /* =====================================
+   * ⚠️ USER MESSAGE
+   * ===================================== */
+  if (reason) {
+    alert(reason);
+  }
+}
+
 async function validateAppliedCouponForMobile(mobile) {
   console.log("🧪 validateAppliedCouponForMobile HIT", mobile);
 
@@ -13266,13 +13340,15 @@ async function validateAppliedCouponForMobile(mobile) {
 
     console.log("🎯 Picked couponId:", couponId);
 
+    // 🛑 No coupon → nothing to validate
     if (!couponId) {
       console.warn("⚠️ No couponId found, skipping validation");
       return;
     }
 
+    // 🛑 API safety
     if (typeof API_BASE === "undefined") {
-      console.error("❌ API_BASE not defined");
+      console.error("❌ API_BASE not defined, cannot validate coupon");
       return;
     }
 
@@ -13282,47 +13358,33 @@ async function validateAppliedCouponForMobile(mobile) {
       "&mobile=" + encodeURIComponent(mobile) +
       "&couponId=" + encodeURIComponent(couponId);
 
+    console.log("🌐 Coupon validation API URL:", url);
+
     const res = await fetch(url);
     const result = await res.json();
 
     console.log("📦 Coupon check API result:", result);
 
+    /* =====================================
+     * ❌ COUPON ALREADY USED
+     * ===================================== */
     if (result && result.used === true) {
-      console.warn("❌ Coupon already used → removing coupon");
+      console.warn("❌ Coupon already used → invalidating coupon");
 
-      // 1️⃣ remove coupon
-      removeAppliedCoupon();
-
-      // 2️⃣ FULL STATE RESET
-      selectedCoupon = null;
-      alreadyAppliedCouponId = "";
-      window._appliedCoupon = null;
-      window._appliedCouponId = "";
-      window._appliedCouponType = "";
-      window._appliedCouponDiscount = 0;
-
-      // 3️⃣ CLEAN INVOICE
-      if (window._checkoutInvoice) {
-        window._checkoutInvoice.couponId = "";
-        window._checkoutInvoice.couponAmount = 0;
-        window._checkoutInvoice.couponDiscount = 0;
-        window._checkoutInvoice.normalCoupon = 0;
-      }
-
-      // 4️⃣ USER MESSAGE
-      alert(
+      invalidateAppliedCoupon(
         "Ye coupon is period me pehle hi use ho chuka hai, isliye remove kar diya gaya hai."
       );
 
-      // 5️⃣ REFRESH TOTALS (CORRECT WAY)
-      try { renderCart(); } catch(e){}
-      try { updateCheckoutInvoice(); } catch(e){}
+      return; // 🔒 hard stop
     }
+
+    console.log("✅ Coupon valid for this mobile");
 
   } catch (err) {
     console.error("❌ Coupon validation failed", err);
   }
 }
+
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -13579,6 +13641,7 @@ async function validateAppliedCouponForMobile(mobile) {
   
 </body>
 </html>
+
 
 
 
