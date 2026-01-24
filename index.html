@@ -2649,7 +2649,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (safePromoOffers.length > 0) {
       renderPromoBanner(safePromoOffers);
     } else {
-      hidePromoBanner(); // existing or simple classList.add("hidden")
+      hidePromoBannerForLoggedInUser();// existing or simple classList.add("hidden")
     }
   });
 });
@@ -13541,6 +13541,7 @@ function filterPromoOffersForUser(offers = []) {
   
 </body>
 </html>
+
 
 
 
