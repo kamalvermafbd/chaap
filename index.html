@@ -13258,7 +13258,6 @@ if (emailTpl && uiTpl) {
   console.log("🧪 validateAppliedCouponForMobile HIT", mobile);
 
   try {
-    // 🔑 pick couponId from all possible states (guest-safe)
     const couponId =
       window._appliedCoupon?.id ||
       selectedCoupon?.id ||
@@ -13273,18 +13272,20 @@ if (emailTpl && uiTpl) {
       return;
     }
 
-    // 🔒 SAFE BASE URL (scope + load-order proof)
-    const BASE =
+    // ✅ FIX: Resolve API base safely
+    const API_BASE =
       window.API_BASE_URL ||
-      (typeof API_BASE_URL !== "undefined" ? API_BASE_URL : "");
+      window.SCRIPT_URL ||
+      window.GAS_API_URL ||
+      "";
 
-    if (!BASE) {
-      console.error("❌ API_BASE_URL not available, aborting coupon validation");
+    if (!API_BASE) {
+      console.error("❌ No API base URL found for coupon validation");
       return;
     }
 
     const url =
-      BASE +
+      API_BASE +
       "?api=checkOneTimeCouponUsage" +
       "&mobile=" + encodeURIComponent(mobile) +
       "&couponId=" + encodeURIComponent(couponId);
@@ -13296,14 +13297,13 @@ if (emailTpl && uiTpl) {
 
     console.log("📦 Coupon check API result:", result);
 
-    // 🔥 RESULT HANDLE
+    // 🔥 HANDLE RESULT
     if (result && result.used === true) {
       console.warn("❌ Coupon already used → removing coupon");
 
-      // 1️⃣ remove coupon UI/state
       removeAppliedCoupon();
 
-      // 🔒 FULL COUPON STATE RESET
+      // 🔒 FULL COUPON RESET
       selectedCoupon = null;
       alreadyAppliedCouponId = "";
       window._appliedCoupon = null;
@@ -13311,7 +13311,6 @@ if (emailTpl && uiTpl) {
       window._appliedCouponType = "";
       window._appliedCouponDiscount = 0;
 
-      // 🔒 CLEAN INVOICE SNAPSHOT
       if (window._checkoutInvoice) {
         console.log("🧹 Cleaning checkout invoice coupon fields");
         window._checkoutInvoice.couponId = "";
@@ -13320,23 +13319,19 @@ if (emailTpl && uiTpl) {
         window._checkoutInvoice.normalCoupon = 0;
       }
 
-      // 2️⃣ user warning
       alert(
         "Ye coupon is period me pehle hi use ho chuka hai, isliye remove kar diya gaya hai."
       );
 
-      // 3️⃣ refresh totals
-      console.log("🔄 Recalculating cart totals");
       recalcCartTotals();
     } else {
-      console.log("✅ Coupon not used / allowed");
+      console.log("✅ Coupon valid / not used");
     }
 
   } catch (err) {
     console.error("❌ Coupon validation failed", err);
   }
 }
-
 
 
 </script>
@@ -13594,6 +13589,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
