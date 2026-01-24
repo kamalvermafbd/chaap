@@ -13257,9 +13257,14 @@ if (emailTpl && uiTpl) {
   async function validateAppliedCouponForMobile(mobile) {
   try {
     // 🛑 agar coupon hi apply nahi hai → kuch mat karo
-    if (!window._appliedCoupon || !window._appliedCoupon.id) return;
+    const couponId =
+  window._appliedCoupon?.id ||
+  selectedCoupon?.id ||
+  window._checkoutInvoice?.couponId ||
+  "";
 
-    const couponId = window._appliedCoupon.id;
+if (!couponId) return;
+
 
     const url =
       API_BASE_URL +
@@ -13277,6 +13282,20 @@ if (emailTpl && uiTpl) {
 
       // 1️⃣ coupon remove
       removeAppliedCoupon();
+// 🔒 FULL COUPON STATE RESET (CRITICAL)
+selectedCoupon = null;
+alreadyAppliedCouponId = "";
+window._appliedCoupon = null;
+window._appliedCouponId = "";
+window._appliedCouponType = "";
+window._appliedCouponDiscount = 0;
+
+// 🔒 ALSO CLEAN INVOICE
+if (window._checkoutInvoice) {
+  window._checkoutInvoice.couponId = "";
+  window._checkoutInvoice.couponAmount = 0;
+  window._checkoutInvoice.couponDiscount = 0;
+}
 
       // 2️⃣ user ko message
       alert(
@@ -13547,6 +13566,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
