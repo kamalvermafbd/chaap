@@ -13261,6 +13261,7 @@ if (emailTpl && uiTpl) {
     const couponId =
       window._appliedCoupon?.id ||
       selectedCoupon?.id ||
+        alreadyAppliedCouponId ||   // 🔥 YAHI ADD KARNA HAI
       window._checkoutInvoice?.couponId ||
       "";
 
@@ -13581,6 +13582,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
