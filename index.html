@@ -2597,17 +2597,18 @@ function apiGet(api, params = {}) {
 // ===============================
 async function fetchOffersForPromoBanner() {
   try {
-    const res = await apiGet("getOffers");
+    const mobile = isUserLoggedIn() ? getUserMobile() : "";
 
-    // 🔥 IMPORTANT FIX
+    const res = await apiGet("getOffers", { mobile });
+
     window._promoOffers = res.allOffersRaw || [];
-
     return window._promoOffers;
   } catch (e) {
     window._promoOffers = [];
     return [];
   }
 }
+
 // ===============================
 // GUEST PROMO BANNER FETCH (NEW) FOR GUEST USER
 // ===============================
@@ -13501,6 +13502,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
