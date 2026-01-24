@@ -2636,20 +2636,22 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  if (!isUserLoggedIn()) return; // 🔐 login only
+  if (!isUserLoggedIn()) return;
 
   fetchOffersForPromoBanner().then(() => {
 
-    // 🔒 STEP-A: filter only safe promo offers
-    const safePromoOffers = filterPromoOffersForUser(
-      window.promoOffers || []
-    );
+    const safePromoOffers = getSafePromoOffersForBanner();
 
-    // 🔒 STEP-B: show / hide banner safely
+    // ⏳ data abhi ready nahi → kuch mat karo
+    if (safePromoOffers === null) {
+      console.log("⏳ Promo offers not ready yet, skipping banner render");
+      return;
+    }
+
     if (safePromoOffers.length > 0) {
       renderPromoBanner(safePromoOffers);
     } else {
-      hidePromoBannerForLoggedInUser();// existing or simple classList.add("hidden")
+      hidePromoBannerForLoggedInUser();
     }
   });
 });
@@ -13284,6 +13286,17 @@ function filterPromoOffersForUser(offers = []) {
   });
 }
 
+function getSafePromoOffersForBanner() {
+  const offers = window.promoOffers;
+
+  // ⛔ data hi ready nahi
+  if (!Array.isArray(offers) || offers.length === 0) {
+    return null; // IMPORTANT: null ≠ empty
+  }
+
+  const safe = filterPromoOffersForUser(offers);
+  return safe;
+}
 
   
 </script>
@@ -13541,24 +13554,6 @@ function filterPromoOffersForUser(offers = []) {
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
