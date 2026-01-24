@@ -13254,14 +13254,15 @@ if (emailTpl && uiTpl) {
   }
 
 
-  async function validateAppliedCouponForMobile(mobile) {
+ async function validateAppliedCouponForMobile(mobile) {
   console.log("🧪 validateAppliedCouponForMobile HIT", mobile);
 
   try {
+    // 🔑 pick couponId from all possible states (guest-safe)
     const couponId =
       window._appliedCoupon?.id ||
       selectedCoupon?.id ||
-        alreadyAppliedCouponId ||   // 🔥 YAHI ADD KARNA HAI
+      alreadyAppliedCouponId ||
       window._checkoutInvoice?.couponId ||
       "";
 
@@ -13272,8 +13273,18 @@ if (emailTpl && uiTpl) {
       return;
     }
 
+    // 🔒 SAFE BASE URL (scope + load-order proof)
+    const BASE =
+      window.API_BASE_URL ||
+      (typeof API_BASE_URL !== "undefined" ? API_BASE_URL : "");
+
+    if (!BASE) {
+      console.error("❌ API_BASE_URL not available, aborting coupon validation");
+      return;
+    }
+
     const url =
-      API_BASE_URL +
+      BASE +
       "?api=checkOneTimeCouponUsage" +
       "&mobile=" + encodeURIComponent(mobile) +
       "&couponId=" + encodeURIComponent(couponId);
@@ -13289,7 +13300,7 @@ if (emailTpl && uiTpl) {
     if (result && result.used === true) {
       console.warn("❌ Coupon already used → removing coupon");
 
-      // 1️⃣ coupon remove
+      // 1️⃣ remove coupon UI/state
       removeAppliedCoupon();
 
       // 🔒 FULL COUPON STATE RESET
@@ -13300,7 +13311,7 @@ if (emailTpl && uiTpl) {
       window._appliedCouponType = "";
       window._appliedCouponDiscount = 0;
 
-      // 🔒 CLEAN INVOICE
+      // 🔒 CLEAN INVOICE SNAPSHOT
       if (window._checkoutInvoice) {
         console.log("🧹 Cleaning checkout invoice coupon fields");
         window._checkoutInvoice.couponId = "";
@@ -13309,12 +13320,12 @@ if (emailTpl && uiTpl) {
         window._checkoutInvoice.normalCoupon = 0;
       }
 
-      // 2️⃣ user message
+      // 2️⃣ user warning
       alert(
         "Ye coupon is period me pehle hi use ho chuka hai, isliye remove kar diya gaya hai."
       );
 
-      // 3️⃣ totals refresh
+      // 3️⃣ refresh totals
       console.log("🔄 Recalculating cart totals");
       recalcCartTotals();
     } else {
@@ -13325,6 +13336,7 @@ if (emailTpl && uiTpl) {
     console.error("❌ Coupon validation failed", err);
   }
 }
+
 
 
 </script>
@@ -13582,6 +13594,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
