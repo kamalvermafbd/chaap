@@ -4828,7 +4828,7 @@ sgstAmt: Number(inv.sgst || 0),
 igstAmt: Number(inv.igst || 0),
 grandTotal: Number(inv.netPayable || 0),
     paymentMethod,
-couponId =
+couponId:
   inv.couponId ||
   selectedCoupon?.id ||
   alreadyAppliedCouponId ||
@@ -13505,6 +13505,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
