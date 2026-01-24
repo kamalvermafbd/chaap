@@ -13253,7 +13253,6 @@ if (emailTpl && uiTpl) {
 }
   }
 
-
 async function validateAppliedCouponForMobile(mobile) {
   console.log("🧪 validateAppliedCouponForMobile HIT", mobile);
 
@@ -13273,7 +13272,7 @@ async function validateAppliedCouponForMobile(mobile) {
     }
 
     if (typeof API_BASE === "undefined") {
-      console.error("❌ API_BASE is not defined");
+      console.error("❌ API_BASE not defined");
       return;
     }
 
@@ -13283,8 +13282,6 @@ async function validateAppliedCouponForMobile(mobile) {
       "&mobile=" + encodeURIComponent(mobile) +
       "&couponId=" + encodeURIComponent(couponId);
 
-    console.log("🌐 Coupon validation API URL:", url);
-
     const res = await fetch(url);
     const result = await res.json();
 
@@ -13293,9 +13290,10 @@ async function validateAppliedCouponForMobile(mobile) {
     if (result && result.used === true) {
       console.warn("❌ Coupon already used → removing coupon");
 
+      // 1️⃣ remove coupon
       removeAppliedCoupon();
 
-      // 🔒 FULL RESET
+      // 2️⃣ FULL STATE RESET
       selectedCoupon = null;
       alreadyAppliedCouponId = "";
       window._appliedCoupon = null;
@@ -13303,6 +13301,7 @@ async function validateAppliedCouponForMobile(mobile) {
       window._appliedCouponType = "";
       window._appliedCouponDiscount = 0;
 
+      // 3️⃣ CLEAN INVOICE
       if (window._checkoutInvoice) {
         window._checkoutInvoice.couponId = "";
         window._checkoutInvoice.couponAmount = 0;
@@ -13310,20 +13309,20 @@ async function validateAppliedCouponForMobile(mobile) {
         window._checkoutInvoice.normalCoupon = 0;
       }
 
+      // 4️⃣ USER MESSAGE
       alert(
         "Ye coupon is period me pehle hi use ho chuka hai, isliye remove kar diya gaya hai."
       );
 
-      recalcCartTotals();
-    } else {
-      console.log("✅ Coupon not used / allowed");
+      // 5️⃣ REFRESH TOTALS (CORRECT WAY)
+      try { renderCart(); } catch(e){}
+      try { updateCheckoutInvoice(); } catch(e){}
     }
 
   } catch (err) {
     console.error("❌ Coupon validation failed", err);
   }
 }
-
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -13580,6 +13579,7 @@ async function validateAppliedCouponForMobile(mobile) {
   
 </body>
 </html>
+
 
 
 
