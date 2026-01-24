@@ -13254,7 +13254,7 @@ if (emailTpl && uiTpl) {
   }
 
 
- async function validateAppliedCouponForMobile(mobile) {
+async function validateAppliedCouponForMobile(mobile) {
   console.log("🧪 validateAppliedCouponForMobile HIT", mobile);
 
   try {
@@ -13272,15 +13272,8 @@ if (emailTpl && uiTpl) {
       return;
     }
 
-    // ✅ FIX: Resolve API base safely
-    const API_BASE =
-      window.API_BASE_URL ||
-      window.SCRIPT_URL ||
-      window.GAS_API_URL ||
-      "";
-
-    if (!API_BASE) {
-      console.error("❌ No API base URL found for coupon validation");
+    if (typeof API_BASE === "undefined") {
+      console.error("❌ API_BASE is not defined");
       return;
     }
 
@@ -13297,13 +13290,12 @@ if (emailTpl && uiTpl) {
 
     console.log("📦 Coupon check API result:", result);
 
-    // 🔥 HANDLE RESULT
     if (result && result.used === true) {
       console.warn("❌ Coupon already used → removing coupon");
 
       removeAppliedCoupon();
 
-      // 🔒 FULL COUPON RESET
+      // 🔒 FULL RESET
       selectedCoupon = null;
       alreadyAppliedCouponId = "";
       window._appliedCoupon = null;
@@ -13312,7 +13304,6 @@ if (emailTpl && uiTpl) {
       window._appliedCouponDiscount = 0;
 
       if (window._checkoutInvoice) {
-        console.log("🧹 Cleaning checkout invoice coupon fields");
         window._checkoutInvoice.couponId = "";
         window._checkoutInvoice.couponAmount = 0;
         window._checkoutInvoice.couponDiscount = 0;
@@ -13325,7 +13316,7 @@ if (emailTpl && uiTpl) {
 
       recalcCartTotals();
     } else {
-      console.log("✅ Coupon valid / not used");
+      console.log("✅ Coupon not used / allowed");
     }
 
   } catch (err) {
@@ -13589,6 +13580,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
