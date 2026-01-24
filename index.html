@@ -2639,22 +2639,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!isUserLoggedIn()) return;
 
   fetchOffersForPromoBanner().then(() => {
-
-    const safePromoOffers = getSafePromoOffersForBanner();
-
-    // ⏳ data abhi ready nahi → kuch mat karo
-    if (safePromoOffers === null) {
-      console.log("⏳ Promo offers not ready yet, skipping banner render");
-      return;
-    }
-
-    if (safePromoOffers.length > 0) {
-      renderPromoBanner(safePromoOffers);
-    } else {
-      hidePromoBannerForLoggedInUser();
-    }
+    waitForPromoOffersAndRender();
   });
 });
+
 
 
 // ===============================
@@ -13260,7 +13248,7 @@ if (emailTpl && uiTpl) {
 }
   }
 
-  // 🔐 PROMO SAFEGUARD — LOGIN USER FRIENDLY
+
 // ===============================
 // 🔒 SAFE PROMO FILTER (LOGIN USER)
 // ===============================
@@ -13289,19 +13277,52 @@ function filterPromoOffersForUser(offers = []) {
 function getSafePromoOffersForBanner() {
   const offers = window.promoOffers;
 
-  // ⛔ data hi ready nahi
   if (!Array.isArray(offers) || offers.length === 0) {
-    return null; // IMPORTANT: null ≠ empty
+    return null;
   }
 
   const safe = filterPromoOffersForUser(offers);
   return safe;
 }
 
+
+function waitForPromoOffersAndRender(maxTries = 10, delay = 200) {
+  if (window._promoWaitRunning) return; // optional guard
+  window._promoWaitRunning = true;
+
+  let tries = 0;
+  const timer = setInterval(() => {
+    tries++;
+
+    if (window.couponMode && Array.isArray(window.promoOffers)) {
+      clearInterval(timer);
+      window._promoWaitRunning = false;
+
+      const safePromoOffers =
+        filterPromoOffersForUser(window.promoOffers);
+
+      if (safePromoOffers.length > 0) {
+        renderPromoBanner(safePromoOffers);
+      } else {
+        hidePromoBannerForLoggedInUser();
+      }
+      return;
+    }
+
+    if (tries >= maxTries) {
+      clearInterval(timer);
+      window._promoWaitRunning = false;
+      console.log("🚫 Promo engine ready but no usable promo offers");
+    }
+  }, delay);
+}
+
+
   
 </script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
+  
   <div id="cartHandle" onclick="expandDrawerCart()">
   ›
 </div>
@@ -13554,6 +13575,7 @@ function getSafePromoOffersForBanner() {
   
 </body>
 </html>
+
 
 
 
