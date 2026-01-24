@@ -4370,143 +4370,134 @@ function enablePlaceOrder() {
 
 async function canProceedPlaceOrder() {
 
-  // 🔐 LOGGED-IN USER LOCATION AUTO-READY FIX
-if (isUserLoggedIn()) {
-  // agar user sheet se location aa chuki hai
-  if (
-    window._userLocation &&
-    window._userLocation.lat &&
-    window._userLocation.lng
-  ) {
-    window._deliveryLocation = window._userLocation;
-    window._deliveryLocationReady = true;
+  // 🔴 FIX-1: HARD GUARD — prevent repeated / parallel execution
+  if (window._eligibilityRunning) {
+    return false;
   }
-}
-
-  // 🔥 Sync GPS from frontend memory (prevents false lock)
-if (window._deliveryLocation && window._deliveryLocation.lat && window._deliveryLocation.lng) {
-  window._deliveryLocationReady = true;
-}
-
-  const paymentError = document.getElementById("paymentError");
-
-  // helper functions (same UX everywhere)
-  const showError = (msg) => {
-    if (!paymentError) return;
-    paymentError.innerText = msg;
-    paymentError.classList.remove("hidden", "text-green-600");
-    paymentError.classList.add("text-red-600");
-     disablePlaceOrder(); 
-  };
-
-  const showSuccess = (msg) => {
-    if (!paymentError) return;
-    paymentError.innerText = msg;
-    paymentError.classList.remove("hidden", "text-red-600");
-    paymentError.classList.add("text-green-600");
-     enablePlaceOrder();
-  };
+  window._eligibilityRunning = true;
 
   try {
+
+    // 🔐 LOGGED-IN USER LOCATION AUTO-READY FIX
+    if (isUserLoggedIn()) {
+      if (
+        window._userLocation &&
+        window._userLocation.lat &&
+        window._userLocation.lng
+      ) {
+        window._deliveryLocation = window._userLocation;
+        window._deliveryLocationReady = true;
+      }
+    }
+
+    // 🔥 Sync GPS from frontend memory
+    if (
+      window._deliveryLocation &&
+      window._deliveryLocation.lat &&
+      window._deliveryLocation.lng
+    ) {
+      window._deliveryLocationReady = true;
+    }
+
+    const paymentError = document.getElementById("paymentError");
+
+    // helper functions (same UX everywhere)
+    const showError = (msg) => {
+      if (!paymentError) return;
+      paymentError.innerText = msg;
+      paymentError.classList.remove("hidden", "text-green-600");
+      paymentError.classList.add("text-red-600");
+
+      // 🔴 FIX-2: DO NOT trigger invoice / eligibility indirectly
+      // ❌ disablePlaceOrder() removed from eligibility loop
+    };
+
+    const showSuccess = (msg) => {
+      if (!paymentError) return;
+      paymentError.innerText = msg;
+      paymentError.classList.remove("hidden", "text-red-600");
+      paymentError.classList.add("text-green-600");
+
+      // 🔴 FIX-2: DO NOT enable button here (handled by placeOrder flow)
+    };
+
     window.orderEligibility = { allowed: false, extraCharge: 0, chargeType: "" };
-  const orderTypeNow = document.getElementById("orderType")?.value;
 
-if (orderTypeNow === "Home Delivery" && !window._deliveryLocationReady) {
-  showError("📍 Please set your delivery location");
-  return false;
-}
+    const orderTypeNow = document.getElementById("orderType")?.value;
 
-  if (paymentError) paymentError.classList.add("hidden");
+    if (orderTypeNow === "Home Delivery" && !window._deliveryLocationReady) {
+      showError("📍 Please set your delivery location");
+      return false;
+    }
+
+    if (paymentError) paymentError.classList.add("hidden");
+
     const orderType = document.getElementById("orderType")?.value.trim();
-  const amount = Number(window.cartSummary?.itemsSubtotal || 0);
+    const amount = Number(window.cartSummary?.itemsSubtotal || 0);
 
-
-    // 🔴 GUARD 1: Order Type mandatory
+    // 🔴 GUARD 1
     if (!orderType) {
       showError("⚠️ Please select Order Type");
       return false;
     }
 
-    // 🔴 GUARD 2: Cart must not be empty
+    // 🔴 GUARD 2
     if (amount <= 0) {
       showError("⚠️ Cart is empty");
       return false;
     }
-// 🔴 GUARD 2.5 — Payment required BEFORE eligibility check (guest-safe)
-const payment = document.getElementById("paymentMethod")?.value;
 
-if (!payment) {
-  showError("⚠️ Please select a payment method");
-  return false;
-}
+    // 🔴 GUARD 2.5
+    const payment = document.getElementById("paymentMethod")?.value;
+    if (!payment) {
+      showError("⚠️ Please select a payment method");
+      return false;
+    }
 
-    // 🔴 GUARD 3: Backend eligibility (final authority)
+    // 🔴 GUARD 3 — Backend eligibility
     const mobile = document.getElementById("mobile")?.value.trim();
+    const userType = isUserLoggedIn() ? "logged" : "guest";
 
-const userType = isUserLoggedIn() ? "logged" : "guest";
+    const res = await apiPost("checkOrderEligibility", {
+      orderType,
+      orderAmount: amount,
+      mobile,
+      userType,
+      lat: window._deliveryLocation?.lat || "",
+      lng: window._deliveryLocation?.lng || ""
+    });
 
-const res = await apiPost("checkOrderEligibility", {
-  orderType,
-  orderAmount: amount,
-  mobile,
-  userType, // 🔥 MOST IMPORTANT
-  lat: window._deliveryLocation?.lat || "",
-  lng: window._deliveryLocation?.lng || ""
-});
+    // 🔴 FIX-3: Just STORE backend data, DO NOT rebuild invoice here
+    window.orderEligibility = {
+      allowed: false,
+      extraCharge: Number(res?.extraCharge || 0),
+      chargeType: res?.chargeType || ""
+    };
 
-// 🔒 ALWAYS capture backend delivery charge (even if user not eligible yet)
-window.orderEligibility = {
-  allowed: false,   // permission later
-  extraCharge: Number(res?.extraCharge || 0),
-  chargeType: res?.chargeType || ""
-};
-// 🔥 Force preview refresh even if payment missing
-updateCheckoutInvoice();
+    // ❌ REMOVED: updateCheckoutInvoice();  <-- THIS WAS CAUSING LOOP
 
-    console.log("🧠 FULL RES KEYS:", Object.keys(res));
-console.log("🧠 RES JSON:", JSON.stringify(res, null, 2));
+    console.log("🧪 BACKEND RESPONSE:", res);
 
-console.log("🧾 FRONTEND → BACKEND PAYLOAD:", {
-  orderType,
-  orderAmount: amount
-});
-
-console.log("🧪 BACKEND RESPONSE:", res);
-
-    console.log("🧪 ELIGIBILITY CHECK:", res);
-// 📍 Location based delivery errors → show under location box
-if (
-  res?.reason === "OUT_OF_DELIVERY_RADIUS" ||
-  res?.reason === "LOCATION_NOT_SET"
-) {
-  const row = document.getElementById("locationStatusRow");
-  const txt = document.getElementById("locationStatusText");
-
-  if (row && txt) {
-    row.classList.remove("hidden");
-    row.classList.remove("border-green-400", "bg-green-50", "text-green-700");
-    row.classList.add("border-red-400", "bg-red-50", "text-red-700");
-
-    txt.innerText = res.message || "Delivery not available for this location";
-  }
-
-  // also show small message near payment
-  showError(res.message || "Delivery not available for this location");
-  return false;
-}
+    if (
+      res?.reason === "OUT_OF_DELIVERY_RADIUS" ||
+      res?.reason === "LOCATION_NOT_SET"
+    ) {
+      showError(res.message || "Delivery not available for this location");
+      return false;
+    }
 
     if (!res || res.allowed !== true) {
       showError(res?.message || "Order is not allowed at this time");
       return false;
     }
 
-window.orderEligibility = {
-  allowed: true,
-  extraCharge: Number(res.extraCharge || 0),
-  chargeType: res.chargeType || ""
-};
+    window.orderEligibility = {
+      allowed: true,
+      extraCharge: Number(res.extraCharge || 0),
+      chargeType: res.chargeType || ""
+    };
 
-    // ✅ PASSED ALL CHECKS
+    // ✅ SUCCESS (NO UI SIDE-EFFECT LOOP)
     showSuccess("✅ Great! Everything is ready — you may place your order now.");
     return true;
 
@@ -4514,8 +4505,13 @@ window.orderEligibility = {
     console.error("Eligibility check failed", err);
     showError("⚠️ System error. Please try again.");
     return false;
+
+  } finally {
+    // 🔴 FIX-4: ALWAYS release lock
+    window._eligibilityRunning = false;
   }
 }
+
 
   
 // ==================================
@@ -13505,6 +13501,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
