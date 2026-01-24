@@ -13255,16 +13255,21 @@ if (emailTpl && uiTpl) {
 
 
   async function validateAppliedCouponForMobile(mobile) {
+  console.log("🧪 validateAppliedCouponForMobile HIT", mobile);
+
   try {
-    // 🛑 agar coupon hi apply nahi hai → kuch mat karo
     const couponId =
-  window._appliedCoupon?.id ||
-  selectedCoupon?.id ||
-  window._checkoutInvoice?.couponId ||
-  "";
+      window._appliedCoupon?.id ||
+      selectedCoupon?.id ||
+      window._checkoutInvoice?.couponId ||
+      "";
 
-if (!couponId) return;
+    console.log("🎯 Picked couponId:", couponId);
 
+    if (!couponId) {
+      console.warn("⚠️ No couponId found, skipping validation");
+      return;
+    }
 
     const url =
       API_BASE_URL +
@@ -13272,44 +13277,54 @@ if (!couponId) return;
       "&mobile=" + encodeURIComponent(mobile) +
       "&couponId=" + encodeURIComponent(couponId);
 
+    console.log("🌐 Coupon validation API URL:", url);
+
     const res = await fetch(url);
     const result = await res.json();
 
-    console.log("Coupon check result:", result);
+    console.log("📦 Coupon check API result:", result);
 
-    // 🔥 RESULT HANDLE YAHAN HOTA HAI
+    // 🔥 RESULT HANDLE
     if (result && result.used === true) {
+      console.warn("❌ Coupon already used → removing coupon");
 
       // 1️⃣ coupon remove
       removeAppliedCoupon();
-// 🔒 FULL COUPON STATE RESET (CRITICAL)
-selectedCoupon = null;
-alreadyAppliedCouponId = "";
-window._appliedCoupon = null;
-window._appliedCouponId = "";
-window._appliedCouponType = "";
-window._appliedCouponDiscount = 0;
 
-// 🔒 ALSO CLEAN INVOICE
-if (window._checkoutInvoice) {
-  window._checkoutInvoice.couponId = "";
-  window._checkoutInvoice.couponAmount = 0;
-  window._checkoutInvoice.couponDiscount = 0;
-}
+      // 🔒 FULL COUPON STATE RESET
+      selectedCoupon = null;
+      alreadyAppliedCouponId = "";
+      window._appliedCoupon = null;
+      window._appliedCouponId = "";
+      window._appliedCouponType = "";
+      window._appliedCouponDiscount = 0;
 
-      // 2️⃣ user ko message
+      // 🔒 CLEAN INVOICE
+      if (window._checkoutInvoice) {
+        console.log("🧹 Cleaning checkout invoice coupon fields");
+        window._checkoutInvoice.couponId = "";
+        window._checkoutInvoice.couponAmount = 0;
+        window._checkoutInvoice.couponDiscount = 0;
+        window._checkoutInvoice.normalCoupon = 0;
+      }
+
+      // 2️⃣ user message
       alert(
         "Ye coupon is period me pehle hi use ho chuka hai, isliye remove kar diya gaya hai."
       );
 
       // 3️⃣ totals refresh
+      console.log("🔄 Recalculating cart totals");
       recalcCartTotals();
+    } else {
+      console.log("✅ Coupon not used / allowed");
     }
 
   } catch (err) {
-    console.error("Coupon validation failed", err);
+    console.error("❌ Coupon validation failed", err);
   }
 }
+
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -13566,6 +13581,7 @@ if (window._checkoutInvoice) {
   
 </body>
 </html>
+
 
 
 
