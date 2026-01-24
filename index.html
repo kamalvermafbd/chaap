@@ -2636,12 +2636,24 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  if (!isUserLoggedIn()) return;  // 🔐 login only
+  if (!isUserLoggedIn()) return; // 🔐 login only
 
   fetchOffersForPromoBanner().then(() => {
-    showLoginUserOfferBanner();
+
+    // 🔒 STEP-A: filter only safe promo offers
+    const safePromoOffers = filterPromoOffersForUser(
+      window.promoOffers || []
+    );
+
+    // 🔒 STEP-B: show / hide banner safely
+    if (safePromoOffers.length > 0) {
+      renderPromoBanner(safePromoOffers);
+    } else {
+      hidePromoBanner(); // existing or simple classList.add("hidden")
+    }
   });
 });
+
 
 // ===============================
 // MENU LOAD
@@ -13246,6 +13258,34 @@ if (emailTpl && uiTpl) {
 }
   }
 
+  // 🔐 PROMO SAFEGUARD — LOGIN USER FRIENDLY
+// ===============================
+// 🔒 SAFE PROMO FILTER (LOGIN USER)
+// ===============================
+function filterPromoOffersForUser(offers = []) {
+  if (!Array.isArray(offers)) return [];
+
+  return offers.filter(o => {
+    // ❌ already used
+    if (o.used === true) return false;
+
+    // ❌ exhausted (limit over)
+    if (Number(o.remainingUses || 1) <= 0) return false;
+
+    // ❌ same coupon already applied in cart
+    if (
+      window._appliedCouponId &&
+      o.couponId === window._appliedCouponId
+    ) {
+      return false;
+    }
+
+    return true; // ✅ SAFE TO SHOW IN PROMO
+  });
+}
+
+
+  
 </script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
@@ -13501,6 +13541,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
