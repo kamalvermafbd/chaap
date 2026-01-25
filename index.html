@@ -3860,8 +3860,9 @@ function onMobileChanged() {
   guestAutoFilling   = false;
 }
 
-    let _lastCheckedMobile = null;
- function checkCustomerByMobile() {
+ let _lastCheckedMobile = null;
+
+function checkCustomerByMobile() {
   const mobile = document.getElementById("mobile").value.trim();
   const hint = document.getElementById("mobileHint");
 
@@ -3879,72 +3880,81 @@ function onMobileChanged() {
   const cityWrapper    = document.getElementById("cityWrapper");
   const stateWrapper   = document.getElementById("stateWrapper");
 
-  /* ❌ MOBILE < 10 DIGITS */
+  /* ======================================================
+   * ❌ MOBILE < 10 DIGITS → FULL HARD RESET
+   * ====================================================== */
   if (mobile.length < 10) {
 
-    // 🔴 hint show
+    // 🔴 show hint
     hint.style.display = "block";
 
-    // ⛔ RESET ORDER TYPE
+    // 🔄 RESET UI (reuse existing reset)
+    resetCheckoutFieldsDefault();
+
+    // 🔄 reset order type explicitly
     if (orderType) orderType.value = "";
     if (orderTypeBox) orderTypeBox.style.display = "none";
 
-    // ⛔ CLEAR + HIDE NAME / EMAIL
+    // 🔄 clear text fields
     nameInput.value  = "";
     emailInput.value = "";
 
-    nameWrapper.style.display  = "none";
-    emailWrapper.style.display = "none";
-
-    // ⛔ CLEAR + HIDE ADDRESS BLOCK
     document.getElementById("address").value = "";
     document.getElementById("pincode").value = "";
     document.getElementById("city").value    = "";
     document.getElementById("state").value   = "";
 
+    // 🔄 hide wrappers
+    nameWrapper.style.display  = "none";
+    emailWrapper.style.display = "none";
     addressWrapper.style.display = "none";
     pincodeWrapper.style.display = "none";
     cityWrapper.style.display    = "none";
     stateWrapper.style.display   = "none";
- _lastCheckedMobile = null; // reset guard
-    // 🔥 FULL CHECKOUT RESET (CRITICAL)
-window._deliveryLocationReady = false;
-window.orderEligibility = { allowed:false, extraCharge:0, chargeType:"" };
-window._guestLocationPromptShown = false;
-window._skipCouponSyncForCheckout = false;
-// 🔥 HARD RESET DELIVERY LOCATION (CRITICAL)
-window._deliveryLocation = null;
-window._userLat = "";
-window._userLng = "";
-window._deliveryLocationReady = false;
 
-// hide location UI
-const locRow = document.getElementById("locationStatusRow");
-if (locRow) locRow.classList.add("hidden");
+    // 🔒 reset guards
+    _lastCheckedMobile = null;
 
-const mapBox = document.getElementById("mapPreviewBox");
-if (mapBox) mapBox.classList.add("hidden");
+    // 🔥 RUNTIME STATE RESET (CRITICAL)
+    window._deliveryLocation = null;
+    window._deliveryLocationReady = false;
+    window._userLat = "";
+    window._userLng = "";
 
-const mapFrame = document.getElementById("mapPreviewFrame");
-if (mapFrame) mapFrame.src = "";
+    window.orderEligibility = { allowed:false, extraCharge:0, chargeType:"" };
+    window._guestLocationPromptShown = false;
+    window._skipCouponSyncForCheckout = false;
+    window._orderTypeChanging = false;
+    window._lastPromptOrderType = null;
+
+    // 🔄 hide location UI
+    const locRow = document.getElementById("locationStatusRow");
+    if (locRow) locRow.classList.add("hidden");
+
+    const mapBox = document.getElementById("mapPreviewBox");
+    if (mapBox) mapBox.classList.add("hidden");
+
+    const mapFrame = document.getElementById("mapPreviewFrame");
+    if (mapFrame) mapFrame.src = "";
 
     return;
   }
 
-  /* ✅ MOBILE = 10 DIGITS */
+  /* ======================================================
+   * ✅ MOBILE = 10 DIGITS → READY STATE
+   * ====================================================== */
   hint.style.display = "none";
-   // 🔒 prevent repeat API calls for same number
+
+  // 🔒 prevent duplicate runs for same number
   if (_lastCheckedMobile === mobile) return;
   _lastCheckedMobile = mobile;
-   
-//validateAppliedCouponForMobile(mobile);
 
-  // show only order type
+  // show order type selector
   if (orderTypeBox) orderTypeBox.style.display = "block";
-   // 🔁 POST-MOBILE-READY SYNC
-syncCouponFromDrawerForCheckout();
-updateCheckoutInvoice();
 
+  // 🔁 ensure checkout reflects new mobile context
+  syncCouponFromDrawerForCheckout();
+  updateCheckoutInvoice();
 }
 
 
@@ -6953,7 +6963,7 @@ function resetCheckoutFieldsDefault() {
 
   // SHOW only these 3 rows
   document.getElementById("mobile").parentElement.style.display = "block";
-  document.getElementById("orderType").parentElement.style.display = "block";
+ // document.getElementById("orderType").parentElement.style.display = "block";
   document.getElementById("paymentMethod").parentElement.style.display = "block";
 
   // HIDE Name + Email + Address (label + input together)
@@ -13596,6 +13606,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
