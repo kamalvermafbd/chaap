@@ -5005,6 +5005,14 @@ if (mobileInput) {
     }
 
     mobileInput.value = val;
+
+     // ✅ ADD THIS BLOCK (EXACTLY HERE)
+    if (/^[0-9]{10}$/.test(val)) {
+      console.log("📞 Mobile valid → refresh checkout coupon");
+
+      syncCouponFromDrawerForCheckout();
+      updateCheckoutInvoice();
+    }
      // STEP 1a: hide mobile error while typing
     
       // ✅ IMPORTANT: re-trigger logic after auto-fix
@@ -13563,6 +13571,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
