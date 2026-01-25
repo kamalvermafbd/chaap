@@ -12299,17 +12299,21 @@ function syncCouponFromDrawerForCheckout() {
   if (!window.cartSummary) return;
   if (!window._drawerTotals) return;
 
-  // 🚫 GUEST + normal discount invalidated → skip ONLY normal discount
+  // 🚫 Guest + normal coupon explicitly invalidated
   if (!isUserLoggedIn() && window._skipCouponSyncForCheckout === true) {
     console.warn("🚫 Guest normal discount sync skipped");
     window.cartSummary.couponAmount = 0;
-    return;
+  } else {
+    // ✅ ULTIMATE RULE:
+    // Final effective normal coupon > 0 ho to hi post karo
+    const normalDiscount =
+      Number(window._drawerTotals.offerDiscount || 0);
+
+    window.cartSummary.couponAmount =
+      normalDiscount > 0 ? normalDiscount : 0;
   }
 
-  // ✅ normal flow (guest normal OR logged-in reward/paid)
-  window.cartSummary.couponAmount =
-    Number(window._drawerTotals.offerDiscount || 0);
-
+  // 🔒 Reward discount always sync separately (unchanged)
   window.cartSummary.rewardDiscount =
     Number(window._drawerTotals.rewardDiscount || 0);
 }
@@ -13717,6 +13721,7 @@ async function validateAppliedCouponForMobile(mobile) {
   
 </body>
 </html>
+
 
 
 
