@@ -3907,6 +3907,12 @@ function onMobileChanged() {
     cityWrapper.style.display    = "none";
     stateWrapper.style.display   = "none";
  _lastCheckedMobile = null; // reset guard
+    // 🔥 FULL CHECKOUT RESET (CRITICAL)
+window._deliveryLocationReady = false;
+window.orderEligibility = { allowed:false, extraCharge:0, chargeType:"" };
+window._guestLocationPromptShown = false;
+window._skipCouponSyncForCheckout = false;
+
     return;
   }
 
@@ -3920,6 +3926,10 @@ function onMobileChanged() {
 
   // show only order type
   if (orderTypeBox) orderTypeBox.style.display = "block";
+   // 🔁 POST-MOBILE-READY SYNC
+syncCouponFromDrawerForCheckout();
+updateCheckoutInvoice();
+
 }
 
 
@@ -13571,6 +13581,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
