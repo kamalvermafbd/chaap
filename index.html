@@ -4862,7 +4862,21 @@ lng: orderType === "Home Delivery"
     invoiceImage: invoiceImageBase64,
  invoiceSnapshot: window._checkoutInvoice
   };
-  console.log("👤 userType:", userType);
+
+  // 🔒 GUEST COUPON SAFETY RULE (LOGIN USER UNTOUCHED)
+if (!isUserLoggedIn()) {
+  const normalDisc = Number(drawer.offerDiscount || 0);
+
+  // agar normal coupon effectively 0 hai → hard reset
+  if (normalDisc <= 0) {
+    orderData.couponDiscount = 0;
+    orderData.couponId = "";
+    orderData.couponType = "";
+  }
+}
+
+  
+    console.log("👤 userType:", userType);
 console.log("🚀 ORDER PAYLOAD TO BACKEND:", JSON.stringify(orderData, null, 2));
 document.querySelectorAll('#checkoutForm input, #checkoutForm select')
   .forEach(el => el.disabled = true);
@@ -13729,6 +13743,7 @@ async function validateAppliedCouponForMobile(mobile) {
   
 </body>
 </html>
+
 
 
 
