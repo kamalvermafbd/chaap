@@ -4881,16 +4881,18 @@ if (orderData.couponDiscount > 0 && !orderData.couponId) {
   resetPlaceOrderBtn();
   return;
 }
-// 🔒 GUEST COUPON CONTROL — API DRIVEN
+// 🔒 GUEST COUPON FINAL GUARD (CORRECT)
 if (!isUserLoggedIn()) {
 
-  // API ka final verdict (true / false)
-  const guestCouponAllowed = window._guestCouponAllowed === true;
+  // API ne explicitly bola: NOT allowed
+  if (window._guestCouponAllowed === false) {
 
-  if (!guestCouponAllowed) {
-    orderData.couponDiscount = 0;
-    orderData.couponId = "";
-    orderData.couponType = "";
+    // aur coupon abhi bhi kisi wajah se bacha hua hai
+    if (orderData.couponId || orderData.couponDiscount > 0) {
+      orderData.couponDiscount = 0;
+      orderData.couponId = "";
+      orderData.couponType = "";
+    }
   }
 }
 
@@ -13466,6 +13468,8 @@ async function validateAppliedCouponForMobile(mobile) {
     const result = await res.json();
 
     console.log("📦 Coupon check API result:", result);
+// 🔑 API verdict snapshot (guest coupon decision)
+window._guestCouponAllowed = (result && result.used === false);
 
     /* =====================================
      * ❌ COUPON ALREADY USED
@@ -13743,6 +13747,7 @@ async function validateAppliedCouponForMobile(mobile) {
   
 </body>
 </html>
+
 
 
 
