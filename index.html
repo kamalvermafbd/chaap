@@ -2372,6 +2372,7 @@ function fmt(amount, digits = 2) {
 }
 
 window._disableBestOffer = false;
+window._skipCouponSyncForCheckout = false;
 
 
     
@@ -12298,14 +12299,27 @@ function syncCouponFromDrawerForCheckout() {
   if (!window.cartSummary) return;
   if (!window._drawerTotals) return;
 
- 
-  // ❌ DO NOT mix reward into normal coupon
-window.cartSummary.couponAmount = Number(window._drawerTotals.offerDiscount || 0);
-window.cartSummary.rewardDiscount = Number(window._drawerTotals.rewardDiscount || 0);
+  // 🚫 GUEST + normal discount invalidated → skip ONLY normal discount
+  if (!isUserLoggedIn() && window._skipCouponSyncForCheckout === true) {
+    console.warn("🚫 Guest normal discount sync skipped");
+    window.cartSummary.couponAmount = 0;
+    return;
+  }
 
+  // ✅ normal flow (guest normal OR logged-in reward/paid)
+  window.cartSummary.couponAmount =
+    Number(window._drawerTotals.offerDiscount || 0);
+
+  window.cartSummary.rewardDiscount =
+    Number(window._drawerTotals.rewardDiscount || 0);
 }
 
+
 function injectCheckoutOfferDiscount(inv) {
+
+// 🚫 GUEST + normal discount invalid → do not inject UI
+if (!isUserLoggedIn() && window._skipCouponSyncForCheckout === true) return;
+  
   if (!inv || !inv.couponAmount || inv.couponAmount <= 0) return;
 
   const container = document.querySelector("#checkoutInvoiceContainer");
@@ -13262,29 +13276,34 @@ if (emailTpl && uiTpl) {
   console.group("🚫 invalidateAppliedCoupon START");
 
   console.log("🧪 BEFORE REMOVE SNAPSHOT", {
+    isGuest: !isUserLoggedIn(),
     appliedType: window._appliedCouponType,
     couponMode: window.couponMode,
-    disableBest: window._disableBestOffer,
+    skipSync: window._skipCouponSyncForCheckout,
     normalCoupon: window._checkoutInvoice?.normalCoupon
   });
 
   const appliedType = window._appliedCouponType || "";
 
   /* =====================================
-   * 🟢 CASE 1: BEST OFFER AUTO-APPLIED
+   * 🟢 CASE 1: BEST OFFER / NORMAL DISCOUNT
    * ===================================== */
   if (appliedType === "best") {
 
     console.log("🟢 BEST OFFER detected → removing");
 
-    // 🔥 HARD RESET (console-proven)
-    window.couponMode = "";
-    window._disableBestOffer = true;
+    // 🔒 GUEST ONLY: control NORMAL discount
+    if (!isUserLoggedIn()) {
+      window.couponMode = "";                 // auto best-offer mode off
+      window._disableBestOffer = true;        // session guard
+      window._skipCouponSyncForCheckout = true; // 🔥 key fix (drawer → checkout)
 
-    console.log("🔒 HARD RESET DONE", {
-      couponMode: window.couponMode,
-      disableBest: window._disableBestOffer
-    });
+      console.log("🔒 GUEST NORMAL DISCOUNT DISABLED", {
+        couponMode: window.couponMode,
+        disableBest: window._disableBestOffer,
+        skipSync: window._skipCouponSyncForCheckout
+      });
+    }
 
     // clear best-offer state
     window._appliedCouponType = null;
@@ -13292,17 +13311,14 @@ if (emailTpl && uiTpl) {
     window._appliedCouponId = "";
     window._appliedCouponDiscount = 0;
 
-    // clear invoice snapshot
+    // clear checkout snapshot (safe even if locked)
     if (window._checkoutInvoice) {
       window._checkoutInvoice.couponId = "";
       window._checkoutInvoice.couponAmount = 0;
       window._checkoutInvoice.couponDiscount = 0;
       window._checkoutInvoice.normalCoupon = 0;
 
-      console.log("🧾 INVOICE CLEARED", {
-        couponAmount: window._checkoutInvoice.couponAmount,
-        normalCoupon: window._checkoutInvoice.normalCoupon
-      });
+      console.log("🧾 INVOICE NORMAL DISCOUNT CLEARED");
     }
 
     const bestBox = document.getElementById("bestOfferApplied");
@@ -13313,11 +13329,17 @@ if (emailTpl && uiTpl) {
   }
 
   /* =====================================
-   * 🟡 CASE 2: MANUAL COUPON
+   * 🟡 CASE 2: MANUAL COUPON (API invalid etc.)
    * ===================================== */
   else {
 
     console.log("🟡 MANUAL coupon detected → removing");
+
+    // 🔒 GUEST ONLY: manual coupon invalid → still normal discount flow
+    if (!isUserLoggedIn()) {
+      window._skipCouponSyncForCheckout = true;
+      console.log("🔒 Guest manual coupon invalid → skip normal discount sync");
+    }
 
     selectedCoupon = null;
     alreadyAppliedCouponId = "";
@@ -13362,9 +13384,10 @@ if (emailTpl && uiTpl) {
    * 🔍 FINAL SNAPSHOT
    * ===================================== */
   console.log("🧪 AFTER REMOVE SNAPSHOT", {
+    isGuest: !isUserLoggedIn(),
     appliedType: window._appliedCouponType,
     couponMode: window.couponMode,
-    disableBest: window._disableBestOffer,
+    skipSync: window._skipCouponSyncForCheckout,
     normalCoupon: window._checkoutInvoice?.normalCoupon
   });
 
@@ -13377,6 +13400,7 @@ if (emailTpl && uiTpl) {
     alert(reason);
   }
 }
+
 
 
 async function validateAppliedCouponForMobile(mobile) {
@@ -13693,6 +13717,7 @@ async function validateAppliedCouponForMobile(mobile) {
   
 </body>
 </html>
+
 
 
 
