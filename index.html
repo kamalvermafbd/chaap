@@ -3934,6 +3934,14 @@ let guestAutoFilling  = false;
 window._guestLocationPromptShown = false;
     
 function toggleAddressField() {
+  // 🔒 prevent heavy re-runs on orderType change
+if (window._orderTypeChanging === true) return;
+window._orderTypeChanging = true;
+
+setTimeout(() => {
+  window._orderTypeChanging = false;
+}, 0);
+
 console.log("toggleAddressField fired");
 
   const mobile = document.getElementById("mobile").value.trim();
@@ -12396,17 +12404,21 @@ function unlockCheckout() {
 
 
  async function updateCheckoutInvoice() {
+
+    if (window._invoiceUpdating) return;
+  window._invoiceUpdating = true;
+   
    document.getElementById("checkoutInvoiceOverlay")?.classList.remove("hidden");
 
      if (window._cartSavePromise) {
     await window._cartSavePromise;
   }
-    toggleAddressField(); 
+    
   syncCouponFromDrawerForCheckout();
   mountInvoiceIntoCheckout();
-console.log("🧪 PREVIEW", buildCheckoutPreviewInv());
-
+   
   const inv = buildCheckoutPreviewInv();
+   console.log("🧪 PREVIEW", buildCheckoutPreviewInv());
    
   renderInvoiceFromAPI(inv);
 document.getElementById("checkoutInvoiceOverlay")?.classList.add("hidden");
@@ -12442,6 +12454,7 @@ if (inv.serviceAmt > 0) {
 
   injectCheckoutOfferDiscount(inv);
     window._couponApplying = false;
+   window._invoiceUpdating = false;
 }
 
 
@@ -13547,6 +13560,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
