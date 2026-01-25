@@ -3912,6 +3912,21 @@ window._deliveryLocationReady = false;
 window.orderEligibility = { allowed:false, extraCharge:0, chargeType:"" };
 window._guestLocationPromptShown = false;
 window._skipCouponSyncForCheckout = false;
+// 🔥 HARD RESET DELIVERY LOCATION (CRITICAL)
+window._deliveryLocation = null;
+window._userLat = "";
+window._userLng = "";
+window._deliveryLocationReady = false;
+
+// hide location UI
+const locRow = document.getElementById("locationStatusRow");
+if (locRow) locRow.classList.add("hidden");
+
+const mapBox = document.getElementById("mapPreviewBox");
+if (mapBox) mapBox.classList.add("hidden");
+
+const mapFrame = document.getElementById("mapPreviewFrame");
+if (mapFrame) mapFrame.src = "";
 
     return;
   }
@@ -13581,6 +13596,7 @@ if (emailTpl && uiTpl) {
   
 </body>
 </html>
+
 
 
 
