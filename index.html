@@ -4881,12 +4881,19 @@ if (orderData.couponDiscount > 0 && !orderData.couponId) {
   resetPlaceOrderBtn();
   return;
 }
-// 🔒 FINAL RULE: GUEST USER NEVER SENDS COUPON
+// 🔒 GUEST COUPON CONTROL — API DRIVEN
 if (!isUserLoggedIn()) {
-  orderData.couponDiscount = 0;
-  orderData.couponId = "";
-  orderData.couponType = "";
+
+  // API ka final verdict (true / false)
+  const guestCouponAllowed = window._guestCouponAllowed === true;
+
+  if (!guestCouponAllowed) {
+    orderData.couponDiscount = 0;
+    orderData.couponId = "";
+    orderData.couponType = "";
+  }
 }
+
 
   apiPost("placeOrder", orderData)
     .then(res => {
@@ -13736,6 +13743,7 @@ async function validateAppliedCouponForMobile(mobile) {
   
 </body>
 </html>
+
 
 
 
