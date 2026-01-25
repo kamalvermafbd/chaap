@@ -13356,6 +13356,14 @@ if (emailTpl && uiTpl) {
     }
   }
 
+      /* =====================================
+   * 🔥 🔥 CRITICAL FIX — RESET CART SUMMARY
+   * ===================================== */
+  if (window.cartSummary) {
+    window.cartSummary.couponAmount = 0;
+    window.cartSummary.couponId = "";
+  }
+
   /* =====================================
    * 🔄 COMMON REFRESH
    * ===================================== */
@@ -13721,6 +13729,7 @@ async function validateAppliedCouponForMobile(mobile) {
   
 </body>
 </html>
+
 
 
 
