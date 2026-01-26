@@ -4425,6 +4425,22 @@ function enablePlaceOrder() {
 }
 
 async function canProceedPlaceOrder() {
+// ===============================
+// 🔒 PROCESSING STATE (default)
+// ===============================
+const placeBtn = document.getElementById("placeOrderBtn");
+const payMsg   = document.getElementById("paymentError");
+
+if (placeBtn) {
+  placeBtn.disabled = true;
+  placeBtn.classList.add("disabled-btn");
+}
+
+if (payMsg) {
+  payMsg.classList.remove("hidden", "text-green-600");
+  payMsg.classList.add("text-red-600");
+  payMsg.innerText = "⏳ Your order is being processed. Please wait…";
+}
 
   // 🔴 FIX-1: HARD GUARD — prevent repeated / parallel execution
   if (window._eligibilityRunning) {
@@ -13839,6 +13855,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
