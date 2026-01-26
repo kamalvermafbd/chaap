@@ -7050,6 +7050,19 @@ const mapBox = document.getElementById("mapPreviewBox");
 mapBox.classList.add("hidden");
 
 document.getElementById("mapPreviewFrame").src = "";
+console.log("🧪 LOCATION STATE CHECK", {
+  selectedLocation: window.selectedLocation,
+  deliveryLatLng: window.deliveryLatLng,
+  isLocationSet: window.isLocationSet,
+  addressValue: document.getElementById("address").value,
+  locationStatusVisible: !document
+    .getElementById("locationStatusRow")
+    .classList.contains("hidden"),
+  mapVisible: !document
+    .getElementById("mapPreviewBox")
+    .classList.contains("hidden"),
+  mapSrc: document.getElementById("mapPreviewFrame").src
+});
 
 }
 
@@ -13911,6 +13924,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
