@@ -6987,6 +6987,24 @@ function resetCheckoutFieldsDefault() {
   document.getElementById("mobile").parentElement.style.display = "block";
  // document.getElementById("orderType").parentElement.style.display = "block";
   document.getElementById("paymentMethod").parentElement.style.display = "block";
+  // ===============================
+  // 🔄 RESET PAYMENT + STATUS STATE
+  // ===============================
+  window.selectedPaymentMethod = "";
+  document.getElementById("paymentMethod").value = "";
+
+  const payMsg = document.getElementById("paymentError");
+  if (payMsg) {
+    payMsg.innerText = "";
+    payMsg.classList.add("hidden");
+    payMsg.classList.remove("text-green-600", "text-red-600");
+  }
+
+  const placeBtn = document.getElementById("placeOrderBtn");
+  if (placeBtn) {
+    placeBtn.disabled = true;
+    placeBtn.classList.add("disabled-btn");
+  }
 
   // HIDE Name + Email + Address (label + input together)
   document.getElementById("customerName").parentElement.style.display = "none";
@@ -13860,6 +13878,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
