@@ -7025,6 +7025,13 @@ document.querySelectorAll(".paymentBtn").forEach(btn => {
 
   // Payment MUST remain visible always
   document.getElementById("paymentMethod").style.display = "block";
+
+  // ===============================
+// 🔄 RESET LOCATION (GUEST ONLY)
+// ===============================
+window.selectedLocation = null;
+window.deliveryLatLng = null;
+window.isLocationSet = false;
 }
 
 
