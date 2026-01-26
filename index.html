@@ -10570,76 +10570,40 @@ function markAppliedCouponUI() {
   }
 }
 
-function applyRewardCoupon(couponCode, rewardAmount) {
+function applyRewardCoupon(couponCode, amount, couponType) {
+  if (!couponCode) return;
 
-  // 🔴 RED FIX: SAFETY GUARD — PAID coupon must NOT enter reward flow
-  if (String(couponCode).startsWith("PC-")) {
-    console.warn("⛔ Paid coupon blocked in applyRewardCoupon:", couponCode);
-    return;
-  }
+  // 🔑 default safety
+  const type = couponType || "reward"; // reward | paid
 
-  // 🛑 already applied → do nothing
+  console.log("🎟 Applying coupon:", couponCode, type, amount);
+
+  // 🛑 already applied
   if (
-    window._appliedCouponType === "reward" &&
+    window._appliedCouponType === type &&
     alreadyAppliedCouponId === couponCode
   ) {
     return;
   }
 
-  // 🔥 CLEAR BEST OFFER (TEMPORARY, THIS CART ONLY)
-  if (selectedCoupon && selectedCoupon.type === "offer") {
-    selectedCoupon = null;
-  }
-
-  window._couponLocked = false;
-
-  // 🔒 lock coupons (reward wins)
+  // 🔒 lock coupon system
   window._couponLocked = true;
-
-  // 🔴 RED FIX: explicitly mark applied type as reward
-  window._appliedCouponType = "reward";
+  window._appliedCouponType = type;
   window.couponMode = "manualcoupon";
 
-  // ❌ REMOVE any previously applied coupon
+  // ❌ clear offer coupon
   selectedCoupon = null;
-  alreadyAppliedCouponId = "";
-
-  // ✅ APPLY reward coupon (DRAWER SINGLE SOURCE)
-  window.drawerSpecialCoupon = {
-    // 🔴 RED FIX: type hard-locked to reward (safe after PC guard)
-    type: "reward",
-    id: couponCode,
-    amount: Number(rewardAmount || 0)
-  };
-
   alreadyAppliedCouponId = couponCode;
 
-  // 🔄 recalc totals
-  try {
-    updateDrawerTotals();
-  } catch (e) {}
+  // ✅ SINGLE SOURCE (drawer)
+  window.drawerSpecialCoupon = {
+    type,                 // 🔥 dynamic
+    id: couponCode,
+    amount: Number(amount || 0)
+  };
 
-  // 🔁 refresh reward UI
-  toggleClaimRewardOnCart(getCart());
-
-  // 🚫 DISABLE normal coupon list
-  const offerList = document.getElementById("offerList");
-  if (offerList) {
-    offerList.style.pointerEvents = "auto";
-    offerList.style.opacity = "0.85";
-  }
-
-  // 🔴 SHOW RED INFO MESSAGE
-  const offerLoadingText = document.getElementById("offerLoadingText");
-  if (offerLoadingText) {
-    offerLoadingText.innerText =
-      "Reward coupon already applied. Promotional offers cannot be used together.";
-    offerLoadingText.style.display = "block";
-    offerLoadingText.style.color = "#dc2626";
-    offerLoadingText.style.fontSize = "14px";
-    offerLoadingText.style.fontWeight = "600";
-  }
-
+  updateDrawerTotals();
+  syncCouponFromDrawerForCheckout();
   markAppliedCouponUI();
 }
 
@@ -14053,6 +14017,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
