@@ -9785,8 +9785,9 @@ if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type 
   // =====================================================
   // ========== 2) COUPON & OFFER LOGIC ==================
   // =====================================================
-  let offerDiscount = 0;   // normal coupon
-let rewardDiscount = 0; // 🔥 reward wallet
+ let offerDiscount = 0;   // normal coupon
+let rewardDiscount = 0; // reward wallet
+let paidDiscount   = 0; // 🔴 RED FIX: prepaid / paid coupon
 let appliedOfferText = "";
 let rewardHint = "";
 
@@ -9819,20 +9820,32 @@ if (selectedCoupon && selectedCoupon.type === "reward") {
         }
 
 if (o.flat) {
+
   if (o.type === "reward") {
-    rewardDiscount = Math.min(Number(o.flat), subtotal);   // ✅ wallet
-  } else {
-    offerDiscount = Number(o.flat);                        // normal coupon
+    rewardDiscount = Math.min(Number(o.flat), subtotal);   // reward wallet
+  }
+
+  // 🔴 RED FIX: PAID / PREPAID coupon
+  else if (o.type === "paid") {
+    paidDiscount = Math.min(Number(o.flat), subtotal);
+  }
+
+  // normal / offer coupon
+  else {
+    offerDiscount = Number(o.flat);
   }
 }
+
        // 🧪 DEBUG: Reward / Paid coupon applied in drawer
 console.log("🎁 Drawer Special Coupon DEBUG", {
   selectedCouponType: selectedCoupon?.type || "",
   selectedCouponId: selectedCoupon?.id || "",
   rewardDiscount,
+  paidDiscount,        // 🔴 RED FIX
   offerDiscount,
   couponMode: window.couponMode
 });
+
 
         offerDiscount = Number(offerDiscount.toFixed(2));
         appliedOfferText = `🎁 ${o.text} applied`;
@@ -9912,7 +9925,8 @@ try {
   }
 } catch (e) {}
 
-const afterTaxWallet = signupDiscount + rewardDiscount;   // 🔥 reward included
+// 🔴 RED FIX: include PAID coupon
+const afterTaxWallet = signupDiscount + rewardDiscount + paidDiscount;
 
   // =====================================================
   // ========== 4) TAX + SERVICE CHARGE ==================
@@ -9974,13 +9988,26 @@ ${offerDiscount > 0
            <span>- ${fmt(rewardDiscount)}</span>
          </div>`
       : ``}
+${paidDiscount > 0 
+  ? `<div class="flex justify-between text-green-600">
+       <span>Prepaid Coupon:</span>
+       <span>- ${fmt(paidDiscount)}</span>
+     </div>`
+  : ``}
 
     ${(offerDiscount > 0 || signupDiscount > 0 || rewardDiscount > 0) ? `
   <div class="border-t my-2"></div>
 
   <div class="flex justify-between items-center font-semibold text-base sm:text-lg text-gray-900 whitespace-nowrap">
     <span>Amt after coupon adj</span>
-    <span>${fmt(subtotal - offerDiscount - signupDiscount - rewardDiscount)}</span>
+    <span>${fmt(
+  subtotal
+  - offerDiscount
+  - signupDiscount
+  - rewardDiscount
+  - paidDiscount     // 🔴 RED FIX: include prepaid
+)}</span>
+
   </div>
 ` : ``}
 
@@ -9996,6 +10023,9 @@ window._drawerTotals = {
   baseTotal: subtotal,
   offerDiscount: offerDiscount,
   rewardDiscount: rewardDiscount,
+  // 🔴 RED FIX: expose paid coupon to drawer + checkout
+  paidCouponDiscount: paidDiscount,
+  
   signupDiscount: signupDiscount,
   payableAfterDiscount: netPayable,   // 🔥 FIX
   serviceAmt: serviceAmt,
@@ -14012,6 +14042,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
