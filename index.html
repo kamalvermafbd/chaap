@@ -12257,7 +12257,10 @@ document.getElementById("invoiceItems").innerHTML =
     ? window.drawerSpecialCoupon.amount
     : Number(inv.rewardDiscount || 0);
 
-  const paid = Number(inv.paidCouponDiscount || 0);
+  // 🔴 FIX: drawer always wins
+const paid =
+  Number(inv.paidCouponDiscount || 0) ||
+  Number(window._drawerTotals?.paidCouponDiscount || 0);
 
   // Actual selling price
   const grossValue = items - normalCoupon;
@@ -12613,7 +12616,12 @@ function syncCouponFromDrawerForCheckout() {
 
   // 🔒 Reward discount always sync separately (unchanged)
   window.cartSummary.rewardDiscount =
-    Number(window._drawerTotals.rewardDiscount || 0);
+  Number(window._drawerTotals.rewardDiscount || 0);
+
+// 🔴 FIX: PAID / PREPAID COUPON SYNC
+window.cartSummary.paidCouponDiscount =
+  Number(window._drawerTotals.paidCouponDiscount || 0);
+
 }
 
 
@@ -13427,8 +13435,11 @@ const deliveryAmt = Number(inv.deliveryCharge || 0);
 
 const signup = Number(inv.signupDiscount || 0);
 const paid   = Number(inv.paidCouponDiscount || 0);
-const reward = Number(inv.rewardDiscount || inv.couponAmount || 0);
 
+  
+  const reward = Number(inv.rewardDiscount || inv.couponAmount || 0);
+
+  
 // order sheet only has total tax
 const taxTotal = Number(inv.taxTotal || 0);
 
@@ -14042,6 +14053,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
