@@ -9760,8 +9760,6 @@ if (cartArr.length === 0) {
     igstAmt: 0,
     grandTotal: 0
   };
-
-
   return;
 }
   // ----------------------------------------
@@ -9804,6 +9802,15 @@ let rewardHint = "";
   if (mode === "manualcoupon") {
 // ⭐ STEP-3B: Reward partial usage hint
 
+// 🔴 FIX: ensure drawer coupon is respected
+if (!selectedCoupon && window.drawerSpecialCoupon) {
+  selectedCoupon = {
+    id: window.drawerSpecialCoupon.id,
+    type: window.drawerSpecialCoupon.type,
+    flat: window.drawerSpecialCoupon.amount,
+    min: 0
+  };
+}
 
 if (selectedCoupon && selectedCoupon.type === "reward") {
   const rewardValue = Number(selectedCoupon.flat || 0);
@@ -9827,7 +9834,6 @@ if (selectedCoupon && selectedCoupon.type === "reward") {
         }
 
 if (o.flat) {
-
   if (o.type === "reward") {
     rewardDiscount = Math.min(Number(o.flat), subtotal);   // reward wallet
   }
@@ -9852,8 +9858,6 @@ console.log("🎁 Drawer Special Coupon DEBUG", {
   offerDiscount,
   couponMode: window.couponMode
 });
-
-
         offerDiscount = Number(offerDiscount.toFixed(2));
         appliedOfferText = `🎁 ${o.text} applied`;
 
@@ -10580,12 +10584,10 @@ function markAppliedCouponUI() {
 function applyRewardCoupon(couponCode, amount, couponType) {
   if (!couponCode) return;
 
-  // 🔑 default safety
-  const type = couponType || "reward"; // reward | paid
+  const type = couponType || "reward";
 
   console.log("🎟 Applying coupon:", couponCode, type, amount);
 
-  // 🛑 already applied
   if (
     window._appliedCouponType === type &&
     alreadyAppliedCouponId === couponCode
@@ -10593,7 +10595,6 @@ function applyRewardCoupon(couponCode, amount, couponType) {
     return;
   }
 
-  // 🔒 lock coupon system
   window._couponLocked = true;
   window._appliedCouponType = type;
   window.couponMode = "manualcoupon";
@@ -10602,11 +10603,19 @@ function applyRewardCoupon(couponCode, amount, couponType) {
   selectedCoupon = null;
   alreadyAppliedCouponId = couponCode;
 
-  // ✅ SINGLE SOURCE (drawer)
+  // ✅ drawer snapshot
   window.drawerSpecialCoupon = {
-    type,                 // 🔥 dynamic
+    type,
     id: couponCode,
     amount: Number(amount || 0)
+  };
+
+  // 🔴 THIS WAS MISSING (MOST IMPORTANT)
+  selectedCoupon = {
+    id: couponCode,
+    type: type,
+    flat: Number(amount || 0),
+    min: 0
   };
 
   updateDrawerTotals();
@@ -14024,6 +14033,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
