@@ -12230,7 +12230,8 @@ if (paid > 0) {
     cgst, sgst, igst,
     taxTotal,
     netPayable,
-    couponId: inv.couponId || "",
+   couponId: inv.couponId || window._appliedCoupon?.id || "",
+
     paymentMethod: inv.paymentMethod || ""
   };
 
@@ -13358,7 +13359,8 @@ if (paid > 0) {
     cgst, sgst, igst,
     taxTotal,
     netPayable,
-    couponId: inv.couponId || "",
+    couponId: inv.couponId || window._appliedCoupon?.id || "",
+
     paymentMethod: inv.paymentMethod || ""
   };
 
@@ -13837,6 +13839,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
