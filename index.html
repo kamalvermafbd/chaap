@@ -472,12 +472,15 @@ body::before {
 .animate-fadeIn {
   animation: fadeIn .25s ease-out;
 }
-  .disabled-btn {
-  opacity: 0.5 !important;
+ .disabled-btn {
+  background: #e5e7eb !important;      /* solid light gray */
+  color: #6b7280 !important;           /* readable gray text */
+  opacity: 1 !important;               /* 🔥 opacity hata diya */
   cursor: not-allowed !important;
-  background: #ccc !important;
-  pointer-events: auto !important; /* click allowed for alert */
-}  
+  border: 1px dashed #9ca3af !important;
+  pointer-events: auto !important;     /* alerts / messages ke liye */
+}
+
       #savedAddressDropdown {
     font-family: monospace;
   }
@@ -13882,6 +13885,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
