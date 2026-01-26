@@ -4502,8 +4502,7 @@ if (payMsg) {
       return false;
     }
 
-    if (paymentError) paymentError.classList.add("hidden");
-
+    
     const orderType = document.getElementById("orderType")?.value.trim();
     const amount = Number(window.cartSummary?.itemsSubtotal || 0);
 
@@ -6992,6 +6991,11 @@ function resetCheckoutFieldsDefault() {
   // ===============================
   window.selectedPaymentMethod = "";
   document.getElementById("paymentMethod").value = "";
+// 🔄 RESET payment button UI state
+document.querySelectorAll(".paymentBtn").forEach(btn => {
+  btn.classList.remove("bg-orange-500", "text-white", "border-orange-500");
+  btn.classList.add("bg-white", "text-gray-800", "border-gray-300");
+});
 
   const payMsg = document.getElementById("paymentError");
   if (payMsg) {
@@ -13878,6 +13882,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
