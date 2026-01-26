@@ -7032,6 +7032,15 @@ document.querySelectorAll(".paymentBtn").forEach(btn => {
 window.selectedLocation = null;
 window.deliveryLatLng = null;
 window.isLocationSet = false;
+  // ===============================
+// 🔐 GUEST: ORDER TYPE HIDE
+// ===============================
+if (!isLoggedIn()) {
+  const ot = document.getElementById("orderType");
+  ot.value = "";
+  ot.parentElement.style.display = "none";
+}
+
 }
 
 
@@ -13892,6 +13901,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
