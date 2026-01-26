@@ -12330,6 +12330,11 @@ if (paid > 0) {
     signupDiscount: signup,
     rewardDiscount: reward,
     paidCouponDiscount: paid,
+
+   couponType: window._appliedCouponType || "",
+  selectedCouponId: window.selectedCoupon?.id || "",
+  selectedCouponType: window.selectedCoupon?.type || "",
+
     taxableAmount: gstBase,
     cgst, sgst, igst,
     taxTotal,
@@ -13944,6 +13949,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
