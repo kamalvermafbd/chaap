@@ -9724,6 +9724,30 @@ if (o.flat) {
       const prevAuto = window._lastAutoCouponId;
 
       alreadyAppliedCouponId = best.id;
+
+// ===============================
+// 🔥 FIX: SYNC BEST OFFER AS REAL COUPON
+// ===============================
+const autoCoupon = {
+  id: best.id,
+  type: "normal",
+  discount: best.discount || 0,
+  flat: best.value || 0,
+  min: best.min || 0,
+  text: best.text || best.id
+};
+
+// 🔑 SINGLE SOURCE OF TRUTH
+selectedCoupon = autoCoupon;
+window._appliedCoupon = autoCoupon;
+alreadyAppliedCouponId = best.id;
+
+// 🧹 CLEAN any stale checkout snapshot
+if (window._checkoutInvoice) {
+  window._checkoutInvoice.couponId = best.id;
+}
+
+  
       offerDiscount = Number(best.value || 0);
       appliedOfferText = `🎉 ${best.text} (Saved ${fmt(offerDiscount)})`;
 
@@ -13813,5 +13837,6 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
