@@ -7029,6 +7029,8 @@ document.querySelectorAll(".paymentBtn").forEach(btn => {
   // ===============================
 // 🔄 RESET LOCATION (GUEST ONLY)
 // ===============================
+  document.getElementById("address").value = "";
+
 window.selectedLocation = null;
 window.deliveryLatLng = null;
 window.isLocationSet = false;
@@ -13901,6 +13903,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
