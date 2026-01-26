@@ -9165,17 +9165,17 @@ function renderAvailableUserCoupons(coupons = []) {
         </div>
       </div>
 
-     <button
+   <button
   class="px-3 py-1 text-sm bg-green-600 text-white rounded"
- onclick="${
-  (c.couponType === 'reward' || c.couponType === 'paid')
-    ? `applyRewardCoupon('${c.couponcode}', ${Number(c.flat || 0)})`
-    : `applyCoupon('${c.couponcode}')`
-}"
-
+  onclick="applyRewardCoupon(
+    '${c.couponcode}',
+    ${Number(c.flat || 0)},
+    '${c.couponType}'
+  )"
 >
   Apply
 </button>
+
 
     `;
 
@@ -9281,7 +9281,10 @@ function removeCouponIfNeeded() {
     alreadyAppliedCouponId = "";
     window._couponLocked = false;
     window._appliedCouponType = "";
-
+  
+    // 🔴 FIX: CLEAR drawer coupon (reward / paid)
+    window.drawerSpecialCoupon = null;
+    
     // 🔁 UI RESET
     const appliedBox = document.getElementById("bestOfferApplied");
     if (appliedBox) appliedBox.style.display = "none";
@@ -9299,6 +9302,7 @@ function removeCouponIfNeeded() {
     refreshCouponMotivationHint();
   }
 }
+  
 function removeAppliedCoupon() {
   // 1️⃣ reset coupon state
   selectedCoupon = null;
@@ -9306,6 +9310,9 @@ function removeAppliedCoupon() {
   window._couponLocked = false;
   window._appliedCouponType = "";
 
+ // 🔴 FIX: CLEAR drawer coupon
+  window.drawerSpecialCoupon = null;
+  
   // 2️⃣ UI reset
   const appliedBox = document.getElementById("bestOfferApplied");
   if (appliedBox) appliedBox.style.display = "none";
@@ -14017,6 +14024,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
