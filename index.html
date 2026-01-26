@@ -3396,13 +3396,24 @@ window.cartSummary = {
   items: cart,
   itemsSubtotal: d.baseTotal || baseTotal,
 
-  // 🔥 EXACT drawer discount (Offer / Reward / Paid sab yahin aa chuka)
-  couponAmount: d.offerDiscount || 0,
-  signupDiscount: d.signupDiscount || 0,
+  // ===== COUPONS (🔥 MAIN FIX) =====
+  couponAmount: Number(d.offerDiscount || 0),     // normal / offer
+  rewardDiscount:
+    window.drawerSpecialCoupon?.type === "reward"
+      ? Number(window.drawerSpecialCoupon.amount || 0)
+      : 0,
+
+  paidCouponDiscount:
+    window.drawerSpecialCoupon?.type === "paid"
+      ? Number(window.drawerSpecialCoupon.amount || 0)
+      : Number(d.paidCouponDiscount || 0),
+
+  signupDiscount: Number(d.signupDiscount || 0),
 
   totalDiscount:
     Number(d.offerDiscount || 0) +
-    Number(d.signupDiscount || 0),
+    Number(d.signupDiscount || 0) +
+    (window.drawerSpecialCoupon?.amount || 0),
 
   // ===== CHARGES =====
   serviceCharge: d.serviceAmt || 0,
@@ -3413,9 +3424,10 @@ window.cartSummary = {
     Number(d.sgstAmt || 0) +
     Number(d.igstAmt || 0),
 
-  // ===== FINAL PAYABLE (DRAWER GRAND TOTAL) =====
+  // ===== FINAL =====
   netPayable: d.grandTotal || baseTotal
 };
+
 
 
 const checkoutModal = document.getElementById("checkoutModal");
@@ -10530,6 +10542,12 @@ function markAppliedCouponUI() {
 
 function applyRewardCoupon(couponCode, rewardAmount) {
 
+  // 🔴 RED FIX: SAFETY GUARD — PAID coupon must NOT enter reward flow
+  if (String(couponCode).startsWith("PC-")) {
+    console.warn("⛔ Paid coupon blocked in applyRewardCoupon:", couponCode);
+    return;
+  }
+
   // 🛑 already applied → do nothing
   if (
     window._appliedCouponType === "reward" &&
@@ -10542,24 +10560,27 @@ function applyRewardCoupon(couponCode, rewardAmount) {
   if (selectedCoupon && selectedCoupon.type === "offer") {
     selectedCoupon = null;
   }
+
   window._couponLocked = false;
-  
+
   // 🔒 lock coupons (reward wins)
   window._couponLocked = true;
+
+  // 🔴 RED FIX: explicitly mark applied type as reward
   window._appliedCouponType = "reward";
-window.couponMode = "manualcoupon";
+  window.couponMode = "manualcoupon";
+
   // ❌ REMOVE any previously applied coupon
   selectedCoupon = null;
   alreadyAppliedCouponId = "";
 
-  // ✅ APPLY reward coupon
-  
-window.drawerSpecialCoupon = {
-  type: "reward",
-  id: couponCode,
-  amount: Number(rewardAmount || 0)
-};
-
+  // ✅ APPLY reward coupon (DRAWER SINGLE SOURCE)
+  window.drawerSpecialCoupon = {
+    // 🔴 RED FIX: type hard-locked to reward (safe after PC guard)
+    type: "reward",
+    id: couponCode,
+    amount: Number(rewardAmount || 0)
+  };
 
   alreadyAppliedCouponId = couponCode;
 
@@ -10588,9 +10609,10 @@ window.drawerSpecialCoupon = {
     offerLoadingText.style.fontSize = "14px";
     offerLoadingText.style.fontWeight = "600";
   }
-  markAppliedCouponUI();
 
+  markAppliedCouponUI();
 }
+
 
 
 async function refreshMonthlySpendAndReward() {
@@ -12351,9 +12373,22 @@ if (paid > 0) {
     rewardDiscount: reward,
     paidCouponDiscount: paid,
 
-   couponType: window._appliedCouponType || "",
-  selectedCouponId: window.selectedCoupon?.id || "",
-  selectedCouponType: window.selectedCoupon?.type || "",
+   couponType:
+  window.drawerSpecialCoupon?.type ||
+  inv.couponType ||
+  window._appliedCouponType ||
+  "",
+
+selectedCouponId:
+  window.drawerSpecialCoupon?.id ||
+  inv.couponId ||
+  "",
+
+selectedCouponType:
+  window.drawerSpecialCoupon?.type ||
+  inv.couponType ||
+  "",
+
 
     taxableAmount: gstBase,
     cgst, sgst, igst,
@@ -13977,6 +14012,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
