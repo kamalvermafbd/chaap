@@ -4016,7 +4016,7 @@ if (!orderType) return;
   nameField.closest("div").style.display = "block";
   emailField.closest("div").style.display = "block";
   paymentField.style.display = "block";
-console.log("overlay about to show");   //
+console.log("toggleAddressField reached");
 
 
   // ==========================================================
@@ -4151,7 +4151,10 @@ if (locRow) locRow.classList.add("hidden");        // ⭐ hide for non-HD
   nameField.readOnly = false;
   emailField.readOnly = false;
   addressField.readOnly = false;
-if (window._lastPromptOrderType === orderType) return; 
+if (window._lastPromptOrderType === orderType) {
+  return; // overlay already handled earlier
+}
+
   window._lastPromptOrderType = orderType;
   
 if (orderType !== "Home Delivery") {
@@ -4175,7 +4178,14 @@ if (
 
   if (addressLookupRunning) return;
 addressLookupRunning = true;
+
+  // 🔥 SHOW overlay for GUEST Home Delivery
+if (orderType === "Home Delivery") {
+  overlay.style.display = "flex";
+}
+ 
   console.log("📞 Guest lookup API CALL, mobile =", mobile);
+ 
 apiGet("getCustomerDetailsByMobile", { mobile })
   .then(rows => {
     console.log("📦 Guest lookup RAW rows =", rows);
@@ -13933,6 +13943,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
