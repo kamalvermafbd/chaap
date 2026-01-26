@@ -4571,8 +4571,13 @@ if (payMsg) {
 
     // ✅ SUCCESS (NO UI SIDE-EFFECT LOOP)
     showSuccess("✅ Great! Everything is ready — you may place your order now.");
-    return true;
-
+   
+// 🔓 ENABLE Place Order after success
+if (placeBtn) {
+  placeBtn.disabled = false;
+  placeBtn.classList.remove("disabled-btn");
+}
+ return true;
   } catch (err) {
     console.error("Eligibility check failed", err);
     showError("⚠️ System error. Please try again.");
@@ -13855,6 +13860,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
