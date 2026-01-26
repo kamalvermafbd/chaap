@@ -4756,9 +4756,7 @@ if (!paymentMethod) {
   const btn = document.getElementById("placeOrderBtn");
   btn.classList.add("payment-attention");
   setTimeout(() => btn.classList.remove("payment-attention"), 4000);
-
   resetPlaceOrderBtn();
-
   return;
 }
 
@@ -4767,8 +4765,6 @@ if (paymentError) {
   paymentError.innerText = "";
   paymentError.classList.add("hidden");
 }
-
-
 
   // ❌ BLOCK ORDER IF MOBILE INVALID (NO ALERT)
 if (!/^[0-9]{10}$/.test(mobile)) {
@@ -4910,7 +4906,8 @@ const safeCartItems = inv.items.map(i => ({ ...i }));
 const drawer = window._drawerTotals || {};
 const couponDiscFinal =
   Number(drawer.offerDiscount || 0) +
-  Number(drawer.rewardDiscount || 0);
+  Number(drawer.rewardDiscount || 0) +
+  Number(drawer.paidCouponDiscount || 0); // 🔴 ADD THIS
 
   const orderData = {
     customerName,
@@ -4921,11 +4918,8 @@ const couponDiscFinal =
     cartItems: normalizeCartForOrder(safeCartItems),
     baseTotal: Number(inv.itemsSubtotal || 0),
 signupDiscount: Number(inv.signupDiscount || 0),
-payableAfterDiscount: Number(
-  (inv.taxableAmount || 0) -
-  couponDiscFinal -
-  Number(inv.signupDiscount || 0)
-),
+payableAfterDiscount: Number(inv.netPayable || 0),
+
 serviceAmt: Number(inv.serviceCharge || 0),
 taxableAmount: Number(inv.taxableAmount || 0),
 cgstAmt: Number(inv.cgst || 0),
@@ -4938,7 +4932,11 @@ couponId:
   selectedCoupon?.id ||
   alreadyAppliedCouponId ||
   "",
-    couponType: selectedCoupon ? selectedCoupon.type : "",
+   couponType:
+  selectedCoupon?.type ||
+  window.drawerSpecialCoupon?.type ||
+  "",
+
 couponDiscount: Number(couponDiscFinal || 0),
 
     pincode,
@@ -14033,6 +14031,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
