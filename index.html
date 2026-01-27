@@ -12284,7 +12284,15 @@ if (normalCoupon > 0) {
   c.classList.remove("hidden");
   c.innerHTML = `
     <div class="flex justify-between text-green-600">
-      <span>Normal Coupon</span>
+    
+     <span>
+  Normal Coupon
+  ${window._checkoutInvoice?.couponId
+    ? `<span class="text-xs text-gray-500">(${window._checkoutInvoice.couponId})</span>`
+    : ""}
+</span>
+
+      
       <span>−${fmt(normalCoupon)}</span>
     </div>
     <div class="flex justify-between font-semibold text-gray-900">
@@ -12353,22 +12361,36 @@ if (signup > 0) {
 const rewardBox = document.getElementById("invReward");
 if (reward > 0) {
   rewardBox.classList.remove("hidden");
+
   rewardBox.innerHTML = `
-    <div class="flex justify-between text-green-600">
-      <span>Reward Coupon</span>
-      <span>−${fmt(reward)}</span>
-    </div>`;
+  <div class="flex justify-between text-green-600">
+    <span>
+      Reward Coupon
+      ${window._checkoutInvoice?.couponId
+        ? `<span class="text-xs text-gray-500">(${window._checkoutInvoice.couponId})</span>`
+        : ""}
+    </span>
+    <span>−${fmt(reward)}</span>
+  </div>`;
+
 } else rewardBox.classList.add("hidden");
 
 // 7️⃣ Prepaid Coupon
 const paidBox = document.getElementById("invPaid");
 if (paid > 0) {
   paidBox.classList.remove("hidden");
-  paidBox.innerHTML = `
-    <div class="flex justify-between text-green-600">
-      <span>Prepaid Coupon</span>
-      <span>−${fmt(paid)}</span>
-    </div>`;
+  
+paidBox.innerHTML = `
+  <div class="flex justify-between text-green-600">
+    <span>
+      Prepaid Coupon
+      ${window._checkoutInvoice?.couponId
+        ? `<span class="text-xs text-gray-500">(${window._checkoutInvoice.couponId})</span>`
+        : ""}
+    </span>
+    <span>−${fmt(paid)}</span>
+  </div>`;
+
 } else paidBox.classList.add("hidden");
 
   document.getElementById("invNet").innerText = fmt(netPayable);
@@ -14055,6 +14077,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
