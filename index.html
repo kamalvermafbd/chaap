@@ -10618,6 +10618,14 @@ function applyRewardCoupon(couponCode, amount, couponType) {
     min: 0
   };
 
+   window._appliedCouponSnapshot = {
+    id: couponCode,
+    type: type,
+    amount: Number(amount || 0)
+  };
+
+  console.log("🔐 COUPON SNAPSHOT LOCKED", window._appliedCouponSnapshot);
+
   updateDrawerTotals();
   syncCouponFromDrawerForCheckout();
   markAppliedCouponUI();
@@ -12113,6 +12121,7 @@ function formatInvoiceDate(dt) {
   
 function renderInvoiceFromAPI(inv) {
   console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
+const couponSnapshotId = window._appliedCouponSnapshot?.id || "";
 
   /* ================= HEADER ================= */
   const orderDt = new Date(inv.orderDate).toLocaleString();
@@ -12366,9 +12375,10 @@ if (reward > 0) {
   <div class="flex justify-between text-green-600">
     <span>
       Reward Coupon
-      ${inv.couponId
-        ? `<span class="text-xs text-gray-500">(${inv.couponId})</span>`
-        : ""}
+     ${couponSnapshotId
+  ? `<span class="text-xs text-gray-500">(${couponSnapshotId})</span>`
+  : ""}
+
     </span>
     <span>−${fmt(reward)}</span>
   </div>`;
@@ -12384,12 +12394,13 @@ paidBox.innerHTML = `
   <div class="flex justify-between text-green-600">
     <span>
       Prepaid Coupon
-      ${inv.couponId
-        ? `<span class="text-xs text-gray-500">(${inv.couponId})</span>`
+      ${couponSnapshotId
+        ? `<span class="text-xs text-gray-500">(${couponSnapshotId})</span>`
         : ""}
     </span>
     <span>−${fmt(paid)}</span>
   </div>`;
+
 
 
 } else paidBox.classList.add("hidden");
@@ -14084,6 +14095,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
