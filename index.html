@@ -13485,9 +13485,13 @@ const paid   = Number(inv.paidCouponDiscount || 0);
 // order sheet only has total tax
 const taxTotal = Number(inv.taxTotal || 0);
 
-// 👉 display purpose split (not recalculation of bill)
-const cgst = +(taxTotal / 2).toFixed(2);
-const sgst = +(taxTotal / 2).toFixed(2);
+// ================= TAX (FROM ORDER SHEET – NO SPLIT) =================
+const cgst = Number(inv.cgstAmt || 0);
+const sgst = Number(inv.sgstAmt || 0);
+const igst = Number(inv.igstAmt || 0);
+
+const taxTotal = cgst + sgst + igst;
+
 
 // taxable & bill are not stored separately
 const gstBase    = items + serviceAmt + deliveryAmt;
@@ -13631,11 +13635,7 @@ if (emailTpl && uiTpl) {
   emailTpl.innerHTML = uiTpl.innerHTML;
 }
   }
-
-
-// ===============================
-// STEP-for duplicate coupon
-// ===============================
+ ===============================
 
 
   function invalidateAppliedCoupon(reason = "") {
@@ -14095,6 +14095,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
