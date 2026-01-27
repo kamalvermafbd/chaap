@@ -12252,14 +12252,14 @@ const paid =
   Number(window._drawerTotals?.paidCouponDiscount || 0);
 
   // Actual selling price
-  const grossValue = items - normalCoupon;
+  // Actual selling price (PRE-TAX discounts)
+const grossValue = items - normalCoupon - signup;
 
   // What customer pays before tax
   const afterAllDiscounts = grossValue - signup - reward - paid;
 
-// 🔥 FINAL GST BASE
+// 🔥 FINAL GST BASE (signup already adjusted)
 const gstBase = grossValue + serviceAmt + deliveryAmt;
-
 
   /* ================= GST ================= */
   const cgstRate = Number(inv.cgstPercent || 0);
@@ -12274,7 +12274,7 @@ const gstBase = grossValue + serviceAmt + deliveryAmt;
 // Bill before reward / prepaid
 const billAmount = gstBase + taxTotal;
 
-  const postTaxDiscount = signup + reward + paid;
+  const postTaxDiscount = reward + paid;
 
 // ✅ FINAL
 const netPayable = billAmount - postTaxDiscount;
@@ -12495,11 +12495,11 @@ const reward =
 const paid   = Number(s.paidCouponDiscount || 0);
 
 
-  // Sale value after ONLY normal coupon (this is GST base)
-const grossValue = base - normalCoupon;
+ // Sale value after NORMAL + SIGNUP (PRE-TAX)
+const grossValue = base - normalCoupon - signup;
 
 // Post-tax discounts (wallet / prepaid / signup)
-const postTaxDiscount = signup + reward + paid;
+const postTaxDiscount =  reward + paid;
 
   /* ======================
      SERVICE / DELIVERY (on GROSS VALUE)
@@ -14089,6 +14089,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
