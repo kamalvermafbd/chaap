@@ -12304,11 +12304,14 @@ if (normalCoupon > 0) {
     <div class="flex justify-between text-green-600">
     
      <span>
-  Normal Coupon
-  ${window._checkoutInvoice?.couponId
-    ? `<span class="text-xs text-gray-500">(${window._checkoutInvoice.couponId})</span>`
-    : ""}
+  ${selectedCoupon?.type === "normal" ? "Offer Applied" : "Coupon Applied"}
+  ${
+    window._checkoutInvoice?.couponId
+      ? `<span class="text-xs text-gray-500">(${window._checkoutInvoice.couponId})</span>`
+      : ""
+  }
 </span>
+
 
       
       <span>−${fmt(normalCoupon)}</span>
@@ -14107,6 +14110,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
