@@ -4928,7 +4928,8 @@ sgstAmt: Number(inv.sgst || 0),
 igstAmt: Number(inv.igst || 0),
 
     paymentMethod,
-    billAmount: Number(inv.billAmount || 0),
+   billAmount: Number(inv.taxableAmount + inv.cgst + inv.sgst + inv.igst),
+
 rewardcoupon: Number(inv.rewardDiscount || 0),
 paidcoupon: Number(inv.paidCouponDiscount || 0),
 netpayable: Number(inv.netPayable || 0),
@@ -4943,7 +4944,7 @@ couponId:
   window.drawerSpecialCoupon?.type ||
   "",
 
-couponDiscount: Number(inv.couponAmount || 0),
+couponDiscount: Number(drawer.offerDiscount || 0),
 
 
     pincode,
@@ -14105,6 +14106,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
