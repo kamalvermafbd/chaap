@@ -9901,6 +9901,8 @@ const autoCoupon = {
 selectedCoupon = autoCoupon;
 window._appliedCoupon = autoCoupon;
 alreadyAppliedCouponId = best.id;
+// 🔒 FINAL COUPON ID LOCK (TIMING SAFE)
+window._finalCouponId = best.id;
 
 // 🧹 CLEAN any stale checkout snapshot
 if (window._checkoutInvoice) {
@@ -12128,6 +12130,12 @@ function formatInvoiceDate(dt) {
 function renderInvoiceFromAPI(inv) {
   console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
 const couponSnapshotId = window._appliedCouponSnapshot?.id || "";
+// 🔒 FINAL COUPON ID (timing-safe)
+const finalCouponId =
+  window._finalCouponId ||
+  inv.couponId ||
+  window._checkoutInvoice?.couponId ||
+  "";
 
   /* ================= HEADER ================= */
   const orderDt = new Date(inv.orderDate).toLocaleString();
@@ -12305,11 +12313,12 @@ if (normalCoupon > 0) {
     
      <span>
   ${selectedCoupon?.type === "normal" ? "Offer Applied" : "Coupon Applied"}
-  ${
-    window._checkoutInvoice?.couponId
-      ? `<span class="text-xs text-gray-500">(${window._checkoutInvoice.couponId})</span>`
-      : ""
-  }
+${
+  finalCouponId
+    ? `<span class="text-xs text-gray-500">(${finalCouponId})</span>`
+    : ""
+}
+
 </span>
 
 
@@ -14110,6 +14119,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
