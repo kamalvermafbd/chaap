@@ -12592,6 +12592,12 @@ normalCoupon: Number(s.couponAmount || 0),
     paidCouponDiscount: paid,
     signupDiscount: signup,
 
+    couponId:
+  window.drawerSpecialCoupon?.id ||
+  selectedCoupon?.id ||
+  alreadyAppliedCouponId ||
+  "",
+
     // ===== PAYMENT =====
     paymentMethod: document.getElementById("paymentMethod")?.value || ""
   };
@@ -14078,6 +14084,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
