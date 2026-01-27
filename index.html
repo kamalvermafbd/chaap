@@ -12467,9 +12467,7 @@ if (
 }
 
 
-
-
-  function buildCheckoutPreviewInv() {
+function buildCheckoutPreviewInv() {
 console.log("🚚 ELIGIBILITY USED:", window.orderEligibility);
 
   // 🔒 SINGLE SOURCE OF TRUTH (drawer cart snapshot for amounts only)
@@ -12485,8 +12483,10 @@ console.log("🚚 ELIGIBILITY USED:", window.orderEligibility);
   ====================== */
 const base = Number(d.baseTotal || 0);
 
-const normalCoupon = Number(s.couponAmount || 0);
-const signup = Number(s.signupDiscount || 0);
+const normalCoupon =
+  Number(s.couponAmount || selectedCoupon?.flat || 0);
+
+  const signup = Number(s.signupDiscount || 0);
 const reward =
   window.drawerSpecialCoupon?.type === "reward"
     ? window.drawerSpecialCoupon.amount
@@ -14089,6 +14089,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
