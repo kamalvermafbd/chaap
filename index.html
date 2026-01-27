@@ -5056,9 +5056,9 @@ try { refreshCouponMotivationHint(); } catch(e){}
 }, 0);
 
         // ✅ FINAL HARD RESET – MUST BE LAST
-//setTimeout(() => {
-//  window.location.href = window.location.pathname + "?r=" + Date.now();
-//}, 300);
+setTimeout(() => {
+  window.location.href = window.location.pathname + "?r=" + Date.now();
+}, 300);
 
       } else {
         alert(res.message || "Order failed.");
@@ -14106,6 +14106,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
