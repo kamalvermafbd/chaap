@@ -12244,10 +12244,10 @@ document.getElementById("invoiceItems").innerHTML =
   const items = Number(inv.baseTotal || 0);
 
   const normalCoupon =
-  Number(inv.couponAmount || selectedCoupon?.flat || 0);
+  selectedCoupon?.type === "normal"
+    ? Number(inv.couponAmount || selectedCoupon.flat || 0)
+    : 0;
 
-
-  
   const signup = Number(inv.signupDiscount || 0);
   //const reward = Number(inv.rewardDiscount || 0);
 
@@ -12265,8 +12265,7 @@ const paid =
   // Actual selling price (PRE-TAX discounts)
 const grossValue = items - normalCoupon - signup;
 
-  // What customer pays before tax
-  const afterAllDiscounts = grossValue - signup - reward - paid;
+  
 
 // 🔥 FINAL GST BASE (signup already adjusted)
 const gstBase = grossValue + serviceAmt + deliveryAmt;
@@ -12494,7 +12493,9 @@ console.log("🚚 ELIGIBILITY USED:", window.orderEligibility);
 const base = Number(d.baseTotal || 0);
 
 const normalCoupon =
-  Number(s.couponAmount || selectedCoupon?.flat || 0);
+  selectedCoupon?.type === "normal"
+    ? Number(s.couponAmount || selectedCoupon.flat || 0)
+    : 0;
 
   const signup = Number(s.signupDiscount || 0);
 const reward =
@@ -14106,6 +14107,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
