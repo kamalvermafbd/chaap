@@ -13480,9 +13480,16 @@ const serviceAmt  = Number(inv.serviceCharge ?? inv.serviceCharges ?? 0);
 const deliveryAmt = Number(inv.deliveryCharge || 0);
 
 const signup = Number(inv.signupDiscount || 0);
-const paid   = Number(inv.paidCouponDiscount || 0);
 
-const reward = Number(inv.rewardDiscount || inv.couponAmount || 0);
+const normalCoupon =
+  inv.couponType === "normal" ? Number(inv.couponAmount || 0) : 0;
+
+const reward =
+  inv.couponType === "reward" ? Number(inv.rewardDiscount || 0) : 0;
+
+const paid =
+  Number(inv.paidCouponDiscount || 0);
+
 
 // ================= TAX (FROM ORDER SHEET – NO SPLIT) =================
 const cgst = Number(inv.cgstAmt || 0);
@@ -14093,41 +14100,6 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
