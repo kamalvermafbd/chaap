@@ -4723,12 +4723,10 @@ if (!(await canProceedPlaceOrder())) {
 
 const userType = isUserLoggedIn() ? "logged" : "guest";
 
-
   // ----------------------------------
 // AUTO CUSTOMER LOOKUP (ONCE)
 // mobile + payment ready
 // ----------------------------------
-
 
 // ✅ OPTION A: Address sirf Home Delivery me hi save hoga
 const finalAddress =
@@ -4874,8 +4872,7 @@ if (orderType === "Home Delivery" && !address) {
   addressError.classList.add("hidden");
 }
   
-
-    const overlay = document.getElementById('loadingOverlay');
+const overlay = document.getElementById('loadingOverlay');
   window._orderSubmitting = true; // ✅ ADD THIS
   overlay.innerText = "Processing your order... Please wait...";
   overlay.style.display = "flex";
@@ -4908,7 +4905,13 @@ const couponDiscFinal =
   Number(drawer.offerDiscount || 0) +
   Number(drawer.rewardDiscount || 0) +
   Number(drawer.paidCouponDiscount || 0); // 🔴 ADD THIS
-
+// 🔽 YAHAN CONSOLE
+console.log("🧾 COUPON DEBUG (FINAL)", {
+  offer: drawer.offerDiscount,
+  reward: drawer.rewardDiscount,
+  paid: drawer.paidCouponDiscount,
+  totalCouponDiscount: couponDiscFinal
+});
   const orderData = {
     customerName,
     email,
@@ -4918,14 +4921,13 @@ const couponDiscFinal =
     cartItems: normalizeCartForOrder(safeCartItems),
     baseTotal: Number(inv.itemsSubtotal || 0),
 signupDiscount: Number(inv.signupDiscount || 0),
-payableAfterDiscount: Number(inv.netPayable || 0),
-
+payableAfterDiscount: Number(drawer.payableAfterDiscount || 0),
 serviceAmt: Number(inv.serviceCharge || 0),
 taxableAmount: Number(inv.taxableAmount || 0),
 cgstAmt: Number(inv.cgst || 0),
 sgstAmt: Number(inv.sgst || 0),
 igstAmt: Number(inv.igst || 0),
-grandTotal: Number(inv.netPayable || 0),
+grandTotal: Number(drawer.grandTotal || 0),
     paymentMethod,
 couponId:
   inv.couponId ||
@@ -14031,6 +14033,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
