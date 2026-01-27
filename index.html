@@ -12366,8 +12366,8 @@ if (reward > 0) {
   <div class="flex justify-between text-green-600">
     <span>
       Reward Coupon
-      ${window._checkoutInvoice?.couponId
-        ? `<span class="text-xs text-gray-500">(${window._checkoutInvoice.couponId})</span>`
+      ${inv.couponId
+        ? `<span class="text-xs text-gray-500">(${inv.couponId})</span>`
         : ""}
     </span>
     <span>−${fmt(reward)}</span>
@@ -12384,12 +12384,13 @@ paidBox.innerHTML = `
   <div class="flex justify-between text-green-600">
     <span>
       Prepaid Coupon
-      ${window._checkoutInvoice?.couponId
-        ? `<span class="text-xs text-gray-500">(${window._checkoutInvoice.couponId})</span>`
+      ${inv.couponId
+        ? `<span class="text-xs text-gray-500">(${inv.couponId})</span>`
         : ""}
     </span>
     <span>−${fmt(paid)}</span>
   </div>`;
+
 
 } else paidBox.classList.add("hidden");
 
@@ -14077,6 +14078,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
