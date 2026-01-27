@@ -12610,7 +12610,15 @@ function injectCheckoutOfferDiscount(inv) {
 // 🚫 GUEST + normal discount invalid → do not inject UI
 if (!isUserLoggedIn() && window._skipCouponSyncForCheckout === true) return;
   
-  if (!inv || !inv.couponAmount || inv.couponAmount <= 0) return;
+ if (
+  !inv ||
+  (
+    (inv.couponAmount || 0) <= 0 &&
+    (inv.rewardDiscount || 0) <= 0 &&
+    (inv.paidDiscount || 0) <= 0
+  )
+) return;
+
 
   const container = document.querySelector("#checkoutInvoiceContainer");
   if (!container) return;
@@ -12622,10 +12630,24 @@ if (container.innerText.includes("Coupon")) return;
   const row = document.createElement("div");
   row.className = "offer-discount-row flex justify-between text-green-600 mt-2";
 
-  row.innerHTML = `
-    <span>Offer Discount</span>
-    <span>- ${fmt(inv.couponAmount)}</span>
-  `;
+  const label =
+  inv.paidDiscount > 0 ? "Prepaid Coupon" :
+  inv.rewardDiscount > 0 ? "Reward Coupon" :
+  "Offer Discount";
+
+const amount =
+  inv.paidDiscount ||
+  inv.rewardDiscount ||
+  inv.couponAmount;
+
+row.innerHTML = `
+  <span>
+    ${label}
+    ${inv.couponId ? `<span class="text-xs text-gray-500">(${inv.couponId})</span>` : ""}
+  </span>
+  <span>- ${fmt(amount)}</span>
+`;
+
 
   // 👉 INSERT BEFORE NET PAYABLE (safe spot)
   const netPayableRow = container.querySelector(".net-payable-row");
@@ -14033,6 +14055,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
