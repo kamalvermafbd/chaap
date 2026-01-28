@@ -9316,8 +9316,14 @@ function removeAppliedCoupon() {
   window._couponLocked = false;
   window._appliedCouponType = "";
 
-  // 🔴 CLEAR drawer coupon (reward / paid)
+  // 🔴 CLEAR drawer special coupon (reward / paid)
   window.drawerSpecialCoupon = null;
+
+  // 🔓 CRITICAL: UNBLOCK BEST OFFER ENGINE
+  window._disableBestOffer = false;
+
+  // 🔁 RESTORE AUTO MODE
+  window.couponMode = "best offer";
 
   // 2️⃣ UI RESET
   const appliedBox = document.getElementById("bestOfferApplied");
@@ -9326,28 +9332,12 @@ function removeAppliedCoupon() {
   // 3️⃣ RESTORE AVAILABLE COUPONS
   fetchAndRenderUserCouponsForCart();
 
-  // 4️⃣ FORCE TOTALS RECALC (IMPORTANT)
-  try { updateDrawerTotals(); } catch(e){}
-
-  // ===============================
-  // 🔥 BEST OFFER AUTO-REAPPLY (FINAL)
-  // ===============================
-  const mode = (window.couponMode || "").toLowerCase();
-  const isBest = mode === "best offer" || mode === "bestoffer";
-
-  if (isBest) {
-    setTimeout(async () => {
-      try {
-        await fetchOffersFromBackend(); // 🔁 refresh offers
-        updateDrawerTotals();           // 🔥 ensure fresh cart total
-        refreshCouponMotivationHint();  // ✅ auto-apply best offer
-      } catch (e) {
-        console.error("Best-offer reapply failed:", e);
-      }
-    }, 0);
-  }
+  // 4️⃣ 🔥 TRIGGER EXISTING BEST-OFFER FLOW
+  try {
+    updateDrawerTotals();          // ← best offer auto-apply happens INSIDE this
+    refreshCouponMotivationHint(); // ← UI sync only
+  } catch (e) {}
 }
-
 
 // 🔴 RED error message
 function showCouponError(msg) {
@@ -14136,6 +14126,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
