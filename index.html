@@ -4926,7 +4926,6 @@ taxableAmount: Number(inv.taxableAmount || 0),
 cgstAmt: Number(inv.cgst || 0),
 sgstAmt: Number(inv.sgst || 0),
 igstAmt: Number(inv.igst || 0),
-
     paymentMethod,
    billAmount: Number(inv.taxableAmount + inv.cgst + inv.sgst + inv.igst),
 
@@ -4943,10 +4942,7 @@ couponId:
   selectedCoupon?.type ||
   window.drawerSpecialCoupon?.type ||
   "",
-
 couponDiscount: Number(drawer.offerDiscount || 0),
-
-
     pincode,
   city,
   state,
@@ -4958,7 +4954,6 @@ couponDiscount: Number(drawer.offerDiscount || 0),
 lng: orderType === "Home Delivery"
       ? (window._userLng || window._deliveryLocation?.lng || "")
       : "",
-
   deliveryCharges: Number(inv.deliveryCharge || 0),
   courierCharges: Number(inv.courierCharge || 0),
   extraChargeReason: String(inv.chargeType || ""),
@@ -4966,7 +4961,7 @@ lng: orderType === "Home Delivery"
  invoiceSnapshot: window._checkoutInvoice
   };
 
-    console.log("👤 userType:", userType);
+console.log("👤 userType:", userType);
 console.log("🚀 ORDER PAYLOAD TO BACKEND:", JSON.stringify(orderData, null, 2));
 document.querySelectorAll('#checkoutForm input, #checkoutForm select')
   .forEach(el => el.disabled = true);
@@ -4998,7 +4993,14 @@ if (!isUserLoggedIn()) {
     }
   }
 }
+// 🔥 DEBUG: FREEZE FINAL PAYLOAD (COMPLETE)
+window.__FINAL_PLACE_ORDER_PAYLOAD__ = JSON.parse(JSON.stringify(orderData));
 
+console.log(
+  "%c🚀 FINAL PLACE ORDER PAYLOAD (FREEZED)",
+  "color: green; font-weight: bold;",
+  window.__FINAL_PLACE_ORDER_PAYLOAD__
+);
 
   apiPost("placeOrder", orderData)
     .then(res => {
@@ -14126,6 +14128,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
