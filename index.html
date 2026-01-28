@@ -8841,8 +8841,9 @@ async function openCouponList() {
     // 3️⃣ FINAL FILTER (ONLY ONE PLACE)
     const loggedIn = isUserLoggedIn();
 
-   const apiOffers =
-  (window._lastOffersResponse && window._lastOffersResponse.offers) || [];
+  const apiOffers =
+  (window._lastOffersResponse && window._lastOffersResponse.allOffersRaw) || [];
+
 
 const activeOffers = apiOffers.filter(o => {
 
@@ -14119,6 +14120,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
