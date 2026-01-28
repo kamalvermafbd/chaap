@@ -2587,7 +2587,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbyXc7KKh8poMWECHqjn62ac_CMutmhoW3E4mEfpidd6_yQxJb-Ix4ER79dQlR7iOvfQcg/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbx7V0R0yoYWR25pW17OV7BxgVmxc4vnlhp9ZtjRiLEjJaBRdletfI6Stc8ebjZc_Wq4Ew/exec";
 
 // ===============================
 // API HELPER
@@ -8841,9 +8841,8 @@ async function openCouponList() {
     // 3️⃣ FINAL FILTER (ONLY ONE PLACE)
     const loggedIn = isUserLoggedIn();
 
-  const apiOffers =
-  (window._lastOffersResponse && window._lastOffersResponse.allOffersRaw) || [];
-
+   const apiOffers =
+  (window._lastOffersResponse && window._lastOffersResponse.offers) || [];
 
 const activeOffers = apiOffers.filter(o => {
 
@@ -8944,10 +8943,7 @@ window._couponLocked = false;
 // ===============================
 // STEP 1c: Defensive apply-time guard
 // ===============================
-const offer = (
-  window._lastOffersResponse?.allOffersRaw || []
-).find(o => o.id === couponId);
-
+const offer = (window.liveOffers || []).find(o => o.id === couponId);
 
 if (offer) {
   const ua = (offer["User applicable"] || "All user").toLowerCase();
@@ -8985,12 +8981,10 @@ couponItems.forEach(el => {
 
   // 🔑 1️⃣ Fresh backend truth
   await fetchOffersFromBackend();
-  const offers =
-  window._lastOffersResponse?.allOffersRaw || [];
+  const offers = window.liveOffers || [];
 
-const o = offers.find(
-  x => x.id === couponId && x.active === true
-);
+  // 🔑 2️⃣ Coupon still active?
+  const o = offers.find(x => x.id === couponId && x.active === true);
 
   if (!o) {
     showCouponError("This promotional offer is no longer available.");
@@ -9777,8 +9771,7 @@ if (cartArr.length === 0) {
   // ----------------------------------------
 // ⭐ G4: REVALIDATE COUPON on totals update
 // ----------------------------------------
-if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type === "normal"))
-
+if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type === "regular"))
  {
     const min = Number(selectedCoupon.min || 0);
 
@@ -9793,14 +9786,10 @@ if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type 
   // ⭐⭐ RESTORE COUPON ON REFRESH (MAIN FIX)
   // =====================================================
   try {
-    if (!selectedCoupon && alreadyAppliedCouponId) {
-  const found =
-    window._lastOffersResponse?.allOffersRaw
-      ?.find(o => o.id === alreadyAppliedCouponId);
-
-  if (found) selectedCoupon = found;
-}
-
+    if (!selectedCoupon && alreadyAppliedCouponId && window.liveOffers) {
+      const found = window.liveOffers.find(o => o.id === alreadyAppliedCouponId);
+      if (found) selectedCoupon = found;
+    }
   } catch (e) {}
 
 
@@ -14130,9 +14119,6 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
-
-
-
 
 
 
