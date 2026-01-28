@@ -9329,6 +9329,21 @@ function removeAppliedCoupon() {
   // 4️⃣ totals + hint refresh
   try { updateDrawerTotals(); } catch(e){}
   try { refreshCouponMotivationHint(); } catch(e){}
+
+    // ===============================
+  // 🔥 BEST OFFER AUTO-REAPPLY FIX
+  // ===============================
+  const mode = (window.couponMode || "").toLowerCase();
+  const isBest = mode === "best offer" || mode === "bestoffer";
+
+  if (isBest) {
+    setTimeout(async () => {
+      await fetchOffersFromBackend();   // 🔁 re-evaluate offers
+      try {
+        refreshCouponMotivationHint();  // 🔥 auto-apply best offer
+      } catch (e) {}
+    }, 0);
+  }
 }
 
 
@@ -10579,7 +10594,7 @@ function markAppliedCouponUI() {
     const removeBtn = document.createElement("button");
     removeBtn.className =
       "remove-coupon-btn px-3 py-1 text-sm bg-red-500 text-white rounded";
-    removeBtn.innerText = "Removes";
+    removeBtn.innerText = "Remove";
     removeBtn.onclick = removeAppliedCoupon;
 
     card.appendChild(removeBtn);
@@ -14119,6 +14134,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
