@@ -9310,38 +9310,40 @@ function removeCouponIfNeeded() {
 }
   
 function removeAppliedCoupon() {
-  // 1️⃣ reset coupon state
+  // 1️⃣ RESET COUPON STATE
   selectedCoupon = null;
   alreadyAppliedCouponId = "";
   window._couponLocked = false;
   window._appliedCouponType = "";
 
- // 🔴 FIX: CLEAR drawer coupon
+  // 🔴 CLEAR drawer coupon (reward / paid)
   window.drawerSpecialCoupon = null;
-  
-  // 2️⃣ UI reset
+
+  // 2️⃣ UI RESET
   const appliedBox = document.getElementById("bestOfferApplied");
   if (appliedBox) appliedBox.style.display = "none";
 
-  // 3️⃣ restore available coupons
+  // 3️⃣ RESTORE AVAILABLE COUPONS
   fetchAndRenderUserCouponsForCart();
 
-  // 4️⃣ totals + hint refresh
+  // 4️⃣ FORCE TOTALS RECALC (IMPORTANT)
   try { updateDrawerTotals(); } catch(e){}
-  try { refreshCouponMotivationHint(); } catch(e){}
 
-    // ===============================
-  // 🔥 BEST OFFER AUTO-REAPPLY FIX
+  // ===============================
+  // 🔥 BEST OFFER AUTO-REAPPLY (FINAL)
   // ===============================
   const mode = (window.couponMode || "").toLowerCase();
   const isBest = mode === "best offer" || mode === "bestoffer";
 
   if (isBest) {
     setTimeout(async () => {
-      await fetchOffersFromBackend();   // 🔁 re-evaluate offers
       try {
-        refreshCouponMotivationHint();  // 🔥 auto-apply best offer
-      } catch (e) {}
+        await fetchOffersFromBackend(); // 🔁 refresh offers
+        updateDrawerTotals();           // 🔥 ensure fresh cart total
+        refreshCouponMotivationHint();  // ✅ auto-apply best offer
+      } catch (e) {
+        console.error("Best-offer reapply failed:", e);
+      }
     }, 0);
   }
 }
@@ -14134,6 +14136,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
