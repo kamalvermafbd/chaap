@@ -4974,36 +4974,7 @@ console.log("🧪 FINAL ORDER PAYLOAD (before send)", {
   full: orderData
 });
 
-  // ===============================
-// 🔥 INTENTIONAL TAMPER (DEV TEST)
-// ===============================
-if (window.TEST_TAMPER === true) {
-  console.warn("🚨 FRONTEND PAYLOAD TAMPER ENABLED");
 
-  // 💣 Bill-level cheating
-  orderData.billAmount = 1;
-  orderData.netpayable = 1;
-  orderData.taxableAmount = 0;
-  orderData.cgstAmt = 0;
-  orderData.sgstAmt = 0;
-  orderData.igstAmt = 0;
-
-  // 💣 Coupon cheating
-  orderData.couponDiscount = 9999;
-  orderData.rewardcoupon = 9999;
-  orderData.paidcoupon = 9999;
-  orderData.couponId = "HACKED50";
-  orderData.couponType = "reward";
-
-  // 💣 Item-level cheating
-  orderData.cartItems.forEach(i => {
-    i.price = 1;
-    i.total = 1;
-    i.amount = 1;
-  });
-
-  console.log("💥 TAMPERED ORDER DATA:", JSON.stringify(orderData, null, 2));
-}
 
 // 🔒 HARD GUARD: coupon discount hai par couponId missing
 if (orderData.couponDiscount > 0 && !orderData.couponId) {
@@ -14160,6 +14131,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
