@@ -12260,11 +12260,12 @@ document.getElementById("invoiceItems").innerHTML =
     
 
 deliveryAmt = Number(
+  window.orderEligibility?.extraCharge ??   // 🔥 backend always wins
   inv.deliveryCharge ??
-  window.orderEligibility?.extraCharge ??
   window._checkoutInvoice?.deliveryCharge ??
   0
 );
+
 
 const deliveryChargeLabel =
   inv.deliveryChargeLabel ||
@@ -14158,6 +14159,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
