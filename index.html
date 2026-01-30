@@ -12257,7 +12257,21 @@ document.getElementById("invoiceItems").innerHTML =
   if (orderType === "Dine In") {
     serviceAmt = Number(inv.serviceAmt || 0);
   } else if (orderType === "Home Delivery" || orderType === "Courier") {
-    deliveryAmt = Number(inv.deliveryCharge || 0);
+    
+
+deliveryAmt = Number(
+  inv.deliveryCharge ??
+  window.orderEligibility?.extraCharge ??
+  window._checkoutInvoice?.deliveryCharge ??
+  0
+);
+
+const deliveryChargeLabel =
+  inv.deliveryChargeLabel ||
+  window.orderEligibility?.chargeType ||
+  "Delivery Charges";
+
+    
   }
 
   /* ================= BASE & COUPONS ================= */
@@ -12353,7 +12367,12 @@ if (deliveryAmt > 0) {
   deliveryBox.classList.remove("hidden");
   deliveryBox.innerHTML = `
     <div class="flex justify-between">
-      <span>${inv.deliveryChargeLabel || "Delivery Charges"}</span>
+      <span>${
+  inv.deliveryChargeLabel ||
+  window.orderEligibility?.chargeType ||
+  "Delivery Charges"
+}</span>
+
       <span>${fmt(deliveryAmt)}</span>
     </div>`;
 } else deliveryBox.classList.add("hidden");
@@ -12447,7 +12466,18 @@ paidBox.innerHTML = `
     items: (inv.items || []).map(i => ({ ...i })),
     itemsSubtotal: items,
     serviceCharge: serviceAmt,
-    deliveryCharge: deliveryAmt,
+deliveryCharge:
+  Number(inv.deliveryCharge ??
+  window.orderEligibility?.extraCharge ??
+  deliveryAmt ??
+  0),
+
+deliveryChargeLabel:
+  inv.deliveryChargeLabel ||
+  window.orderEligibility?.chargeType ||
+  "Delivery Charges",
+
+    
     normalCoupon,
     signupDiscount: signup,
     rewardDiscount: reward,
@@ -14128,6 +14158,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
