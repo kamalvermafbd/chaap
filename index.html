@@ -7088,9 +7088,19 @@ async function someCartAction() {
   window.deliveryLatLng = null;
   window.isLocationSet = false;
 
+  // ===============================
+  // ORDER TYPE RESET (DIFFERENT VISIBILITY)
+  // ===============================
   const ot = document.getElementById("orderType");
   ot.value = "";
-  ot.parentElement.style.display = "none";
+
+  if (isUserLoggedIn()) {
+    // 🔐 Logged-in → show order type
+    ot.parentElement.style.display = "block";
+  } else {
+    // 👤 Guest → hide order type
+    ot.parentElement.style.display = "none";
+  }
 
   // ===============================
   // HIDE LOCATION UI
@@ -7112,6 +7122,7 @@ async function someCartAction() {
     isLocationSet: window.isLocationSet
   });
 }
+
 
 
 function setupAddressUIVisibility() {
@@ -14207,6 +14218,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
