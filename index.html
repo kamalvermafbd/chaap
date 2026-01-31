@@ -7037,9 +7037,15 @@ async function someCartAction() {
   function resetCheckoutFieldsDefault() {
   console.log("🧪 openCheckout → resetCheckoutFieldsDefault FIRED");
 
+  // ===============================
+  // BASIC VISIBILITY
+  // ===============================
   document.getElementById("mobile").parentElement.style.display = "block";
   document.getElementById("paymentMethod").parentElement.style.display = "block";
 
+  // ===============================
+  // PAYMENT RESET
+  // ===============================
   window.selectedPaymentMethod = "";
   document.getElementById("paymentMethod").value = "";
 
@@ -7061,6 +7067,9 @@ async function someCartAction() {
     placeBtn.classList.add("disabled-btn");
   }
 
+  // ===============================
+  // HIDE CUSTOMER FIELDS
+  // ===============================
   document.getElementById("customerName").parentElement.style.display = "none";
   document.getElementById("email").parentElement.style.display = "none";
   document.getElementById("addressWrapper").style.display = "none";
@@ -7071,18 +7080,23 @@ async function someCartAction() {
 
   document.getElementById("paymentMethod").style.display = "block";
 
-  // 🔄 BASE RESET
-  document.getElementById("address").value = "";
-  window.selectedLocation = null;
-  window.deliveryLatLng = null;
-  window.isLocationSet = false;
+  // ===============================
+  // 🔄 LOCATION RESET (GUEST ONLY)
+  // ===============================
+  if (!isUserLoggedIn()) {
+    document.getElementById("address").value = "";
+    window.selectedLocation = null;
+    window.deliveryLatLng = null;
+    window.isLocationSet = false;
 
-  if (!isLoggedIn()) {
     const ot = document.getElementById("orderType");
     ot.value = "";
     ot.parentElement.style.display = "none";
   }
 
+  // ===============================
+  // HIDE LOCATION UI (TEMP)
+  // ===============================
   document.getElementById("locationStatusRow").classList.add("hidden");
 
   const mapBox = document.getElementById("mapPreviewBox");
@@ -7090,22 +7104,19 @@ async function someCartAction() {
 
   document.getElementById("mapPreviewFrame").src = "";
 
-  // ✅ DEBUG LOG (CLOSED PROPERLY)
+  // ===============================
+  // DEBUG SNAPSHOT
+  // ===============================
   console.log("🧪 LOCATION STATE CHECK", {
+    loggedIn: isUserLoggedIn(),
     selectedLocation: window.selectedLocation,
     deliveryLatLng: window.deliveryLatLng,
-    isLocationSet: window.isLocationSet,
-    addressValue: document.getElementById("address").value,
-    locationStatusVisible: !document
-      .getElementById("locationStatusRow")
-      .classList.contains("hidden"),
-    mapVisible: !document
-      .getElementById("mapPreviewBox")
-      .classList.contains("hidden"),
-    mapSrc: document.getElementById("mapPreviewFrame").src
+    isLocationSet: window.isLocationSet
   });
 
-  // 🔐 LOGIN USER LOCATION RESTORE
+  // ===============================
+  // 🔐 LOGIN USER → RESTORE LOCATION UI
+  // ===============================
   if (isUserLoggedIn() && window.deliveryLatLng) {
 
     window.isLocationSet = true;
@@ -7122,14 +7133,9 @@ async function someCartAction() {
         `https://maps.google.com/maps?q=${window.deliveryLatLng.lat},${window.deliveryLatLng.lng}&z=15&output=embed`;
     }
 
-    console.log("🔐 LOGIN USER LOCATION RESTORED", {
-      latLng: window.deliveryLatLng,
-      isLocationSet: window.isLocationSet
-    });
+    console.log("🔐 LOGIN USER LOCATION RESTORED", window.deliveryLatLng);
   }
 }
-
-
 
 function setupAddressUIVisibility() {
   const changeBtn = document.getElementById("changeAddressBtn");
@@ -14228,6 +14234,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
