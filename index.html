@@ -4548,6 +4548,49 @@ if (payMsg) {
       showError("⚠️ Cart is empty");
       return false;
     }
+// ================================
+// 🔴 NEW — BACKEND ELIGIBILITY CALL (PAYMENT SE PEHLE)
+// ================================
+const mobile = document.getElementById("mobile")?.value.trim();
+const userType = isUserLoggedIn() ? "logged" : "guest";
+
+const res = await apiPost("checkOrderEligibility", {
+  orderType,
+  orderAmount: amount,
+  mobile,
+  userType,
+  lat: window._deliveryLocation?.lat || "",
+  lng: window._deliveryLocation?.lng || ""
+});
+
+// 🔴 NEW — delivery charge yahin aa jayega
+window.orderEligibility = {
+  allowed: false,
+  extraCharge: Number(res?.extraCharge || 0),
+  chargeType: res?.chargeType || ""
+};
+
+console.log("🧪 BACKEND RESPONSE:", res);
+
+if (
+  res?.reason === "OUT_OF_DELIVERY_RADIUS" ||
+  res?.reason === "LOCATION_NOT_SET"
+) {
+  showError(res.message || "Delivery not available for this location");
+  return false;
+}
+
+if (!res || res.allowed !== true) {
+  showError(res?.message || "Order is not allowed at this time");
+  return false;
+}
+
+// 🔴 NEW — final eligibility confirmed
+window.orderEligibility = {
+  allowed: true,
+  extraCharge: Number(res.extraCharge || 0),
+  chargeType: res.chargeType || ""
+};
 
     // 🔴 GUARD 2.5
     const payment = document.getElementById("paymentMethod")?.value;
@@ -4556,49 +4599,7 @@ if (payMsg) {
       return false;
     }
 
-    // 🔴 GUARD 3 — Backend eligibility
-    const mobile = document.getElementById("mobile")?.value.trim();
-    const userType = isUserLoggedIn() ? "logged" : "guest";
-
-    const res = await apiPost("checkOrderEligibility", {
-      orderType,
-      orderAmount: amount,
-      mobile,
-      userType,
-      lat: window._deliveryLocation?.lat || "",
-      lng: window._deliveryLocation?.lng || ""
-    });
-
-    // 🔴 FIX-3: Just STORE backend data, DO NOT rebuild invoice here
-    window.orderEligibility = {
-      allowed: false,
-      extraCharge: Number(res?.extraCharge || 0),
-      chargeType: res?.chargeType || ""
-    };
-
-    // ❌ REMOVED: updateCheckoutInvoice();  <-- THIS WAS CAUSING LOOP
-
-    console.log("🧪 BACKEND RESPONSE:", res);
-
-    if (
-      res?.reason === "OUT_OF_DELIVERY_RADIUS" ||
-      res?.reason === "LOCATION_NOT_SET"
-    ) {
-      showError(res.message || "Delivery not available for this location");
-      return false;
-    }
-
-    if (!res || res.allowed !== true) {
-      showError(res?.message || "Order is not allowed at this time");
-      return false;
-    }
-
-    window.orderEligibility = {
-      allowed: true,
-      extraCharge: Number(res.extraCharge || 0),
-      chargeType: res.chargeType || ""
-    };
-
+  
     // ✅ SUCCESS (NO UI SIDE-EFFECT LOOP)
     showSuccess("✅ Great! Everything is ready — you may place your order now.");
    
@@ -14178,6 +14179,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
