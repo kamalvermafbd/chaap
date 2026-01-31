@@ -4455,9 +4455,6 @@ function enablePlaceOrder() {
   btn.classList.remove("opacity-50", "cursor-not-allowed");
 }
 
-
-
-    
 async function canProceedPlaceOrder() {
 // ===============================
 // 🔒 PROCESSING STATE (default)
@@ -4552,16 +4549,12 @@ if (payMsg) {
       return false;
     }
 
-   // 🔴 GUARD 2.5 (FINAL ORDER ONLY)
-const payment = document.getElementById("paymentMethod")?.value;
-
-// ❗ Payment check sirf tab jab actual PLACE ORDER ho
-if (!payment && !window._eligibilityPrefetch) {
-
-  showError("⚠️ Please select a payment method");
-  return false;
-}
-
+    // 🔴 GUARD 2.5
+    const payment = document.getElementById("paymentMethod")?.value;
+    if (!payment) {
+      showError("⚠️ Please select a payment method");
+      return false;
+    }
 
     // 🔴 GUARD 3 — Backend eligibility
     const mobile = document.getElementById("mobile")?.value.trim();
@@ -4626,59 +4619,34 @@ if (placeBtn) {
   }
 }
 
+
   
 // ==================================
 // STEP-3: Live eligibility on OrderType change
 // ==================================
 async function recheckEligibilityOnOrderTypeChange() {
   if (window._orderTypeChanging) return;
-  window._orderTypeChanging = true;
 
-  try {
-    const orderType = document.getElementById("orderType")?.value;
-    const amount = Number(window.cartSummary?.itemsSubtotal || 0);
+  const ok = await canProceedPlaceOrder();
 
-    if (!orderType || amount <= 0) return;
+  if (ok) {
+    // 🔒 eligibility backend se aa chuki hoti hai yahan
+    // canProceedPlaceOrder ke andar window.orderEligibility set hota hai
 
-    // 🔥 DIRECT eligibility call (payment independent)
-    const res = await apiPost("checkOrderEligibility", {
-      orderType,
-      orderAmount: amount,
-      mobile: document.getElementById("mobile")?.value || "",
-      userType: isUserLoggedIn() ? "logged" : "guest",
-      lat: window._deliveryLocation?.lat || "",
-      lng: window._deliveryLocation?.lng || ""
-    });
+    await updateCheckoutInvoice(); // 🔁 preview rebuild
 
-    console.log("🚚 BACKEND ELIGIBILITY (ORDER TYPE):", res);
-
-    if (res?.allowed) {
-      // 🔒 backend is single source of truth
-      window.orderEligibility = {
-        allowed: true,
-        extraCharge: Number(res.extraCharge || 0),
-        chargeType: res.chargeType || ""
-      };
-
-      // 🛡️ ensure invoice object exists
-      const inv =
-        window._checkoutInvoice ||
-        buildCheckoutPreviewInv();
-
-      // 🔁 FORCE invoice rebuild AFTER delivery charge arrives
+    // 🔥 FORCE invoice re-render if already open
+    if (
+      window._checkoutInvoice &&
+      window._checkoutInvoice.orderType === "Home Delivery"
+    ) {
       renderInvoiceFromAPI({
-        ...inv,
-        orderType,
-        deliveryCharge: window.orderEligibility.extraCharge,
+        ...window._checkoutInvoice,
+        deliveryCharge: window.orderEligibility?.extraCharge || 0,
         deliveryChargeLabel:
-          window.orderEligibility.chargeType || "Delivery Charges"
+          window.orderEligibility?.chargeType || "Delivery Charges"
       });
     }
-
-  } catch (e) {
-    console.error("Order type eligibility error", e);
-  } finally {
-    window._orderTypeChanging = false;
   }
 }
 
@@ -14210,14 +14178,6 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
-
-
-
-
-
-
-
-
 
 
 
