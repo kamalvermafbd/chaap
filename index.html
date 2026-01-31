@@ -4649,22 +4649,30 @@ async function recheckEligibilityOnOrderTypeChange() {
     console.log("🚚 BACKEND ELIGIBILITY (ORDER TYPE):", res);
 
     if (res?.allowed) {
+      // 🔒 backend is single source of truth
       window.orderEligibility = {
         allowed: true,
         extraCharge: Number(res.extraCharge || 0),
         chargeType: res.chargeType || ""
       };
 
-      // 🔁 INSTANT invoice refresh
-      if (window._checkoutInvoice) {
-        renderInvoiceFromAPI({
-          ...window._checkoutInvoice,
-          orderType,
-          deliveryCharge: window.orderEligibility.extraCharge,
-          deliveryChargeLabel: window.orderEligibility.chargeType
-        });
-      }
+      // 🛡️ ensure invoice object exists
+      const inv =
+        window._checkoutInvoice ||
+        buildCheckoutPreviewInv();
+
+      // 🔁 FORCE invoice rebuild AFTER delivery charge arrives
+      renderInvoiceFromAPI({
+        ...inv,
+        orderType,
+        deliveryCharge: window.orderEligibility.extraCharge,
+        deliveryChargeLabel:
+          window.orderEligibility.chargeType || "Delivery Charges"
+      });
     }
+
+  } catch (e) {
+    console.error("Order type eligibility error", e);
   } finally {
     window._orderTypeChanging = false;
   }
@@ -14198,6 +14206,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
