@@ -4627,28 +4627,27 @@ if (placeBtn) {
 async function recheckEligibilityOnOrderTypeChange() {
   if (window._orderTypeChanging) return;
 
-  const ok = await canProceedPlaceOrder();
+  const ok = await canProceedPlaceOrder(); // 🔥 yahin backend eligibility aati hai
 
-  if (ok) {
-    // 🔒 eligibility backend se aa chuki hoti hai yahan
-    // canProceedPlaceOrder ke andar window.orderEligibility set hota hai
+  if (ok && window.orderEligibility) {
+    // 🔒 backend response ko GLOBAL truth bana do
+    window.orderEligibility = window.orderEligibility;
 
-    await updateCheckoutInvoice(); // 🔁 preview rebuild
-
-    // 🔥 FORCE invoice re-render if already open
+    // 🔁 FORCE invoice refresh AFTER delivery charge arrives
     if (
       window._checkoutInvoice &&
       window._checkoutInvoice.orderType === "Home Delivery"
     ) {
       renderInvoiceFromAPI({
         ...window._checkoutInvoice,
-        deliveryCharge: window.orderEligibility?.extraCharge || 0,
+        deliveryCharge: window.orderEligibility.extraCharge || 0,
         deliveryChargeLabel:
-          window.orderEligibility?.chargeType || "Delivery Charges"
+          window.orderEligibility.chargeType || "Delivery Charges"
       });
     }
   }
 }
+
 
     
 function buildOrderPayloadForDebug() {
@@ -14178,6 +14177,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
