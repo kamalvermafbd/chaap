@@ -4628,20 +4628,45 @@ if (placeBtn) {
 // ==================================
 async function recheckEligibilityOnOrderTypeChange() {
   if (window._orderTypeChanging) return;
+  window._orderTypeChanging = true;
 
-  window._orderTypeChanging = true;   // ✅ REQUIRED
+  try {
+    const orderType = document.getElementById("orderType")?.value;
+    const amount = Number(window.cartSummary?.itemsSubtotal || 0);
 
-  const ok = await canProceedPlaceOrder();
+    if (!orderType || amount <= 0) return;
 
-  window._orderTypeChanging = false;  // ✅ REQUIRED
-
-  if (ok && window.orderEligibility?.allowed) {
-    renderInvoiceFromAPI({
-      ...window._checkoutInvoice,
-      deliveryCharge: window.orderEligibility.extraCharge || 0,
-      deliveryChargeLabel:
-        window.orderEligibility.chargeType || "Delivery Charges"
+    // 🔥 DIRECT eligibility call (payment independent)
+    const res = await apiPost("checkOrderEligibility", {
+      orderType,
+      orderAmount: amount,
+      mobile: document.getElementById("mobile")?.value || "",
+      userType: isUserLoggedIn() ? "logged" : "guest",
+      lat: window._deliveryLocation?.lat || "",
+      lng: window._deliveryLocation?.lng || ""
     });
+
+    console.log("🚚 BACKEND ELIGIBILITY (ORDER TYPE):", res);
+
+    if (res?.allowed) {
+      window.orderEligibility = {
+        allowed: true,
+        extraCharge: Number(res.extraCharge || 0),
+        chargeType: res.chargeType || ""
+      };
+
+      // 🔁 INSTANT invoice refresh
+      if (window._checkoutInvoice) {
+        renderInvoiceFromAPI({
+          ...window._checkoutInvoice,
+          orderType,
+          deliveryCharge: window.orderEligibility.extraCharge,
+          deliveryChargeLabel: window.orderEligibility.chargeType
+        });
+      }
+    }
+  } finally {
+    window._orderTypeChanging = false;
   }
 }
 
@@ -14173,6 +14198,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
