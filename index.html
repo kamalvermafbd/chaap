@@ -7639,7 +7639,6 @@ if (isLoggedIn()) {
   const modal = document.getElementById("checkoutModal");
   modal.style.display = "flex";
 // 👤 Logged-in user → hide map
-hideMapForLoggedInUser();
 
   // 🔒 FIX: Logged-in user → hide mobile hint
   if (isLoggedIn()) {
@@ -14245,6 +14244,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
