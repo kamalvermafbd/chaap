@@ -7638,6 +7638,8 @@ if (isLoggedIn()) {
   // ✅ Open modal
   const modal = document.getElementById("checkoutModal");
   modal.style.display = "flex";
+// 👤 Logged-in user → hide map
+hideMapForLoggedInUser();
 
   // 🔒 FIX: Logged-in user → hide mobile hint
   if (isLoggedIn()) {
@@ -7663,6 +7665,15 @@ mountInvoiceIntoCheckout();
       resetCheckoutFieldsDefault();
     }
   }, 0);
+}
+
+  function hideMapForLoggedInUser() {
+  if (!isUserLogin()) return;
+
+  const mapContainer = document.getElementById("deliveryLocationPreview");
+  if (mapContainer) {
+    mapContainer.style.display = "none";
+  }
 }
 
   function hasNormalCouponAvailable() {
@@ -14234,6 +14245,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
