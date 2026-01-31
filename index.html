@@ -7594,11 +7594,11 @@ function updateCartBadge() {
 
 async function openCheckout() {
 
-// 🛑 NEW GUARD: wait until offers are fully applied
-if (!window._offersReady) {
-  alert("⏳ Applying best offers… please wait a moment.");
-  return;
-}
+  // 🛑 NEW GUARD: wait until offers are fully applied
+  if (!window._offersReady) {
+    alert("⏳ Applying best offers… please wait a moment.");
+    return;
+  }
 
   if (window._cartUpdating) {
     alert("Cart is still updating. Please wait…");
@@ -7623,14 +7623,14 @@ if (!window._offersReady) {
 
   // Autofill + reset
   autofillMobileForLoggedIn();
-  
-  document.getElementById("orderType").value = "";
-hideAddressIfOrderTypeBlank();
-  setupAddressUIVisibility();
-if (isLoggedIn()) {
-  loadPrimaryAddress();
-}
 
+  document.getElementById("orderType").value = "";
+  hideAddressIfOrderTypeBlank();
+  setupAddressUIVisibility();
+
+  if (isLoggedIn()) {
+    loadPrimaryAddress();
+  }
 
   refreshCheckout();
   document.getElementById("changeAddressBtn")?.classList.add("hidden");
@@ -7638,7 +7638,6 @@ if (isLoggedIn()) {
   // ✅ Open modal
   const modal = document.getElementById("checkoutModal");
   modal.style.display = "flex";
-// 👤 Logged-in user → hide map
 
   // 🔒 FIX: Logged-in user → hide mobile hint
   if (isLoggedIn()) {
@@ -7655,16 +7654,29 @@ if (isLoggedIn()) {
       toggleAddressField();
     }
   }, 0);
+
   revalidateAppliedCouponAgainstCart(); // 🔒 FINAL SAFETY CHECK
-mountInvoiceIntoCheckout();
+  mountInvoiceIntoCheckout();
   updateCheckoutInvoice();
 
-   setTimeout(() => {
+  setTimeout(() => {
     if (!isLoggedIn()) {
       resetCheckoutFieldsDefault();
     }
   }, 0);
+
+  // ✅ FINAL FIX — Logged-in user: hide location + map AFTER everything settles
+  setTimeout(() => {
+    if (!isUserLogin()) return;
+
+    const map = document.getElementById("deliveryLocationPreview");
+    const location = document.getElementById("locationVerifiedBox");
+
+    if (map) map.style.display = "none";
+    if (location) location.style.display = "none";
+  }, 0);
 }
+
 
   function hideMapForLoggedInUser() {
   if (!isUserLogin()) return;
@@ -14244,6 +14256,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
