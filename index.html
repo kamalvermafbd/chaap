@@ -4549,12 +4549,15 @@ if (payMsg) {
       return false;
     }
 
-    // 🔴 GUARD 2.5
-    const payment = document.getElementById("paymentMethod")?.value;
-    if (!payment) {
-      showError("⚠️ Please select a payment method");
-      return false;
-    }
+   // 🔴 GUARD 2.5 (FINAL ORDER ONLY)
+const payment = document.getElementById("paymentMethod")?.value;
+
+// ❗ Payment check sirf tab jab actual PLACE ORDER ho
+if (!payment && !window._orderTypeChanging) {
+  showError("⚠️ Please select a payment method");
+  return false;
+}
+
 
     // 🔴 GUARD 3 — Backend eligibility
     const mobile = document.getElementById("mobile")?.value.trim();
@@ -4619,37 +4622,28 @@ if (placeBtn) {
   }
 }
 
-
   
 // ==================================
 // STEP-3: Live eligibility on OrderType change
 // ==================================
 async function recheckEligibilityOnOrderTypeChange() {
   if (window._orderTypeChanging) return;
-  window._orderTypeChanging = true;
 
-  try {
-    const ok = await canProceedPlaceOrder(); // 🔥 backend eligibility yahin aati hai
+  window._orderTypeChanging = true;   // ✅ REQUIRED
 
-    if (
-      ok &&
-      window.orderEligibility?.allowed === true &&
-      window._checkoutInvoice?.orderType === "Home Delivery"
-    ) {
-      // 🔁 HARD REFRESH invoice AFTER delivery charge arrives
-      renderInvoiceFromAPI({
-        ...window._checkoutInvoice,
-        deliveryCharge: Number(window.orderEligibility.extraCharge || 0),
-        deliveryChargeLabel:
-          window.orderEligibility.chargeType || "Delivery Charges"
-      });
-    }
-  } finally {
-    window._orderTypeChanging = false;
+  const ok = await canProceedPlaceOrder();
+
+  window._orderTypeChanging = false;  // ✅ REQUIRED
+
+  if (ok && window.orderEligibility?.allowed) {
+    renderInvoiceFromAPI({
+      ...window._checkoutInvoice,
+      deliveryCharge: window.orderEligibility.extraCharge || 0,
+      deliveryChargeLabel:
+        window.orderEligibility.chargeType || "Delivery Charges"
+    });
   }
 }
-
-
 
     
 function buildOrderPayloadForDebug() {
@@ -14179,6 +14173,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
