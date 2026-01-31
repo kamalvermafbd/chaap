@@ -7034,7 +7034,7 @@ async function someCartAction() {
   }
 }
   
-function resetCheckoutFieldsDefault() {
+  function resetCheckoutFieldsDefault() {
   console.log("🧪 openCheckout → resetCheckoutFieldsDefault FIRED");
 
   // ===============================
@@ -7081,19 +7081,21 @@ function resetCheckoutFieldsDefault() {
   document.getElementById("paymentMethod").style.display = "block";
 
   // ===============================
-  // 🔄 LOCATION RESET (COMMON FOR ALL)
+  // 🔄 LOCATION RESET (GUEST ONLY)
   // ===============================
-  document.getElementById("address").value = "";
-  window.selectedLocation = null;
-  window.deliveryLatLng = null;
-  window.isLocationSet = false;
+  if (!isUserLoggedIn()) {
+    document.getElementById("address").value = "";
+    window.selectedLocation = null;
+    window.deliveryLatLng = null;
+    window.isLocationSet = false;
 
-  const ot = document.getElementById("orderType");
-  ot.value = "";
-  ot.parentElement.style.display = "none";
+    const ot = document.getElementById("orderType");
+    ot.value = "";
+    ot.parentElement.style.display = "none";
+  }
 
   // ===============================
-  // HIDE LOCATION UI
+  // HIDE LOCATION UI (TEMP)
   // ===============================
   document.getElementById("locationStatusRow").classList.add("hidden");
 
@@ -7111,6 +7113,28 @@ function resetCheckoutFieldsDefault() {
     deliveryLatLng: window.deliveryLatLng,
     isLocationSet: window.isLocationSet
   });
+
+  // ===============================
+  // 🔐 LOGIN USER → RESTORE LOCATION UI
+  // ===============================
+  if (isUserLoggedIn() && window.deliveryLatLng) {
+
+    window.isLocationSet = true;
+
+    const locRow = document.getElementById("locationStatusRow");
+    if (locRow) locRow.classList.remove("hidden");
+
+    const mapBox = document.getElementById("mapPreviewBox");
+    if (mapBox) mapBox.classList.remove("hidden");
+
+    const mapFrame = document.getElementById("mapPreviewFrame");
+    if (mapFrame && !mapFrame.src && window.deliveryLatLng.lat) {
+      mapFrame.src =
+        `https://maps.google.com/maps?q=${window.deliveryLatLng.lat},${window.deliveryLatLng.lng}&z=15&output=embed`;
+    }
+
+    console.log("🔐 LOGIN USER LOCATION RESTORED", window.deliveryLatLng);
+  }
 }
 
 function setupAddressUIVisibility() {
@@ -14212,6 +14236,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
