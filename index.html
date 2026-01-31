@@ -7440,7 +7440,6 @@ function closeNewAddressModal() {
   console.log("✅ New Address Modal closed, checkout restored");
 }
 
-
 function saveNewAddress() {
   if (window._savingAddress) return;
   window._savingAddress = true;
@@ -7466,36 +7465,50 @@ function saveNewAddress() {
   const city  = document.getElementById("newCity").value.trim();
   const state = document.getElementById("newState").value.trim();
 
-  // 🔴 NEW: location fields
-  const locText = document.getElementById("newAddressLocation")?.value.trim();
-  const latFld  = document.getElementById("newAddressLat");
-  const lngFld  = document.getElementById("newAddressLng");
+  // 🔴🔴🔴 LOCATION FIELDS (NEW)
+  const locInput = document.getElementById("newAddressLocation");
+  const locText  = locInput ? locInput.value.trim() : "";
+  const latFld   = document.getElementById("newAddressLat");
+  const lngFld   = document.getElementById("newAddressLng");
 
+  // 🔴 BASIC ADDRESS VALIDATION
   if (!addr || pin.length !== 6 || !city || !state) {
     alert("Please fill all address fields correctly.");
     resetSaveBtn();
     return;
   }
 
-  // ===============================
-  // 🔴 LOCATION MANDATORY CHECK
-  // ===============================
+  // 🔴 CHECK IF GPS LOCATION EXISTS
   const hasLatLng = latFld?.value && lngFld?.value;
 
+  // ==================================================
+  // 🔴🔴🔴 LOCATION MANDATORY FLOW START
+  // ==================================================
   if (!hasLatLng) {
     const useCurrent = confirm(
-      "Do you want to add your current location to this address?\n\nThis helps us ensure accurate delivery."
+      "Do you want to add your current location to this address?\n\n" +
+      "This helps us ensure accurate delivery."
     );
 
+    // 🔴 USER SAID NO → ENABLE MANUAL LOCATION PASTE
     if (!useCurrent) {
       alert(
-        "Location is required to save this address.\n\nPlease add your current location or paste a location manually."
+        "Location is required to save this address.\n\n" +
+        "You can paste a location manually (for example, from WhatsApp or Google Maps)."
       );
+
+      if (locInput) {
+        locInput.readOnly = false; // 🔴 allow manual paste
+        locInput.placeholder =
+          "Paste location here (e.g. Google Maps / WhatsApp)";
+        locInput.focus();
+      }
+
       resetSaveBtn();
       return;
     }
 
-    // 👉 User said YES → get current location
+    // 🔴 USER SAID YES → USE CURRENT GPS LOCATION
     if (!navigator.geolocation) {
       alert("Location services are not supported on this device.");
       resetSaveBtn();
@@ -7507,11 +7520,11 @@ function saveNewAddress() {
         latFld.value = pos.coords.latitude;
         lngFld.value = pos.coords.longitude;
 
-        if (!locText) {
-          document.getElementById("newAddressLocation").value = "Current Location";
+        if (!locText && locInput) {
+          locInput.value = "Current Location";
         }
 
-        // 🔁 Retry save AFTER lat/lng set
+        // 🔴 RETRY SAVE AFTER GPS IS SET
         window._savingAddress = false;
         saveNewAddress();
       },
@@ -7524,9 +7537,19 @@ function saveNewAddress() {
     return; // ⛔ wait for GPS
   }
 
-  // ===============================
-  // FINAL SAVE (lat/lng present)
-  // ===============================
+  // ==================================================
+  // 🔴🔴🔴 FINAL MANUAL LOCATION GUARD (IMPORTANT)
+  // 🔴 GPS OR MANUAL LOCATION TEXT IS REQUIRED
+  // ==================================================
+  if (!hasLatLng && !locText) {
+    alert("Please add a location before saving this address.");
+    resetSaveBtn();
+    return;
+  }
+
+  // ==================================================
+  // ✅ FINAL SAVE (ALL CONDITIONS PASSED)
+  // ==================================================
   apiPost("saveUserNewAddress", {
     mobile,
     address: addr,
@@ -7546,12 +7569,23 @@ function saveNewAddress() {
       resetSaveBtn();
       closeNewAddressModal();
 
-      // clear fields
-      ["newAddressField","newPincode","newCity","newState","newAddressLocation","newAddressLat","newAddressLng"]
-        .forEach(id => document.getElementById(id) && (document.getElementById(id).value = ""));
+      // 🔴 CLEAR ALL NEW ADDRESS FIELDS
+      [
+        "newAddressField",
+        "newPincode",
+        "newCity",
+        "newState",
+        "newAddressLocation",
+        "newAddressLat",
+        "newAddressLng"
+      ].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = "";
+      });
 
       onChangeAddressClick();
 
+      // 🔴 AUTO-SELECT NEWLY ADDED ADDRESS
       setTimeout(() => {
         const ddl = document.getElementById("savedAddressDropdown");
         if (ddl && ddl.options.length > 0) {
@@ -7567,6 +7601,9 @@ function saveNewAddress() {
       onChangeAddressClick();
     });
 
+  // ==================================================
+  // 🔴 RESET SAVE BUTTON HELPER
+  // ==================================================
   function resetSaveBtn() {
     window._savingAddress = false;
     if (btn) {
@@ -7575,6 +7612,7 @@ function saveNewAddress() {
     }
   }
 }
+
 
 
 const originalBodyOverflow = document.body.style.overflow || "";  
@@ -14274,6 +14312,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
