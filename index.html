@@ -8560,7 +8560,8 @@ if (window._appliedCouponType === "reward") {
  
     const subtotal = Number(window._drawerTotals?.baseTotal || 0);
     const loggedIn = isUserLoggedIn();
-    const allOffers = window._allOffersRaw || [];
+    const allOffers = window.liveOffers || [];
+
 
     // ❌ nothing to show
     if (subtotal <= 0 || allOffers.length === 0) {
@@ -14171,6 +14172,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
