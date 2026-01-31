@@ -7262,6 +7262,8 @@ function onChangeAddressClick() {
             pincode: userRes.pincode || "",
             city: userRes.city || "",
             state: userRes.state || "",
+          lat: userRes.lat || "",               // 🔴 from USER sheet
+          lng: userRes.lng || "",               // 🔴 from USER sheet
             type: "primary"
           }
         : null;
@@ -7272,6 +7274,8 @@ function onChangeAddressClick() {
             pincode: a.pincode || "",
             city: a.city || "",
             state: a.state || "",
+             lat: a.lat || "",                     // 🔴 from multi_add
+          lng: a.lng || "",                     // 🔴 from multi_add
             type: "multi"
           }))
         : [];
@@ -7326,6 +7330,7 @@ if (!primary && multiList.length === 0) {
       const first = ddl.options[0];
       if (first) {
         ddl.value = first.value;
+        ddl.dispatchEvent(new Event("change")); // 🔴 IMPORTANT
         const obj = JSON.parse(first.value);
         document.getElementById("address").value  = obj.address;
         document.getElementById("pincode").value = obj.pincode;
@@ -7368,15 +7373,60 @@ if (!primary && multiList.length === 0) {
 
 
       // 5️⃣ Dropdown change handler
-      ddl.onchange = () => {
-        try {
-          const obj = JSON.parse(ddl.value);
-          document.getElementById("address").value  = obj.address;
-          document.getElementById("pincode").value = obj.pincode;
-          document.getElementById("city").value    = obj.city;
-          document.getElementById("state").value   = obj.state;
-        } catch (e) {}
+     ddl.onchange = () => {
+  try {
+    const obj = JSON.parse(ddl.value);
+
+    // BASIC ADDRESS
+    document.getElementById("address").value  = obj.address || "";
+    document.getElementById("pincode").value = obj.pincode || "";
+    document.getElementById("city").value    = obj.city || "";
+    document.getElementById("state").value   = obj.state || "";
+
+    // 🔴 LOCATION / LAT-LNG BINDING (CRITICAL)
+    if (obj.lat && obj.lng) {
+      window.deliveryLatLng = {
+        lat: Number(obj.lat),
+        lng: Number(obj.lng)
       };
+      window.isLocationSet = true;
+
+      // Show map UI
+      document.getElementById("locationStatusRow")?.classList.remove("hidden");
+      document.getElementById("mapPreviewBox")?.classList.remove("hidden");
+
+      const frame = document.getElementById("mapPreviewFrame");
+      if (frame) {
+        frame.src =
+          `https://maps.google.com/maps?q=${obj.lat},${obj.lng}&z=15&output=embed`;
+      }
+
+      const status = document.getElementById("addressStatus");
+      if (status) {
+        status.innerText = "📍 Location loaded from saved address";
+        status.className = "text-sm text-green-600 font-medium";
+        status.classList.remove("hidden");
+      }
+
+    } else {
+      // 🔴 NO LAT/LNG CASE
+      window.deliveryLatLng = null;
+      window.isLocationSet = false;
+
+      const status = document.getElementById("addressStatus");
+      if (status) {
+        status.innerText =
+          "⚠️ This address does not have an exact map location.";
+        status.className = "text-sm text-orange-600 font-medium";
+        status.classList.remove("hidden");
+      }
+    }
+
+  } catch (e) {
+    console.error("Address parse error", e);
+  }
+};
+
 
   })
   .catch(err => {
@@ -7640,8 +7690,6 @@ function saveNewAddress() {
     }
   }
 }
-
-
 
 
 const originalBodyOverflow = document.body.style.overflow || "";  
@@ -14341,6 +14389,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
