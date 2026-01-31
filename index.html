@@ -4102,7 +4102,7 @@ if (res.lat && res.lng) {
 row.dataset.autoChecked = "1";
 // 🔥 🔥 🔥 FINAL FIX — AUTO RECHECK ELIGIBILITY
   setTimeout(() => {
-    recheckEligibilityOnOrderTypeChange();
+    canProceedPlaceOrder();
   }, 0);
       } else {
         // location exists but outside radius
@@ -14206,6 +14206,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
