@@ -7600,15 +7600,14 @@ if (!window._offersReady) {
 
   // Autofill + reset
   autofillMobileForLoggedIn();
-  
+  // 🔄 RESET FIRST (guest + login same)
+resetCheckoutFieldsDefault();
   document.getElementById("orderType").value = "";
 hideAddressIfOrderTypeBlank();
   setupAddressUIVisibility();
 if (isLoggedIn()) {
   loadPrimaryAddress();
 }
-
-
   refreshCheckout();
   document.getElementById("changeAddressBtn")?.classList.add("hidden");
 
@@ -7636,11 +7635,6 @@ if (isLoggedIn()) {
 mountInvoiceIntoCheckout();
   updateCheckoutInvoice();
 
-   setTimeout(() => {
-    if (!isLoggedIn()) {
-      resetCheckoutFieldsDefault();
-    }
-  }, 0);
 }
 
 
@@ -14213,6 +14207,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
