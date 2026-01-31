@@ -4466,21 +4466,17 @@ if (placeBtn) {
   placeBtn.disabled = true;
   placeBtn.classList.add("disabled-btn");
 }
-
 if (payMsg) {
   payMsg.classList.remove("hidden", "text-green-600");
   payMsg.classList.add("text-red-600");
   payMsg.innerText = "⏳ Your order is being processed. Please wait…";
 }
-
   // 🔴 FIX-1: HARD GUARD — prevent repeated / parallel execution
   if (window._eligibilityRunning) {
     return false;
   }
   window._eligibilityRunning = true;
-
   try {
-
     // 🔐 LOGGED-IN USER LOCATION AUTO-READY FIX
     if (isUserLoggedIn()) {
       if (
@@ -4492,7 +4488,6 @@ if (payMsg) {
         window._deliveryLocationReady = true;
       }
     }
-
     // 🔥 Sync GPS from frontend memory
     if (
       window._deliveryLocation &&
@@ -4501,7 +4496,6 @@ if (payMsg) {
     ) {
       window._deliveryLocationReady = true;
     }
-
     const paymentError = document.getElementById("paymentError");
 
     // helper functions (same UX everywhere)
@@ -4510,7 +4504,6 @@ if (payMsg) {
       paymentError.innerText = msg;
       paymentError.classList.remove("hidden", "text-green-600");
       paymentError.classList.add("text-red-600");
-
       // 🔴 FIX-2: DO NOT trigger invoice / eligibility indirectly
       // ❌ disablePlaceOrder() removed from eligibility loop
     };
@@ -4533,7 +4526,6 @@ if (payMsg) {
       return false;
     }
 
-    
     const orderType = document.getElementById("orderType")?.value.trim();
     const amount = Number(window.cartSummary?.itemsSubtotal || 0);
 
@@ -4563,12 +4555,19 @@ const res = await apiPost("checkOrderEligibility", {
   lng: window._deliveryLocation?.lng || ""
 });
 
-// 🔴 NEW — delivery charge yahin aa jayega
+// 🔴 delivery charge aate hi store karo
 window.orderEligibility = {
-  allowed: false,
+  allowed: res.allowed === true,
   extraCharge: Number(res?.extraCharge || 0),
   chargeType: res?.chargeType || ""
 };
+
+// 🔴 invoice ko turant refresh karo
+if (typeof buildCheckoutPreviewInv === "function") {
+  const inv = buildCheckoutPreviewInv();
+  renderInvoiceFromAPI(inv);
+}
+
 
 console.log("🧪 BACKEND RESPONSE:", res);
 
@@ -4584,13 +4583,6 @@ if (!res || res.allowed !== true) {
   showError(res?.message || "Order is not allowed at this time");
   return false;
 }
-
-// 🔴 NEW — final eligibility confirmed
-window.orderEligibility = {
-  allowed: true,
-  extraCharge: Number(res.extraCharge || 0),
-  chargeType: res.chargeType || ""
-};
 
     // 🔴 GUARD 2.5
     const payment = document.getElementById("paymentMethod")?.value;
@@ -14179,6 +14171,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
