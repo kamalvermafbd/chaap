@@ -2183,7 +2183,7 @@ body::before {
 </div>
 </div>
 
-<!-- NEW ADDRESS MODAL (STEP-2A) -->
+
 <!-- NEW ADDRESS MODAL (STEP-2A) -->
 <div id="newAddressModal"
      class="fixed inset-0 bg-black bg-opacity-40 hidden z-[10000]
@@ -2214,6 +2214,17 @@ body::before {
         class="w-full border px-2 py-2 rounded"
         placeholder="Enter full address"></textarea>
 
+  <!-- 🔴 NEW: LOCATION DISPLAY FIELD -->
+      <label class="text-sm font-medium mt-3">Location</label>
+      <input id="newAddressLocation"
+             class="w-full border px-2 py-2 rounded bg-gray-100"
+             placeholder="Select location from map"
+             readonly />
+
+      <!-- 🔴 NEW: HIDDEN LAT / LNG FIELDS -->
+      <input type="hidden" id="newAddressLat" />
+      <input type="hidden" id="newAddressLng" />
+      
       <label class="text-sm font-medium mt-3">Pincode</label>
       <input id="newPincode"
              maxlength="6"
@@ -7431,8 +7442,8 @@ function closeNewAddressModal() {
 
 
 function saveNewAddress() {
-if (window._savingAddress) return;
-window._savingAddress = true;
+  if (window._savingAddress) return;
+  window._savingAddress = true;
 
   const mobile =
     localStorage.getItem("mobile") ||
@@ -7443,89 +7454,126 @@ window._savingAddress = true;
     window._savingAddress = false;
     return;
   }
-  const btn = document.getElementById("saveNewAddressBtn");
-if (btn) {
-  btn.disabled = true;
-  btn.innerText = "Saving...";
-}
 
+  const btn = document.getElementById("saveNewAddressBtn");
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = "Saving...";
+  }
 
   const addr  = document.getElementById("newAddressField").value.trim();
   const pin   = document.getElementById("newPincode").value.trim();
   const city  = document.getElementById("newCity").value.trim();
   const state = document.getElementById("newState").value.trim();
 
+  // 🔴 NEW: location fields
+  const locText = document.getElementById("newAddressLocation")?.value.trim();
+  const latFld  = document.getElementById("newAddressLat");
+  const lngFld  = document.getElementById("newAddressLng");
+
   if (!addr || pin.length !== 6 || !city || !state) {
     alert("Please fill all address fields correctly.");
-    window._savingAddress = false;
-if (btn) {
-    btn.disabled = false;
-    btn.innerText = "Save Address";
-}
-    
+    resetSaveBtn();
     return;
   }
 
+  // ===============================
+  // 🔴 LOCATION MANDATORY CHECK
+  // ===============================
+  const hasLatLng = latFld?.value && lngFld?.value;
+
+  if (!hasLatLng) {
+    const useCurrent = confirm(
+      "Do you want to add your current location to this address?\n\nThis helps us ensure accurate delivery."
+    );
+
+    if (!useCurrent) {
+      alert(
+        "Location is required to save this address.\n\nPlease add your current location or paste a location manually."
+      );
+      resetSaveBtn();
+      return;
+    }
+
+    // 👉 User said YES → get current location
+    if (!navigator.geolocation) {
+      alert("Location services are not supported on this device.");
+      resetSaveBtn();
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        latFld.value = pos.coords.latitude;
+        lngFld.value = pos.coords.longitude;
+
+        if (!locText) {
+          document.getElementById("newAddressLocation").value = "Current Location";
+        }
+
+        // 🔁 Retry save AFTER lat/lng set
+        window._savingAddress = false;
+        saveNewAddress();
+      },
+      err => {
+        alert("Unable to fetch current location. Please allow location access.");
+        resetSaveBtn();
+      }
+    );
+
+    return; // ⛔ wait for GPS
+  }
+
+  // ===============================
+  // FINAL SAVE (lat/lng present)
+  // ===============================
   apiPost("saveUserNewAddress", {
     mobile,
     address: addr,
     pincode: pin,
     city,
-    state
+    state,
+    lat: latFld?.value || "",
+    lng: lngFld?.value || ""
   })
-  .then(res => {
-    if (!res || !res.success) {
-      alert(res?.message || "Failed to save address.");
-      window._savingAddress = false;
-
-  if (btn) {
-    btn.disabled = false;
-    btn.innerText = "Save Address";
-  }
-      return;
-    }
-window._savingAddress = false;
-if (btn) {
-  btn.disabled = false;
-  btn.innerText = "Save Address";
-}
-
-    // ✅ Close modal
-    closeNewAddressModal();
-
-    // ✅ Clear modal inputs
-    document.getElementById("newAddressField").value = "";
-    document.getElementById("newPincode").value = "";
-    document.getElementById("newCity").value = "";
-    document.getElementById("newState").value = "";
-
-    // ✅ Refresh dropdown
-    onChangeAddressClick();
-
-    // ✅ Auto-select newly added address
-    setTimeout(() => {
-      const ddl = document.getElementById("savedAddressDropdown");
-      if (ddl && ddl.options.length > 0) {
-        ddl.selectedIndex = ddl.options.length - 1;
-        ddl.dispatchEvent(new Event("change"));
+    .then(res => {
+      if (!res || !res.success) {
+        alert(res?.message || "Failed to save address.");
+        resetSaveBtn();
+        return;
       }
-    }, 300);
 
-  })
-  .catch(err => {
-    console.error(err);
-   console.log("NEW MODAL SAVE FLOW RUNNING");
+      resetSaveBtn();
+      closeNewAddressModal();
 
-    console.warn("Save address fetch failed, but may be saved:", err);
-window._savingAddress = false;
-if (btn) {
-  btn.disabled = false;
-  btn.innerText = "Save Address";
-}
+      // clear fields
+      ["newAddressField","newPincode","newCity","newState","newAddressLocation","newAddressLat","newAddressLng"]
+        .forEach(id => document.getElementById(id) && (document.getElementById(id).value = ""));
 
-  closeNewAddressModal();
-  onChangeAddressClick();
-  });
+      onChangeAddressClick();
+
+      setTimeout(() => {
+        const ddl = document.getElementById("savedAddressDropdown");
+        if (ddl && ddl.options.length > 0) {
+          ddl.selectedIndex = ddl.options.length - 1;
+          ddl.dispatchEvent(new Event("change"));
+        }
+      }, 300);
+    })
+    .catch(err => {
+      console.error(err);
+      resetSaveBtn();
+      closeNewAddressModal();
+      onChangeAddressClick();
+    });
+
+  function resetSaveBtn() {
+    window._savingAddress = false;
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = "Save Address";
+    }
+  }
 }
 
 
@@ -14226,6 +14274,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
