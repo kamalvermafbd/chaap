@@ -7106,7 +7106,7 @@ async function someCartAction() {
   });
 
   // 🔐 LOGIN USER LOCATION RESTORE
-  if (isLoggedIn() && window.deliveryLatLng) {
+  if (isUserLoggedIn() && window.deliveryLatLng) {
 
     window.isLocationSet = true;
 
@@ -14228,6 +14228,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
