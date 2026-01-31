@@ -7034,23 +7034,19 @@ async function someCartAction() {
   }
 }
 
-function resetCheckoutFieldsDefault() {
-console.log("🧪 openCheckout → resetCheckoutFieldsDefault FIRED");
+  function resetCheckoutFieldsDefault() {
+  console.log("🧪 openCheckout → resetCheckoutFieldsDefault FIRED");
 
-  // SHOW only these 3 rows
   document.getElementById("mobile").parentElement.style.display = "block";
- // document.getElementById("orderType").parentElement.style.display = "block";
   document.getElementById("paymentMethod").parentElement.style.display = "block";
-  // ===============================
-  // 🔄 RESET PAYMENT + STATUS STATE
-  // ===============================
+
   window.selectedPaymentMethod = "";
   document.getElementById("paymentMethod").value = "";
-// 🔄 RESET payment button UI state
-document.querySelectorAll(".paymentBtn").forEach(btn => {
-  btn.classList.remove("bg-orange-500", "text-white", "border-orange-500");
-  btn.classList.add("bg-white", "text-gray-800", "border-gray-300");
-});
+
+  document.querySelectorAll(".paymentBtn").forEach(btn => {
+    btn.classList.remove("bg-orange-500", "text-white", "border-orange-500");
+    btn.classList.add("bg-white", "text-gray-800", "border-gray-300");
+  });
 
   const payMsg = document.getElementById("paymentError");
   if (payMsg) {
@@ -7065,57 +7061,74 @@ document.querySelectorAll(".paymentBtn").forEach(btn => {
     placeBtn.classList.add("disabled-btn");
   }
 
-  // HIDE Name + Email + Address (label + input together)
   document.getElementById("customerName").parentElement.style.display = "none";
   document.getElementById("email").parentElement.style.display = "none";
   document.getElementById("addressWrapper").style.display = "none";
 
-  // Ensure fields remain editable when shown later
   document.getElementById("customerName").readOnly = false;
   document.getElementById("email").readOnly = false;
   document.getElementById("address").readOnly = false;
 
-  // Payment MUST remain visible always
   document.getElementById("paymentMethod").style.display = "block";
 
-  // ===============================
-// 🔄 RESET LOCATION (GUEST ONLY)
-// ===============================
+  // 🔄 BASE RESET
   document.getElementById("address").value = "";
+  window.selectedLocation = null;
+  window.deliveryLatLng = null;
+  window.isLocationSet = false;
 
-window.selectedLocation = null;
-window.deliveryLatLng = null;
-window.isLocationSet = false;
-  // ===============================
-// 🔐 GUEST: ORDER TYPE HIDE
-// ===============================
-if (!isLoggedIn()) {
-  const ot = document.getElementById("orderType");
-  ot.value = "";
-  ot.parentElement.style.display = "none";
+  if (!isLoggedIn()) {
+    const ot = document.getElementById("orderType");
+    ot.value = "";
+    ot.parentElement.style.display = "none";
+  }
+
+  document.getElementById("locationStatusRow").classList.add("hidden");
+
+  const mapBox = document.getElementById("mapPreviewBox");
+  mapBox.classList.add("hidden");
+
+  document.getElementById("mapPreviewFrame").src = "";
+
+  // ✅ DEBUG LOG (CLOSED PROPERLY)
+  console.log("🧪 LOCATION STATE CHECK", {
+    selectedLocation: window.selectedLocation,
+    deliveryLatLng: window.deliveryLatLng,
+    isLocationSet: window.isLocationSet,
+    addressValue: document.getElementById("address").value,
+    locationStatusVisible: !document
+      .getElementById("locationStatusRow")
+      .classList.contains("hidden"),
+    mapVisible: !document
+      .getElementById("mapPreviewBox")
+      .classList.contains("hidden"),
+    mapSrc: document.getElementById("mapPreviewFrame").src
+  });
+
+  // 🔐 LOGIN USER LOCATION RESTORE
+  if (isLoggedIn() && window.deliveryLatLng) {
+
+    window.isLocationSet = true;
+
+    const locRow = document.getElementById("locationStatusRow");
+    if (locRow) locRow.classList.remove("hidden");
+
+    const mapBox = document.getElementById("mapPreviewBox");
+    if (mapBox) mapBox.classList.remove("hidden");
+
+    const mapFrame = document.getElementById("mapPreviewFrame");
+    if (mapFrame && !mapFrame.src && window.deliveryLatLng.lat) {
+      mapFrame.src =
+        `https://maps.google.com/maps?q=${window.deliveryLatLng.lat},${window.deliveryLatLng.lng}&z=15&output=embed`;
+    }
+
+    console.log("🔐 LOGIN USER LOCATION RESTORED", {
+      latLng: window.deliveryLatLng,
+      isLocationSet: window.isLocationSet
+    });
+  }
 }
-// 🔥 HARD RESET LOCATION UI
-document.getElementById("locationStatusRow").classList.add("hidden");
 
-const mapBox = document.getElementById("mapPreviewBox");
-mapBox.classList.add("hidden");
-
-document.getElementById("mapPreviewFrame").src = "";
-console.log("🧪 LOCATION STATE CHECK", {
-  selectedLocation: window.selectedLocation,
-  deliveryLatLng: window.deliveryLatLng,
-  isLocationSet: window.isLocationSet,
-  addressValue: document.getElementById("address").value,
-  locationStatusVisible: !document
-    .getElementById("locationStatusRow")
-    .classList.contains("hidden"),
-  mapVisible: !document
-    .getElementById("mapPreviewBox")
-    .classList.contains("hidden"),
-  mapSrc: document.getElementById("mapPreviewFrame").src
-});
-
-}
 
 
 function setupAddressUIVisibility() {
@@ -14215,6 +14228,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
