@@ -9797,16 +9797,29 @@ if (cartArr.length === 0) {
   // ----------------------------------------
 // ⭐ G4: REVALIDATE COUPON on totals update
 // ----------------------------------------
-if (selectedCoupon && (selectedCoupon.type === "onetime" || selectedCoupon.type === "regular"))
- {
-    const min = Number(selectedCoupon.min || 0);
+// ----------------------------------------
+// ⭐ G4: REVALIDATE COUPON on totals update
+// ----------------------------------------
+if (selectedCoupon) {
+  const min = Number(selectedCoupon.min || 0);
 
-    if (subtotal < min) {
-        selectedCoupon = null;
-        alreadyAppliedCouponId = "";
-        showCouponError("Coupon removed due to quantity/value change.");
+  if (subtotal < min) {
+    // 🔥 FULL HARD RESET (best offer + manual)
+    selectedCoupon = null;
+    alreadyAppliedCouponId = "";
+    window._appliedCoupon = null;
+    window._finalCouponId = "";
+    window._lastAutoCouponId = "";
+    window._autoCouponJustChanged = false;
+
+    if (window._checkoutInvoice) {
+      window._checkoutInvoice.couponId = "";
     }
+
+    showCouponError("Coupon removed as cart value changed.");
+  }
 }
+
 
   // =====================================================
   // ⭐⭐ RESTORE COUPON ON REFRESH (MAIN FIX)
@@ -14195,6 +14208,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
