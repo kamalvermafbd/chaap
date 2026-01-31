@@ -7619,6 +7619,14 @@ hideAddressIfOrderTypeBlank();
 if (isLoggedIn()) {
   loadPrimaryAddress();
 }
+  // 🔐 LOGIN USER → FORCE SHOW ORDER TYPE
+if (isUserLoggedIn()) {
+  const ot = document.getElementById("orderType");
+  if (ot && ot.parentElement) {
+    ot.parentElement.style.display = "block";
+  }
+}
+
   refreshCheckout();
   document.getElementById("changeAddressBtn")?.classList.add("hidden");
 
@@ -14218,6 +14226,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
