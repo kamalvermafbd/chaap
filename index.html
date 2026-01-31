@@ -4625,12 +4625,31 @@ if (placeBtn) {
 // STEP-3: Live eligibility on OrderType change
 // ==================================
 async function recheckEligibilityOnOrderTypeChange() {
-   if (window._orderTypeChanging) return;
+  if (window._orderTypeChanging) return;
+
   const ok = await canProceedPlaceOrder();
+
   if (ok) {
-    await updateCheckoutInvoice(); // 🔥 eligibility set hone ke BAAD
+    // 🔒 eligibility backend se aa chuki hoti hai yahan
+    // canProceedPlaceOrder ke andar window.orderEligibility set hota hai
+
+    await updateCheckoutInvoice(); // 🔁 preview rebuild
+
+    // 🔥 FORCE invoice re-render if already open
+    if (
+      window._checkoutInvoice &&
+      window._checkoutInvoice.orderType === "Home Delivery"
+    ) {
+      renderInvoiceFromAPI({
+        ...window._checkoutInvoice,
+        deliveryCharge: window.orderEligibility?.extraCharge || 0,
+        deliveryChargeLabel:
+          window.orderEligibility?.chargeType || "Delivery Charges"
+      });
+    }
   }
 }
+
     
 function buildOrderPayloadForDebug() {
   const inv = window._checkoutInvoice;
@@ -14159,6 +14178,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
