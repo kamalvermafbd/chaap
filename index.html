@@ -2615,7 +2615,7 @@ async function fetchOffersForPromoBanner() {
 
     const res = await apiGet("getOffers", { mobile });
 
-    window._promoOffers = window.liveOffers || [];
+    window._promoOffers = res.allOffersRaw || [];
     return window._promoOffers;
   } catch (e) {
     window._promoOffers = [];
@@ -14172,6 +14172,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
