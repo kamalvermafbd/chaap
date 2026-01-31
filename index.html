@@ -2221,6 +2221,18 @@ body::before {
              placeholder="Select location from map"
              readonly />
 
+      <!-- 🔴🔴🔴 MANUAL LOCATION TEXT (ONLY IF GPS NOT USED) -->
+<label id="manualLocationLabel"
+       class="text-sm font-medium mt-3 hidden">
+  Location / Landmark
+</label>
+
+<textarea id="manualLocationText"
+          class="w-full border px-2 py-2 rounded hidden"
+          placeholder="Paste Google Maps link or nearby landmark (required if GPS not used)"
+          rows="2"></textarea>
+<!-- 🔴🔴🔴 END MANUAL LOCATION TEXT -->
+
       <!-- 🔴 NEW: HIDDEN LAT / LNG FIELDS -->
       <input type="hidden" id="newAddressLat" />
       <input type="hidden" id="newAddressLng" />
@@ -7439,7 +7451,7 @@ function closeNewAddressModal() {
 
   console.log("✅ New Address Modal closed, checkout restored");
 }
-
+  
 function saveNewAddress() {
   if (window._savingAddress) return;
   window._savingAddress = true;
@@ -7465,50 +7477,55 @@ function saveNewAddress() {
   const city  = document.getElementById("newCity").value.trim();
   const state = document.getElementById("newState").value.trim();
 
-  // 🔴🔴🔴 LOCATION FIELDS (NEW)
-  const locInput = document.getElementById("newAddressLocation");
-  const locText  = locInput ? locInput.value.trim() : "";
-  const latFld   = document.getElementById("newAddressLat");
-  const lngFld   = document.getElementById("newAddressLng");
+  // 🔴🔴🔴 LOCATION ELEMENTS (AS PER NEW HTML)
+  const gpsLocInput     = document.getElementById("newAddressLocation"); // readonly
+  const manualLocInput  = document.getElementById("manualLocationText"); // textarea
+  const manualLocLabel  = document.getElementById("manualLocationLabel");
+  const latFld          = document.getElementById("newAddressLat");
+  const lngFld          = document.getElementById("newAddressLng");
 
+  const manualLocText = manualLocInput ? manualLocInput.value.trim() : "";
+  const hasLatLng = latFld?.value && lngFld?.value;
+
+  // ==================================================
   // 🔴 BASIC ADDRESS VALIDATION
+  // ==================================================
   if (!addr || pin.length !== 6 || !city || !state) {
     alert("Please fill all address fields correctly.");
     resetSaveBtn();
     return;
   }
 
-  // 🔴 CHECK IF GPS LOCATION EXISTS
-  const hasLatLng = latFld?.value && lngFld?.value;
-
   // ==================================================
-  // 🔴🔴🔴 LOCATION MANDATORY FLOW START
+  // 🔴 LOCATION DECISION FLOW
   // ==================================================
-  if (!hasLatLng) {
+  // Ask for GPS ONLY if:
+  // - no lat/lng
+  // - no manual location text
+  if (!hasLatLng && !manualLocText) {
     const useCurrent = confirm(
       "Do you want to add your current location to this address?\n\n" +
       "This helps us ensure accurate delivery."
     );
 
-    // 🔴 USER SAID NO → ENABLE MANUAL LOCATION PASTE
+    // 🔴 USER SAID NO → SHOW MANUAL LOCATION TEXTAREA
     if (!useCurrent) {
       alert(
         "Location is required to save this address.\n\n" +
-        "You can paste a location manually (for example, from WhatsApp or Google Maps)."
+        "Please paste a Google Maps link or a nearby landmark."
       );
 
-      if (locInput) {
-        locInput.readOnly = false; // 🔴 allow manual paste
-        locInput.placeholder =
-          "Paste location here (e.g. Google Maps / WhatsApp)";
-        locInput.focus();
+      if (manualLocInput && manualLocLabel) {
+        manualLocInput.classList.remove("hidden");
+        manualLocLabel.classList.remove("hidden");
+        manualLocInput.focus();
       }
 
       resetSaveBtn();
       return;
     }
 
-    // 🔴 USER SAID YES → USE CURRENT GPS LOCATION
+    // 🔴 USER SAID YES → FETCH GPS LOCATION
     if (!navigator.geolocation) {
       alert("Location services are not supported on this device.");
       resetSaveBtn();
@@ -7520,8 +7537,15 @@ function saveNewAddress() {
         latFld.value = pos.coords.latitude;
         lngFld.value = pos.coords.longitude;
 
-        if (!locText && locInput) {
-          locInput.value = "Current Location";
+        if (gpsLocInput) {
+          gpsLocInput.value = "Current Location";
+        }
+
+        // 🔴 HIDE MANUAL LOCATION UI (GPS USED)
+        if (manualLocInput && manualLocLabel) {
+          manualLocInput.classList.add("hidden");
+          manualLocLabel.classList.add("hidden");
+          manualLocInput.value = "";
         }
 
         // 🔴 RETRY SAVE AFTER GPS IS SET
@@ -7538,17 +7562,16 @@ function saveNewAddress() {
   }
 
   // ==================================================
-  // 🔴🔴🔴 FINAL MANUAL LOCATION GUARD (IMPORTANT)
-  // 🔴 GPS OR MANUAL LOCATION TEXT IS REQUIRED
+  // 🔴 FINAL SAFETY CHECK
   // ==================================================
-  if (!hasLatLng && !locText) {
+  if (!hasLatLng && !manualLocText) {
     alert("Please add a location before saving this address.");
     resetSaveBtn();
     return;
   }
 
   // ==================================================
-  // ✅ FINAL SAVE (ALL CONDITIONS PASSED)
+  // ✅ FINAL SAVE (lat/lng + location_text)
   // ==================================================
   apiPost("saveUserNewAddress", {
     mobile,
@@ -7557,7 +7580,8 @@ function saveNewAddress() {
     city,
     state,
     lat: latFld?.value || "",
-    lng: lngFld?.value || ""
+    lng: lngFld?.value || "",
+    locationText: manualLocText || "Current Location" // 🔴🔴🔴 IMPORTANT
   })
     .then(res => {
       if (!res || !res.success) {
@@ -7569,19 +7593,23 @@ function saveNewAddress() {
       resetSaveBtn();
       closeNewAddressModal();
 
-      // 🔴 CLEAR ALL NEW ADDRESS FIELDS
+      // 🔴 CLEAR ALL FIELDS
       [
         "newAddressField",
         "newPincode",
         "newCity",
         "newState",
         "newAddressLocation",
+        "manualLocationText",
         "newAddressLat",
         "newAddressLng"
       ].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = "";
       });
+
+      if (manualLocLabel) manualLocLabel.classList.add("hidden");
+      if (manualLocInput) manualLocInput.classList.add("hidden");
 
       onChangeAddressClick();
 
@@ -7612,6 +7640,7 @@ function saveNewAddress() {
     }
   }
 }
+
 
 
 
@@ -14312,6 +14341,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
