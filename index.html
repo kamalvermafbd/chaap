@@ -4455,6 +4455,9 @@ function enablePlaceOrder() {
   btn.classList.remove("opacity-50", "cursor-not-allowed");
 }
 
+
+
+    
 async function canProceedPlaceOrder() {
 // ===============================
 // 🔒 PROCESSING STATE (default)
@@ -4553,7 +4556,8 @@ if (payMsg) {
 const payment = document.getElementById("paymentMethod")?.value;
 
 // ❗ Payment check sirf tab jab actual PLACE ORDER ho
-if (!payment && !window._orderTypeChanging) {
+if (!payment && !window._eligibilityPrefetch) {
+
   showError("⚠️ Please select a payment method");
   return false;
 }
@@ -14206,6 +14210,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
