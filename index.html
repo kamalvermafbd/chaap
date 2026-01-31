@@ -7635,6 +7635,7 @@ if (isLoggedIn()) {
       toggleAddressField();
     }
   }, 0);
+  revalidateAppliedCouponAgainstCart(); // 🔒 FINAL SAFETY CHECK
 mountInvoiceIntoCheckout();
   updateCheckoutInvoice();
 
@@ -12151,6 +12152,28 @@ function formatInvoiceDate(dt) {
 
   return `${dd}-${mm}-${yyyy}`;
 }
+
+
+function revalidateAppliedCouponAgainstCart() {
+  if (window._appliedCouponType !== "normal") return;
+
+  const subtotal = Number(window._drawerTotals?.baseTotal || 0);
+  const applied = window._appliedOffer;
+
+  if (!applied || !applied.min) return;
+
+  // ❌ coupon no longer eligible
+  if (subtotal < Number(applied.min)) {
+    console.warn("🚫 Applied coupon invalid after cart update. Removing.", applied.id);
+
+    window._appliedCouponType = null;
+    window._appliedOffer = null;
+    window._appliedCoupon = null;
+
+    // optional UI cleanup
+    hideCouponMotivationHint?.();
+  }
+}
   
 function renderInvoiceFromAPI(inv) {
   console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
@@ -14172,6 +14195,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
