@@ -4622,6 +4622,8 @@ if (!window._deliveryLocationReady) {
 // ================================
 const mobile = document.getElementById("mobile")?.value.trim();
 const userType = isUserLoggedIn() ? "logged" : "guest";
+    
+showInvoiceProcessingOverlay(); // ⏳ invoice calculation started
 
 const res = await apiPost("checkOrderEligibility", {
   orderType,
@@ -4695,6 +4697,7 @@ if (placeBtn) {
 
   } finally {
     //  FIX-4: ALWAYS release lock
+    hideInvoiceProcessingOverlay(); // ✅ invoice calculation done
     window._eligibilityRunning = false;
   }
 }
@@ -14505,6 +14508,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
