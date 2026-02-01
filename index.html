@@ -4997,12 +4997,13 @@ couponDiscount: Number(drawer.offerDiscount || 0),
   state,
     userType,
       lat: orderType === "Home Delivery"
-      ? (window._userLat || window._deliveryLocation?.lat || "")
-      : "",
+  ? (window._deliveryLocation?.lat || window._userLat || "")
+  : "",
 
 lng: orderType === "Home Delivery"
-      ? (window._userLng || window._deliveryLocation?.lng || "")
-      : "",
+  ? (window._deliveryLocation?.lng || window._userLng || "")
+  : "",
+
   deliveryCharges: Number(inv.deliveryCharge || 0),
   courierCharges: Number(inv.courierCharge || 0),
   extraChargeReason: String(inv.chargeType || ""),
@@ -14385,6 +14386,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
