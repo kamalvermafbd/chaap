@@ -7140,6 +7140,16 @@ async function someCartAction() {
   window.orderEligibility = null;
   window.__CHECKOUT_SNAPSHOT = null;
 
+
+   // 🔓 RESET Change Address one-shot (new checkout session)
+window.__CHANGE_ADDRESS_USED = false;
+
+const btn = document.getElementById("changeAddressBtn");
+if (btn) {
+  btn.disabled = false;
+  btn.classList.remove("opacity-50", "cursor-not-allowed");
+}
+
   // ===============================
   // ORDER TYPE RESET (DIFFERENT VISIBILITY)
   // ===============================
@@ -7253,8 +7263,15 @@ window.__NEW_ADDRESS_FLOW = false;
 window.__ADDRESS_LOADING = false;
 window.__AUTO_ADDRESS_SELECTED = false;
 window.__MANUAL_ADDRESS_SELECTED = false; // 🔑 CRITICAL FLAG
+window.__CHANGE_ADDRESS_USED = false; // 🔐 one-shot per checkout
 
 function onChangeAddressClick() {
+// 🔐 ONE-SHOT GUARD (per checkout session)
+if (window.__CHANGE_ADDRESS_USED) {
+  console.warn("⛔ Change Address already used in this checkout");
+  return;
+}
+  
 
   // 🔒 HARD LOCK
   if (window.__ADDRESS_LOADING) {
@@ -7263,6 +7280,14 @@ function onChangeAddressClick() {
   }
   window.__ADDRESS_LOADING = true;
 
+const btn = document.getElementById("changeAddressBtn");
+if (btn) {
+  btn.disabled = true;
+  btn.classList.add("opacity-50", "cursor-not-allowed");
+}
+
+window.__CHANGE_ADDRESS_USED = true;
+  
   window.__NEW_ADDRESS_FLOW = false;
   window.__MANUAL_ADDRESS_SELECTED = false; // reset every open
 
@@ -7415,8 +7440,9 @@ function onChangeAddressClick() {
 // 🔥 CLEAR OLD "NO MAP LOCATION" WARNING
 if (status) {
   status.innerText = "";
-  status.className = "hidden";
+  status.classList.add("hidden"); // ✅ FIX
 }
+
 
          const frame = document.getElementById("mapPreviewFrame");
         if (frame) {
@@ -7470,8 +7496,9 @@ setTimeout(() => {
         if (status) {
           status.innerText =
             "⚠️ This address does not have an exact map location.";
-          status.className = "text-sm text-orange-600 font-medium";
-          status.classList.remove("hidden");
+          status.classList.remove("hidden", "text-green-600", "text-orange-600");
+status.classList.add("text-sm", "text-red-600", "font-medium");
+
         }
       }
     } catch (e) {
@@ -14429,6 +14456,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
