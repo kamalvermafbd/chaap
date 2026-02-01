@@ -1916,7 +1916,7 @@ body::before {
 
    
 <h2 class="text-lg font-semibold text-gray-900 mb-2">
-  Checkouttest3
+  Checkout
 </h2>
 
 <div class="flex gap-4">
@@ -2176,9 +2176,20 @@ body::before {
 </div>
 </form>
 </div>
-  <div class="w-6/12">
-<div id="checkoutInvoiceContainer"></div>
+<div class="w-6/12 relative">
+  <div id="checkoutInvoiceContainer"></div>
+
+  <!-- 🔒 INVOICE PROCESSING OVERLAY -->
+  <div
+    id="invoiceProcessingOverlay"
+    class="hidden absolute inset-0 z-20
+           bg-white/70 backdrop-blur-sm
+           flex items-center justify-center
+           text-sm font-medium text-gray-700">
+    ⏳ Updating final amount, please wait…
+  </div>
 </div>
+
   </div>
 </div>
 </div>
@@ -14473,6 +14484,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
