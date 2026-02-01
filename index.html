@@ -4188,7 +4188,7 @@ row.dataset.autoChecked = "1";
           pincodeWrapper.style.display = "block";
           cityWrapper.style.display    = "block";
           stateWrapper.style.display   = "block";
-   
+   changeBtn?.classList.remove("hidden");
  const locRow = document.getElementById("locationStatusRow");
   if (locRow) locRow.classList.remove("hidden");   //  FIX
           
@@ -7149,14 +7149,10 @@ async function someCartAction() {
 
 
    // 🔓 RESET Change Address one-shot (new checkout session)
-window.__CHANGE_ADDRESS_USED = false;
+//window.__CHANGE_ADDRESS_USED = false;
 
 const btn = document.getElementById("changeAddressBtn");
-// 🔒 Change Address must stay DISABLED on checkout open
-if (btn) {
-  btn.disabled = true;
-  btn.classList.add("opacity-50", "cursor-not-allowed");
-}
+
 
 
   // ===============================
@@ -7267,6 +7263,13 @@ function autofillMobileForLoggedIn() {
 }
 
 
+function lockChangeAddressBtn() {
+  const btn = document.getElementById("changeAddressBtn");
+  if (!btn) return;
+
+  btn.disabled = true;
+  btn.classList.add("opacity-50", "cursor-not-allowed");
+}
 
 window.__NEW_ADDRESS_FLOW = false;
 window.__ADDRESS_LOADING = false;
@@ -14466,6 +14469,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
