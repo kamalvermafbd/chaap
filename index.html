@@ -7128,6 +7128,18 @@ async function someCartAction() {
   window.deliveryLatLng = null;
   window.isLocationSet = false;
 
+     // ===============================
+  // 🔥 CRITICAL: RESET ADDRESS FLOW FLAGS
+  // ===============================
+  window.__MANUAL_ADDRESS_SELECTED = false;
+  window.__AUTO_ADDRESS_SELECTED   = false;
+  window.__ADDRESS_LOADING         = false;
+  window.__NEW_ADDRESS_FLOW        = false;
+
+  window._eligibilityRunning = false;
+  window.orderEligibility = null;
+  window.__CHECKOUT_SNAPSHOT = null;
+
   // ===============================
   // ORDER TYPE RESET (DIFFERENT VISIBILITY)
   // ===============================
@@ -14412,6 +14424,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
