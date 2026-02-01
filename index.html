@@ -7224,7 +7224,7 @@ function autofillMobileForLoggedIn() {
 
 
 
-  window.__NEW_ADDRESS_FLOW = false;
+window.__NEW_ADDRESS_FLOW = false;
 window.__ADDRESS_LOADING = false;
 window.__AUTO_ADDRESS_SELECTED = false;
 
@@ -7372,60 +7372,86 @@ function onChangeAddressClick() {
     });
 
   // 5️⃣ Dropdown CHANGE HANDLER (single source of truth)
-  ddl.onchange = () => {
-    try {
-      const obj = JSON.parse(ddl.value);
+ // 5️⃣ Dropdown CHANGE HANDLER (single source of truth)
+ddl.onchange = () => {
+  try {
+    const obj = JSON.parse(ddl.value);
 
-      document.getElementById("address").value  = obj.address || "";
-      document.getElementById("pincode").value = obj.pincode || "";
-      document.getElementById("city").value    = obj.city || "";
-      document.getElementById("state").value   = obj.state || "";
+    // BASIC ADDRESS FIELDS
+    document.getElementById("address").value  = obj.address || "";
+    document.getElementById("pincode").value = obj.pincode || "";
+    document.getElementById("city").value    = obj.city || "";
+    document.getElementById("state").value   = obj.state || "";
 
-      if (obj.lat && obj.lng) {
-        window._deliveryLocation = {
-          lat: Number(obj.lat),
-          lng: Number(obj.lng)
-        };
-        window._deliveryLocationReady = true;
+    if (obj.lat && obj.lng) {
 
-        window.orderEligibility = null;
-        window.__CHECKOUT_SNAPSHOT = null;
+      // ================================
+      // 🔥 SINGLE SOURCE OF TRUTH (CRITICAL FIX)
+      // ================================
+      const lat = Number(obj.lat);
+      const lng = Number(obj.lng);
 
-        document.getElementById("locationStatusRow")?.classList.remove("hidden");
-        document.getElementById("mapPreviewBox")?.classList.remove("hidden");
+      // NEW SYSTEM (your current code)
+      window._deliveryLocation = { lat, lng };
+      window._deliveryLocationReady = true;
 
-        const frame = document.getElementById("mapPreviewFrame");
-        if (frame) {
-          frame.src =
-            `https://maps.google.com/maps?q=${obj.lat},${obj.lng}&z=15&output=embed`;
-        }
+      // OLD / CHECKOUT SYSTEM (THIS WAS MISSING)
+      window.deliveryLatLng = { lat, lng };
+      window.isLocationSet = true;
 
-        if (status) {
-          status.innerText = "📍 Location loaded from saved address";
-          status.className = "text-sm text-green-600 font-medium";
-          status.classList.remove("hidden");
-        }
+      console.log("📍 LOCATION SYNCED:", {
+        _deliveryLocation: window._deliveryLocation,
+        deliveryLatLng: window.deliveryLatLng,
+        isLocationSet: window.isLocationSet
+      });
 
-        // 🔥 eligibility ONLY after location ready
+      // RESET CACHED STATES
+      window.orderEligibility = null;
+      window.__CHECKOUT_SNAPSHOT = null;
+
+      // MAP UI
+      document.getElementById("locationStatusRow")?.classList.remove("hidden");
+      document.getElementById("mapPreviewBox")?.classList.remove("hidden");
+
+      const frame = document.getElementById("mapPreviewFrame");
+      if (frame) {
+        frame.src = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+      }
+
+      const status = document.getElementById("addressStatus");
+      if (status) {
+        status.innerText = "📍 Location loaded from saved address";
+        status.className = "text-sm text-green-600 font-medium";
+        status.classList.remove("hidden");
+      }
+
+      // 🔥 RE-CHECK ELIGIBILITY AFTER LOCATION SYNC
+      setTimeout(() => {
         if (typeof canProceedPlaceOrder === "function") {
           canProceedPlaceOrder();
         }
+      }, 0);
 
-      } else {
-        window._deliveryLocation = null;
-        window._deliveryLocationReady = false;
+    } else {
+      // ❌ NO LAT / LNG
+      window._deliveryLocation = null;
+      window._deliveryLocationReady = false;
+      window.deliveryLatLng = null;
+      window.isLocationSet = false;
 
-        if (status) {
-          status.innerText =
-            "⚠️ This address does not have an exact map location.";
-          status.className = "text-sm text-orange-600 font-medium";
-          status.classList.remove("hidden");
-        }
+      const status = document.getElementById("addressStatus");
+      if (status) {
+        status.innerText =
+          "⚠️ This address does not have an exact map location.";
+        status.className = "text-sm text-orange-600 font-medium";
+        status.classList.remove("hidden");
       }
-    } catch (e) {
-      console.error("Address parse error", e);
     }
-  };
+  } catch (e) {
+    console.error("Address parse error", e);
+  }
+};
+
 }
 
 
@@ -14378,6 +14404,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
