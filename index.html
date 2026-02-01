@@ -4188,7 +4188,7 @@ row.dataset.autoChecked = "1";
           pincodeWrapper.style.display = "block";
           cityWrapper.style.display    = "block";
           stateWrapper.style.display   = "block";
-   changeBtn?.classList.remove("hidden");
+          changeBtn?.classList.remove("hidden");
  const locRow = document.getElementById("locationStatusRow");
   if (locRow) locRow.classList.remove("hidden");   //  FIX
           
@@ -4623,13 +4623,6 @@ if (!res || res.allowed !== true) {
   return false;
 }
 
-    // 🔓 FINAL: Enable Change Address AFTER backend eligibility success
-const changeBtn = document.getElementById("changeAddressBtn");
-if (changeBtn) {
-  changeBtn.disabled = false;
-  changeBtn.classList.remove("opacity-50", "cursor-not-allowed");
-}
- 
     //  GUARD 2.5
     const payment = document.getElementById("paymentMethod")?.value;
     if (!payment) {
@@ -7149,11 +7142,13 @@ async function someCartAction() {
 
 
    // 🔓 RESET Change Address one-shot (new checkout session)
-//window.__CHANGE_ADDRESS_USED = false;
+window.__CHANGE_ADDRESS_USED = false;
 
 const btn = document.getElementById("changeAddressBtn");
-
-
+if (btn) {
+  btn.disabled = false;
+  btn.classList.remove("opacity-50", "cursor-not-allowed");
+}
 
   // ===============================
   // ORDER TYPE RESET (DIFFERENT VISIBILITY)
@@ -7263,13 +7258,6 @@ function autofillMobileForLoggedIn() {
 }
 
 
-function lockChangeAddressBtn() {
-  const btn = document.getElementById("changeAddressBtn");
-  if (!btn) return;
-
-  btn.disabled = true;
-  btn.classList.add("opacity-50", "cursor-not-allowed");
-}
 
 window.__NEW_ADDRESS_FLOW = false;
 window.__ADDRESS_LOADING = false;
@@ -14469,77 +14457,5 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
