@@ -7442,22 +7442,27 @@ if (status) {
   status.innerText = "";
   status.classList.add("hidden"); // ✅ FIX
 }
-
-
-         const frame = document.getElementById("mapPreviewFrame");
+ const frame = document.getElementById("mapPreviewFrame");
         if (frame) {
           frame.src =
             `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
-        }
+}
+ const txt = document.getElementById("locationStatusText");
+  const row = document.getElementById("locationStatusRow");
 
+if (txt && row) {
+  txt.innerText = "⏳ Checking delivery distance…";
+  row.classList.remove("border-green-400", "bg-green-50", "text-green-700");
+  row.classList.add("border-gray-300", "bg-gray-50", "text-gray-600");
+  row.classList.remove("hidden");
+}
+        
 // 🔥 UPDATE "Location verified (xx km)" LABEL
 apiPost("checkDeliveryDistance", {
   lat: lat,
   lng: lng
 }).then(dist => {
-  const txt = document.getElementById("locationStatusText");
-  const row = document.getElementById("locationStatusRow");
-
+  
   if (dist?.success && txt && row) {
     txt.innerText = `Location verified (${dist.distanceKm} km)`;
     row.classList.remove("border-red-400", "bg-red-50", "text-red-700");
@@ -7465,15 +7470,13 @@ apiPost("checkDeliveryDistance", {
   }
 });
 
-        // RESET CACHES
-        window.orderEligibility = null;
-        window.__CHECKOUT_SNAPSHOT = null;
+  // RESET CACHES
+window.orderEligibility = null;
+window.__CHECKOUT_SNAPSHOT = null;
 
-        document.getElementById("locationStatusRow")?.classList.remove("hidden");
-        document.getElementById("mapPreviewBox")?.classList.remove("hidden");
-
-       
-       window.orderEligibility = null;
+document.getElementById("locationStatusRow")?.classList.remove("hidden");
+document.getElementById("mapPreviewBox")?.classList.remove("hidden");  
+window.orderEligibility = null;
 window.__CHECKOUT_SNAPSHOT = null;
 window._eligibilityRunning = false; // ⭐ THIS WAS MISSING
 setTimeout(() => {
@@ -7481,30 +7484,28 @@ setTimeout(() => {
     canProceedPlaceOrder();
   }
 }, 0);
+ } else {
+ window._deliveryLocation = null;
 
-
-      } else {
-        window._deliveryLocation = null;
-
-    window._userLat = "";     // ✅ CLEAR STALE GPS
-  window._userLng = "";     // ✅ CLEAR STALE GPS
+window._userLat = "";     // ✅ CLEAR STALE GPS
+window._userLng = "";     // ✅ CLEAR STALE GPS
         
-        window._deliveryLocationReady = false;
-        window.deliveryLatLng = null;
-        window.isLocationSet = false;
+ window._deliveryLocationReady = false;
+window.deliveryLatLng = null;
+window.isLocationSet = false;
 
-        if (status) {
-          status.innerText =
-            "⚠️ This address does not have an exact map location.";
-          status.classList.remove("hidden", "text-green-600", "text-orange-600");
+ if (status) {
+status.innerText =
+ "⚠️ This address does not have an exact map location.";
+status.classList.remove("hidden", "text-green-600", "text-orange-600");
 status.classList.add("text-sm", "text-red-600", "font-medium");
 
-        }
-      }
-    } catch (e) {
-      console.error("Address parse error", e);
-    }
-  };
+ }
+}
+} catch (e) {
+console.error("Address parse error", e);
+}
+};
 }
 
 function onChangeAddressAddNew() {
@@ -14456,6 +14457,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
