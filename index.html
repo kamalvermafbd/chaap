@@ -4525,17 +4525,20 @@ if (payMsg) {
   window._eligibilityRunning = true;
   try {
     // 🔐 LOGGED-IN USER LOCATION AUTO-READY FIX
-     if (
-    isUserLoggedIn() &&
-    !window._deliveryLocationReady &&        //  IMPORTANT CONDITION
-    window._userLocation &&
-    window._userLocation.lat &&
-    window._userLocation.lng
-  ) {
-    console.log("📍 Using USER profile location");
-    window._deliveryLocation = window._userLocation;
-    window._deliveryLocationReady = true;
-  }
+  // 🔒 DO NOT override manually selected address
+if (
+  isUserLoggedIn() &&
+  !window._deliveryLocationReady &&
+  window._userLocation &&
+  window._userLocation.lat &&
+  window._userLocation.lng &&
+  window.__MANUAL_ADDRESS_SELECTED !== true   // ⭐ CRITICAL LINE
+) {
+  console.log("📍 Using USER profile location");
+  window._deliveryLocation = window._userLocation;
+  window._deliveryLocationReady = true;
+}
+
 
   //  DEBUG: which location is actually used
   console.log("📍 DELIVERY LOCATION USED:", window._deliveryLocation);
@@ -14382,6 +14385,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
