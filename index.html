@@ -4494,53 +4494,46 @@ if (payMsg) {
   payMsg.classList.add("text-red-600");
   payMsg.innerText = "⏳ Your order is being processed. Please wait…";
 }
-  // 🔴 FIX-1: HARD GUARD — prevent repeated / parallel execution
+  //  FIX-1: HARD GUARD — prevent repeated / parallel execution
   if (window._eligibilityRunning) {
+    console.warn("⛔ Eligibility already running, skipping");
     return false;
   }
   window._eligibilityRunning = true;
   try {
     // 🔐 LOGGED-IN USER LOCATION AUTO-READY FIX
-    if (isUserLoggedIn()) {
-      if (
-        window._userLocation &&
-        window._userLocation.lat &&
-        window._userLocation.lng
-      ) {
-        window._deliveryLocation = window._userLocation;
-        window._deliveryLocationReady = true;
-      }
-    }
-    // 🔥 Sync GPS from frontend memory
-    if (
-      window._deliveryLocation &&
-      window._deliveryLocation.lat &&
-      window._deliveryLocation.lng
-    ) {
-      window._deliveryLocationReady = true;
-    }
-    const paymentError = document.getElementById("paymentError");
+     if (
+    isUserLoggedIn() &&
+    !window._deliveryLocationReady &&        //  IMPORTANT CONDITION
+    window._userLocation &&
+    window._userLocation.lat &&
+    window._userLocation.lng
+  ) {
+    console.log("📍 Using USER profile location");
+    window._deliveryLocation = window._userLocation;
+    window._deliveryLocationReady = true;
+  }
 
-    // helper functions (same UX everywhere)
-    const showError = (msg) => {
-      if (!paymentError) return;
-      paymentError.innerText = msg;
-      paymentError.classList.remove("hidden", "text-green-600");
-      paymentError.classList.add("text-red-600");
-      // 🔴 FIX-2: DO NOT trigger invoice / eligibility indirectly
-      // ❌ disablePlaceOrder() removed from eligibility loop
-    };
+  //  DEBUG: which location is actually used
+  console.log("📍 DELIVERY LOCATION USED:", window._deliveryLocation);
 
-    const showSuccess = (msg) => {
-      if (!paymentError) return;
-      paymentError.innerText = msg;
-      paymentError.classList.remove("hidden", "text-red-600");
-      paymentError.classList.add("text-green-600");
+  const paymentError = document.getElementById("paymentError");
 
-      // 🔴 FIX-2: DO NOT enable button here (handled by placeOrder flow)
-    };
+  const showError = (msg) => {
+    if (!paymentError) return;
+    paymentError.innerText = msg;
+    paymentError.classList.remove("hidden", "text-green-600");
+    paymentError.classList.add("text-red-600");
+  };
 
-    window.orderEligibility = { allowed: false, extraCharge: 0, chargeType: "" };
+  const showSuccess = (msg) => {
+    if (!paymentError) return;
+    paymentError.innerText = msg;
+    paymentError.classList.remove("hidden", "text-red-600");
+    paymentError.classList.add("text-green-600");
+  };
+
+  window.orderEligibility = { allowed: false, extraCharge: 0, chargeType: "" };
 
     const orderTypeNow = document.getElementById("orderType")?.value;
 
@@ -4548,23 +4541,21 @@ if (payMsg) {
       showError("📍 Please set your delivery location");
       return false;
     }
-
     const orderType = document.getElementById("orderType")?.value.trim();
     const amount = Number(window.cartSummary?.itemsSubtotal || 0);
 
-    // 🔴 GUARD 1
+    //  GUARD 1
     if (!orderType) {
       showError("⚠️ Please select Order Type");
       return false;
     }
-
-    // 🔴 GUARD 2
+    //  GUARD 2
     if (amount <= 0) {
       showError("⚠️ Cart is empty");
       return false;
     }
 // ================================
-// 🔴 NEW — BACKEND ELIGIBILITY CALL (PAYMENT SE PEHLE)
+//  NEW — BACKEND ELIGIBILITY CALL (PAYMENT SE PEHLE)
 // ================================
 const mobile = document.getElementById("mobile")?.value.trim();
 const userType = isUserLoggedIn() ? "logged" : "guest";
@@ -4578,20 +4569,17 @@ const res = await apiPost("checkOrderEligibility", {
   lng: window._deliveryLocation?.lng || ""
 });
 
-// 🔴 delivery charge aate hi store karo
+//  delivery charge aate hi store karo
 window.orderEligibility = {
   allowed: res.allowed === true,
   extraCharge: Number(res?.extraCharge || 0),
   chargeType: res?.chargeType || ""
 };
-
-// 🔴 invoice ko turant refresh karo
+//  invoice ko turant refresh karo
 if (typeof buildCheckoutPreviewInv === "function") {
   const inv = buildCheckoutPreviewInv();
   renderInvoiceFromAPI(inv);
 }
-
-
 console.log("🧪 BACKEND RESPONSE:", res);
 
 if (
@@ -4607,7 +4595,7 @@ if (!res || res.allowed !== true) {
   return false;
 }
 
-    // 🔴 GUARD 2.5
+    //  GUARD 2.5
     const payment = document.getElementById("paymentMethod")?.value;
     if (!payment) {
       showError("⚠️ Please select a payment method");
@@ -4630,7 +4618,7 @@ if (placeBtn) {
     return false;
 
   } finally {
-    // 🔴 FIX-4: ALWAYS release lock
+    //  FIX-4: ALWAYS release lock
     window._eligibilityRunning = false;
   }
 }
@@ -7376,48 +7364,51 @@ if (!primary && multiList.length === 0) {
     document.getElementById("city").value    = obj.city || "";
     document.getElementById("state").value   = obj.state || "";
 
-    // 🔴 LOCATION / LAT-LNG BINDING (CRITICAL)
-    if (obj.lat && obj.lng) {
-      window.deliveryLatLng = {
-        lat: Number(obj.lat),
-        lng: Number(obj.lng)
-      };
-      window.isLocationSet = true;
+if (obj.lat && obj.lng) {
+  window._deliveryLocation = {
+    lat: Number(obj.lat),
+    lng: Number(obj.lng)
+  };
+  window._deliveryLocationReady = true;
 
-      // Show map UI
-      document.getElementById("locationStatusRow")?.classList.remove("hidden");
-      document.getElementById("mapPreviewBox")?.classList.remove("hidden");
-      const frame = document.getElementById("mapPreviewFrame");
-      if (frame) {
-        frame.src =
-          `https://maps.google.com/maps?q=${obj.lat},${obj.lng}&z=15&output=embed`;
-      }
+  window.orderEligibility = null;
+  window.__CHECKOUT_SNAPSHOT = null;
 
-      const status = document.getElementById("addressStatus");
-      if (status) {
-        status.innerText = "📍 Location loaded from saved address";
-        status.className = "text-sm text-green-600 font-medium";
-        status.classList.remove("hidden");
-      }
+  // ✅ Show map UI
+  document.getElementById("locationStatusRow")?.classList.remove("hidden");
+  document.getElementById("mapPreviewBox")?.classList.remove("hidden");
 
-// 🔥 FORCE DELIVERY DISTANCE & CHARGE RECALC
-if (typeof canProceedPlaceOrder === "function") {
-  canProceedPlaceOrder();
+  const frame = document.getElementById("mapPreviewFrame");
+  if (frame) {
+    frame.src =
+      `https://maps.google.com/maps?q=${obj.lat},${obj.lng}&z=15&output=embed`;
+  }
+
+  const status = document.getElementById("addressStatus");
+  if (status) {
+    status.innerText = "📍 Location loaded from saved address";
+    status.className = "text-sm text-green-600 font-medium";
+    status.classList.remove("hidden");
+  }
+
+  // 🔥 FORCE DELIVERY DISTANCE & CHARGE RECALC
+  if (typeof canProceedPlaceOrder === "function") {
+    canProceedPlaceOrder();
+  }
+
+} else {
+  // ❌ NO LAT / LNG
+  window._deliveryLocation = null;
+  window._deliveryLocationReady = false;
+
+  const status = document.getElementById("addressStatus");
+  if (status) {
+    status.innerText =
+      "⚠️ This address does not have an exact map location.";
+    status.className = "text-sm text-orange-600 font-medium";
+    status.classList.remove("hidden");
+  }
 }
-    } else {
-      // 🔴 NO LAT/LNG CASE
-      window.deliveryLatLng = null;
-      window.isLocationSet = false;
-
-      const status = document.getElementById("addressStatus");
-      if (status) {
-        status.innerText =
-          "⚠️ This address does not have an exact map location.";
-        status.className = "text-sm text-orange-600 font-medium";
-        status.classList.remove("hidden");
-      }
-    }
-
   } catch (e) {
     console.error("Address parse error", e);
   }
@@ -14383,6 +14374,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
