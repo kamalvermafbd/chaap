@@ -4536,6 +4536,7 @@ if (payMsg) {
 if (
   isUserLoggedIn() &&
   !window._deliveryLocationReady &&
+    !window.__MANUAL_ADDRESS_SELECTED &&   // ⭐⭐⭐ THIS IS THE FIX
   window._userLocation &&
   window._userLocation.lat &&
   window._userLocation.lng &&
@@ -14397,6 +14398,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
