@@ -4080,6 +4080,13 @@ console.log("toggleAddressField reached");
   //                LOGGED-IN USER LOGIC
   // ==========================================================
   if (isLoggedIn()) {
+
+    // 🔒 HARD GUARD — manual address must win
+  if (window.__MANUAL_ADDRESS_SELECTED === true) {
+    console.warn("🛑 toggleAddressField blocked (manual address active)");
+    return;
+  }
+    
 overlay.style.display = "flex";
   orderSelect.disabled = true;
     nameField.readOnly = true;
@@ -7420,6 +7427,10 @@ function onChangeAddressClick() {
 
       } else {
         window._deliveryLocation = null;
+
+    window._userLat = "";     // ✅ CLEAR STALE GPS
+  window._userLng = "";     // ✅ CLEAR STALE GPS
+        
         window._deliveryLocationReady = false;
         window.deliveryLatLng = null;
         window.isLocationSet = false;
@@ -14386,6 +14397,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
