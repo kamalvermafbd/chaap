@@ -4532,8 +4532,7 @@ if (payMsg) {
   }
   window._eligibilityRunning = true;
   try {
-    // 🔐 LOGGED-IN USER LOCATION AUTO-READY FIX
-  // 🔒 DO NOT override manually selected address
+   
 // 🔒 NEVER override selected delivery location here
 if (!window._deliveryLocationReady) {
   console.warn("⛔ Delivery location not ready");
@@ -4609,7 +4608,12 @@ if (typeof buildCheckoutPreviewInv === "function") {
   renderInvoiceFromAPI(inv);
 }
 console.log("🧪 BACKEND RESPONSE:", res);
-
+// 🔓 ENABLE Change Address ONLY after backend eligibility SUCCESS
+const changeBtn = document.getElementById("changeAddressBtn");
+if (changeBtn && res?.allowed === true) {
+  changeBtn.disabled = false;
+  changeBtn.classList.remove("opacity-50", "cursor-not-allowed");
+}
 if (
   res?.reason === "OUT_OF_DELIVERY_RADIUS" ||
   res?.reason === "LOCATION_NOT_SET"
@@ -14457,5 +14461,6 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
