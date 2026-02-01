@@ -4085,6 +4085,13 @@ overlay.style.display = "flex";
     nameField.readOnly = true;
     emailField.readOnly = true;
     addressField.readOnly = true;
+// 🛑 DO NOT overwrite location if user selected from dropdown
+if (window.__MANUAL_ADDRESS_SELECTED === true) {
+  console.warn("🛑 Skipping USER-SHEET location overwrite");
+  overlay.style.display = "none";
+  orderSelect.disabled = false;
+  return;
+}
 
     // Fetch everything from USER SHEET
     apiGet("getUserProfile", { mobile })
@@ -7227,10 +7234,11 @@ function autofillMobileForLoggedIn() {
 window.__NEW_ADDRESS_FLOW = false;
 window.__ADDRESS_LOADING = false;
 window.__AUTO_ADDRESS_SELECTED = false;
+window.__MANUAL_ADDRESS_SELECTED = false; // 🔑 CRITICAL FLAG
 
 function onChangeAddressClick() {
 
-  // 🔒 HARD LOCK — prevent multiple runs
+  // 🔒 HARD LOCK
   if (window.__ADDRESS_LOADING) {
     console.warn("⛔ onChangeAddressClick already running");
     return;
@@ -7238,8 +7246,8 @@ function onChangeAddressClick() {
   window.__ADDRESS_LOADING = true;
 
   window.__NEW_ADDRESS_FLOW = false;
+  window.__MANUAL_ADDRESS_SELECTED = false; // reset every open
 
-  // 🔹 STATUS MESSAGE
   const status = document.getElementById("addressStatus");
   if (status) {
     status.innerText = "Fetching your saved address…";
@@ -7260,200 +7268,170 @@ function onChangeAddressClick() {
   if (overlay) overlay.style.display = "flex";
 
   const dropdownBox = document.getElementById("addressSelectContainer");
-  const newFormBox = document.getElementById("newAddressForm");
+  const newFormBox  = document.getElementById("newAddressForm");
+  const ddl         = document.getElementById("savedAddressDropdown");
 
   dropdownBox.classList.add("hidden");
   newFormBox.classList.add("hidden");
-
-  const ddl = document.getElementById("savedAddressDropdown");
   ddl.innerHTML = "";
   ddl.classList.remove("hidden");
 
-  // 🔥 reset auto-select flag every open
   window.__AUTO_ADDRESS_SELECTED = false;
 
-  // 1️⃣ Fetch Primary + MultiAdd
+  // ======================================================
+  // 1️⃣ FETCH PRIMARY + MULTI_ADD
+  // ======================================================
   Promise.all([
     apiGet("getUserProfile", { mobile }),
     apiGet("getUserMultiAddresses", { mobile })
   ])
-    .then(([userRes, multiRes]) => {
+  .then(([userRes, multiRes]) => {
 
-      const primary = userRes?.address
-        ? {
-            address: userRes.address,
-            pincode: userRes.pincode || "",
-            city: userRes.city || "",
-            state: userRes.state || "",
-            lat: userRes.lat || "",
-            lng: userRes.lng || "",
-            type: "primary"
-          }
-        : null;
+    const primary = userRes?.address ? {
+      address: userRes.address,
+      pincode: userRes.pincode || "",
+      city: userRes.city || "",
+      state: userRes.state || "",
+      lat: userRes.lat || "",
+      lng: userRes.lng || "",
+      type: "primary"
+    } : null;
 
-      const multiList = Array.isArray(multiRes?.addresses)
-        ? multiRes.addresses.map(a => ({
-            address: a.address || "",
-            pincode: a.pincode || "",
-            city: a.city || "",
-            state: a.state || "",
-            lat: a.lat || "",
-            lng: a.lng || "",
-            type: "multi"
-          }))
-        : [];
+    const multiList = Array.isArray(multiRes?.addresses)
+      ? multiRes.addresses.map(a => ({
+          address: a.address || "",
+          pincode: a.pincode || "",
+          city: a.city || "",
+          state: a.state || "",
+          lat: a.lat || "",
+          lng: a.lng || "",
+          type: "multi"
+        }))
+      : [];
 
-      // 2️⃣ No saved address
-      if (!primary && multiList.length === 0) {
-        dropdownBox.classList.add("hidden");
-
-        if (status) {
-          status.innerText = "No saved address found. Please add a new address.";
-          status.className = "text-sm text-red-600 font-medium";
-          status.classList.remove("hidden");
-        }
-        return;
-      }
-
-      // 3️⃣ Show dropdown
-      dropdownBox.classList.remove("hidden");
-
-      let count = 1;
-
-      if (primary) {
-        const opt = document.createElement("option");
-        opt.value = JSON.stringify(primary);
-        opt.textContent =
-          `${count}) ${primary.address} | ${primary.pincode} | ${primary.city} | ${primary.state}`;
-        ddl.appendChild(opt);
-        count++;
-      }
-
-      multiList.forEach(a => {
-        const opt = document.createElement("option");
-        opt.value = JSON.stringify(a);
-        opt.textContent =
-          `${count}) ${a.address} | ${a.pincode} | ${a.city} | ${a.state}`;
-        ddl.appendChild(opt);
-        count++;
-      });
-
-      // 4️⃣ Auto-select FIRST ADDRESS (ONLY ONCE)
-      if (ddl.options.length > 0 && !window.__AUTO_ADDRESS_SELECTED) {
-        window.__AUTO_ADDRESS_SELECTED = true;
-
-        const first = ddl.options[0];
-        ddl.value = first.value;
-
-        // delay to avoid race with checkout open
-        setTimeout(() => {
-          ddl.dispatchEvent(new Event("change"));
-        }, 0);
-      }
-    })
-    .catch(err => {
-      console.error("Address load error:", err);
-      alert("Unable to load saved addresses.");
-    })
-    .finally(() => {
-      // 🔓 RELEASE LOCK + UI CLEANUP
-      window.__ADDRESS_LOADING = false;
-
-      if (overlay && !window.__NEW_ADDRESS_FLOW) {
-        overlay.style.display = "none";
-      }
-
+    if (!primary && multiList.length === 0) {
+      dropdownBox.classList.add("hidden");
       if (status) {
-        status.innerText = "Address loaded successfully";
-        status.className = "text-sm text-green-600 font-medium";
+        status.innerText = "No saved address found. Please add a new address.";
+        status.className = "text-sm text-red-600 font-medium";
         status.classList.remove("hidden");
-        setTimeout(() => status.classList.add("hidden"), 1500);
       }
+      return;
+    }
+
+    dropdownBox.classList.remove("hidden");
+
+    let count = 1;
+
+    if (primary) {
+      const opt = document.createElement("option");
+      opt.value = JSON.stringify(primary);
+      opt.textContent =
+        `${count}) ${primary.address} | ${primary.pincode} | ${primary.city} | ${primary.state}`;
+      ddl.appendChild(opt);
+      count++;
+    }
+
+    multiList.forEach(a => {
+      const opt = document.createElement("option");
+      opt.value = JSON.stringify(a);
+      opt.textContent =
+        `${count}) ${a.address} | ${a.pincode} | ${a.city} | ${a.state}`;
+      ddl.appendChild(opt);
+      count++;
     });
 
-  // 5️⃣ Dropdown CHANGE HANDLER (single source of truth)
- // 5️⃣ Dropdown CHANGE HANDLER (single source of truth)
-ddl.onchange = () => {
-  try {
-    const obj = JSON.parse(ddl.value);
-
-    // BASIC ADDRESS FIELDS
-    document.getElementById("address").value  = obj.address || "";
-    document.getElementById("pincode").value = obj.pincode || "";
-    document.getElementById("city").value    = obj.city || "";
-    document.getElementById("state").value   = obj.state || "";
-
-    if (obj.lat && obj.lng) {
-
-      // ================================
-      // 🔥 SINGLE SOURCE OF TRUTH (CRITICAL FIX)
-      // ================================
-      const lat = Number(obj.lat);
-      const lng = Number(obj.lng);
-
-      // NEW SYSTEM (your current code)
-      window._deliveryLocation = { lat, lng };
-      window._deliveryLocationReady = true;
-
-      // OLD / CHECKOUT SYSTEM (THIS WAS MISSING)
-      window.deliveryLatLng = { lat, lng };
-      window.isLocationSet = true;
-
-      console.log("📍 LOCATION SYNCED:", {
-        _deliveryLocation: window._deliveryLocation,
-        deliveryLatLng: window.deliveryLatLng,
-        isLocationSet: window.isLocationSet
-      });
-
-      // RESET CACHED STATES
-      window.orderEligibility = null;
-      window.__CHECKOUT_SNAPSHOT = null;
-
-      // MAP UI
-      document.getElementById("locationStatusRow")?.classList.remove("hidden");
-      document.getElementById("mapPreviewBox")?.classList.remove("hidden");
-
-      const frame = document.getElementById("mapPreviewFrame");
-      if (frame) {
-        frame.src = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
-      }
-
-      const status = document.getElementById("addressStatus");
-      if (status) {
-        status.innerText = "📍 Location loaded from saved address";
-        status.className = "text-sm text-green-600 font-medium";
-        status.classList.remove("hidden");
-      }
-
-      // 🔥 RE-CHECK ELIGIBILITY AFTER LOCATION SYNC
-      setTimeout(() => {
-        if (typeof canProceedPlaceOrder === "function") {
-          canProceedPlaceOrder();
-        }
-      }, 0);
-
-    } else {
-      // ❌ NO LAT / LNG
-      window._deliveryLocation = null;
-      window._deliveryLocationReady = false;
-      window.deliveryLatLng = null;
-      window.isLocationSet = false;
-
-      const status = document.getElementById("addressStatus");
-      if (status) {
-        status.innerText =
-          "⚠️ This address does not have an exact map location.";
-        status.className = "text-sm text-orange-600 font-medium";
-        status.classList.remove("hidden");
-      }
+    // 2️⃣ AUTO SELECT FIRST (ONLY ONCE)
+    if (ddl.options.length > 0 && !window.__AUTO_ADDRESS_SELECTED) {
+      window.__AUTO_ADDRESS_SELECTED = true;
+      ddl.value = ddl.options[0].value;
+      setTimeout(() => ddl.dispatchEvent(new Event("change")), 0);
     }
-  } catch (e) {
-    console.error("Address parse error", e);
-  }
-};
+  })
+  .catch(err => {
+    console.error("Address load error:", err);
+    alert("Unable to load saved addresses.");
+  })
+  .finally(() => {
+    window.__ADDRESS_LOADING = false;
+    if (overlay && !window.__NEW_ADDRESS_FLOW) {
+      overlay.style.display = "none";
+    }
+    if (status) {
+      status.innerText = "Address loaded successfully";
+      status.className = "text-sm text-green-600 font-medium";
+      status.classList.remove("hidden");
+      setTimeout(() => status.classList.add("hidden"), 1500);
+    }
+  });
 
+  // ======================================================
+  // 3️⃣ DROPDOWN CHANGE — SINGLE SOURCE OF TRUTH
+  // ======================================================
+  ddl.onchange = () => {
+    try {
+      const obj = JSON.parse(ddl.value);
+
+      // 🔑 MANUAL OVERRIDE FLAG
+      window.__MANUAL_ADDRESS_SELECTED = true;
+      console.log("🟢 MANUAL ADDRESS SELECTED (dropdown)");
+
+      document.getElementById("address").value  = obj.address || "";
+      document.getElementById("pincode").value = obj.pincode || "";
+      document.getElementById("city").value    = obj.city || "";
+      document.getElementById("state").value   = obj.state || "";
+
+      if (obj.lat && obj.lng) {
+        const lat = Number(obj.lat);
+        const lng = Number(obj.lng);
+
+        // ✅ NEW SYSTEM
+        window._deliveryLocation = { lat, lng };
+        window._deliveryLocationReady = true;
+
+        // ✅ OLD CHECKOUT SYSTEM (CRITICAL)
+        window.deliveryLatLng = { lat, lng };
+        window.isLocationSet = true;
+
+        console.log("📍 LOCATION SYNCED:", { lat, lng });
+
+        // RESET CACHES
+        window.orderEligibility = null;
+        window.__CHECKOUT_SNAPSHOT = null;
+
+        document.getElementById("locationStatusRow")?.classList.remove("hidden");
+        document.getElementById("mapPreviewBox")?.classList.remove("hidden");
+
+        const frame = document.getElementById("mapPreviewFrame");
+        if (frame) {
+          frame.src =
+            `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+        }
+
+        setTimeout(() => {
+          if (typeof canProceedPlaceOrder === "function") {
+            canProceedPlaceOrder();
+          }
+        }, 0);
+
+      } else {
+        window._deliveryLocation = null;
+        window._deliveryLocationReady = false;
+        window.deliveryLatLng = null;
+        window.isLocationSet = false;
+
+        if (status) {
+          status.innerText =
+            "⚠️ This address does not have an exact map location.";
+          status.className = "text-sm text-orange-600 font-medium";
+          status.classList.remove("hidden");
+        }
+      }
+    } catch (e) {
+      console.error("Address parse error", e);
+    }
+  };
 }
-
 
 function onChangeAddressAddNew() {
 window.__NEW_ADDRESS_FLOW = true;
@@ -14404,6 +14382,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
