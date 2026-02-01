@@ -4134,7 +4134,8 @@ if (res.lat && res.lng) {
 
 // 🔥 If location already exists in user sheet, auto-validate it
 if (res.lat && res.lng) {
-  apiPost("checkDeliveryDistance", { mobile })
+  apiPost("checkDeliveryDistance", { mobile,lat: window._deliveryLocation?.lat,
+  lng: window._deliveryLocation?.lng })
     .then(dist => {
       console.log("📍 AUTO DIST CHECK:", dist);
 
@@ -4533,18 +4534,9 @@ if (payMsg) {
   try {
     // 🔐 LOGGED-IN USER LOCATION AUTO-READY FIX
   // 🔒 DO NOT override manually selected address
-if (
-  isUserLoggedIn() &&
-  !window._deliveryLocationReady &&
-    !window.__MANUAL_ADDRESS_SELECTED &&   // ⭐⭐⭐ THIS IS THE FIX
-  window._userLocation &&
-  window._userLocation.lat &&
-  window._userLocation.lng &&
-  window.__MANUAL_ADDRESS_SELECTED !== true   // ⭐ CRITICAL LINE
-) {
-  console.log("📍 Using USER profile location");
-  window._deliveryLocation = window._userLocation;
-  window._deliveryLocationReady = true;
+// 🔒 NEVER override selected delivery location here
+if (!window._deliveryLocationReady) {
+  console.warn("⛔ Delivery location not ready");
 }
 
 
@@ -4567,7 +4559,8 @@ if (
     paymentError.classList.add("text-green-600");
   };
 
-  window.orderEligibility = { allowed: false, extraCharge: 0, chargeType: "" };
+ window.orderEligibility = null;
+
 
     const orderTypeNow = document.getElementById("orderType")?.value;
 
@@ -4599,8 +4592,9 @@ const res = await apiPost("checkOrderEligibility", {
   orderAmount: amount,
   mobile,
   userType,
-  lat: window._deliveryLocation?.lat || "",
-  lng: window._deliveryLocation?.lng || ""
+  lat: Number(window._deliveryLocation?.lat),
+lng: Number(window._deliveryLocation?.lng)
+
 });
 
 //  delivery charge aate hi store karo
@@ -14398,6 +14392,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
