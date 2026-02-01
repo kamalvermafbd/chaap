@@ -4189,6 +4189,11 @@ row.dataset.autoChecked = "1";
           cityWrapper.style.display    = "block";
           stateWrapper.style.display   = "block";
           changeBtn?.classList.remove("hidden");
+
+          // 🔒 IMPORTANT: force keep disabled
+changeBtn.disabled = true;
+changeBtn.classList.add("opacity-50", "cursor-not-allowed");
+          
  const locRow = document.getElementById("locationStatusRow");
   if (locRow) locRow.classList.remove("hidden");   //  FIX
           
@@ -14461,6 +14466,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
