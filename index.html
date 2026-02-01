@@ -4623,6 +4623,13 @@ if (!res || res.allowed !== true) {
   return false;
 }
 
+    // 🔓 FINAL: Enable Change Address AFTER backend eligibility success
+const changeBtn = document.getElementById("changeAddressBtn");
+if (changeBtn) {
+  changeBtn.disabled = false;
+  changeBtn.classList.remove("opacity-50", "cursor-not-allowed");
+}
+ 
     //  GUARD 2.5
     const payment = document.getElementById("paymentMethod")?.value;
     if (!payment) {
@@ -7145,10 +7152,12 @@ async function someCartAction() {
 window.__CHANGE_ADDRESS_USED = false;
 
 const btn = document.getElementById("changeAddressBtn");
+// 🔒 Change Address must stay DISABLED on checkout open
 if (btn) {
-  btn.disabled = false;
-  btn.classList.remove("opacity-50", "cursor-not-allowed");
+  btn.disabled = true;
+  btn.classList.add("opacity-50", "cursor-not-allowed");
 }
+
 
   // ===============================
   // ORDER TYPE RESET (DIFFERENT VISIBILITY)
@@ -14457,6 +14466,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
