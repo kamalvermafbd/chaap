@@ -7296,11 +7296,8 @@ if (!primary && multiList.length === 0) {
   if (overlay && !window.__NEW_ADDRESS_FLOW) {
   overlay.style.display = "none";
 }
-
   return;
 }
-
-
       // 3️⃣ Show dropdown box
       dropdownBox.classList.remove("hidden");
 
@@ -7358,7 +7355,6 @@ if (!primary && multiList.length === 0) {
           status.innerText = "Address loaded successfully";
           status.className = "text-sm text-green-600 font-medium";
           status.classList.remove("hidden");
-
           // auto hide after 1.5 sec
           setTimeout(() => {
             status.classList.add("hidden");
@@ -7369,10 +7365,7 @@ if (!primary && multiList.length === 0) {
   }
 
 }, 50);
-
-
-
-      // 5️⃣ Dropdown change handler
+// 5️⃣ Dropdown change handler
      ddl.onchange = () => {
   try {
     const obj = JSON.parse(ddl.value);
@@ -7394,7 +7387,6 @@ if (!primary && multiList.length === 0) {
       // Show map UI
       document.getElementById("locationStatusRow")?.classList.remove("hidden");
       document.getElementById("mapPreviewBox")?.classList.remove("hidden");
-
       const frame = document.getElementById("mapPreviewFrame");
       if (frame) {
         frame.src =
@@ -7408,6 +7400,13 @@ if (!primary && multiList.length === 0) {
         status.classList.remove("hidden");
       }
 
+        // 🔥 FORCE DELIVERY DISTANCE RECALC
+  if (typeof checkDeliveryEligibility === "function") {
+    console.log("🔁 Recalculating delivery after address change");
+    checkDeliveryEligibility();
+  }
+
+      
     } else {
       // 🔴 NO LAT/LNG CASE
       window.deliveryLatLng = null;
@@ -14389,6 +14388,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
