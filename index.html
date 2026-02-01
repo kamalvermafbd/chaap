@@ -4525,6 +4525,27 @@ function enablePlaceOrder() {
   btn.classList.remove("opacity-50", "cursor-not-allowed");
 }
 
+
+// ===============================
+// 🔒 INVOICE PROCESSING OVERLAY
+// ===============================
+function showInvoiceProcessingOverlay() {
+  const ov = document.getElementById("invoiceProcessingOverlay");
+  if (!ov) return;
+
+  ov.classList.remove("hidden");
+  console.log("⏳ Invoice overlay SHOWN");
+}
+
+function hideInvoiceProcessingOverlay() {
+  const ov = document.getElementById("invoiceProcessingOverlay");
+  if (!ov) return;
+
+  ov.classList.add("hidden");
+  console.log("✅ Invoice overlay HIDDEN");
+}
+
+    
 async function canProceedPlaceOrder() {
 // ===============================
 // 🔒 PROCESSING STATE (default)
@@ -14484,6 +14505,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
