@@ -4615,10 +4615,17 @@ if (typeof buildCheckoutPreviewInv === "function") {
 console.log("🧪 BACKEND RESPONSE:", res);
 // 🔓 ENABLE Change Address ONLY after backend eligibility SUCCESS
 const changeBtn = document.getElementById("changeAddressBtn");
-if (changeBtn && res?.allowed === true) {
+if (
+  changeBtn &&
+  res?.allowed === true &&
+  window.__CHANGE_ADDRESS_USED !== true   // 🔐 GUARD
+) {
   changeBtn.disabled = false;
   changeBtn.classList.remove("opacity-50", "cursor-not-allowed");
+} else {
+  console.log("🔒 Change Address kept locked (one-shot active)");
 }
+
 if (
   res?.reason === "OUT_OF_DELIVERY_RADIUS" ||
   res?.reason === "LOCATION_NOT_SET"
@@ -14466,6 +14473,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
