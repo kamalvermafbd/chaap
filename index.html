@@ -7401,6 +7401,27 @@ function onChangeAddressClick() {
 
         console.log("📍 LOCATION SYNCED:", { lat, lng });
 
+         const frame = document.getElementById("mapPreviewFrame");
+        if (frame) {
+          frame.src =
+            `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+        }
+
+// 🔥 UPDATE "Location verified (xx km)" LABEL
+apiPost("checkDeliveryDistance", {
+  lat: lat,
+  lng: lng
+}).then(dist => {
+  const txt = document.getElementById("locationStatusText");
+  const row = document.getElementById("locationStatusRow");
+
+  if (dist?.success && txt && row) {
+    txt.innerText = `Location verified (${dist.distanceKm} km)`;
+    row.classList.remove("border-red-400", "bg-red-50", "text-red-700");
+    row.classList.add("border-green-400", "bg-green-50", "text-green-700");
+  }
+});
+
         // RESET CACHES
         window.orderEligibility = null;
         window.__CHECKOUT_SNAPSHOT = null;
@@ -7408,12 +7429,7 @@ function onChangeAddressClick() {
         document.getElementById("locationStatusRow")?.classList.remove("hidden");
         document.getElementById("mapPreviewBox")?.classList.remove("hidden");
 
-        const frame = document.getElementById("mapPreviewFrame");
-        if (frame) {
-          frame.src =
-            `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
-        }
-
+       
        window.orderEligibility = null;
 window.__CHECKOUT_SNAPSHOT = null;
 window._eligibilityRunning = false; // ⭐ THIS WAS MISSING
@@ -14396,6 +14412,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
