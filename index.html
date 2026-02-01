@@ -7400,13 +7400,10 @@ if (!primary && multiList.length === 0) {
         status.classList.remove("hidden");
       }
 
-        // 🔥 FORCE DELIVERY DISTANCE RECALC
-  if (typeof checkDeliveryEligibility === "function") {
-    console.log("🔁 Recalculating delivery after address change");
-    checkDeliveryEligibility();
-  }
-
-      
+// 🔥 FORCE DELIVERY DISTANCE & CHARGE RECALC
+if (typeof canProceedPlaceOrder === "function") {
+  canProceedPlaceOrder();
+}
     } else {
       // 🔴 NO LAT/LNG CASE
       window.deliveryLatLng = null;
@@ -7425,8 +7422,6 @@ if (!primary && multiList.length === 0) {
     console.error("Address parse error", e);
   }
 };
-
-
   })
   .catch(err => {
       console.error("Address load error:", err);
@@ -14388,6 +14383,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
