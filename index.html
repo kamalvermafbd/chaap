@@ -3655,6 +3655,16 @@ async function loadSavedAddresses() {
 
     
 document.getElementById("changeAddressBtn").addEventListener("click", async () => {
+// 🔒 GUEST SAFETY: purana flow untouched
+if (!isUserLoggedIn()) {
+  console.log("👤 Guest user → using old address flow");
+  return; // guest yahin se nikal jayega
+}
+
+// 🔐 Logged-in user → NEW address flow
+console.log("🔐 Logged-in user → using NEW address flow");
+onChangeAddressClick();
+return;
 
   const overlay = document.getElementById("loadingOverlay");
   const dropdown = document.getElementById("savedAddressDropdown");
@@ -3753,6 +3763,12 @@ if (defaultAddressObj) {
 
 
 document.getElementById("savedAddressDropdown").addEventListener("change", async function () {
+  // 🔒 Logged-in users handled by NEW address system
+if (isUserLoggedIn()) {
+  console.log("🔐 Skipping OLD dropdown handler for logged-in user");
+  return;
+}
+
   const selected = this.value;
 
   const formBox = document.getElementById("newAddressForm");
@@ -14374,6 +14390,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
