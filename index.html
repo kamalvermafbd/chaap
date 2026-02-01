@@ -7414,11 +7414,15 @@ function onChangeAddressClick() {
             `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
         }
 
-        setTimeout(() => {
-          if (typeof canProceedPlaceOrder === "function") {
-            canProceedPlaceOrder();
-          }
-        }, 0);
+       window.orderEligibility = null;
+window.__CHECKOUT_SNAPSHOT = null;
+window._eligibilityRunning = false; // ⭐ THIS WAS MISSING
+setTimeout(() => {
+  if (typeof canProceedPlaceOrder === "function") {
+    canProceedPlaceOrder();
+  }
+}, 0);
+
 
       } else {
         window._deliveryLocation = null;
@@ -14392,6 +14396,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
