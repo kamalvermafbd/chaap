@@ -7412,6 +7412,11 @@ function onChangeAddressClick() {
         window.isLocationSet = true;
 
         console.log("📍 LOCATION SYNCED:", { lat, lng });
+// 🔥 CLEAR OLD "NO MAP LOCATION" WARNING
+if (status) {
+  status.innerText = "";
+  status.className = "hidden";
+}
 
          const frame = document.getElementById("mapPreviewFrame");
         if (frame) {
@@ -14424,6 +14429,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
