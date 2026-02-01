@@ -4714,14 +4714,14 @@ function buildOrderPayloadForDebug() {
       : "",
     couponType: selectedCoupon?.type || "",
 
-    lat:
+   lat:
       document.getElementById("orderType")?.value === "Home Delivery"
-        ? (window._userLat || window._deliveryLocation?.lat || "")
+        ? (window._deliveryLocation?.lat || window._userLat || "")
         : "",
 
     lng:
       document.getElementById("orderType")?.value === "Home Delivery"
-        ? (window._userLng || window._deliveryLocation?.lng || "")
+        ? (window._deliveryLocation?.lng || window._userLng || "")
         : ""
   };
 
@@ -14385,6 +14385,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
