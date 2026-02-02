@@ -4580,6 +4580,18 @@ function toggleMapByOrderType(orderType) {
 
   if (!mapBox) return;
 
+  // 🚫 COURIER MODE → NEVER show map/location
+  if (window.__COURIER_MODE === true) {
+    mapBox.classList.add("hidden");
+    if (locRow) locRow.classList.add("hidden");
+
+    // Courier does NOT need GPS
+    window._deliveryLocationReady = true;
+    updatePlaceOrderLockByLocation();
+    return; // ⛔ STOP HERE
+  }
+
+  // 🟢 EXISTING LOGIC (UNCHANGED)
   if (orderType === "Home Delivery") {
     mapBox.classList.remove("hidden");
     if (locRow) locRow.classList.remove("hidden");
@@ -14655,6 +14667,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
