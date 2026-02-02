@@ -4508,7 +4508,7 @@ if (pincodeField.readOnly) return;
 
 window.__COURIER_MODE = false;
 
- function onDispatchModeChange() {
+function onDispatchModeChange() {
   const mode = document.getElementById("dispatchMode")?.value;
 
   const locRow   = document.getElementById("locationStatusRow");
@@ -4521,29 +4521,35 @@ window.__COURIER_MODE = false;
    * 🏠 DISPATCH = HOME DELIVERY
    * 👉 FULL EXISTING FLOW (DATA + GPS)
    * ====================================================== */
-if (mode === "Home Delivery") {
-  window.__COURIER_MODE = false;
+  if (mode === "Home Delivery") {
+    window.__COURIER_MODE = false;
 
-  // 🔄 FULL RESET when coming back from Courier
-  window._deliveryLocation = null;
-  window._deliveryLocationReady = false;
-  window._guestLocationPromptShown = false;
+    // 🔄 HARD RESET (Courier → Home Delivery)
+    window._deliveryLocation = null;
+    window._deliveryLocationReady = false;
+    window._guestLocationPromptShown = false;
 
-  const orderType = document.getElementById("orderType");
-  if (orderType) {
-    orderType.value = "Home Delivery";
+    // 🔓 release any stuck eligibility lock
+    window._eligibilityRunning = false;
+
+    // 🔁 force orderType so existing logic works
+    const orderType = document.getElementById("orderType");
+    if (orderType) {
+      orderType.value = "Home Delivery";
+    }
+
+    // 🔥 re-arm full HD flow
+    toggleAddressField();
+    updatePlaceOrderLockByLocation();
+
+    // 🔑 IMPORTANT: re-run eligibility AFTER reset
+    setTimeout(() => {
+      recheckEligibilityOnDispatchModeChange();
+    }, 0);
+
+    console.log("🔄 Switched to Home Delivery — waiting for fresh location");
+    return;
   }
-
-  toggleAddressField();
-
-  // 🔒 lock place order until location is set again
-  updatePlaceOrderLockByLocation();
-
-  console.log("🔄 Switched to Home Delivery — waiting for fresh location");
-
-  return;
-}
-
 
   /* ======================================================
    * 📦 DISPATCH = COURIER
@@ -4551,19 +4557,19 @@ if (mode === "Home Delivery") {
    * 👉 BUT GPS / MAP / LAT-LNG COMPLETELY DISABLED
    * ====================================================== */
   if (mode === "Courier") {
-window.__COURIER_MODE = true;
+    window.__COURIER_MODE = true;
 
-    // 🛑 HARD BLOCK GPS PROMPT + AUTO LOCATION SAVE
-    window._guestLocationPromptShown = true; // skip confirm popup
-    window._deliveryLocationReady = true;    // GPS not required
+    // 🛑 HARD BLOCK GPS PROMPT + LOCATION REQUIREMENT
+    window._guestLocationPromptShown = true;
+    window._deliveryLocationReady = true;
 
-    // 🔁 trick: use Home Delivery only for DATA FILL
+    // 🔁 trick: Home Delivery only for data fill
     const orderType = document.getElementById("orderType");
     if (orderType) {
       orderType.value = "Home Delivery";
     }
 
-    // 🔥 fills name/email/address for guest + login
+    // 🔥 fills name/email/address (guest + logged-in)
     toggleAddressField();
 
     // ❌ REMOVE MAP / LOCATION UI
@@ -4571,27 +4577,29 @@ window.__COURIER_MODE = true;
     if (mapBox) mapBox.classList.add("hidden");
     if (mapFrame) mapFrame.src = "";
 
-    // ❌ CLEAR ALL GPS STATE (NO SAVE)
+    // ❌ CLEAR GPS STATE (Courier never stores location)
     window._deliveryLocation = null;
     window._userLat = "";
     window._userLng = "";
 
-   // 🔓 allow place order without distance check
-updatePlaceOrderLockByLocation();
+    // 🔓 allow order without distance check
+    updatePlaceOrderLockByLocation();
 
-// 🔑 FINAL ELIGIBILITY CHECK
-canProceedPlaceOrder();
+    // 🔑 FINAL eligibility run (Courier)
+    setTimeout(() => {
+      recheckEligibilityOnDispatchModeChange();
+    }, 0);
 
-    // 🔒 FINAL OVERRIDE — Courier must NEVER show location/map
-setTimeout(() => {
-  const locRow = document.getElementById("locationStatusRow");
-  const mapBox = document.getElementById("mapPreviewBox");
-  const mapFrame = document.getElementById("mapPreviewFrame");
+    // 🔒 FINAL OVERRIDE — ensure map never reappears
+    setTimeout(() => {
+      const locRow = document.getElementById("locationStatusRow");
+      const mapBox = document.getElementById("mapPreviewBox");
+      const mapFrame = document.getElementById("mapPreviewFrame");
 
-  if (locRow) locRow.classList.add("hidden");
-  if (mapBox) mapBox.classList.add("hidden");
-  if (mapFrame) mapFrame.src = "";
-}, 0);
+      if (locRow) locRow.classList.add("hidden");
+      if (mapBox) mapBox.classList.add("hidden");
+      if (mapFrame) mapFrame.src = "";
+    }, 0);
 
     return;
   }
@@ -14767,6 +14775,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
