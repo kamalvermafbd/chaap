@@ -4733,6 +4733,7 @@ async function canProceedPlaceOrder() {
   // 🔒 Always sync Courier mode from UI (single source of truth)
 const dispatchMode = document.getElementById("dispatchMode")?.value;
 window.__COURIER_MODE = dispatchMode === "Courier";
+window.__INDUSTRY = (window.RESTAURANT_INDUSTRY || "").toLowerCase();
 
 const placeBtn = document.getElementById("placeOrderBtn");
 const payMsg   = document.getElementById("paymentError");
@@ -4800,14 +4801,15 @@ if (
 
     const orderType = document.getElementById("orderType")?.value.trim();
     const amount = Number(window.cartSummary?.itemsSubtotal || 0);
+// 🔧 FIX: define element before using
+const orderTypeEl = document.getElementById("orderType");
 
     //  GUARD 1
-    const orderTypeEl = document.getElementById("orderType");
-
-if (!orderType && orderTypeEl) {
+    if (window.__INDUSTRY !== "retail" && !orderType && orderTypeEl) {
   showError("⚠️ Please select Order Type");
   return false;
 }
+
 
     //  GUARD 2
     if (amount <= 0) {
@@ -14750,6 +14752,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
