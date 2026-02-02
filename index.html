@@ -1975,13 +1975,19 @@ body::before {
         </select>
       </div>
 <div id="dispatchModeWrapper" style="display:none;">
-  <label>Dispatch Mode</label>
-  <select id="dispatchMode">
-    <option value="">Select</option>
+  <label class="block text-sm font-medium text-gray-700 mb-1">
+    Dispatch Mode
+  </label>
+
+  <select id="dispatchMode"
+    class="w-full border border-gray-300 rounded-lg p-2.5 bg-white
+           focus:outline-none focus:ring-2 focus:ring-orange-500">
+    <option value="">Select Dispatch Mode</option>
     <option value="Courier">Courier</option>
     <option value="Home Delivery">Home Delivery</option>
   </select>
 </div>
+
 
       <!-- Name -->
       <div>
@@ -14558,6 +14564,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
