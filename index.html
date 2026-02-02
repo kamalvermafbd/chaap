@@ -3966,6 +3966,7 @@ function onMobileChanged() {
 function checkCustomerByMobile() {
   const mobile = document.getElementById("mobile").value.trim();
   const hint = document.getElementById("mobileHint");
+const dispatchBox = document.getElementById("dispatchModeWrapper");
 
   const orderType = document.getElementById("orderType");
   const orderTypeBox = document.getElementById("orderTypeWrapper");
@@ -3991,6 +3992,8 @@ function checkCustomerByMobile() {
 
     // 🔄 RESET UI (reuse existing reset)
     resetCheckoutFieldsDefault();
+// 🔴 OPTIONAL: also hide dispatch on reset
+if (dispatchBox) dispatchBox.style.display = "none";
 
     // 🔄 reset order type explicitly
     if (orderType) orderType.value = "";
@@ -4052,7 +4055,23 @@ function checkCustomerByMobile() {
 validateAppliedCouponForMobile(mobile);
 
   // show order type selector
-  if (orderTypeBox) orderTypeBox.style.display = "block";
+  // 🔥 Industry based primary mode
+if (window.RESTAURANT_INDUSTRY === "Retail") {
+
+  // ❌ Order Type hide
+  if (orderTypeBox) orderTypeBox.style.display = "none";
+  if (orderType) orderType.value = "";
+
+  // ✅ Dispatch Mode show
+  if (dispatchBox) dispatchBox.style.display = "block";
+
+  return; // ⛔ stop Hotel flow here
+}
+
+// 🟢 Hotel flow (existing behaviour)
+if (dispatchBox) dispatchBox.style.display = "none";
+if (orderTypeBox) orderTypeBox.style.display = "block";
+
 
   // 🔁 ensure checkout reflects new mobile context
   syncCouponFromDrawerForCheckout();
@@ -14539,6 +14558,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
