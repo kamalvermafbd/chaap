@@ -4765,10 +4765,16 @@ if (!window._deliveryLocationReady) {
 
     const orderTypeNow = document.getElementById("orderType")?.value;
 
-    if (orderTypeNow === "Home Delivery" && !window._deliveryLocationReady) {
-      showError("📍 Please set your delivery location");
-      return false;
-    }
+   // 📦 COURIER MODE → skip delivery location requirement
+if (
+  orderTypeNow === "Home Delivery" &&
+  window.__COURIER_MODE !== true &&
+  !window._deliveryLocationReady
+) {
+  showError("📍 Please set your delivery location");
+  return false;
+}
+
     const orderType = document.getElementById("orderType")?.value.trim();
     const amount = Number(window.cartSummary?.itemsSubtotal || 0);
 
@@ -4795,8 +4801,14 @@ const res = await apiPost("checkOrderEligibility", {
   orderAmount: amount,
   mobile,
   userType,
-  lat: Number(window._deliveryLocation?.lat),
-lng: Number(window._deliveryLocation?.lng)
+ lat: window.__COURIER_MODE === true
+  ? null
+  : Number(window._deliveryLocation?.lat),
+
+lng: window.__COURIER_MODE === true
+  ? null
+  : Number(window._deliveryLocation?.lng)
+
 
 });
 
@@ -14693,6 +14705,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
