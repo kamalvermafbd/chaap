@@ -4521,7 +4521,9 @@ window.__COURIER_MODE = false;
 
     // 🔥 existing logic (guest + login handled inside)
     toggleAddressField();
-    
+     // 🔑 HD requires fresh validation
+    canProceedPlaceOrder();
+
     return;
   }
 
@@ -4556,8 +4558,12 @@ window.__COURIER_MODE = true;
     window._userLat = "";
     window._userLng = "";
 
-    // 🔓 allow place order without distance check
-    updatePlaceOrderLockByLocation();
+   // 🔓 allow place order without distance check
+updatePlaceOrderLockByLocation();
+
+// 🔑 FINAL ELIGIBILITY CHECK
+canProceedPlaceOrder();
+
     // 🔒 FINAL OVERRIDE — Courier must NEVER show location/map
 setTimeout(() => {
   const locRow = document.getElementById("locationStatusRow");
@@ -4602,6 +4608,7 @@ function toggleMapByOrderType(orderType) {
     // 🔓 Non-delivery orders don't need GPS
     window._deliveryLocationReady = true;
     updatePlaceOrderLockByLocation();
+    
   }
 }
 
@@ -14686,6 +14693,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
