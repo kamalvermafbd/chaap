@@ -1980,6 +1980,7 @@ body::before {
   </label>
 
   <select id="dispatchMode"
+    onchange="onDispatchModeChange()"
     class="w-full border border-gray-300 rounded-lg p-2.5 bg-white
            focus:outline-none focus:ring-2 focus:ring-orange-500">
     <option value="">Select Dispatch Mode</option>
@@ -4482,6 +4483,85 @@ if (pincodeField.readOnly) return;
     onCheckoutPincodeChange();
   }
 });
+
+
+  function onDispatchModeChange() {
+  const mode = document.getElementById("dispatchMode")?.value;
+
+  const addressWrapper = document.getElementById("addressWrapper");
+  const pincodeWrapper = document.getElementById("pincodeWrapper");
+  const cityWrapper    = document.getElementById("cityWrapper");
+  const stateWrapper   = document.getElementById("stateWrapper");
+
+  const addressField = document.getElementById("address");
+  const pincodeField = document.getElementById("pincode");
+  const cityField    = document.getElementById("city");
+  const stateField   = document.getElementById("state");
+
+  const locRow   = document.getElementById("locationStatusRow");
+  const mapBox   = document.getElementById("mapPreviewBox");
+  const mapFrame = document.getElementById("mapPreviewFrame");
+
+  console.log("🚚 Dispatch mode selected:", mode);
+
+  /* ======================================================
+   * 🏠 DISPATCH = HOME DELIVERY
+   * 👉 FULL GPS FLOW (GUEST + LOGIN)
+   * ====================================================== */
+  if (mode === "Home Delivery") {
+
+    // 🔴 SAFETY: reset GPS readiness (Courier → HD switch)
+    window._deliveryLocationReady = false;
+
+    // 🔁 Reuse existing Home Delivery logic
+    const orderType = document.getElementById("orderType");
+    if (orderType) {
+      orderType.value = "Home Delivery";
+    }
+
+    toggleAddressField(); // 🔥 single source of truth
+    return;
+  }
+
+  /* ======================================================
+   * 📦 DISPATCH = COURIER
+   * 👉 ADDRESS ONLY (NO GPS / MAP)
+   * ====================================================== */
+  if (mode === "Courier") {
+
+    // ✅ Show address fields
+    addressWrapper.style.display = "block";
+    pincodeWrapper.style.display = "block";
+    cityWrapper.style.display    = "block";
+    stateWrapper.style.display   = "block";
+
+    addressField.required = true;
+    pincodeField.required = true;
+    cityField.required    = true;
+    stateField.required   = true;
+
+    addressField.readOnly = false;
+    pincodeField.readOnly = false;
+    cityField.readOnly    = false;
+    stateField.readOnly   = false;
+
+    // ❌ HARD DISABLE GPS / MAP
+    if (locRow) locRow.classList.add("hidden");
+    if (mapBox) mapBox.classList.add("hidden");
+    if (mapFrame) mapFrame.src = "";
+
+    // ❌ CLEAR GPS STATE COMPLETELY
+    window._deliveryLocation = null;
+    window._userLat = "";
+    window._userLng = "";
+    window._deliveryLocationReady = true; // ⭐ allow order without GPS
+
+    // 🔓 Allow place order (no distance restriction)
+    updatePlaceOrderLockByLocation();
+
+    return;
+  }
+}
 
 function toggleMapByOrderType(orderType) {
   const mapBox = document.getElementById("mapPreviewBox");
@@ -14564,6 +14644,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
