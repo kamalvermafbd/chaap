@@ -13600,6 +13600,13 @@ function updatePlaceOrderLockByLocation() {
 
   if (!btn) return;
 
+  // 🚚 COURIER MODE → location NOT required
+  if (window.__COURIER_MODE === true) {
+    btn.disabled = false;
+    btn.classList.remove("opacity-50", "cursor-not-allowed");
+    return;
+  }
+
   // Only Home Delivery depends on GPS
   if (orderType !== "Home Delivery") {
     btn.disabled = false;
@@ -14718,6 +14725,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
