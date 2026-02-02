@@ -4955,12 +4955,24 @@ async function recheckEligibilityOnOrderTypeChange() {
 async function recheckEligibilityOnDispatchModeChange() {
   if (window._orderTypeChanging) return;
 
+  const dispatchMode = document.getElementById("dispatchMode")?.value;
+
+  // 🛑 Home Delivery without location → DO NOT run eligibility
+  if (
+    dispatchMode === "Home Delivery" &&
+    !window._deliveryLocationReady
+  ) {
+    console.log("⏸️ HD selected but location not ready — skipping eligibility");
+    return;
+  }
+
+  console.log("🚚 Running eligibility for dispatch mode:", dispatchMode);
+
   const ok = await canProceedPlaceOrder();
 
   if (ok) {
     await updateCheckoutInvoice();
 
-    // 🔥 force invoice refresh if checkout already open
     if (window._checkoutInvoice) {
       renderInvoiceFromAPI({
         ...window._checkoutInvoice,
@@ -14755,6 +14767,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
