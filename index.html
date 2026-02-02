@@ -4839,11 +4839,15 @@ if (
 
 if (
   res?.reason === "OUT_OF_DELIVERY_RADIUS" ||
-  res?.reason === "LOCATION_NOT_SET"
+  (
+    res?.reason === "LOCATION_NOT_SET" &&
+    window.__COURIER_MODE !== true
+  )
 ) {
   showError(res.message || "Delivery not available for this location");
   return false;
 }
+
 
 if (!res || res.allowed !== true) {
   showError(res?.message || "Order is not allowed at this time");
@@ -14710,6 +14714,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
