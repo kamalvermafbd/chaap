@@ -4505,7 +4505,6 @@ if (pincodeField.readOnly) return;
     onCheckoutPincodeChange();
   }
 });
-
 window.__COURIER_MODE = false;
 
 function onDispatchModeChange() {
@@ -4519,83 +4518,67 @@ function onDispatchModeChange() {
 
   /* ======================================================
    * 🏠 DISPATCH = HOME DELIVERY
-   * 👉 FULL EXISTING FLOW (DATA + GPS)
+   * 👉 RESET + WAIT FOR LOCATION
+   * 👉 ❌ NO ELIGIBILITY RUN HERE
    * ====================================================== */
   if (mode === "Home Delivery") {
     window.__COURIER_MODE = false;
 
-    // 🔄 HARD RESET (Courier → Home Delivery)
+    // 🔄 FULL RESET (Courier → HD)
     window._deliveryLocation = null;
     window._deliveryLocationReady = false;
     window._guestLocationPromptShown = false;
 
-    // 🔓 release any stuck eligibility lock
+    // 🔓 release any stuck lock
     window._eligibilityRunning = false;
 
-    // 🔁 force orderType so existing logic works
+    // 🔁 keep data logic consistent
     const orderType = document.getElementById("orderType");
-    if (orderType) {
-      orderType.value = "Home Delivery";
-    }
+    if (orderType) orderType.value = "Home Delivery";
 
-    // 🔥 re-arm full HD flow
     toggleAddressField();
     updatePlaceOrderLockByLocation();
 
-    // 🔑 IMPORTANT: re-run eligibility AFTER reset
-    setTimeout(() => {
-      recheckEligibilityOnDispatchModeChange();
-    }, 0);
-
-    console.log("🔄 Switched to Home Delivery — waiting for fresh location");
+    console.log("🕓 Home Delivery selected — waiting for location");
     return;
   }
 
   /* ======================================================
    * 📦 DISPATCH = COURIER
-   * 👉 DATA SAME AS HOME DELIVERY
-   * 👉 BUT GPS / MAP / LAT-LNG COMPLETELY DISABLED
+   * 👉 NO GPS / MAP / LOCATION REQUIRED
+   * 👉 ELIGIBILITY RUNS IMMEDIATELY
    * ====================================================== */
   if (mode === "Courier") {
     window.__COURIER_MODE = true;
 
-    // 🛑 HARD BLOCK GPS PROMPT + LOCATION REQUIREMENT
+    // 🛑 disable all GPS logic
     window._guestLocationPromptShown = true;
     window._deliveryLocationReady = true;
 
-    // 🔁 trick: Home Delivery only for data fill
     const orderType = document.getElementById("orderType");
-    if (orderType) {
-      orderType.value = "Home Delivery";
-    }
+    if (orderType) orderType.value = "Home Delivery";
 
-    // 🔥 fills name/email/address (guest + logged-in)
     toggleAddressField();
 
-    // ❌ REMOVE MAP / LOCATION UI
+    // ❌ hide map + location UI
     if (locRow) locRow.classList.add("hidden");
     if (mapBox) mapBox.classList.add("hidden");
     if (mapFrame) mapFrame.src = "";
 
-    // ❌ CLEAR GPS STATE (Courier never stores location)
+    // ❌ clear GPS data
     window._deliveryLocation = null;
     window._userLat = "";
     window._userLng = "";
 
-    // 🔓 allow order without distance check
     updatePlaceOrderLockByLocation();
 
-    // 🔑 FINAL eligibility run (Courier)
+    // ✅ Courier eligibility can run immediately
     setTimeout(() => {
       recheckEligibilityOnDispatchModeChange();
     }, 0);
 
-    // 🔒 FINAL OVERRIDE — ensure map never reappears
+    // 🔒 ensure map never reappears
     setTimeout(() => {
-      const locRow = document.getElementById("locationStatusRow");
-      const mapBox = document.getElementById("mapPreviewBox");
-      const mapFrame = document.getElementById("mapPreviewFrame");
-
       if (locRow) locRow.classList.add("hidden");
       if (mapBox) mapBox.classList.add("hidden");
       if (mapFrame) mapFrame.src = "";
@@ -14775,6 +14758,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
