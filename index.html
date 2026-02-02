@@ -4309,6 +4309,7 @@ if (orderType !== "Home Delivery") {
 if (
   !isLoggedIn() &&
   orderType === "Home Delivery" &&
+   !window.__COURIER_MODE &&          //
   !window._deliveryLocationReady &&
   !window._guestLocationPromptShown
 ) {
@@ -4350,7 +4351,10 @@ if (orderType === "Home Delivery") {
   cityWrapper.style.display    = "block";
   stateWrapper.style.display   = "block";
   const locRow = document.getElementById("locationStatusRow");
-  if (locRow) locRow.classList.remove("hidden");   //  FIX
+  if (!window.__COURIER_MODE && locRow) {
+    locRow.classList.remove("hidden");
+  }
+
 
   // 👤 Guest + Home Delivery → ask for location update (once)
   addressField.required = true;
@@ -4419,8 +4423,11 @@ console.log("🏠 Latest Home Delivery Address =", latestHD);
   pincodeWrapper.style.display = "block";
   cityWrapper.style.display    = "block";
   stateWrapper.style.display   = "block";
-const locRow = document.getElementById("locationStatusRow");
-if (locRow) locRow.classList.remove("hidden");
+  const locRow = document.getElementById("locationStatusRow");
+  if (!window.__COURIER_MODE && locRow) {
+    locRow.classList.remove("hidden");
+  }
+
   addressField.required = true;
   addressField.readOnly = false;
 pincodeField.readOnly = false;
@@ -4484,6 +4491,7 @@ if (pincodeField.readOnly) return;
   }
 });
 
+window.__COURIER_MODE = false;
 
  function onDispatchModeChange() {
   const mode = document.getElementById("dispatchMode")?.value;
@@ -4499,6 +4507,7 @@ if (pincodeField.readOnly) return;
    * 👉 FULL EXISTING FLOW (DATA + GPS)
    * ====================================================== */
   if (mode === "Home Delivery") {
+window.__COURIER_MODE = false;
 
     // 🔴 reset GPS readiness (Courier → HD safety)
     window._deliveryLocationReady = false;
@@ -4522,6 +4531,7 @@ if (pincodeField.readOnly) return;
    * 👉 BUT GPS / MAP / LAT-LNG COMPLETELY DISABLED
    * ====================================================== */
   if (mode === "Courier") {
+window.__COURIER_MODE = true;
 
     // 🛑 HARD BLOCK GPS PROMPT + AUTO LOCATION SAVE
     window._guestLocationPromptShown = true; // skip confirm popup
@@ -14645,6 +14655,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
