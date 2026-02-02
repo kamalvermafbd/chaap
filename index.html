@@ -2649,22 +2649,23 @@ function apiGet(api, params = {}) {
 }
 
     
-document.addEventListener("DOMContentLoaded", function () {
-  apiGet("getRestaurantIndustry")
-    .then(res => {
-      if (res && res.success && res.industry) {
-        window.RESTAURANT_INDUSTRY = res.industry;
-        console.log("Industry loaded:", res.industry);
-      } else {
-        window.RESTAURANT_INDUSTRY = "Hotel"; // safe default
-        console.warn("Industry API failed, defaulting to Hotel");
-      }
-    })
-    .catch(err => {
-      window.RESTAURANT_INDUSTRY = "Hotel";
-      console.error("Industry API error:", err);
-    });
-});
+// ===============================
+// LOAD RESTAURANT INDUSTRY (ONCE)
+// ===============================
+apiGet("getRestaurantIndustry")
+  .then(res => {
+    if (res && res.success && res.industry) {
+      window.RESTAURANT_INDUSTRY = res.industry;
+      console.log("Industry loaded:", res.industry);
+    } else {
+      window.RESTAURANT_INDUSTRY = "Hotel"; // safe fallback
+      console.warn("Industry API failed, defaulting to Hotel");
+    }
+  })
+  .catch(err => {
+    window.RESTAURANT_INDUSTRY = "Hotel";
+    console.error("Industry API error:", err);
+  });
 
 
 // ===============================
@@ -14536,6 +14537,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
