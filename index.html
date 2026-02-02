@@ -2668,17 +2668,28 @@ apiGet("getRestaurantIndustry")
     console.log("🔍 RAW Industry API response:", res);
 
     if (res && res.success && res.industry) {
+      // ✅ EXISTING (DO NOT REMOVE)
       window.RESTAURANT_INDUSTRY = res.industry;
+
+      // ✅ ADD THIS — single source of truth for new logic
+      window.__INDUSTRY = String(res.industry).toLowerCase();
+
       console.log("Industry loaded:", res.industry);
     } else {
+      // ⚠️ fallback
       window.RESTAURANT_INDUSTRY = "Hotel";
+      window.__INDUSTRY = "hotel";
+
       console.warn("Industry API failed, defaulting to Hotel");
     }
   })
   .catch(err => {
     window.RESTAURANT_INDUSTRY = "Hotel";
+    window.__INDUSTRY = "hotel";
+
     console.error("Industry API error:", err);
   });
+
 
 
 // ===============================
@@ -14739,6 +14750,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
