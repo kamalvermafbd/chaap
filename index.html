@@ -4500,52 +4500,53 @@ if (pincodeField.readOnly) return;
    * ====================================================== */
   if (mode === "Home Delivery") {
 
-    // 🔴 reset GPS readiness (safety)
+    // 🔴 reset GPS readiness (Courier → HD safety)
     window._deliveryLocationReady = false;
+    window._guestLocationPromptShown = false;
 
-    // 🔁 Trick: force orderType so toggleAddressField works
+    // 🔁 force orderType so toggleAddressField works
     const orderType = document.getElementById("orderType");
     if (orderType) {
       orderType.value = "Home Delivery";
     }
 
-    // 🔥 DATA + LOGIN/GUEST LOGIC COMES FROM HERE
+    // 🔥 existing logic (guest + login handled inside)
     toggleAddressField();
-
     return;
   }
 
   /* ======================================================
    * 📦 DISPATCH = COURIER
    * 👉 DATA SAME AS HOME DELIVERY
-   * 👉 BUT GPS / MAP / LAT-LNG DISABLED
+   * 👉 BUT GPS / MAP / LAT-LNG COMPLETELY DISABLED
    * ====================================================== */
   if (mode === "Courier") {
 
-    // 🔁 STEP-1: reuse Home Delivery data logic
+    // 🛑 HARD BLOCK GPS PROMPT + AUTO LOCATION SAVE
+    window._guestLocationPromptShown = true; // skip confirm popup
+    window._deliveryLocationReady = true;    // GPS not required
+
+    // 🔁 trick: use Home Delivery only for DATA FILL
     const orderType = document.getElementById("orderType");
     if (orderType) {
       orderType.value = "Home Delivery";
     }
 
-    toggleAddressField(); // ✅ fills data for guest + login
+    // 🔥 fills name/email/address for guest + login
+    toggleAddressField();
 
-    // 🔁 STEP-2: HARD OVERRIDE — NO GPS FOR COURIER
+    // ❌ REMOVE MAP / LOCATION UI
     if (locRow) locRow.classList.add("hidden");
     if (mapBox) mapBox.classList.add("hidden");
     if (mapFrame) mapFrame.src = "";
 
-    // ❌ clear all GPS state
+    // ❌ CLEAR ALL GPS STATE (NO SAVE)
     window._deliveryLocation = null;
     window._userLat = "";
     window._userLng = "";
 
-    // ⭐ mark location as NOT REQUIRED
-    window._deliveryLocationReady = true;
-
     // 🔓 allow place order without distance check
     updatePlaceOrderLockByLocation();
-
     return;
   }
 }
@@ -14632,6 +14633,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
