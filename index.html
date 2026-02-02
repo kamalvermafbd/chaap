@@ -5587,19 +5587,7 @@ function filterMenu() {
     
   </div>
 </div>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    apiGet("getRestaurantIndustry", function (res) {
-      if (res && res.success && res.industry) {
-        window.RESTAURANT_INDUSTRY = res.industry;
-        console.log("Industry loaded:", res.industry);
-      } else {
-        window.RESTAURANT_INDUSTRY = "Hotel"; // safe default
-        console.warn("Industry API failed, defaulting to Hotel");
-      }
-    });
-  });
-</script>
+
 
 <script>
 
@@ -6693,6 +6681,17 @@ function apiPost(api, data = {}) {
   });
 }
 
+  document.addEventListener("DOMContentLoaded", function () {
+    apiGet("getRestaurantIndustry", function (res) {
+      if (res && res.success && res.industry) {
+        window.RESTAURANT_INDUSTRY = res.industry;
+        console.log("Industry loaded:", res.industry);
+      } else {
+        window.RESTAURANT_INDUSTRY = "Hotel"; // safe default
+        console.warn("Industry API failed, defaulting to Hotel");
+      }
+    });
+  });
 
 function isLoggedIn() {
   return Boolean(localStorage.getItem("userMobile"));
@@ -14529,6 +14528,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
