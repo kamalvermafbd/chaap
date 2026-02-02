@@ -4512,6 +4512,7 @@ if (pincodeField.readOnly) return;
 
     // 🔥 existing logic (guest + login handled inside)
     toggleAddressField();
+    
     return;
   }
 
@@ -4547,6 +4548,17 @@ if (pincodeField.readOnly) return;
 
     // 🔓 allow place order without distance check
     updatePlaceOrderLockByLocation();
+    // 🔒 FINAL OVERRIDE — Courier must NEVER show location/map
+setTimeout(() => {
+  const locRow = document.getElementById("locationStatusRow");
+  const mapBox = document.getElementById("mapPreviewBox");
+  const mapFrame = document.getElementById("mapPreviewFrame");
+
+  if (locRow) locRow.classList.add("hidden");
+  if (mapBox) mapBox.classList.add("hidden");
+  if (mapFrame) mapFrame.src = "";
+}, 0);
+
     return;
   }
 }
@@ -14633,6 +14645,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
