@@ -4805,6 +4805,9 @@ const res = await apiPost("checkOrderEligibility", {
   orderAmount: amount,
   mobile,
   userType,
+    // 🔑 VERY IMPORTANT — tells backend this is Courier
+  dispatchMode: document.getElementById("dispatchMode")?.value,
+  
  lat: window.__COURIER_MODE === true
   ? null
   : Number(window._deliveryLocation?.lat),
@@ -14725,6 +14728,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
