@@ -2654,11 +2654,13 @@ function apiGet(api, params = {}) {
 // ===============================
 apiGet("getRestaurantIndustry")
   .then(res => {
+    console.log("🔍 RAW Industry API response:", res);
+
     if (res && res.success && res.industry) {
       window.RESTAURANT_INDUSTRY = res.industry;
       console.log("Industry loaded:", res.industry);
     } else {
-      window.RESTAURANT_INDUSTRY = "Hotel"; // safe fallback
+      window.RESTAURANT_INDUSTRY = "Hotel";
       console.warn("Industry API failed, defaulting to Hotel");
     }
   })
@@ -14537,6 +14539,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
