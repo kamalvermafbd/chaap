@@ -1916,7 +1916,7 @@ body::before {
 
    
 <h2 class="text-lg font-semibold text-gray-900 mb-2">
-  Checkout
+  Checkouttest3
 </h2>
 
 <div class="flex gap-4">
@@ -1974,25 +1974,6 @@ body::before {
           <option value="Home Delivery">Home Delivery</option>
         </select>
       </div>
-<div id="dispatchModeWrapper" style="display:none;">
-  <label class="block text-sm font-medium text-gray-700 mb-1">
-    Dispatch Mode
-  </label>
-
-  <select
-    id="dispatchMode"
-    onchange="onDispatchModeChange(); recheckEligibilityOnDispatchModeChange();"
-    class="w-full border border-gray-300 rounded-lg p-2.5 bg-white
-           focus:outline-none focus:ring-2 focus:ring-orange-500">
-
-    <option value="">Select Dispatch Mode</option>
-    <option value="Courier">Courier</option>
-    <option value="Home Delivery">Home Delivery</option>
-
-  </select>
-</div>
-
-
 
       <!-- Name -->
       <div>
@@ -2195,20 +2176,9 @@ body::before {
 </div>
 </form>
 </div>
-<div class="w-6/12 relative">
-  <div id="checkoutInvoiceContainer"></div>
-
-  <!-- 🔒 INVOICE PROCESSING OVERLAY -->
-  <div
-    id="invoiceProcessingOverlay"
-    class="hidden absolute inset-0 z-20
-           bg-white/70 backdrop-blur-sm
-           flex items-center justify-center
-           text-sm font-medium text-gray-700">
-    ⏳ Updating final amount, please wait…
-  </div>
+  <div class="w-6/12">
+<div id="checkoutInvoiceContainer"></div>
 </div>
-
   </div>
 </div>
 </div>
@@ -2640,7 +2610,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbww6Kna3reTVcmzG9PjteLcbdWVIPoMBQFxM3HTe0Rt4ZbNYi--jzhcoWuYAwcm85HR/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbztFdQo_izKqwYUclCr2Wb1pJeGhu4-qHfwlX-4R_hxn_8NYpeGh0oSlsYHb8oK4CKxXg/exec";
 
 // ===============================
 // API HELPER
@@ -2658,39 +2628,6 @@ function apiGet(api, params = {}) {
     headers: { "Accept": "application/json" }
   }).then(res => res.json());
 }
-
-    
-// ===============================
-// LOAD RESTAURANT INDUSTRY (ONCE)
-// ===============================
-apiGet("getRestaurantIndustry")
-  .then(res => {
-    console.log("🔍 RAW Industry API response:", res);
-
-    if (res && res.success && res.industry) {
-      // ✅ EXISTING (DO NOT REMOVE)
-      window.RESTAURANT_INDUSTRY = res.industry;
-
-      // ✅ ADD THIS — single source of truth for new logic
-      window.__INDUSTRY = String(res.industry).toLowerCase();
-
-      console.log("Industry loaded:", res.industry);
-    } else {
-      // ⚠️ fallback
-      window.RESTAURANT_INDUSTRY = "Hotel";
-      window.__INDUSTRY = "hotel";
-
-      console.warn("Industry API failed, defaulting to Hotel");
-    }
-  })
-  .catch(err => {
-    window.RESTAURANT_INDUSTRY = "Hotel";
-    window.__INDUSTRY = "hotel";
-
-    console.error("Industry API error:", err);
-  });
-
-
 
 // ===============================
 // PROMO BANNER OFFER FETCH (SAFE)
@@ -3988,7 +3925,6 @@ function onMobileChanged() {
 function checkCustomerByMobile() {
   const mobile = document.getElementById("mobile").value.trim();
   const hint = document.getElementById("mobileHint");
-const dispatchBox = document.getElementById("dispatchModeWrapper");
 
   const orderType = document.getElementById("orderType");
   const orderTypeBox = document.getElementById("orderTypeWrapper");
@@ -4014,8 +3950,6 @@ const dispatchBox = document.getElementById("dispatchModeWrapper");
 
     // 🔄 RESET UI (reuse existing reset)
     resetCheckoutFieldsDefault();
-// 🔴 OPTIONAL: also hide dispatch on reset
-if (dispatchBox) dispatchBox.style.display = "none";
 
     // 🔄 reset order type explicitly
     if (orderType) orderType.value = "";
@@ -4077,23 +4011,7 @@ if (dispatchBox) dispatchBox.style.display = "none";
 validateAppliedCouponForMobile(mobile);
 
   // show order type selector
-  // 🔥 Industry based primary mode
-if (window.RESTAURANT_INDUSTRY === "Retail") {
-
-  // ❌ Order Type hide
-  if (orderTypeBox) orderTypeBox.style.display = "none";
-  if (orderType) orderType.value = "";
-
-  // ✅ Dispatch Mode show
-  if (dispatchBox) dispatchBox.style.display = "block";
-
-  return; // ⛔ stop Hotel flow here
-}
-
-// 🟢 Hotel flow (existing behaviour)
-if (dispatchBox) dispatchBox.style.display = "none";
-if (orderTypeBox) orderTypeBox.style.display = "block";
-
+  if (orderTypeBox) orderTypeBox.style.display = "block";
 
   // 🔁 ensure checkout reflects new mobile context
   syncCouponFromDrawerForCheckout();
@@ -4324,7 +4242,6 @@ if (orderType !== "Home Delivery") {
 if (
   !isLoggedIn() &&
   orderType === "Home Delivery" &&
-   !window.__COURIER_MODE &&          //
   !window._deliveryLocationReady &&
   !window._guestLocationPromptShown
 ) {
@@ -4366,10 +4283,7 @@ if (orderType === "Home Delivery") {
   cityWrapper.style.display    = "block";
   stateWrapper.style.display   = "block";
   const locRow = document.getElementById("locationStatusRow");
-  if (!window.__COURIER_MODE && locRow) {
-    locRow.classList.remove("hidden");
-  }
-
+  if (locRow) locRow.classList.remove("hidden");   //  FIX
 
   // 👤 Guest + Home Delivery → ask for location update (once)
   addressField.required = true;
@@ -4438,11 +4352,8 @@ console.log("🏠 Latest Home Delivery Address =", latestHD);
   pincodeWrapper.style.display = "block";
   cityWrapper.style.display    = "block";
   stateWrapper.style.display   = "block";
-  const locRow = document.getElementById("locationStatusRow");
-  if (!window.__COURIER_MODE && locRow) {
-    locRow.classList.remove("hidden");
-  }
-
+const locRow = document.getElementById("locationStatusRow");
+if (locRow) locRow.classList.remove("hidden");
   addressField.required = true;
   addressField.readOnly = false;
 pincodeField.readOnly = false;
@@ -4505,89 +4416,6 @@ if (pincodeField.readOnly) return;
     onCheckoutPincodeChange();
   }
 });
-window.__COURIER_MODE = false;
-
-function onDispatchModeChange() {
-  const mode = document.getElementById("dispatchMode")?.value;
-
-  const locRow   = document.getElementById("locationStatusRow");
-  const mapBox   = document.getElementById("mapPreviewBox");
-  const mapFrame = document.getElementById("mapPreviewFrame");
-
-  console.log("🚚 Dispatch mode selected:", mode);
-
-  /* ======================================================
-   * 🏠 DISPATCH = HOME DELIVERY
-   * 👉 RESET + WAIT FOR LOCATION
-   * 👉 ❌ NO ELIGIBILITY RUN HERE
-   * ====================================================== */
-  if (mode === "Home Delivery") {
-    window.__COURIER_MODE = false;
-
-    // 🔄 FULL RESET (Courier → HD)
-    window._deliveryLocation = null;
-    window._deliveryLocationReady = false;
-    window._guestLocationPromptShown = false;
-
-    // 🔓 release any stuck lock
-    window._eligibilityRunning = false;
-
-    // 🔁 keep data logic consistent
-    const orderType = document.getElementById("orderType");
-    if (orderType) orderType.value = "Home Delivery";
-
-    toggleAddressField();
-    updatePlaceOrderLockByLocation();
-
-    console.log("🕓 Home Delivery selected — waiting for location");
-    return;
-  }
-
-  /* ======================================================
-   * 📦 DISPATCH = COURIER
-   * 👉 NO GPS / MAP / LOCATION REQUIRED
-   * 👉 ELIGIBILITY RUNS IMMEDIATELY
-   * ====================================================== */
-  if (mode === "Courier") {
-    window.__COURIER_MODE = true;
-
-    // 🛑 disable all GPS logic
-    window._guestLocationPromptShown = true;
-    window._deliveryLocationReady = true;
-
-    const orderType = document.getElementById("orderType");
-    if (orderType) orderType.value = "Home Delivery";
-
-    toggleAddressField();
-
-    // ❌ hide map + location UI
-    if (locRow) locRow.classList.add("hidden");
-    if (mapBox) mapBox.classList.add("hidden");
-    if (mapFrame) mapFrame.src = "";
-
-    // ❌ clear GPS data
-    window._deliveryLocation = null;
-    window._userLat = "";
-    window._userLng = "";
-
-    updatePlaceOrderLockByLocation();
-
-    // ✅ Courier eligibility can run immediately
-    setTimeout(() => {
-      recheckEligibilityOnDispatchModeChange();
-    }, 0);
-
-    // 🔒 ensure map never reappears
-    setTimeout(() => {
-      if (locRow) locRow.classList.add("hidden");
-      if (mapBox) mapBox.classList.add("hidden");
-      if (mapFrame) mapFrame.src = "";
-    }, 0);
-
-    return;
-  }
-}
-
 
 function toggleMapByOrderType(orderType) {
   const mapBox = document.getElementById("mapPreviewBox");
@@ -4595,18 +4423,6 @@ function toggleMapByOrderType(orderType) {
 
   if (!mapBox) return;
 
-  // 🚫 COURIER MODE → NEVER show map/location
-  if (window.__COURIER_MODE === true) {
-    mapBox.classList.add("hidden");
-    if (locRow) locRow.classList.add("hidden");
-
-    // Courier does NOT need GPS
-    window._deliveryLocationReady = true;
-    updatePlaceOrderLockByLocation();
-    return; // ⛔ STOP HERE
-  }
-
-  // 🟢 EXISTING LOGIC (UNCHANGED)
   if (orderType === "Home Delivery") {
     mapBox.classList.remove("hidden");
     if (locRow) locRow.classList.remove("hidden");
@@ -4617,7 +4433,6 @@ function toggleMapByOrderType(orderType) {
     // 🔓 Non-delivery orders don't need GPS
     window._deliveryLocationReady = true;
     updatePlaceOrderLockByLocation();
-    
   }
 }
 
@@ -4699,36 +4514,10 @@ function enablePlaceOrder() {
   btn.classList.remove("opacity-50", "cursor-not-allowed");
 }
 
-
-// ===============================
-// 🔒 INVOICE PROCESSING OVERLAY
-// ===============================
-function showInvoiceProcessingOverlay() {
-  const ov = document.getElementById("invoiceProcessingOverlay");
-  if (!ov) return;
-
-  ov.classList.remove("hidden");
-  console.log("⏳ Invoice overlay SHOWN");
-}
-
-function hideInvoiceProcessingOverlay() {
-  const ov = document.getElementById("invoiceProcessingOverlay");
-  if (!ov) return;
-
-  ov.classList.add("hidden");
-  console.log("✅ Invoice overlay HIDDEN");
-}
-
-    
 async function canProceedPlaceOrder() {
 // ===============================
 // 🔒 PROCESSING STATE (default)
 // ===============================
-  // 🔒 Always sync Courier mode from UI (single source of truth)
-const dispatchMode = document.getElementById("dispatchMode")?.value;
-window.__COURIER_MODE = dispatchMode === "Courier";
-window.__INDUSTRY = (window.RESTAURANT_INDUSTRY || "").toLowerCase();
-
 const placeBtn = document.getElementById("placeOrderBtn");
 const payMsg   = document.getElementById("paymentError");
 
@@ -4773,38 +4562,24 @@ if (!window._deliveryLocationReady) {
     paymentError.classList.remove("hidden", "text-red-600");
     paymentError.classList.add("text-green-600");
   };
-window.orderEligibility = null;
-// 🏬 RETAIL MODE: dispatchMode decides delivery, not orderType
-const industry = window.__INDUSTRY; // already set from Restaurant Info
-const dispatchModeNow = document.getElementById("dispatchMode")?.value;
 
-const isHomeDelivery =
-  industry === "retail"
-    ? dispatchModeNow === "Home Delivery"
-    : document.getElementById("orderType")?.value === "Home Delivery";
+ window.orderEligibility = null;
 
-// 📍 Location required only for REAL Home Delivery
-if (
-  isHomeDelivery &&
-  window.__COURIER_MODE !== true &&
-  !window._deliveryLocationReady
-) {
-  showError("📍 Please set your delivery location");
-  return false;
-}
 
+    const orderTypeNow = document.getElementById("orderType")?.value;
+
+    if (orderTypeNow === "Home Delivery" && !window._deliveryLocationReady) {
+      showError("📍 Please set your delivery location");
+      return false;
+    }
     const orderType = document.getElementById("orderType")?.value.trim();
     const amount = Number(window.cartSummary?.itemsSubtotal || 0);
-// 🔧 FIX: define element before using
-const orderTypeEl = document.getElementById("orderType");
 
     //  GUARD 1
-    if (window.__INDUSTRY !== "retail" && !orderType && orderTypeEl) {
-  showError("⚠️ Please select Order Type");
-  return false;
-}
-
-
+    if (!orderType) {
+      showError("⚠️ Please select Order Type");
+      return false;
+    }
     //  GUARD 2
     if (amount <= 0) {
       showError("⚠️ Cart is empty");
@@ -4815,25 +4590,14 @@ const orderTypeEl = document.getElementById("orderType");
 // ================================
 const mobile = document.getElementById("mobile")?.value.trim();
 const userType = isUserLoggedIn() ? "logged" : "guest";
-    
-showInvoiceProcessingOverlay(); // ⏳ invoice calculation started
 
 const res = await apiPost("checkOrderEligibility", {
   orderType,
   orderAmount: amount,
   mobile,
   userType,
-    // 🔑 VERY IMPORTANT — tells backend this is Courier
-  dispatchMode: document.getElementById("dispatchMode")?.value,
-  
- lat: window.__COURIER_MODE === true
-  ? null
-  : Number(window._deliveryLocation?.lat),
-
-lng: window.__COURIER_MODE === true
-  ? null
-  : Number(window._deliveryLocation?.lng)
-
+  lat: Number(window._deliveryLocation?.lat),
+lng: Number(window._deliveryLocation?.lng)
 
 });
 
@@ -4864,15 +4628,11 @@ if (
 
 if (
   res?.reason === "OUT_OF_DELIVERY_RADIUS" ||
-  (
-    res?.reason === "LOCATION_NOT_SET" &&
-    window.__COURIER_MODE !== true
-  )
+  res?.reason === "LOCATION_NOT_SET"
 ) {
   showError(res.message || "Delivery not available for this location");
   return false;
 }
-
 
 if (!res || res.allowed !== true) {
   showError(res?.message || "Order is not allowed at this time");
@@ -4903,7 +4663,6 @@ if (placeBtn) {
 
   } finally {
     //  FIX-4: ALWAYS release lock
-    hideInvoiceProcessingOverlay(); // ✅ invoice calculation done
     window._eligibilityRunning = false;
   }
 }
@@ -4914,10 +4673,6 @@ if (placeBtn) {
 // STEP-3: Live eligibility on OrderType change
 // ==================================
 async function recheckEligibilityOnOrderTypeChange() {
-    if (window.__COURIER_MODE === true) {
-    console.log("🚚 Courier active — skipping OrderType eligibility check");
-    return;
-  }
   if (window._orderTypeChanging) return;
 
   const ok = await canProceedPlaceOrder();
@@ -4933,38 +4688,6 @@ async function recheckEligibilityOnOrderTypeChange() {
       window._checkoutInvoice &&
       window._checkoutInvoice.orderType === "Home Delivery"
     ) {
-      renderInvoiceFromAPI({
-        ...window._checkoutInvoice,
-        deliveryCharge: window.orderEligibility?.extraCharge || 0,
-        deliveryChargeLabel:
-          window.orderEligibility?.chargeType || "Delivery Charges"
-      });
-    }
-  }
-}
-    
-async function recheckEligibilityOnDispatchModeChange() {
-  if (window._orderTypeChanging) return;
-
-  const dispatchMode = document.getElementById("dispatchMode")?.value;
-
-  // 🛑 Home Delivery without location → DO NOT run eligibility
-  if (
-    dispatchMode === "Home Delivery" &&
-    !window._deliveryLocationReady
-  ) {
-    console.log("⏸️ HD selected but location not ready — skipping eligibility");
-    return;
-  }
-
-  console.log("🚚 Running eligibility for dispatch mode:", dispatchMode);
-
-  const ok = await canProceedPlaceOrder();
-
-  if (ok) {
-    await updateCheckoutInvoice();
-
-    if (window._checkoutInvoice) {
       renderInvoiceFromAPI({
         ...window._checkoutInvoice,
         deliveryCharge: window.orderEligibility?.extraCharge || 0,
@@ -5821,7 +5544,6 @@ function filterMenu() {
     
   </div>
 </div>
-
 
 <script>
 
@@ -6915,7 +6637,7 @@ function apiPost(api, data = {}) {
   });
 }
 
-  
+
 function isLoggedIn() {
   return Boolean(localStorage.getItem("userMobile"));
 }
@@ -13633,13 +13355,6 @@ function updatePlaceOrderLockByLocation() {
 
   if (!btn) return;
 
-  // 🚚 COURIER MODE → location NOT required
-  if (window.__COURIER_MODE === true) {
-    btn.disabled = false;
-    btn.classList.remove("opacity-50", "cursor-not-allowed");
-    return;
-  }
-
   // Only Home Delivery depends on GPS
   if (orderType !== "Home Delivery") {
     btn.disabled = false;
@@ -14758,4 +14473,8 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
+
+
+
 
