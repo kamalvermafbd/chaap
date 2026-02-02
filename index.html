@@ -4521,26 +4521,29 @@ window.__COURIER_MODE = false;
    * 🏠 DISPATCH = HOME DELIVERY
    * 👉 FULL EXISTING FLOW (DATA + GPS)
    * ====================================================== */
-  if (mode === "Home Delivery") {
-window.__COURIER_MODE = false;
+if (mode === "Home Delivery") {
+  window.__COURIER_MODE = false;
 
-    // 🔴 reset GPS readiness (Courier → HD safety)
-    window._deliveryLocationReady = false;
-    window._guestLocationPromptShown = false;
+  // 🔄 FULL RESET when coming back from Courier
+  window._deliveryLocation = null;
+  window._deliveryLocationReady = false;
+  window._guestLocationPromptShown = false;
 
-    // 🔁 force orderType so toggleAddressField works
-    const orderType = document.getElementById("orderType");
-    if (orderType) {
-      orderType.value = "Home Delivery";
-    }
-
-    // 🔥 existing logic (guest + login handled inside)
-    toggleAddressField();
-     // 🔑 HD requires fresh validation
-    canProceedPlaceOrder();
-
-    return;
+  const orderType = document.getElementById("orderType");
+  if (orderType) {
+    orderType.value = "Home Delivery";
   }
+
+  toggleAddressField();
+
+  // 🔒 lock place order until location is set again
+  updatePlaceOrderLockByLocation();
+
+  console.log("🔄 Switched to Home Delivery — waiting for fresh location");
+
+  return;
+}
+
 
   /* ======================================================
    * 📦 DISPATCH = COURIER
@@ -14752,6 +14755,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
