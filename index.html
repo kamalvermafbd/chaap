@@ -4715,6 +4715,10 @@ async function canProceedPlaceOrder() {
 // ===============================
 // 🔒 PROCESSING STATE (default)
 // ===============================
+  // 🔒 Always sync Courier mode from UI (single source of truth)
+const dispatchMode = document.getElementById("dispatchMode")?.value;
+window.__COURIER_MODE = dispatchMode === "Courier";
+
 const placeBtn = document.getElementById("placeOrderBtn");
 const payMsg   = document.getElementById("paymentError");
 
@@ -14714,6 +14718,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
