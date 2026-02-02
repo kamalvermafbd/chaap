@@ -4885,6 +4885,10 @@ if (placeBtn) {
 // STEP-3: Live eligibility on OrderType change
 // ==================================
 async function recheckEligibilityOnOrderTypeChange() {
+    if (window.__COURIER_MODE === true) {
+    console.log("🚚 Courier active — skipping OrderType eligibility check");
+    return;
+  }
   if (window._orderTypeChanging) return;
 
   const ok = await canProceedPlaceOrder();
@@ -4909,6 +4913,7 @@ async function recheckEligibilityOnOrderTypeChange() {
     }
   }
 }
+    
 async function recheckEligibilityOnDispatchModeChange() {
   if (window._orderTypeChanging) return;
 
@@ -14705,6 +14710,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
