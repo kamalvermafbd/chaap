@@ -4485,18 +4485,8 @@ if (pincodeField.readOnly) return;
 });
 
 
-  function onDispatchModeChange() {
+ function onDispatchModeChange() {
   const mode = document.getElementById("dispatchMode")?.value;
-
-  const addressWrapper = document.getElementById("addressWrapper");
-  const pincodeWrapper = document.getElementById("pincodeWrapper");
-  const cityWrapper    = document.getElementById("cityWrapper");
-  const stateWrapper   = document.getElementById("stateWrapper");
-
-  const addressField = document.getElementById("address");
-  const pincodeField = document.getElementById("pincode");
-  const cityField    = document.getElementById("city");
-  const stateField   = document.getElementById("state");
 
   const locRow   = document.getElementById("locationStatusRow");
   const mapBox   = document.getElementById("mapPreviewBox");
@@ -4506,62 +4496,60 @@ if (pincodeField.readOnly) return;
 
   /* ======================================================
    * 🏠 DISPATCH = HOME DELIVERY
-   * 👉 FULL GPS FLOW (GUEST + LOGIN)
+   * 👉 FULL EXISTING FLOW (DATA + GPS)
    * ====================================================== */
   if (mode === "Home Delivery") {
 
-    // 🔴 SAFETY: reset GPS readiness (Courier → HD switch)
+    // 🔴 reset GPS readiness (safety)
     window._deliveryLocationReady = false;
 
-    // 🔁 Reuse existing Home Delivery logic
+    // 🔁 Trick: force orderType so toggleAddressField works
     const orderType = document.getElementById("orderType");
     if (orderType) {
       orderType.value = "Home Delivery";
     }
 
-    toggleAddressField(); // 🔥 single source of truth
+    // 🔥 DATA + LOGIN/GUEST LOGIC COMES FROM HERE
+    toggleAddressField();
+
     return;
   }
 
   /* ======================================================
    * 📦 DISPATCH = COURIER
-   * 👉 ADDRESS ONLY (NO GPS / MAP)
+   * 👉 DATA SAME AS HOME DELIVERY
+   * 👉 BUT GPS / MAP / LAT-LNG DISABLED
    * ====================================================== */
   if (mode === "Courier") {
 
-    // ✅ Show address fields
-    addressWrapper.style.display = "block";
-    pincodeWrapper.style.display = "block";
-    cityWrapper.style.display    = "block";
-    stateWrapper.style.display   = "block";
+    // 🔁 STEP-1: reuse Home Delivery data logic
+    const orderType = document.getElementById("orderType");
+    if (orderType) {
+      orderType.value = "Home Delivery";
+    }
 
-    addressField.required = true;
-    pincodeField.required = true;
-    cityField.required    = true;
-    stateField.required   = true;
+    toggleAddressField(); // ✅ fills data for guest + login
 
-    addressField.readOnly = false;
-    pincodeField.readOnly = false;
-    cityField.readOnly    = false;
-    stateField.readOnly   = false;
-
-    // ❌ HARD DISABLE GPS / MAP
+    // 🔁 STEP-2: HARD OVERRIDE — NO GPS FOR COURIER
     if (locRow) locRow.classList.add("hidden");
     if (mapBox) mapBox.classList.add("hidden");
     if (mapFrame) mapFrame.src = "";
 
-    // ❌ CLEAR GPS STATE COMPLETELY
+    // ❌ clear all GPS state
     window._deliveryLocation = null;
     window._userLat = "";
     window._userLng = "";
-    window._deliveryLocationReady = true; // ⭐ allow order without GPS
 
-    // 🔓 Allow place order (no distance restriction)
+    // ⭐ mark location as NOT REQUIRED
+    window._deliveryLocationReady = true;
+
+    // 🔓 allow place order without distance check
     updatePlaceOrderLockByLocation();
 
     return;
   }
 }
+
 
 function toggleMapByOrderType(orderType) {
   const mapBox = document.getElementById("mapPreviewBox");
@@ -14644,6 +14632,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
