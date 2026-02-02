@@ -2648,6 +2648,25 @@ function apiGet(api, params = {}) {
   }).then(res => res.json());
 }
 
+    
+document.addEventListener("DOMContentLoaded", function () {
+  apiGet("getRestaurantIndustry")
+    .then(res => {
+      if (res && res.success && res.industry) {
+        window.RESTAURANT_INDUSTRY = res.industry;
+        console.log("Industry loaded:", res.industry);
+      } else {
+        window.RESTAURANT_INDUSTRY = "Hotel"; // safe default
+        console.warn("Industry API failed, defaulting to Hotel");
+      }
+    })
+    .catch(err => {
+      window.RESTAURANT_INDUSTRY = "Hotel";
+      console.error("Industry API error:", err);
+    });
+});
+
+
 // ===============================
 // PROMO BANNER OFFER FETCH (SAFE)
 // ===============================
@@ -6681,18 +6700,7 @@ function apiPost(api, data = {}) {
   });
 }
 
-  document.addEventListener("DOMContentLoaded", function () {
-    apiGet("getRestaurantIndustry", function (res) {
-      if (res && res.success && res.industry) {
-        window.RESTAURANT_INDUSTRY = res.industry;
-        console.log("Industry loaded:", res.industry);
-      } else {
-        window.RESTAURANT_INDUSTRY = "Hotel"; // safe default
-        console.warn("Industry API failed, defaulting to Hotel");
-      }
-    });
-  });
-
+  
 function isLoggedIn() {
   return Boolean(localStorage.getItem("userMobile"));
 }
@@ -14528,6 +14536,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
