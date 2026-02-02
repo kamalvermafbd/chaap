@@ -1979,15 +1979,19 @@ body::before {
     Dispatch Mode
   </label>
 
-  <select id="dispatchMode"
-    onchange="onDispatchModeChange()"
+  <select
+    id="dispatchMode"
+    onchange="onDispatchModeChange(); recheckEligibilityOnDispatchModeChange();"
     class="w-full border border-gray-300 rounded-lg p-2.5 bg-white
            focus:outline-none focus:ring-2 focus:ring-orange-500">
+
     <option value="">Select Dispatch Mode</option>
     <option value="Courier">Courier</option>
     <option value="Home Delivery">Home Delivery</option>
+
   </select>
 </div>
+
 
 
       <!-- Name -->
@@ -14728,6 +14732,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
