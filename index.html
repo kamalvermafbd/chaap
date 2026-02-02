@@ -4767,15 +4767,19 @@ if (!window._deliveryLocationReady) {
     paymentError.classList.remove("hidden", "text-red-600");
     paymentError.classList.add("text-green-600");
   };
+window.orderEligibility = null;
+// 🏬 RETAIL MODE: dispatchMode decides delivery, not orderType
+const industry = window.__INDUSTRY; // already set from Restaurant Info
+const dispatchModeNow = document.getElementById("dispatchMode")?.value;
 
- window.orderEligibility = null;
+const isHomeDelivery =
+  industry === "retail"
+    ? dispatchModeNow === "Home Delivery"
+    : document.getElementById("orderType")?.value === "Home Delivery";
 
-
-    const orderTypeNow = document.getElementById("orderType")?.value;
-
-   // 📦 COURIER MODE → skip delivery location requirement
+// 📍 Location required only for REAL Home Delivery
 if (
-  orderTypeNow === "Home Delivery" &&
+  isHomeDelivery &&
   window.__COURIER_MODE !== true &&
   !window._deliveryLocationReady
 ) {
@@ -4787,10 +4791,13 @@ if (
     const amount = Number(window.cartSummary?.itemsSubtotal || 0);
 
     //  GUARD 1
-    if (!orderType) {
-      showError("⚠️ Please select Order Type");
-      return false;
-    }
+    const orderTypeEl = document.getElementById("orderType");
+
+if (!orderType && orderTypeEl) {
+  showError("⚠️ Please select Order Type");
+  return false;
+}
+
     //  GUARD 2
     if (amount <= 0) {
       showError("⚠️ Cart is empty");
@@ -14732,6 +14739,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
