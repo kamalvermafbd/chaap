@@ -4890,6 +4890,25 @@ async function recheckEligibilityOnOrderTypeChange() {
     }
   }
 }
+async function recheckEligibilityOnDispatchModeChange() {
+  if (window._orderTypeChanging) return;
+
+  const ok = await canProceedPlaceOrder();
+
+  if (ok) {
+    await updateCheckoutInvoice();
+
+    // 🔥 force invoice refresh if checkout already open
+    if (window._checkoutInvoice) {
+      renderInvoiceFromAPI({
+        ...window._checkoutInvoice,
+        deliveryCharge: window.orderEligibility?.extraCharge || 0,
+        deliveryChargeLabel:
+          window.orderEligibility?.chargeType || "Delivery Charges"
+      });
+    }
+  }
+}
 
     
 function buildOrderPayloadForDebug() {
@@ -14667,6 +14686,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
