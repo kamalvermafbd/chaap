@@ -7504,6 +7504,14 @@ async function someCartAction() {
   window.deliveryLatLng = null;
   window.isLocationSet = false;
 
+
+   // 🔥 REAL GPS STATE RESET (CRITICAL – DO NOT MOVE)
+window._deliveryLocation = null;
+window._deliveryLocationReady = false;
+window._userLat = null;
+window._userLng = null;
+window._guestLocationPromptShown = false;
+
      // ===============================
   // 🔥 CRITICAL: RESET ADDRESS FLOW FLAGS
   // ===============================
@@ -14866,6 +14874,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
