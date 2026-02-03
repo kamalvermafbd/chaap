@@ -4137,7 +4137,18 @@ console.log("toggleAddressField fired");
 if (!/^[0-9]{10}$/.test(mobile)) return;
 if (!orderType) return;
 
- 
+ // 🔥 HARD RESET when orderType just became available
+if (lastLookupOrderType !== orderType) {
+  window._guestLocationPromptShown = false;
+  lastLookupOrderType = orderType;
+}
+console.log("🧪 ORDER TYPE CHANGE", {
+  industry: window.RESTAURANT_INDUSTRY,
+  orderType,
+  courierMode: window.__COURIER_MODE,
+  lastPrompt: window._guestLocationPromptShown
+});
+
   // --- 2) Base references ---
   const nameField = document.getElementById("customerName");
   const emailField = document.getElementById("email");
@@ -4314,18 +4325,6 @@ if (locRow) locRow.classList.add("hidden");        // ⭐ hide for non-HD
   emailField.readOnly = false;
   addressField.readOnly = false;
 
-  
-// 🚨 HOTEL + GUEST + HOME DELIVERY → FORCE GPS IF LOCATION MISSING
-if (
-  window.RESTAURANT_INDUSTRY === "Hotel" &&
-  orderType === "Home Delivery" &&
-  !window._deliveryLocation &&
-  !window._deliveryLocationReady
-) {
-  console.log("📍 Forcing GPS prompt (Hotel HD, location missing)");
-  window._guestLocationPromptShown = false;
-}
-
 
 // 🔒 Guard ONLY for Retail (Dispatch flow)
 if (
@@ -4350,6 +4349,15 @@ if (
   !window._deliveryLocationReady &&
   !window._guestLocationPromptShown
 ) {
+  console.log("📍 GPS PROMPT SHOWN");
+console.log("🧪 GPS PROMPT CHECK PASSED", {
+  industry: window.RESTAURANT_INDUSTRY,
+  orderType,
+  deliveryReady: window._deliveryLocationReady,
+  guestPromptShown: window._guestLocationPromptShown,
+  courierMode: window.__COURIER_MODE
+});
+
   window._guestLocationPromptShown = true;
 
   const ok = confirm(
@@ -7578,11 +7586,6 @@ else if (window.__INDUSTRY === "retail") {
 if (typeof _lastCheckedMobile !== "undefined") {
   _lastCheckedMobile = null;
 }
-
-console.log("🔁 resetCheckout → retrigger address flow (forced)");
-toggleAddressField();
-
-
    
   // ===============================
   // DEBUG SNAPSHOT
@@ -7594,8 +7597,6 @@ toggleAddressField();
     isLocationSet: window.isLocationSet
   });
 }
-
-
 
 function setupAddressUIVisibility() {
   const changeBtn = document.getElementById("changeAddressBtn");
@@ -7667,8 +7668,6 @@ function autofillMobileForLoggedIn() {
   }
 }
 
-
-
 window.__NEW_ADDRESS_FLOW = false;
 window.__ADDRESS_LOADING = false;
 window.__AUTO_ADDRESS_SELECTED = false;
@@ -7682,7 +7681,6 @@ if (window.__CHANGE_ADDRESS_USED) {
   return;
 }
   
-
   // 🔒 HARD LOCK
   if (window.__ADDRESS_LOADING) {
     console.warn("⛔ onChangeAddressClick already running");
@@ -14874,6 +14872,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
