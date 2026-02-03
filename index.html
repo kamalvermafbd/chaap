@@ -1981,7 +1981,7 @@ body::before {
 
   <select
     id="dispatchMode"
-    onchange="onDispatchModeChange(); recheckEligibilityOnDispatchModeChange();"
+    onchange="onDispatchModeChange();"
     class="w-full border border-gray-300 rounded-lg p-2.5 bg-white
            focus:outline-none focus:ring-2 focus:ring-orange-500">
 
@@ -4535,7 +4535,13 @@ if (pincodeField.readOnly) return;
 window.__COURIER_MODE = false;
 
  function onDispatchModeChange() {
-   window.__CHECKOUT_SNAPSHOT = null;
+  // 🔥🔥🔥 RETAIL HARD RESET — allow eligibility + overlay again
+window.__CHECKOUT_SNAPSHOT = null;
+window._checkoutInvoice = null;
+
+const overlay = document.getElementById("invoiceProcessingOverlay");
+if (overlay) overlay.classList.add("hidden");
+
   const mode = document.getElementById("dispatchMode")?.value;
 
   const locRow   = document.getElementById("locationStatusRow");
@@ -14824,6 +14830,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
