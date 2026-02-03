@@ -4506,6 +4506,32 @@ if (pincodeField.readOnly) return;
   }
 });
 
+
+
+    function resetLocationForDispatchChange() {
+  // Address & location reset
+  document.getElementById("address").value = "";
+  window.selectedLocation = null;
+  window.deliveryLatLng = null;
+  window.isLocationSet = false;
+
+  // Address flow flags
+  window.__MANUAL_ADDRESS_SELECTED = false;
+  window.__AUTO_ADDRESS_SELECTED   = false;
+  window.__ADDRESS_LOADING         = false;
+  window.__NEW_ADDRESS_FLOW        = false;
+
+  window._eligibilityRunning = false;
+  window.orderEligibility = null;
+  window.__CHECKOUT_SNAPSHOT = null;
+
+  // Hide location UI
+  document.getElementById("locationStatusRow").classList.add("hidden");
+  document.getElementById("mapPreviewBox").classList.add("hidden");
+  document.getElementById("mapPreviewFrame").src = "";
+}
+
+    
 window.__COURIER_MODE = false;
 
  function onDispatchModeChange() {
@@ -4516,7 +4542,10 @@ window.__COURIER_MODE = false;
   const mapFrame = document.getElementById("mapPreviewFrame");
 
   console.log("🚚 Dispatch mode selected:", mode);
-
+ // 🔄 COMMON: reset location whenever dispatch mode changes
+  if (typeof resetLocationForDispatchChange === "function") {
+    resetLocationForDispatchChange();
+  }
   /* ======================================================
    * 🏠 DISPATCH = HOME DELIVERY
    * 👉 FULL EXISTING FLOW (DATA + GPS)
@@ -7454,18 +7483,35 @@ if (btn) {
 }
 
   // ===============================
-  // ORDER TYPE RESET (DIFFERENT VISIBILITY)
-  // ===============================
-  const ot = document.getElementById("orderType");
-  ot.value = "";
+// ORDER TYPE / DISPATCH MODE RESET (DIFFERENT VISIBILITY)
+// ===============================
+const ot = document.getElementById("orderType");
+const dm = document.getElementById("dispatchMode");
 
-  if (isUserLoggedIn()) {
-    // 🔐 Logged-in → show order type
-    ot.parentElement.style.display = "block";
-  } else {
-    // 👤 Guest → hide order type
+// value reset
+if (ot) ot.value = "";
+if (dm) dm.value = "";
+
+// industry based visibility
+if (window.__INDUSTRY === "hotel") {
+  // Hotel → orderType
+  if (ot) {
+    ot.parentElement.style.display = isUserLoggedIn() ? "block" : "none";
+  }
+  if (dm) {
+    dm.parentElement.style.display = "none";
+  }
+} 
+else if (window.__INDUSTRY === "retail") {
+  // Retail → dispatchMode
+  if (dm) {
+    dm.parentElement.style.display = isUserLoggedIn() ? "block" : "none";
+  }
+  if (ot) {
     ot.parentElement.style.display = "none";
   }
+}
+
 
   // ===============================
   // HIDE LOCATION UI
@@ -14767,6 +14813,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
