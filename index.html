@@ -4539,6 +4539,17 @@ if (pincodeField.readOnly) return;
   document.getElementById("mapPreviewBox").classList.add("hidden");
   document.getElementById("mapPreviewFrame").src = "";
 }
+    
+function toggleAddressForDispatch() {
+  const orderType = document.getElementById("orderType");
+  if (!orderType) return;
+
+  // 🔥 FORCE RESET internal guards (Retail flow only)
+  window._orderTypeChanging = false;
+  window._lastPromptOrderType = null;
+
+  toggleAddressField();
+}
 
     
 window.__COURIER_MODE = false;
@@ -4577,7 +4588,8 @@ if (mode === "Home Delivery") {
     orderType.value = "Home Delivery";
   }
 
-  toggleAddressField();
+  toggleAddressForDispatch();
+
 
   // 🔒 lock place order until location is set again
   updatePlaceOrderLockByLocation();
@@ -4607,7 +4619,8 @@ window.__COURIER_MODE = true;
     }
 
     // 🔥 fills name/email/address for guest + login
-    toggleAddressField();
+toggleAddressForDispatch();
+
 // 🔑 Retail master trigger — eligibility via dispatch mode
 if (typeof recheckEligibilityOnDispatchModeChange === "function") {
   recheckEligibilityOnDispatchModeChange();
@@ -14839,6 +14852,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
