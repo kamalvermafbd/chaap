@@ -7481,18 +7481,34 @@ if (btn) {
 }
 
  // ===============================
-  // ORDER TYPE RESET (DIFFERENT VISIBILITY)
-  // ===============================
-  const ot = document.getElementById("orderType");
-  ot.value = "";
+// ORDER TYPE / DISPATCH MODE RESET (DIFFERENT VISIBILITY)
+// ===============================
+const ot = document.getElementById("orderType");
+const dm = document.getElementById("dispatchMode");
 
-  if (isUserLoggedIn()) {
-    // 🔐 Logged-in → show order type
-    ot.parentElement.style.display = "block";
-  } else {
-    // 👤 Guest → hide order type
+// value reset
+if (ot) ot.value = "";
+if (dm) dm.value = "";
+
+// industry based visibility
+if (window.__INDUSTRY === "hotel") {
+  // Hotel → orderType
+  if (ot) {
+    ot.parentElement.style.display = isUserLoggedIn() ? "block" : "none";
+  }
+  if (dm) {
+    dm.parentElement.style.display = "none";
+  }
+} 
+else if (window.__INDUSTRY === "retail") {
+  // Retail → dispatchMode
+  if (dm) {
+    dm.parentElement.style.display = isUserLoggedIn() ? "block" : "none";
+  }
+  if (ot) {
     ot.parentElement.style.display = "none";
   }
+}
 
 
 
@@ -14796,6 +14812,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
