@@ -4259,9 +4259,7 @@ row.dataset.autoChecked = "1";
         txt.innerText  = dist.error || 
           `Outside delivery radius (${dist.distanceKm} km, limit ${dist.radiusKm} km)`;
         row.dataset.autoChecked = "1";
-
       }
-
       updatePlaceOrderLockByLocation();
     })
     .catch(err => {
@@ -4271,7 +4269,6 @@ row.dataset.autoChecked = "1";
         }
       })
       .finally(() => {
-
         // UI rules based on order type
         if (orderType === "Home Delivery") {
           // Address + 3 other fields visible
@@ -4280,14 +4277,11 @@ row.dataset.autoChecked = "1";
           cityWrapper.style.display    = "block";
           stateWrapper.style.display   = "block";
           changeBtn?.classList.remove("hidden");
-
           // 🔒 IMPORTANT: force keep disabled
 changeBtn.disabled = true;
 changeBtn.classList.add("opacity-50", "cursor-not-allowed");
-          
  const locRow = document.getElementById("locationStatusRow");
-  if (locRow) locRow.classList.remove("hidden");   //  FIX
-          
+  if (locRow) locRow.classList.remove("hidden");   //  FIX  
           addressField.required = true;
           updatePlaceOrderLockByLocation();
         } else {
@@ -7562,8 +7556,6 @@ else if (window.__INDUSTRY === "retail") {
   }
 }
 
-
-
   // ===============================
   // HIDE LOCATION UI
   // ===============================
@@ -7578,6 +7570,9 @@ else if (window.__INDUSTRY === "retail") {
 if (typeof _lastCheckedMobile !== "undefined") {
   _lastCheckedMobile = null;
 }
+
+console.log("🔁 resetCheckout → retrigger address flow (forced)");
+toggleAddressField();
 
 
    
@@ -14871,6 +14866,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
