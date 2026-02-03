@@ -4319,9 +4319,14 @@ if (locRow) locRow.classList.add("hidden");        // ⭐ hide for non-HD
   nameField.readOnly = false;
   emailField.readOnly = false;
   addressField.readOnly = false;
-if (window._lastPromptOrderType === orderType) {
+// 🔒 Guard ONLY for Retail (Dispatch flow)
+if (
+  window.RESTAURANT_INDUSTRY === "Retail" &&
+  window._lastPromptOrderType === orderType
+) {
   return; // overlay already handled earlier
 }
+
 
   window._lastPromptOrderType = orderType;
   
@@ -14852,6 +14857,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
