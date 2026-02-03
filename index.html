@@ -4543,9 +4543,7 @@ window.__COURIER_MODE = false;
 
   console.log("🚚 Dispatch mode selected:", mode);
  // 🔄 COMMON: reset location whenever dispatch mode changes
-  if (typeof resetLocationForDispatchChange === "function") {
-    resetLocationForDispatchChange();
-  }
+
   /* ======================================================
    * 🏠 DISPATCH = HOME DELIVERY
    * 👉 FULL EXISTING FLOW (DATA + GPS)
@@ -14813,6 +14811,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
