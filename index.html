@@ -4319,6 +4319,16 @@ if (locRow) locRow.classList.add("hidden");        // ⭐ hide for non-HD
   nameField.readOnly = false;
   emailField.readOnly = false;
   addressField.readOnly = false;
+
+  // 🔥 Hotel fix: allow GPS prompt when coming from non-HD → HD
+if (
+  window.RESTAURANT_INDUSTRY === "Hotel" &&
+  orderType === "Home Delivery"
+) {
+  window._lastPromptOrderType = null;
+  window._guestLocationPromptShown = false;
+}
+
 // 🔒 Guard ONLY for Retail (Dispatch flow)
 if (
   window.RESTAURANT_INDUSTRY === "Retail" &&
@@ -14857,6 +14867,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
