@@ -4130,7 +4130,6 @@ setTimeout(() => {
 }, 0);
 
 console.log("toggleAddressField fired");
-
   const mobile = document.getElementById("mobile").value.trim();
   const orderType = document.getElementById("orderType").value;
 
@@ -4176,8 +4175,6 @@ console.log("🧪 ORDER TYPE CHANGE", {
   emailField.closest("div").style.display = "block";
   paymentField.style.display = "block";
 console.log("toggleAddressField reached");
-
-
   // ==========================================================
   //                LOGGED-IN USER LOGIC
   // ==========================================================
@@ -4187,8 +4184,7 @@ console.log("toggleAddressField reached");
   if (window.__MANUAL_ADDRESS_SELECTED === true) {
     console.warn("🛑 toggleAddressField blocked (manual address active)");
     return;
-  }
-    
+  }    
 overlay.style.display = "flex";
   orderSelect.disabled = true;
     nameField.readOnly = true;
@@ -4201,7 +4197,6 @@ if (window.__MANUAL_ADDRESS_SELECTED === true) {
   orderSelect.disabled = false;
   return;
 }
-
     // Fetch everything from USER SHEET
     apiGet("getUserProfile", { mobile })
       .then(res => {
@@ -4222,7 +4217,6 @@ if (res.lat && res.lng) {
   window._userLat = Number(res.lat);
   window._userLng = Number(res.lng);
   window._deliveryLocationReady = true;
-
   const mapBox = document.getElementById("mapPreviewBox");
   const mapFrame = document.getElementById("mapPreviewFrame");
 
@@ -4233,7 +4227,6 @@ if (res.lat && res.lng) {
 } else {
   window._deliveryLocationReady = false;
 }
-
 // 🔥 If location already exists in user sheet, auto-validate it
 if (res.lat && res.lng) {
   apiPost("checkDeliveryDistance", { mobile,lat: window._deliveryLocation?.lat,
@@ -4250,7 +4243,6 @@ if (res.lat && res.lng) {
       if (dist.success && dist.allowed === true) {
         // user is inside delivery radius
         window._deliveryLocationReady = true;
-
         row.classList.remove("border-red-400", "bg-red-50", "text-red-700");
         row.classList.add("border-green-400", "bg-green-50", "text-green-700");
         icon.innerText = "📍";
@@ -4319,28 +4311,13 @@ if (locRow) locRow.classList.add("hidden");        // ⭐ hide for non-HD
   // ==========================================================
   //                GUEST USER LOGIC (UNTOUCHED)
   // ==========================================================
-  
-
   nameField.readOnly = false;
   emailField.readOnly = false;
   addressField.readOnly = false;
-
-
-// 🔒 Guard ONLY for Retail (Dispatch flow)
-if (
-  window.RESTAURANT_INDUSTRY === "Retail" &&
-  window._lastPromptOrderType === orderType
-) {
-  return; // overlay already handled earlier
-}
-
-
-  window._lastPromptOrderType = orderType;
-  
+ 
 if (orderType !== "Home Delivery") {
   window._guestLocationPromptShown = false;
 }
-
   // 👤 Guest + Home Delivery → ask location ONCE
 if (
   !isLoggedIn() &&
@@ -4365,7 +4342,15 @@ console.log("🧪 GPS PROMPT CHECK PASSED", {
   );
   if (ok) captureDeliveryLocation();
 }
-
+// 🔒 Guard ONLY for Retail (Dispatch flow)
+if (
+  window.RESTAURANT_INDUSTRY === "Retail" &&
+  window._lastPromptOrderType === orderType
+) {
+  return; // overlay already handled earlier
+}
+ window._lastPromptOrderType = orderType;
+  
   if (addressLookupRunning) return;
 addressLookupRunning = true;
 
@@ -4399,8 +4384,6 @@ if (orderType === "Home Delivery") {
   if (!window.__COURIER_MODE && locRow) {
     locRow.classList.remove("hidden");
   }
-
-
   // 👤 Guest + Home Delivery → ask for location update (once)
   addressField.required = true;
   addressField.readOnly = false;
@@ -4535,8 +4518,6 @@ if (pincodeField.readOnly) return;
     onCheckoutPincodeChange();
   }
 });
-
-
 
     function resetLocationForDispatchChange() {
   // Address & location reset
@@ -14872,6 +14853,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
