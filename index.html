@@ -7521,7 +7521,14 @@ else if (window.__INDUSTRY === "retail") {
   mapBox.classList.add("hidden");
 
   document.getElementById("mapPreviewFrame").src = "";
+// 🔴🔴🔴 CRITICAL FIX: RESET MOBILE CHECK GUARD ON CHECKOUT OPEN
+// Agar ye reset nahi hua to 10 digit hone pe dispatch/order type dobara show nahi hoga
+if (typeof _lastCheckedMobile !== "undefined") {
+  _lastCheckedMobile = null;
+}
 
+
+   
   // ===============================
   // DEBUG SNAPSHOT
   // ===============================
@@ -14812,6 +14819,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
