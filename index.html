@@ -4592,6 +4592,10 @@ window.__COURIER_MODE = true;
 
     // 🔥 fills name/email/address for guest + login
     toggleAddressField();
+// 🔑 Retail master trigger — eligibility via dispatch mode
+if (typeof recheckEligibilityOnDispatchModeChange === "function") {
+  recheckEligibilityOnDispatchModeChange();
+}
 
     // ❌ REMOVE MAP / LOCATION UI
     if (locRow) locRow.classList.add("hidden");
@@ -14819,6 +14823,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
