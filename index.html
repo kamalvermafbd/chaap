@@ -4094,6 +4094,15 @@ if (window.RESTAURANT_INDUSTRY === "Retail") {
 if (dispatchBox) dispatchBox.style.display = "none";
 if (orderTypeBox) orderTypeBox.style.display = "block";
 
+// 🔴 Retail guard: do NOT run preview / eligibility before dispatch selection
+if (window.RESTAURANT_INDUSTRY === "Retail") {
+  console.log("⏸️ Retail: skipping invoice preview until dispatch mode is selected");
+  return;
+}
+
+// 🟢 Hotel only
+syncCouponFromDrawerForCheckout();
+updateCheckoutInvoice();
 
   // 🔁 ensure checkout reflects new mobile context
   syncCouponFromDrawerForCheckout();
@@ -14830,6 +14839,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
