@@ -4535,6 +4535,7 @@ if (pincodeField.readOnly) return;
 window.__COURIER_MODE = false;
 
  function onDispatchModeChange() {
+   window.__CHECKOUT_SNAPSHOT = null;
   const mode = document.getElementById("dispatchMode")?.value;
 
   const locRow   = document.getElementById("locationStatusRow");
@@ -14823,6 +14824,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
