@@ -4136,11 +4136,25 @@ console.log("toggleAddressField fired");
 if (!/^[0-9]{10}$/.test(mobile)) return;
 if (!orderType) return;
 
- // 🔥 HARD RESET when orderType just became available
+
+// 🔥 HARD RESET when orderType just became available
 if (lastLookupOrderType !== orderType) {
   window._guestLocationPromptShown = false;
+
+  // 🔐 FORCE GPS RESET ONLY FOR HOTEL + GUEST + HOME DELIVERY
+  if (
+    window.RESTAURANT_INDUSTRY === "Hotel" &&
+    !isLoggedIn() &&
+    orderType === "Home Delivery"
+  ) {
+    console.log("🔁 FORCE GPS RESET (Hotel Guest HD)");
+    window._deliveryLocationReady = false;
+    window._deliveryLocation = null;
+  }
+
   lastLookupOrderType = orderType;
 }
+
 console.log("🧪 ORDER TYPE CHANGE", {
   industry: window.RESTAURANT_INDUSTRY,
   orderType,
@@ -14853,6 +14867,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
