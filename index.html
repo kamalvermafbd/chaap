@@ -13284,6 +13284,9 @@ if (
 
 function buildCheckoutPreviewInv() {
 console.log("🚚 ELIGIBILITY USED:", window.orderEligibility);
+console.log("🧾 [INVOICE] Raw cart items (before filter):",
+  JSON.parse(JSON.stringify(window.cartSummary?.items || []))
+);
 
   // 🔒 SINGLE SOURCE OF TRUTH (drawer cart snapshot for amounts only)
   const s = window.cartSummary || {};
@@ -13300,7 +13303,6 @@ const invoiceItems = getInvoiceVisibleItems(rawItems);
      BASE & COUPONS
   ====================== */
 // 🔥 Recalculate base from invoice-visible items only
-// 🔥 Recalculate base from invoice-visible items only
 const calculatedBase = invoiceItems.reduce((sum, item) => {
   const rate = Number(item.rate || 0);
   const qty  = Number(item.qty || 0);
@@ -13311,7 +13313,13 @@ const calculatedBase = invoiceItems.reduce((sum, item) => {
 
   return sum + (netRate * qty);
 }, 0);
+  
+console.log("🧾 [INVOICE] Invoice-visible items (after filter):",
+  JSON.parse(JSON.stringify(invoiceItems))
+);
 
+
+  
 // 🔒 ROUND FINAL BASE (currency-safe)
 const base = Number(calculatedBase.toFixed(2));
   
@@ -14634,15 +14642,29 @@ function invalidateAppliedCoupon(reason = "") {
 }
 
 function renderInvoiceNotesFromCart(cartItems = []) {
+  console.log(
+    "⚠️ [INVOICE NOTES] renderInvoiceNotesFromCart called with items:",
+    JSON.parse(JSON.stringify(cartItems))
+  );
+
   const { cancelled, holded } = getInvoiceNotes(cartItems);
+
+  console.log("❌ [INVOICE NOTES] Cancelled items:", cancelled);
+  console.log("⏸️ [INVOICE NOTES] Hold items:", holded);
+
   const box = document.getElementById("invWarnings");
-  if (!box) return;
+  if (!box) {
+    console.warn("⚠️ [INVOICE NOTES] invWarnings container not found");
+    return;
+  }
 
   if (!cancelled.length && !holded.length) {
+    console.log("✅ [INVOICE NOTES] No cancelled or hold items, hiding warnings");
     box.classList.add("hidden");
     return;
   }
 
+  console.log("⚠️ [INVOICE NOTES] Rendering warning messages");
   box.classList.remove("hidden");
 
   let html = `<div class="font-semibold text-red-600 mb-1">Important Notice</div>`;
@@ -14662,6 +14684,8 @@ function renderInvoiceNotesFromCart(cartItems = []) {
   });
 
   box.innerHTML = html;
+
+  console.log("✅ [INVOICE NOTES] Warning HTML injected");
 }
 
   
@@ -14679,21 +14703,36 @@ function getInvoiceNotes(cartItems = []) {
 
   return { cancelled, holded };
 }
- 
-async function handleCheckoutClick_LOGIN() {
+  async function handleCheckoutClick_LOGIN() {
   const mobile = localStorage.getItem("userMobile");
-  if (!mobile) return;
+  console.log("🛒 [CHECKOUT] LOGIN pre-check started", { mobile });
+
+  if (!mobile) {
+    console.warn("⚠️ [CHECKOUT] No mobile found, skipping backend sync");
+    return;
+  }
 
   try {
-    // ✅ ONLY THIS — sync flags, no mutation
-    await fetch(API_BASE + "?api=updateCartHoldCancelByMobile", {
+    console.log("🔄 [CHECKOUT] Calling updateCartHoldCancelByMobile API");
+
+    const res = await fetch(API_BASE + "?api=updateCartHoldCancelByMobile", {
       method: "POST",
       body: JSON.stringify({ mobile })
-    });
+    }).then(r => r.json());
+
+    console.log("✅ [CHECKOUT] Backend cart flag sync response:", res);
+
+    // 🔍 Log current frontend cart state
+    console.log(
+      "🧩 [CHECKOUT] Frontend cartSummary BEFORE invoice filter:",
+      JSON.parse(JSON.stringify(window.cartSummary?.items || []))
+    );
+
   } catch (err) {
-    console.error("❌ Cart flag sync failed", err);
+    console.error("❌ [CHECKOUT] Cart flag sync failed", err);
   }
 }
+
 
 async function validateAppliedCouponForMobile(mobile) {
   console.log("🧪 validateAppliedCouponForMobile HIT", mobile);
@@ -15010,6 +15049,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
