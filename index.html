@@ -13288,6 +13288,9 @@ console.log("🚚 ELIGIBILITY USED:", window.orderEligibility);
   // 🔒 SINGLE SOURCE OF TRUTH (drawer cart snapshot for amounts only)
   const s = window.cartSummary || {};
   const d = window._drawerTotals || {};
+// 🔥 FILTER items for invoice (hide cancel / hold)
+const rawItems = s.items || [];
+const invoiceItems = getInvoiceVisibleItems(rawItems);
 
   const orderType = document.getElementById("orderType")?.value || "";
   const eligibility = window.orderEligibility || {};
@@ -13296,8 +13299,22 @@ console.log("🚚 ELIGIBILITY USED:", window.orderEligibility);
   /* ======================
      BASE & COUPONS
   ====================== */
-const base = Number(d.baseTotal || 0);
+// 🔥 Recalculate base from invoice-visible items only
+// 🔥 Recalculate base from invoice-visible items only
+const calculatedBase = invoiceItems.reduce((sum, item) => {
+  const rate = Number(item.rate || 0);
+  const qty  = Number(item.qty || 0);
+  const disc = Number(item.discPercent || 0);
 
+  const discAmt = (rate * disc) / 100;
+  const netRate = rate - discAmt;
+
+  return sum + (netRate * qty);
+}, 0);
+
+// 🔒 ROUND FINAL BASE (currency-safe)
+const base = Number(calculatedBase.toFixed(2));
+  
 const normalCoupon =
   selectedCoupon?.type === "normal"
     ? Number(s.couponAmount || selectedCoupon.flat || 0)
@@ -13395,7 +13412,8 @@ const billAmount = gstBase + taxTotal;
     address: document.getElementById("address")?.value || "",
 
     // ===== ITEMS =====
-    items: s.items || [],
+   items: invoiceItems,
+
 
     // ===== TOTALS =====
     baseTotal: base,
@@ -13559,6 +13577,9 @@ function unlockCheckout() {
    console.log("🧪 PREVIEW", buildCheckoutPreviewInv());
    
   renderInvoiceFromAPI(inv);
+   // 🔥 HIDE cancel / hold items from invoice + show notes
+renderInvoiceNotesFromCart(window.cartSummary?.items || []);
+
 document.getElementById("checkoutInvoiceOverlay")?.classList.add("hidden");
 
   // 🔒 SINGLE CONTROL POINT
@@ -14989,6 +15010,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
