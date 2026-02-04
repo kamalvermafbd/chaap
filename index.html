@@ -4567,6 +4567,23 @@ function toggleAddressForDispatch() {
   toggleAddressField();
 }
 
+function updateCartWeightByMobileAPI() {
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) return;
+
+  fetch(API_BASE + "?api=updateCartWeightByMobile", {
+    method: "POST",
+    body: JSON.stringify({
+      mobile: mobile
+    })
+  })
+  .then(r => r.json())
+  .then(d => console.log("⚖️ cart weight updated (courier):", d))
+  .catch(err => console.error("❌ cart weight api error:", err));
+}
+
+
+
     
 window.__COURIER_MODE = false;
 
@@ -4658,6 +4675,10 @@ updatePlaceOrderLockByLocation();
 // 🔑 FINAL ELIGIBILITY CHECK
 canProceedPlaceOrder();
 
+    
+  // ✅✅✅ NEW: UPDATE CART WEIGHT IN BACKEND
+  updateCartWeightByMobileAPI();
+    
     // 🔒 FINAL OVERRIDE — Courier must NEVER show location/map
 setTimeout(() => {
   const locRow = document.getElementById("locationStatusRow");
@@ -14893,6 +14914,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
