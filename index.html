@@ -8263,9 +8263,11 @@ function updateCartBadge() {
 
 async function openCheckout() {
 
-   if (isLoggedIn()) {
-    await handleCheckoutClick_LOGIN();
-  }
+ if (isLoggedIn()) {
+  await handleCheckoutClick_LOGIN(); // existing
+  await syncCancelHoldFromScanAPI(); // 🔥 NEW
+}
+
   // 🛑 NEW GUARD: wait until offers are fully applied
 if (!window._offersReady) {
   alert("⏳ Applying best offers… please wait a moment.");
@@ -14703,6 +14705,32 @@ function getInvoiceNotes(cartItems = []) {
 
   return { cancelled, holded };
 }
+async function syncCancelHoldFromScanAPI() {
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) return;
+
+  const res = await fetch(
+    API_BASE + "?api=scanCancelledCartItemsByMobile&mobile=" + mobile
+  ).then(r => r.json());
+
+  if (!res?.success) return;
+
+  const flagged = res.items || [];
+
+  // 🔁 Merge flags into existing cartSummary
+  window.cartSummary.items = (window.cartSummary.items || []).map(item => {
+    const match = flagged.find(f => f.cartId === item.cartId);
+    if (match) {
+      item.hold = match.hold;
+      item.Cancel = match.Cancel;
+    }
+    return item;
+  });
+
+  console.log("✅ Cart flags merged from scan API", window.cartSummary.items);
+}
+
+      
   async function handleCheckoutClick_LOGIN() {
   const mobile = localStorage.getItem("userMobile");
   console.log("🛒 [CHECKOUT] LOGIN pre-check started", { mobile });
@@ -15000,6 +15028,12 @@ window._guestCouponAllowed = (result && result.used === false);
       <!-- items injected by JS -->
     </div>
 
+<!-- ⚠️ Cancel / Hold Notes -->
+<div
+  id="invWarnings"
+  class="hidden mb-2 space-y-1 text-xs text-red-600">
+</div>
+  
     <hr class="my-2">
 
     <!-- TOTALS -->
@@ -15049,26 +15083,6 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
