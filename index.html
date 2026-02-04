@@ -14713,24 +14713,32 @@ async function syncCancelHoldFromScanAPI() {
     API_BASE + "?api=scanCancelledCartItemsByMobile&mobile=" + mobile
   ).then(r => r.json());
 
-  if (!res?.success) return;
+  if (!res?.success || !Array.isArray(res.items)) return;
 
-  const flagged = res.items || [];
+  const flagged = res.items;
 
   // 🔁 Merge flags into existing cartSummary
   window.cartSummary.items = (window.cartSummary.items || []).map(item => {
-    const match = flagged.find(f => f.cartId === item.cartId);
+    const match = flagged.find(f =>
+      String(f.itemId) === String(item.itemId) &&
+      String(f.variantId || "") === String(item.variantId || "") &&
+      String(f.unit || "") === String(item.unit || "")
+    );
+
     if (match) {
-      item.hold = match.hold;
-      item.Cancel = match.Cancel;
+      if (match.hold)   item.hold   = match.hold;
+      if (match.Cancel) item.Cancel = match.Cancel;
     }
+
     return item;
   });
 
-  console.log("✅ Cart flags merged from scan API", window.cartSummary.items);
+  console.log(
+    "✅ Cart flags merged from scan API (FINAL)",
+    JSON.parse(JSON.stringify(window.cartSummary.items))
+  );
 }
 
-      
   async function handleCheckoutClick_LOGIN() {
   const mobile = localStorage.getItem("userMobile");
   console.log("🛒 [CHECKOUT] LOGIN pre-check started", { mobile });
@@ -15083,6 +15091,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
