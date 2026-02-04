@@ -7455,11 +7455,7 @@ async function someCartAction() {
   
  function resetCheckoutFieldsDefault() {
   console.log("🧪 openCheckout → resetCheckoutFieldsDefault FIRED");
-// 🔒 HARD RESET (like guest <10 digit)
-const _otBox = document.getElementById("orderTypeWrapper");
-const _dmBox = document.getElementById("dispatchModeWrapper");
-if (_otBox) _otBox.style.display = "none";
-if (_dmBox) _dmBox.style.display = "none";
+
 
   // ===============================
   // BASIC VISIBILITY
@@ -7596,11 +7592,6 @@ if (isUserLoggedIn()) {
     if (dispatchBox)  dispatchBox.style.display  = "block";
     if (orderTypeBox) orderTypeBox.style.display  = "none";
   }
-}
-// 🔥 FINAL FORCE: Retail login me OrderType kabhi dikhna hi nahi chahiye
-if (isUserLoggedIn() && window.__INDUSTRY === "retail") {
-  const orderTypeBox = document.getElementById("orderTypeWrapper");
-  if (orderTypeBox) orderTypeBox.style.display = "none";
 }
 
   // ===============================
@@ -14902,6 +14893,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
