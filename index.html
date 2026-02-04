@@ -8263,17 +8263,6 @@ function updateCartBadge() {
 
 async function openCheckout() {
 
-    // 🔥 LOGIN USER → sanitize cart BEFORE checkout snapshot
-  if (isLoggedIn()) {
-    try {
-      await handleCheckoutClick_LOGIN();
-    } catch (e) {
-      console.error("❌ Checkout pre-clean failed", e);
-      alert("Please try checkout again.");
-      return;
-    }
-  }
-
   // 🛑 NEW GUARD: wait until offers are fully applied
 if (!window._offersReady) {
   alert("⏳ Applying best offers… please wait a moment.");
@@ -15022,6 +15011,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
