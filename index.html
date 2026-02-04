@@ -7455,6 +7455,11 @@ async function someCartAction() {
   
  function resetCheckoutFieldsDefault() {
   console.log("🧪 openCheckout → resetCheckoutFieldsDefault FIRED");
+// 🔒 HARD RESET (like guest <10 digit)
+const _otBox = document.getElementById("orderTypeWrapper");
+const _dmBox = document.getElementById("dispatchModeWrapper");
+if (_otBox) _otBox.style.display = "none";
+if (_dmBox) _dmBox.style.display = "none";
 
   // ===============================
   // BASIC VISIBILITY
@@ -7567,9 +7572,6 @@ else if (window.__INDUSTRY === "retail") {
   }
 }
 
-   // ===============================
-// 🔥 EXTENSION: LOGIN USER INDUSTRY DROPDOWN (DO NOT TOUCH EXISTING LOGIC)
-// ===============================
 // ===============================
 // 🔥 EXTENSION: LOGIN USER INDUSTRY DROPDOWN (DO NOT TOUCH EXISTING LOGIC)
 // ===============================
@@ -7601,7 +7603,6 @@ if (isUserLoggedIn() && window.__INDUSTRY === "retail") {
   if (orderTypeBox) orderTypeBox.style.display = "none";
 }
 
-
   // ===============================
   // HIDE LOCATION UI
   // ===============================
@@ -7616,7 +7617,6 @@ if (isUserLoggedIn() && window.__INDUSTRY === "retail") {
 if (typeof _lastCheckedMobile !== "undefined") {
   _lastCheckedMobile = null;
 }
-   
   // ===============================
   // DEBUG SNAPSHOT
   // ===============================
@@ -14902,6 +14902,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
