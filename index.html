@@ -8263,6 +8263,9 @@ function updateCartBadge() {
 
 async function openCheckout() {
 
+   if (isLoggedIn()) {
+    await handleCheckoutClick_LOGIN();
+  }
   // 🛑 NEW GUARD: wait until offers are fully applied
 if (!window._offersReady) {
   alert("⏳ Applying best offers… please wait a moment.");
@@ -14595,106 +14598,81 @@ function invalidateAppliedCoupon(reason = "") {
   }
 }
 
+  function isFlagTrue(val) {
+  if (val === true) return true;
+  const v = String(val || "").trim().toLowerCase();
+  return v === "yes" || v === "true" || v === "y";
+}
+
+ function getInvoiceVisibleItems(cartItems = []) {
+  return cartItems.filter(item => {
+    const isCancel = isFlagTrue(item.Cancel);
+    const isHold   = isFlagTrue(item.hold) || isFlagTrue(item.hold1);
+    return !isCancel && !isHold;
+  });
+}
+
+function renderInvoiceNotesFromCart(cartItems = []) {
+  const { cancelled, holded } = getInvoiceNotes(cartItems);
+  const box = document.getElementById("invWarnings");
+  if (!box) return;
+
+  if (!cancelled.length && !holded.length) {
+    box.classList.add("hidden");
+    return;
+  }
+
+  box.classList.remove("hidden");
+
+  let html = `<div class="font-semibold text-red-600 mb-1">Important Notice</div>`;
+
+  cancelled.forEach(i => {
+    html += `
+      <div class="text-sm text-gray-700">
+        ❌ ${i.name} (${i.unit}) has been discontinued and removed from this order
+      </div>`;
+  });
+
+  holded.forEach(i => {
+    html += `
+      <div class="text-sm text-gray-700">
+        ⏸️ ${i.name} (${i.unit}) is currently unavailable and kept in your cart for later
+      </div>`;
+  });
+
+  box.innerHTML = html;
+}
+
+  
+function getInvoiceNotes(cartItems = []) {
+  const cancelled = [];
+  const holded = [];
+
+  cartItems.forEach(item => {
+    if (isFlagTrue(item.Cancel)) {
+      cancelled.push(item);
+    } else if (isFlagTrue(item.hold) || isFlagTrue(item.hold1)) {
+      holded.push(item);
+    }
+  });
+
+  return { cancelled, holded };
+}
+ 
 async function handleCheckoutClick_LOGIN() {
   const mobile = localStorage.getItem("userMobile");
   if (!mobile) return;
 
   try {
-    // 1️⃣ Sync latest hold / cancel flags
+    // ✅ ONLY THIS — sync flags, no mutation
     await fetch(API_BASE + "?api=updateCartHoldCancelByMobile", {
       method: "POST",
       body: JSON.stringify({ mobile })
     });
-
-    // 2️⃣ Scan cancelled items (SNAPSHOT for notes)
-    const scanRes = await fetch(
-      API_BASE + "?api=scanCancelledCartItemsByMobile",
-      {
-        method: "POST",
-        body: JSON.stringify({ mobile })
-      }
-    ).then(r => r.json());
-
-    // store snapshot for invoice notes
-    window._cancelledAtCheckout = scanRes.cancelledItems || [];
-
-    // 3️⃣ Delete cancelled items from backend cart
-    await fetch(
-      API_BASE + "?api=deleteCancelledCartItemsByMobile",
-      {
-        method: "POST",
-        body: JSON.stringify({ mobile })
-      }
-    );
-
-    // 4️⃣ 🔥🔥🔥 FORCE DRAWER CART REFRESH
-    await forceReloadDrawerCart_LOGIN();
-
-   
   } catch (err) {
-    console.error("❌ Checkout flow error:", err);
-    alert("Something went wrong while preparing checkout. Please try again.");
+    console.error("❌ Cart flag sync failed", err);
   }
 }
-async function forceReloadDrawerCart_LOGIN() {
-  console.log("🔄 Forcing drawer cart reload from backend...");
-
-  // A️⃣ Clear frontend cart state (IMPORTANT)
-  window.cartSummary = null;
-  window._drawerTotals = null;
-  window._checkoutInvoice = null;
-
-  // optional: if you mirror cart in localStorage
-  localStorage.removeItem("cart");
-  localStorage.removeItem("cartSummary");
-
-  // B️⃣ Fetch fresh cart from backend (existing API)
-  const cartRes = await fetch(API_BASE + "?api=getCart", {
-    method: "GET"
-  }).then(r => r.json());
-
-  if (!cartRes || !cartRes.success) {
-    console.warn("⚠️ Failed to reload cart from backend");
-    return;
-  }
-
-  // C️⃣ Rebuild frontend cart state
-  window.cartSummary = cartRes.cart || cartRes.data || {};
-  
-  console.log("✅ Fresh cart loaded:", window.cartSummary);
-
-  // D️⃣ Re-render drawer cart (existing render function)
-  if (typeof renderDrawerCart === "function") {
-    renderDrawerCart(window.cartSummary);
-  }
-
-  // E️⃣ Recalculate totals if required
-  if (typeof recalcDrawerTotals === "function") {
-    recalcDrawerTotals();
-  }
-}
-
-  function renderInvoiceCancelNotes() {
-  const notes = window._cancelledAtCheckout || [];
-  if (!notes.length) return;
-
-  const box = document.getElementById("invWarnings");
-  if (!box) return;
-
-  box.classList.remove("hidden");
-
-  box.innerHTML = `
-    <div class="font-semibold text-red-600 mb-1">
-      Important Notice
-    </div>
-    ${notes.map(i => `
-      <div class="text-sm text-gray-700">
-        ❌ ${i.name} (${i.unit}) has been discontinued and removed from this order
-      </div>
-    `).join("")}
-  `;
-}
-
 
 async function validateAppliedCouponForMobile(mobile) {
   console.log("🧪 validateAppliedCouponForMobile HIT", mobile);
@@ -15011,6 +14989,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
