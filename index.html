@@ -8289,12 +8289,12 @@ if (isLoggedIn()) {
   loadPrimaryAddress();
 }
   // 🔐 LOGIN USER → FORCE SHOW ORDER TYPE
-if (isUserLoggedIn()) {
-  const ot = document.getElementById("orderType");
-  if (ot && ot.parentElement) {
-    ot.parentElement.style.display = "block";
-  }
+// ✅ SAFE: show Order Type ONLY for Hotel
+if (isUserLoggedIn() && window.__INDUSTRY === "hotel") {
+  const otBox = document.getElementById("orderTypeWrapper");
+  if (otBox) otBox.style.display = "block";
 }
+
 
   refreshCheckout();
   document.getElementById("changeAddressBtn")?.classList.add("hidden");
@@ -14902,6 +14902,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
