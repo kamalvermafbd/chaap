@@ -8263,7 +8263,18 @@ function updateCartBadge() {
 
 async function openCheckout() {
 
-// 🛑 NEW GUARD: wait until offers are fully applied
+    // 🔥 LOGIN USER → sanitize cart BEFORE checkout snapshot
+  if (isLoggedIn()) {
+    try {
+      await handleCheckoutClick_LOGIN();
+    } catch (e) {
+      console.error("❌ Checkout pre-clean failed", e);
+      alert("Please try checkout again.");
+      return;
+    }
+  }
+
+  // 🛑 NEW GUARD: wait until offers are fully applied
 if (!window._offersReady) {
   alert("⏳ Applying best offers… please wait a moment.");
   return;
@@ -14454,10 +14465,10 @@ const uiTpl = document.getElementById("invoiceTemplate");
 if (emailTpl && uiTpl) {
   emailTpl.innerHTML = uiTpl.innerHTML;
 }
-  }
+}
 
 
-  function invalidateAppliedCoupon(reason = "") {
+function invalidateAppliedCoupon(reason = "") {
 
   console.group("🚫 invalidateAppliedCoupon START");
 
@@ -14630,9 +14641,7 @@ async function handleCheckoutClick_LOGIN() {
     // 4️⃣ 🔥🔥🔥 FORCE DRAWER CART REFRESH
     await forceReloadDrawerCart_LOGIN();
 
-    // 5️⃣ Open checkout invoice (existing)
-    openCheckoutInvoice();
-
+   
   } catch (err) {
     console.error("❌ Checkout flow error:", err);
     alert("Something went wrong while preparing checkout. Please try again.");
@@ -15013,6 +15022,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
