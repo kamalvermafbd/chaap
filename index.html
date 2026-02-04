@@ -7582,13 +7582,17 @@ if (isUserLoggedIn()) {
   if (orderTypeBox) orderTypeBox.style.display = "none";
   if (dispatchBox)  dispatchBox.style.display  = "none";
 
-  // login + industry based instant show
+  // 🔥 login + industry decides ONE
   if (window.__INDUSTRY === "hotel") {
+    // Hotel → Order Type only
     if (orderTypeBox) orderTypeBox.style.display = "block";
+    if (dispatchBox)  dispatchBox.style.display  = "none";
   }
 
-  if (window.__INDUSTRY === "retail") {
-    if (dispatchBox) dispatchBox.style.display = "block";
+  else if (window.__INDUSTRY === "retail") {
+    // Retail → Dispatch Mode only
+    if (dispatchBox)  dispatchBox.style.display  = "block";
+    if (orderTypeBox) orderTypeBox.style.display  = "none";
   }
 }
 
@@ -14893,6 +14897,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
