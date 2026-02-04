@@ -7567,6 +7567,32 @@ else if (window.__INDUSTRY === "retail") {
   }
 }
 
+   // ===============================
+// 🔥 EXTENSION: LOGIN USER INDUSTRY DROPDOWN (DO NOT TOUCH EXISTING LOGIC)
+// ===============================
+// ===============================
+// 🔥 EXTENSION: LOGIN USER INDUSTRY DROPDOWN (DO NOT TOUCH EXISTING LOGIC)
+// ===============================
+if (isUserLoggedIn()) {
+
+  const orderTypeBox = document.getElementById("orderTypeWrapper");
+  const dispatchBox  = document.getElementById("dispatchModeWrapper");
+
+  // pehle dono hide (guest behaviour safe rahe)
+  if (orderTypeBox) orderTypeBox.style.display = "none";
+  if (dispatchBox)  dispatchBox.style.display  = "none";
+
+  // login + industry based instant show
+  if (window.__INDUSTRY === "hotel") {
+    if (orderTypeBox) orderTypeBox.style.display = "block";
+  }
+
+  if (window.__INDUSTRY === "retail") {
+    if (dispatchBox) dispatchBox.style.display = "block";
+  }
+}
+
+
   // ===============================
   // HIDE LOCATION UI
   // ===============================
@@ -14867,6 +14893,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
