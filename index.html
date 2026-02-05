@@ -8261,12 +8261,25 @@ function updateCartBadge() {
   }
 }
 
+function deferCheckoutBackgroundSync() {
+  setTimeout(async () => {
+    try {
+      await handleCheckoutClick_LOGIN();
+      await syncCancelHoldFromScanAPI();
+
+      // optional: re-calc invoice after sync
+      updateCheckoutInvoice();
+
+    } catch (err) {
+      console.error("⚠️ Checkout background sync failed", err);
+    }
+  }, 0);
+}
+
+  
 async function openCheckout() {
 
- if (isLoggedIn()) {
-  await handleCheckoutClick_LOGIN(); // existing
-  await syncCancelHoldFromScanAPI(); // 🔥 NEW
-}
+
 
   // 🛑 NEW GUARD: wait until offers are fully applied
 if (!window._offersReady) {
@@ -8339,6 +8352,11 @@ if (isUserLoggedIn() && window.__INDUSTRY === "hotel") {
   revalidateAppliedCouponAgainstCart(); // 🔒 FINAL SAFETY CHECK
 mountInvoiceIntoCheckout();
   updateCheckoutInvoice();
+
+   // 🚀 🔥 HEAVY BACKGROUND SYNC (AFTER UI)
+  if (isLoggedIn()) {
+    deferCheckoutBackgroundSync();
+  }
 
 }
 
@@ -15091,6 +15109,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
