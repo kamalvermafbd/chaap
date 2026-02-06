@@ -14639,6 +14639,10 @@ function invalidateAppliedCoupon(reason = "") {
 }
 
 function getInvoiceVisibleItems(cartItems = []) {
+  console.log("🧪 [INVOICE FILTER] Input items:",
+    JSON.parse(JSON.stringify(cartItems))
+  );
+
   return cartItems
     .map(item => {
       const isCancel = isFlagTrue(item.Cancel);
@@ -14647,25 +14651,56 @@ function getInvoiceVisibleItems(cartItems = []) {
       const qty     = Number(item.qty || 0);
       const closing = Number(item.closing);
 
+      console.log("🧪 [INVOICE CHECK]", {
+        name: item.name,
+        qty,
+        closing,
+        isCancel,
+        isHold
+      });
+
       // 🚫 Cancel / Hold = remove from invoice
-      if (isCancel || isHold) return null;
+      if (isCancel || isHold) {
+        console.log("❌ [INVOICE DROP] Cancel/Hold:", item.name);
+        return null;
+      }
 
       // 🚫 Closing stock = 0 → treat like HOLD
       if (!isNaN(closing) && closing <= 0) {
+        console.log("⏸️ [INVOICE DROP] Closing=0 (HOLD):", item.name);
         item.hold = "Yes";   // 🔥 reuse existing HOLD logic
         return null;
       }
 
       // ⚠️ Partial availability
       if (!isNaN(closing) && closing < qty) {
+        console.log("🟡 [INVOICE PARTIAL]", {
+          name: item.name,
+          requestedQty: qty,
+          closingQty: closing
+        });
+
         item._partialQty   = true;   // 🔔 signal for invoice notes
         item._requestedQty = qty;    // original requested qty
         item.qty = closing;          // clamp qty for invoice
+      } else {
+        console.log("✅ [INVOICE FULL]", {
+          name: item.name,
+          qty,
+          closing
+        });
       }
 
       return item;
     })
-    .filter(Boolean);
+    .filter(item => {
+      if (!item) return false;
+      console.log("✅ [INVOICE KEEP]", {
+        name: item.name,
+        finalQty: item.qty
+      });
+      return true;
+    });
 }
 
 
@@ -15180,6 +15215,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
