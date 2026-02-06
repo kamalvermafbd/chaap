@@ -8265,9 +8265,6 @@ function updateCartBadge() {
   }
 }
 
-
-
-
   
 async function openCheckout() {
 
@@ -14930,21 +14927,30 @@ function deferCheckoutBackgroundSync() {
 
   setTimeout(async () => {
     try {
-      await handleCheckoutClick_LOGIN();
 
-      // 2️⃣ Sync closing + hold + cancel from CART SHEET
-      await syncClosingFromGetCart();
+      // 🏪 Inventory-aware restaurant
+      if (window.RESTAURANT_STOCK_MODE === "check_closing_stock") {
 
-      // 🔥 THIS IS THE KEY — DO NOT REMOVE
-      await syncCancelHoldFromScanAPI();
+        if (isLoggedIn()) {
+          // 📱 LOGIN USER → backend cart derive (AS-IS)
+          await handleCheckoutClick_LOGIN();
+          await syncClosingFromGetCart();
+          await syncCancelHoldFromScanAPI();
 
-      // 🧾 Build invoice AFTER all data ready
-      await updateCheckoutInvoice(); // 👈 await if possible
+        } else {
+          // 👤 GUEST USER → derive from menu / cat_allocation
+          await deriveGuestCartBeforeInvoice();
+        }
+
+      }
+
+      // 🧾 Invoice MUST always build
+      await updateCheckoutInvoice();
 
     } catch (err) {
       console.error("⚠️ Checkout background sync failed", err);
     } finally {
-      hideInvoiceProcessingOverlay(); // ✅ STOP LOADING (always)
+      hideInvoiceProcessingOverlay(); // ✅ STOP LOADING
     }
   }, 0);
 }
@@ -14979,7 +14985,49 @@ function setRestaurantStockMode(restaurantInfo) {
   console.log("🏪 Stock Mode Loaded:", window.RESTAURANT_STOCK_MODE);
 }
 
+async function deriveGuestCartBeforeInvoice() {
+  try {
+    const cart = getCart(); // localStorage cart
 
+    if (!cart.length) return;
+
+    console.log("👤 [GUEST] Sending cart for derive:", cart);
+
+    const res = await fetch(
+      API_BASE + "?api=updateGuestCartDerivedState",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: cart })
+      }
+    ).then(r => r.json());
+
+    if (!res?.success || !Array.isArray(res.items)) {
+      console.warn("⚠️ Guest derive failed", res);
+      return;
+    }
+
+    console.log("✅ [GUEST] Derived cart received:", res.items);
+
+    // 🔁 MERGE derived fields back into cart
+    const merged = cart.map(item => {
+      const d = res.items.find(x =>
+        String(x.itemId) === String(item.itemId) &&
+        String(x.variantId || "") === String(item.variantId || "")
+      );
+
+      return d ? { ...item, ...d } : item;
+    });
+
+    setCart(merged);
+    window.cart = merged;
+
+  } catch (err) {
+    console.error("❌ Guest derive error", err);
+  }
+}
+
+  
 
 async function validateAppliedCouponForMobile(mobile) {
   console.log("🧪 validateAppliedCouponForMobile HIT", mobile);
@@ -15302,6 +15350,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
