@@ -8337,8 +8337,7 @@ if (isUserLoggedIn() && window.__INDUSTRY === "hotel") {
   }, 0);
   revalidateAppliedCouponAgainstCart(); // 🔒 FINAL SAFETY CHECK
 mountInvoiceIntoCheckout();
-  updateCheckoutInvoice();
-
+  
    // 🚀 🔥 HEAVY BACKGROUND SYNC (AFTER UI)
   if (isLoggedIn()) {
     deferCheckoutBackgroundSync();
@@ -15152,6 +15151,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
