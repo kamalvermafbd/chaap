@@ -8264,10 +8264,13 @@ function updateCartBadge() {
 function deferCheckoutBackgroundSync() {
   setTimeout(async () => {
     try {
-      await handleCheckoutClick_LOGIN();
-      await syncCancelHoldFromScanAPI();
+      const mobile = getUserMobile?.() || localStorage.getItem("userMobile");
+      if (!mobile) return;
 
-      // optional: re-calc invoice after sync
+      // 🔥 SINGLE SOURCE OF TRUTH
+      await callAPI("updateCartDerivedStateByMobile", { mobile });
+
+      // 🔁 Re-calc invoice AFTER derived sync
       updateCheckoutInvoice();
 
     } catch (err) {
@@ -8276,10 +8279,9 @@ function deferCheckoutBackgroundSync() {
   }, 0);
 }
 
+
   
 async function openCheckout() {
-
-
 
   // 🛑 NEW GUARD: wait until offers are fully applied
 if (!window._offersReady) {
@@ -15109,6 +15111,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
