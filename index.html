@@ -14755,7 +14755,7 @@ async function handleCheckoutClick_LOGIN() {
   try {
     console.log("🔄 [CHECKOUT] Calling updateCartDerivedStateByMobile API");
 
-    // ✅ NEW SINGLE SOURCE API (GET style – index pattern)
+    // 1️⃣ Backend derived sync (NEW API)
     const res = await fetch(
       API_BASE +
         "?api=updateCartDerivedStateByMobile" +
@@ -14764,9 +14764,12 @@ async function handleCheckoutClick_LOGIN() {
 
     console.log("✅ [CHECKOUT] Backend cart derived sync response:", res);
 
-    // 🔍 Log current frontend cart state
+    // 2️⃣ 🔥 FRONTEND CART REFRESH (THIS MAKES HOLD WORK AGAIN)
+    await refreshCartFromBackend?.(); 
+    // or whatever function earlier syncCancelHoldFromScanAPI was calling
+
     console.log(
-      "🧩 [CHECKOUT] Frontend cartSummary BEFORE invoice filter:",
+      "🧩 [CHECKOUT] Frontend cartSummary AFTER derived sync:",
       JSON.parse(JSON.stringify(window.cartSummary?.items || []))
     );
 
@@ -14774,6 +14777,7 @@ async function handleCheckoutClick_LOGIN() {
     console.error("❌ [CHECKOUT] Cart derived sync failed", err);
   }
 }
+
 
 function deferCheckoutBackgroundSync() {
   setTimeout(async () => {
@@ -15112,6 +15116,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
