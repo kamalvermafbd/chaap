@@ -14848,6 +14848,41 @@ return item;
   );
 }
 
+
+  async function syncClosingFromGetCart() {
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) return;
+
+  const res = await fetch(
+    API_BASE + "?api=getCart&mobile=" + encodeURIComponent(mobile)
+  ).then(r => r.json());
+
+  if (!res?.success || !Array.isArray(res.cart)) return;
+
+  const backendCart = res.cart;
+
+  window.cartSummary.items = (window.cartSummary.items || []).map(item => {
+    const match = backendCart.find(b =>
+      String(b.itemId) === String(item.itemId) &&
+      String(b.variantId || "") === String(item.variantId || "") &&
+      String(b.unit || "") === String(item.unit || "")
+    );
+
+    if (match) {
+      item.closing = Number(match.closing);
+      item.hold    = match.hold;
+      item.Cancel  = match.cancel;
+    }
+
+    return item;
+  });
+
+  console.log(
+    "🔁 [SYNC] Closing synced from getCart",
+    JSON.parse(JSON.stringify(window.cartSummary.items))
+  );
+}
+
 async function handleCheckoutClick_LOGIN() {
   const mobile = localStorage.getItem("userMobile");
   console.log("🛒 [CHECKOUT] LOGIN pre-check started", { mobile });
@@ -14878,7 +14913,8 @@ function deferCheckoutBackgroundSync() {
   setTimeout(async () => {
     try {
       await handleCheckoutClick_LOGIN();
-
+ // 2️⃣ Sync closing + hold + cancel from CART SHEET (getCart)
+      await syncClosingFromGetCart();   // 🔥 ADD THIS LINE
       // 🔥 THIS IS THE KEY — DO NOT REMOVE
       await syncCancelHoldFromScanAPI();
 
@@ -15214,6 +15250,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
