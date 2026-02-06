@@ -14639,12 +14639,6 @@ function invalidateAppliedCoupon(reason = "") {
 }
 
 function getInvoiceVisibleItems(cartItems = []) {
-  console.log("🧪 PARTIAL CHECK", {
-  name: item.name,
-  qty,
-  closing
-});
-
   console.log("🧪 [INVOICE FILTER] Input items:",
     JSON.parse(JSON.stringify(cartItems))
   );
@@ -14665,16 +14659,16 @@ function getInvoiceVisibleItems(cartItems = []) {
         isHold
       });
 
-      // 🚫 Cancel / Hold = remove from invoice
+      // 🚫 Cancel / Hold
       if (isCancel || isHold) {
         console.log("❌ [INVOICE DROP] Cancel/Hold:", item.name);
         return null;
       }
 
-      // 🚫 Closing stock = 0 → treat like HOLD
+      // 🚫 Closing = 0 → HOLD
       if (!isNaN(closing) && closing <= 0) {
         console.log("⏸️ [INVOICE DROP] Closing=0 (HOLD):", item.name);
-        item.hold = "Yes";   // 🔥 reuse existing HOLD logic
+        item.hold = "Yes";
         return null;
       }
 
@@ -14686,9 +14680,9 @@ function getInvoiceVisibleItems(cartItems = []) {
           closingQty: closing
         });
 
-        item._partialQty   = true;   // 🔔 signal for invoice notes
-        item._requestedQty = qty;    // original requested qty
-        item.qty = closing;          // clamp qty for invoice
+        item._partialQty   = true;
+        item._requestedQty = qty;
+        item.qty = closing;
       } else {
         console.log("✅ [INVOICE FULL]", {
           name: item.name,
@@ -14708,7 +14702,6 @@ function getInvoiceVisibleItems(cartItems = []) {
       return true;
     });
 }
-
 
 
 function renderInvoiceNotesFromCart(cartItems = []) {
@@ -15221,6 +15214,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
