@@ -14639,8 +14639,12 @@ function invalidateAppliedCoupon(reason = "") {
 }
 
 function getInvoiceVisibleItems(cartItems = []) {
-   // 🔥 2️⃣ VERY IMPORTANT: reload cart from backend
-  await refreshCartFromBackend();   // ✅ YAHI MISSING THA
+  console.log("🧪 PARTIAL CHECK", {
+  name: item.name,
+  qty,
+  closing
+});
+
   console.log("🧪 [INVOICE FILTER] Input items:",
     JSON.parse(JSON.stringify(cartItems))
   );
@@ -15218,6 +15222,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
