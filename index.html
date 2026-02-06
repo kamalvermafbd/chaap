@@ -14988,18 +14988,16 @@ function setRestaurantStockMode(restaurantInfo) {
 async function deriveGuestCartBeforeInvoice() {
   try {
     const cart = getCart(); // localStorage cart
-
     if (!cart.length) return;
 
     console.log("👤 [GUEST] Sending cart for derive:", cart);
 
+    const itemsJson = encodeURIComponent(JSON.stringify(cart));
+
     const res = await fetch(
-      API_BASE + "?api=updateGuestCartDerivedState",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: cart })
-      }
+      API_BASE +
+        "?api=updateGuestCartDerivedState" +
+        "&itemsJson=" + itemsJson
     ).then(r => r.json());
 
     if (!res?.success || !Array.isArray(res.items)) {
@@ -15026,6 +15024,7 @@ async function deriveGuestCartBeforeInvoice() {
     console.error("❌ Guest derive error", err);
   }
 }
+
 
   
 
@@ -15350,6 +15349,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
