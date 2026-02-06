@@ -8264,11 +8264,18 @@ function updateCartBadge() {
 function deferCheckoutBackgroundSync() {
   setTimeout(async () => {
     try {
-      const mobile = getUserMobile?.() || localStorage.getItem("userMobile");
+      const mobile =
+        getUserMobile?.() ||
+        localStorage.getItem("userMobile");
+
       if (!mobile) return;
 
-      // 🔥 SINGLE SOURCE OF TRUTH
-      await callAPI("updateCartDerivedStateByMobile", { mobile });
+      // 🔥 SAFE DIRECT FETCH (NO callAPI dependency)
+      await fetch(API_BASE + "?api=updateCartDerivedStateByMobile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mobile })
+      });
 
       // 🔁 Re-calc invoice AFTER derived sync
       updateCheckoutInvoice();
@@ -8278,6 +8285,7 @@ function deferCheckoutBackgroundSync() {
     }
   }, 0);
 }
+
 
 
   
@@ -15111,6 +15119,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
