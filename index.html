@@ -8343,9 +8343,9 @@ if (isUserLoggedIn() && window.__INDUSTRY === "hotel") {
 mountInvoiceIntoCheckout();
   
    // 🚀 🔥 HEAVY BACKGROUND SYNC (AFTER UI)
-  if (isLoggedIn()) {
-    deferCheckoutBackgroundSync();
-  }
+  if (window.RESTAURANT_STOCK_MODE === "check_closing_stock") {
+  deferCheckoutBackgroundSync();
+}
 
 }
 
@@ -15297,6 +15297,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
