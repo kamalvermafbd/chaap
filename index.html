@@ -14652,8 +14652,15 @@ function getInvoiceVisibleItems(cartItems = []) {
       const isCancel = isFlagTrue(item.Cancel);
       const isHold   = isFlagTrue(item.hold) || isFlagTrue(item.hold1);
 
-      const qty     = Number(item.qty || 0);
-      const closing = Number(item.closing);
+      const qty = Number(item.qty || 0);
+const stockMode = window.RESTAURANT_STOCK_MODE;
+
+// ✅ inventory apply sirf jab restaurant mode = check_closing_stock
+const closing =
+  stockMode === "check_closing_stock"
+    ? Number(item.closing)
+    : NaN;
+
 
       console.log("🧪 [INVOICE CHECK]", {
         name: item.name,
@@ -15290,6 +15297,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
