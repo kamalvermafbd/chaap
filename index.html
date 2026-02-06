@@ -14681,6 +14681,10 @@ function renderInvoiceNotesFromCart(cartItems = []) {
 
   console.log("❌ [INVOICE NOTES] Cancelled items:", cancelled);
   console.log("⏸️ [INVOICE NOTES] Hold items:", holded);
+// 🔔 PARTIAL QTY ITEMS (frontend-only signal from invoice build)
+const partial = cartItems.filter(i => i._partialQty === true);
+
+console.log("ℹ️ [INVOICE NOTES] Partial qty items:", partial);
 
   const box = document.getElementById("invWarnings");
   if (!box) {
@@ -14688,11 +14692,11 @@ function renderInvoiceNotesFromCart(cartItems = []) {
     return;
   }
 
-  if (!cancelled.length && !holded.length) {
-    console.log("✅ [INVOICE NOTES] No cancelled or hold items, hiding warnings");
-    box.classList.add("hidden");
-    return;
-  }
+if (!cancelled.length && !holded.length && !partial.length) {
+  console.log("✅ [INVOICE NOTES] No warnings, hiding box");
+  box.classList.add("hidden");
+  return;
+}
 
   console.log("⚠️ [INVOICE NOTES] Rendering warning messages");
   box.classList.remove("hidden");
@@ -14712,6 +14716,21 @@ function renderInvoiceNotesFromCart(cartItems = []) {
         ⏸️ ${i.name} (${i.unit}) is currently unavailable and kept in your cart for later
       </div>`;
   });
+
+  partial.forEach(i => {
+  const requested = Number(i._requestedQty || 0);
+  const billed    = Number(i.qty || 0);
+  const remaining = Math.max(requested - billed, 0);
+
+  if (remaining > 0) {
+    html += `
+      <div class="text-sm text-gray-700">
+        ℹ️ Only <b>${billed}</b> quantity of ${i.name} (${i.unit})
+        is available right now. The remaining <b>${remaining}</b>
+        has been kept in your cart for later.
+      </div>`;
+  }
+});
 
   box.innerHTML = html;
 
@@ -15133,6 +15152,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
