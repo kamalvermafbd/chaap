@@ -14751,6 +14751,7 @@ function getInvoiceNotes(cartItems = []) {
 
   return { cancelled, holded };
 }
+  
 async function syncCancelHoldFromScanAPI() {
   const mobile = localStorage.getItem("userMobile");
   if (!mobile) return;
@@ -14772,11 +14773,39 @@ async function syncCancelHoldFromScanAPI() {
     );
 
     if (match) {
-      if (match.hold)   item.hold   = match.hold;
-      if (match.Cancel) item.Cancel = match.Cancel;
+  if (match.hold)   item.hold   = match.hold;
+  if (match.Cancel) item.Cancel = match.Cancel;
+
+  // 🔥 closing sync
+  if (match.closing !== undefined) {
+    const requestedQty =
+      Number(item._requestedQty ?? item.qty ?? 0);
+    const closingQty = Number(match.closing || 0);
+
+    item.closing = closingQty;
+
+    // 🔴 closing = 0 → HOLD
+    if (closingQty <= 0) {
+      item.hold = "yes";
+      delete item._partialQty;
+      delete item._requestedQty;
     }
 
-    return item;
+    // 🟡 PARTIAL availability
+    else if (closingQty < requestedQty) {
+      item._requestedQty = requestedQty;
+      item.qty = closingQty;
+      item._partialQty = true;
+    }
+
+    // ✅ FULLY AVAILABLE → clean state
+    else {
+      delete item._partialQty;
+      delete item._requestedQty;
+    }
+  }
+}
+return item;
   });
 
   console.log(
@@ -15151,6 +15180,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
