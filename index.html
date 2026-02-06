@@ -14910,22 +14910,29 @@ async function handleCheckoutClick_LOGIN() {
 
 
 function deferCheckoutBackgroundSync() {
+  showInvoiceProcessingOverlay(); // 🔥 START LOADING
+
   setTimeout(async () => {
     try {
       await handleCheckoutClick_LOGIN();
- // 2️⃣ Sync closing + hold + cancel from CART SHEET (getCart)
-      await syncClosingFromGetCart();   // 🔥 ADD THIS LINE
+
+      // 2️⃣ Sync closing + hold + cancel from CART SHEET
+      await syncClosingFromGetCart();
+
       // 🔥 THIS IS THE KEY — DO NOT REMOVE
       await syncCancelHoldFromScanAPI();
 
-      // invoice now sees HOLD correctly
-      updateCheckoutInvoice();
+      // 🧾 Build invoice AFTER all data ready
+      await updateCheckoutInvoice(); // 👈 await if possible
 
     } catch (err) {
       console.error("⚠️ Checkout background sync failed", err);
+    } finally {
+      hideInvoiceProcessingOverlay(); // ✅ STOP LOADING (always)
     }
   }, 0);
 }
+
 
 
 
@@ -15250,6 +15257,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
