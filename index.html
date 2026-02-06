@@ -2345,6 +2345,10 @@ body::before {
   return !!localStorage.getItem("userMobile");
 }
 
+    document.addEventListener("DOMContentLoaded", () => {
+  fetchRestaurantInfo();
+});
+
 document.querySelectorAll(".payment-btn").forEach(btn => {
   btn.addEventListener("click", () => {
 
@@ -14933,6 +14937,35 @@ function deferCheckoutBackgroundSync() {
   }, 0);
 }
 
+async function fetchRestaurantInfo() {
+  try {
+    const res = await fetch(
+      API_BASE + "?api=getRestaurantInfo"
+    );
+    const data = await res.json();
+
+    if (!data || data.success !== true) {
+      console.warn("⚠️ Restaurant info fetch failed");
+      return;
+    }
+
+    // 🔑 store stock mode
+    setRestaurantStockMode(data);
+
+  } catch (err) {
+    console.error("❌ Failed to load restaurant info", err);
+  }
+}
+
+  function isClosingStockEnabled() {
+  return window.RESTAURANT_STOCK_MODE === "check_closing_stock";
+}
+function setRestaurantStockMode(restaurantInfo) {
+  window.RESTAURANT_STOCK_MODE =
+    (restaurantInfo?.stock_update || "No_closing_stock").toLowerCase();
+
+  console.log("🏪 Stock Mode Loaded:", window.RESTAURANT_STOCK_MODE);
+}
 
 
 
@@ -15257,6 +15290,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
