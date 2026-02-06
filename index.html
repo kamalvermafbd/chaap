@@ -14639,13 +14639,37 @@ function invalidateAppliedCoupon(reason = "") {
   return v === "yes" || v === "true" || v === "y";
 }
 
- function getInvoiceVisibleItems(cartItems = []) {
-  return cartItems.filter(item => {
-    const isCancel = isFlagTrue(item.Cancel);
-    const isHold   = isFlagTrue(item.hold) || isFlagTrue(item.hold1);
-    return !isCancel && !isHold;
-  });
+function getInvoiceVisibleItems(cartItems = []) {
+  return cartItems
+    .map(item => {
+      const isCancel = isFlagTrue(item.Cancel);
+      const isHold   = isFlagTrue(item.hold) || isFlagTrue(item.hold1);
+
+      const qty     = Number(item.qty || 0);
+      const closing = Number(item.closing);
+
+      // 🚫 Cancel / Hold = remove from invoice
+      if (isCancel || isHold) return null;
+
+      // 🚫 Closing stock = 0 → treat like HOLD
+      if (!isNaN(closing) && closing <= 0) {
+        item.hold = "Yes";   // 🔥 reuse existing HOLD logic
+        return null;
+      }
+
+      // ⚠️ Partial availability
+      if (!isNaN(closing) && closing < qty) {
+        item._partialQty   = true;   // 🔔 signal for invoice notes
+        item._requestedQty = qty;    // original requested qty
+        item.qty = closing;          // clamp qty for invoice
+      }
+
+      return item;
+    })
+    .filter(Boolean);
 }
+
+
 
 function renderInvoiceNotesFromCart(cartItems = []) {
   console.log(
@@ -15109,6 +15133,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
