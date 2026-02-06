@@ -8342,10 +8342,15 @@ if (isUserLoggedIn() && window.__INDUSTRY === "hotel") {
   revalidateAppliedCouponAgainstCart(); // 🔒 FINAL SAFETY CHECK
 mountInvoiceIntoCheckout();
   
-   // 🚀 🔥 HEAVY BACKGROUND SYNC (AFTER UI)
-  if (window.RESTAURANT_STOCK_MODE === "check_closing_stock") {
+  // 🚀 🔥 HEAVY BACKGROUND SYNC (AFTER UI)
+if (window.RESTAURANT_STOCK_MODE === "check_closing_stock") {
+  // Inventory-aware restaurants
   deferCheckoutBackgroundSync();
+} else {
+  // No inventory → direct invoice build
+  updateCheckoutInvoice();
 }
+
 
 }
 
@@ -15297,6 +15302,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
