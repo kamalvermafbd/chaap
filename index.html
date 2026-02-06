@@ -13305,7 +13305,14 @@ console.log("🧾 [INVOICE] Raw cart items (before filter):",
 // 🔥 FILTER items for invoice (hide cancel / hold)
 const rawItems = s.items || [];
 const invoiceItems = getInvoiceVisibleItems(rawItems);
+// 🔥 TOTAL WEIGHT (for courier eligibility)
+let totalWeight = 0;
+invoiceItems.forEach(i => {
+  totalWeight += (Number(i.weight) || 0) * (Number(i.qty) || 0);
+});
 
+
+  
   const orderType = document.getElementById("orderType")?.value || "";
   const eligibility = window.orderEligibility || {};
   const isOrderTypeChosen = orderType && orderType !== "Select Order Type";
@@ -13318,10 +13325,8 @@ const calculatedBase = invoiceItems.reduce((sum, item) => {
   const rate = Number(item.rate || 0);
   const qty  = Number(item.qty || 0);
   const disc = Number(item.discPercent || 0);
-
   const discAmt = (rate * disc) / 100;
   const netRate = rate - discAmt;
-
   return sum + (netRate * qty);
 }, 0);
   
@@ -13329,8 +13334,6 @@ console.log("🧾 [INVOICE] Invoice-visible items (after filter):",
   JSON.parse(JSON.stringify(invoiceItems))
 );
 
-
-  
 // 🔒 ROUND FINAL BASE (currency-safe)
 const base = Number(calculatedBase.toFixed(2));
   
@@ -13344,10 +13347,7 @@ const reward =
   window.drawerSpecialCoupon?.type === "reward"
     ? window.drawerSpecialCoupon.amount
     : 0;
-
 const paid   = Number(s.paidCouponDiscount || 0);
-
-
  // Sale value after NORMAL + SIGNUP (PRE-TAX)
 const grossValue = base - normalCoupon - signup;
 
@@ -13374,8 +13374,6 @@ const postTaxDiscount =  reward + paid;
   deliveryChargeLabel = window.orderEligibility?.chargeType || "Delivery Charges";
   }
 }
-
-
   /* ======================
      GST RULES
   ====================== */
@@ -13412,6 +13410,17 @@ const billAmount = gstBase + taxTotal;
   netPayable
   });
 
+  console.log("📦 [INVOICE FINAL WEIGHT CHECK]", {
+  totalWeight,
+  rounded: Number(totalWeight.toFixed(3)),
+  items: invoiceItems.map(i => ({
+    name: i.name,
+    qty: i.qty,
+    unitWeight: i.weight,
+    lineWeight: (Number(i.weight) || 0) * (Number(i.qty) || 0)
+  }))
+});
+
   /* ======================
      RETURN PAYLOAD
   ====================== */
@@ -13432,8 +13441,6 @@ const billAmount = gstBase + taxTotal;
 
     // ===== ITEMS =====
    items: invoiceItems,
-
-
     // ===== TOTALS =====
     baseTotal: base,
     serviceAmt,
@@ -13444,19 +13451,18 @@ const billAmount = gstBase + taxTotal;
     taxTotal,
     billAmount,
 netPayable,
+    // 🔥 ADD THIS
+totalWeight: Number(totalWeight.toFixed(3)),
 cgstPercent: window.cgstPercent,
 sgstPercent: window.sgstPercent,
 igstPercent: window.igstPercent,
 gstOnDiscountedAmount: window.gstOnDiscountedAmount,
-    
     // ===== COUPONS =====
    couponAmount: Number(s.couponAmount || 0),
 normalCoupon: Number(s.couponAmount || 0),
-
     rewardDiscount: reward,
     paidCouponDiscount: paid,
     signupDiscount: signup,
-
     couponId:
   window.drawerSpecialCoupon?.id ||
   selectedCoupon?.id ||
@@ -15349,6 +15355,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
