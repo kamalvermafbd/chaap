@@ -14639,6 +14639,8 @@ function invalidateAppliedCoupon(reason = "") {
 }
 
 function getInvoiceVisibleItems(cartItems = []) {
+   // 🔥 2️⃣ VERY IMPORTANT: reload cart from backend
+  await refreshCartFromBackend();   // ✅ YAHI MISSING THA
   console.log("🧪 [INVOICE FILTER] Input items:",
     JSON.parse(JSON.stringify(cartItems))
   );
@@ -14866,7 +14868,8 @@ async function handleCheckoutClick_LOGIN() {
         "?api=updateCartDerivedStateByMobile" +
         "&mobile=" + encodeURIComponent(mobile)
     ).then(r => r.json());
-
+ // 🔥 2️⃣ VERY IMPORTANT: reload cart from backend
+  await refreshCartFromBackend();   // ✅ YAHI MISSING THA
     console.log("✅ [CHECKOUT] Backend cart derived sync response:", res);
 
   } catch (err) {
@@ -15215,6 +15218,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
