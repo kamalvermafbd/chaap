@@ -8261,30 +8261,6 @@ function updateCartBadge() {
   }
 }
 
-function deferCheckoutBackgroundSync() {
-  setTimeout(async () => {
-    try {
-      const mobile =
-        getUserMobile?.() ||
-        localStorage.getItem("userMobile");
-
-      if (!mobile) return;
-
-      // 🔥 SAFE DIRECT FETCH (NO callAPI dependency)
-      await fetch(API_BASE + "?api=updateCartDerivedStateByMobile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mobile })
-      });
-
-      // 🔁 Re-calc invoice AFTER derived sync
-      updateCheckoutInvoice();
-
-    } catch (err) {
-      console.error("⚠️ Checkout background sync failed", err);
-    }
-  }, 0);
-}
 
 
 
@@ -14767,7 +14743,7 @@ async function syncCancelHoldFromScanAPI() {
   );
 }
 
-  async function handleCheckoutClick_LOGIN() {
+async function handleCheckoutClick_LOGIN() {
   const mobile = localStorage.getItem("userMobile");
   console.log("🛒 [CHECKOUT] LOGIN pre-check started", { mobile });
 
@@ -14777,14 +14753,16 @@ async function syncCancelHoldFromScanAPI() {
   }
 
   try {
-    console.log("🔄 [CHECKOUT] Calling updateCartHoldCancelByMobile API");
+    console.log("🔄 [CHECKOUT] Calling updateCartDerivedStateByMobile API");
 
-    const res = await fetch(API_BASE + "?api=updateCartHoldCancelByMobile", {
-      method: "POST",
-      body: JSON.stringify({ mobile })
-    }).then(r => r.json());
+    // ✅ NEW SINGLE SOURCE API (GET style – index pattern)
+    const res = await fetch(
+      API_BASE +
+        "?api=updateCartDerivedStateByMobile" +
+        "&mobile=" + encodeURIComponent(mobile)
+    ).then(r => r.json());
 
-    console.log("✅ [CHECKOUT] Backend cart flag sync response:", res);
+    console.log("✅ [CHECKOUT] Backend cart derived sync response:", res);
 
     // 🔍 Log current frontend cart state
     console.log(
@@ -14793,8 +14771,23 @@ async function syncCancelHoldFromScanAPI() {
     );
 
   } catch (err) {
-    console.error("❌ [CHECKOUT] Cart flag sync failed", err);
+    console.error("❌ [CHECKOUT] Cart derived sync failed", err);
   }
+}
+
+function deferCheckoutBackgroundSync() {
+  setTimeout(async () => {
+    try {
+      // 🔥 SAME HANDLE, SAME CALL
+      await handleCheckoutClick_LOGIN();
+
+      // 🔁 optional: re-calc invoice after backend sync
+      updateCheckoutInvoice();
+
+    } catch (err) {
+      console.error("⚠️ Checkout background sync failed", err);
+    }
+  }, 0);
 }
 
 
@@ -15119,6 +15112,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
