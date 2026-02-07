@@ -4973,12 +4973,34 @@ lng: window.__COURIER_MODE === true
   : Number(window._deliveryLocation?.lng)
 });
 
-//  delivery charge aate hi store karo
+    /* 🔴🔴🔴 ADD HERE — COURIER API FETCH (FINAL CHARGE) */
+if (window.__COURIER_MODE === true) {
+  await fetchCourierChargeForCheckout();
+}
+/* 🔴🔴🔴 END ADD */
+
+/* 🔴 FINAL — SINGLE SOURCE OF TRUTH */
+const isCourier = window.__COURIER_MODE === true;
+
 window.orderEligibility = {
   allowed: res.allowed === true,
-  extraCharge: Number(res?.extraCharge || 0),
-  chargeType: res?.chargeType || ""
+
+  // 🔥 HOME DELIVERY ONLY
+  extraCharge: isCourier
+    ? 0
+    : Number(res?.extraCharge || 0),
+
+  chargeType: isCourier
+    ? ""
+    : (res?.chargeType || "")
 };
+
+console.log("🛡️ ELIGIBILITY STORED (GUARDED)", {
+  isCourier,
+  rawExtraCharge: res?.extraCharge,
+  finalExtraCharge: window.orderEligibility.extraCharge
+});
+
 //  invoice ko turant refresh karo
 if (typeof buildCheckoutPreviewInv === "function") {
   const inv = buildCheckoutPreviewInv();
@@ -15567,6 +15589,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
