@@ -4590,6 +4590,7 @@ function updateCartWeightByMobileAPI() {
 
     
 window.__COURIER_MODE = false;
+window.__DISPATCH_MODE = null; // "HOME" | "COURIER"
 
  function onDispatchModeChange() {
   // 🔥🔥🔥 RETAIL HARD RESET — allow eligibility + overlay again
@@ -4614,6 +4615,7 @@ if (overlay) overlay.classList.add("hidden");
    * ====================================================== */
 if (mode === "Home Delivery") {
   window.__COURIER_MODE = false;
+  window.__DISPATCH_MODE = "HOME"; // ✅ NEW
 
   // 🔄 FULL RESET when coming back from Courier
   window._deliveryLocation = null;
@@ -4644,6 +4646,7 @@ if (mode === "Home Delivery") {
    * ====================================================== */
   if (mode === "Courier") {
 window.__COURIER_MODE = true;
+  window.__DISPATCH_MODE = "COURIER"; // ✅ NEW
 
     // 🛑 HARD BLOCK GPS PROMPT + AUTO LOCATION SAVE
     window._guestLocationPromptShown = true; // skip confirm popup
@@ -15049,6 +15052,12 @@ async function deriveGuestCartBeforeInvoice() {
 
 async function fetchCourierChargeForCheckout() {
   try {
+
+    // 🚫 ONLY when Dispatch = COURIER
+    if (window.__DISPATCH_MODE !== "COURIER") {
+      window.courierCharge = 0;
+      return;
+    }
     // 🔒 Preconditions
     if (!window.selectedPincode) {
       console.warn("⚠️ Courier skipped: userPin missing");
@@ -15458,6 +15467,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
