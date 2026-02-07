@@ -4228,6 +4228,12 @@ if (window.__MANUAL_ADDRESS_SELECTED === true) {
           pincodeField.value = res.pincode || "";
           cityField.value    = res.city || "";
           stateField.value   = res.state || "";
+
+          /* 🔴🔴🔴 ADD THIS — LOGGED-IN COURIER TRIGGER */
+if (window.__DISPATCH_MODE === "COURIER" && res.pincode) {
+  handlePincodeUpdated("auto:userProfileFilled");
+}
+          
           // 🔑 Location readiness (lat/lng)
 if (res.lat && res.lng) {
   // 🔥 LOAD GPS FROM USER SHEET INTO FRONTEND MEMORY
@@ -4491,6 +4497,11 @@ stateField.classList.remove("cursor-not-allowed", "bg-gray-100");
   stateField.value   = latestState || "";
   guestAutoFilling = false;
   guestPincodeEdited = false;
+/* 🔴🔴🔴 FINAL COURIER TRIGGER — PIN GUARANTEED */
+if (window.__DISPATCH_MODE === "COURIER" && latestPin) {
+  handlePincodeUpdated("auto:guestAddressFilled");
+}
+       
 } else {
   addressWrapper.style.display = "none";
   pincodeWrapper.style.display = "none";
@@ -15591,6 +15602,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
