@@ -13411,9 +13411,7 @@ roundedKg: Number((totalWeight / 1000).toFixed(3)),
       lineWeight: (Number(i.weight) || 0) * (Number(i.qty) || 0)
     }))
   });
-  // 🔴🔴🔴 END DEBUG
-
-// 🔴🔴🔴 GLOBAL WEIGHT SET — REQUIRED FOR COURIER
+  
 window.totalWeight = Number(totalWeight.toFixed(3));
 
 // 🔴🔴🔴 AUTO COURIER CALC — AFTER WEIGHT IS READY
@@ -13429,7 +13427,7 @@ if (
 //  fetchCourierChargeForCheckout().finally(() => {
     window.__COURIER_CALC_IN_PROGRESS = false;
   });
-}
+
 
 
   const orderType = document.getElementById("orderType")?.value || "";
@@ -15638,6 +15636,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
