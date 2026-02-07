@@ -13586,6 +13586,10 @@ function unlockCheckout() {
   btn.style.cursor = "";
 }
 
+function showCourierText(text) {
+  const el = document.getElementById("invDeliveryText");
+  if (el) el.textContent = text;
+}
 
 
  async function updateCheckoutInvoice() {
@@ -15057,11 +15061,12 @@ async function fetchCourierChargeForCheckout() {
       window.courierCharge = 0;
       return;
     }
-
+const weightKg = Number(window.totalWeight) / 1000;
     const payload = {
       userPin: window.selectedPincode,
       orderAmount: Number(window.cartTotalAmount) || 0,
-      totalWeight: window.totalWeight
+      totalWeight: weightKg
+
     };
 
     console.log("🚚 Courier payload", payload);
@@ -15453,6 +15458,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
