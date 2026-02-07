@@ -2422,6 +2422,7 @@ window.signupDiscount = Number(localStorage.getItem("signupDiscount") || 0);
 
 // === GLOBAL CURRENCY SETUP ===
 window.CURRENCY = window.CURRENCY || "₹";
+window.__COURIER_CALC_IN_PROGRESS = false;
 
 
 function fmt(amount, digits = 2) {
@@ -13395,7 +13396,26 @@ roundedKg: Number((totalWeight / 1000).toFixed(3)),
     }))
   });
   // 🔴🔴🔴 END DEBUG
-  
+
+// 🔴🔴🔴 GLOBAL WEIGHT SET — REQUIRED FOR COURIER
+window.totalWeight = Number(totalWeight.toFixed(3));
+
+// 🔴🔴🔴 AUTO COURIER CALC — AFTER WEIGHT IS READY
+if (
+  window.__DISPATCH_MODE === "COURIER" &&
+  window.selectedPincode &&
+  typeof window.totalWeight === "number" &&
+  window.__COURIER_CALC_IN_PROGRESS !== true
+) {
+  console.log("🚚 Auto courier trigger after weight ready");
+  window.__COURIER_CALC_IN_PROGRESS = true;
+
+  fetchCourierChargeForCheckout().finally(() => {
+    window.__COURIER_CALC_IN_PROGRESS = false;
+  });
+}
+
+
   const orderType = document.getElementById("orderType")?.value || "";
   const eligibility = window.orderEligibility || {};
   const isOrderTypeChosen = orderType && orderType !== "Select Order Type";
@@ -15602,6 +15622,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
