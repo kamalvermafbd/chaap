@@ -4904,7 +4904,10 @@ if (
 }
 
     const orderType = document.getElementById("orderType")?.value.trim();
-    const amount = Number(window.cartSummary?.itemsSubtotal || 0);
+const inv = buildCheckoutPreviewInv();
+
+    const amount = Number(inv.baseTotal || 0);
+
 // 🔧 FIX: define element before using
 const orderTypeEl = document.getElementById("orderType");
 
@@ -4925,12 +4928,15 @@ const orderTypeEl = document.getElementById("orderType");
 // ================================
 const mobile = document.getElementById("mobile")?.value.trim();
 const userType = isUserLoggedIn() ? "logged" : "guest";
+// 🔥 BUILD FINAL INVOICE FIRST (FINAL QTY / BASE)
+
     
 showInvoiceProcessingOverlay(); // ⏳ invoice calculation started
 
 const res = await apiPost("checkOrderEligibility", {
   orderType,
   orderAmount: amount,
+totalWeight: inv.totalWeight,
   mobile,
   userType,
     // 🔑 VERY IMPORTANT — tells backend this is Courier
@@ -4943,8 +4949,6 @@ const res = await apiPost("checkOrderEligibility", {
 lng: window.__COURIER_MODE === true
   ? null
   : Number(window._deliveryLocation?.lng)
-
-
 });
 
 //  delivery charge aate hi store karo
@@ -15355,6 +15359,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
