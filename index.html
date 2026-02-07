@@ -4626,19 +4626,12 @@ if (mode === "Home Delivery") {
   if (orderType) {
     orderType.value = "Home Delivery";
   }
-
   toggleAddressForDispatch();
-
-
   // 🔒 lock place order until location is set again
   updatePlaceOrderLockByLocation();
-
   console.log("🔄 Switched to Home Delivery — waiting for fresh location");
-
   return;
 }
-
-
   /* ======================================================
    * 📦 DISPATCH = COURIER
    * 👉 DATA SAME AS HOME DELIVERY
@@ -4657,7 +4650,6 @@ window.__COURIER_MODE = true;
     if (orderType) {
       orderType.value = "Home Delivery";
     }
-
     // 🔥 fills name/email/address for guest + login
 toggleAddressForDispatch();
 
@@ -4665,7 +4657,6 @@ toggleAddressForDispatch();
 if (typeof recheckEligibilityOnDispatchModeChange === "function") {
   recheckEligibilityOnDispatchModeChange();
 }
-
     // ❌ REMOVE MAP / LOCATION UI
     if (locRow) locRow.classList.add("hidden");
     if (mapBox) mapBox.classList.add("hidden");
@@ -4696,6 +4687,12 @@ setTimeout(() => {
   if (mapBox) mapBox.classList.add("hidden");
   if (mapFrame) mapFrame.src = "";
 }, 0);
+    
+console.log("🚦 DISPATCH MODE STATE", {
+  dispatchMode: window.__DISPATCH_MODE,
+  courierMode: window.__COURIER_MODE,
+  orderTypeUI: document.getElementById("orderType")?.value
+});
 
     return;
   }
@@ -13301,6 +13298,15 @@ if (
 
 
 function buildCheckoutPreviewInv() {
+
+                 // 🔴🔴🔴 DEBUG: ENTRY SNAPSHOT
+  console.log("🧾 [INVOICE ENTRY]", {
+    dispatchMode: window.__DISPATCH_MODE,
+    courierCharge: window.courierCharge,
+    orderEligibility: window.orderEligibility
+  });
+  // 🔴🔴🔴 END DEBUG
+  
 console.log("🚚 ELIGIBILITY USED:", window.orderEligibility);
 console.log("🧾 [INVOICE] Raw cart items (before filter):",
   JSON.parse(JSON.stringify(window.cartSummary?.items || []))
@@ -13318,7 +13324,20 @@ invoiceItems.forEach(i => {
   totalWeight += (Number(i.weight) || 0) * (Number(i.qty) || 0);
 });
 
+// 🔴🔴🔴 DEBUG: WEIGHT CALCULATION
+  console.log("📦 [WEIGHT CALC]", {
+    totalWeight,
+    roundedGrams: Number(totalWeight.toFixed(3)),
+roundedKg: Number((totalWeight / 1000).toFixed(3)),
 
+    items: invoiceItems.map(i => ({
+      name: i.name,
+      qty: i.qty,
+      unitWeight: i.weight,
+      lineWeight: (Number(i.weight) || 0) * (Number(i.qty) || 0)
+    }))
+  });
+  // 🔴🔴🔴 END DEBUG
   
   const orderType = document.getElementById("orderType")?.value || "";
   const eligibility = window.orderEligibility || {};
@@ -13375,12 +13394,33 @@ const postTaxDiscount =  reward + paid;
   if (orderType === "Dine In") {
     serviceAmt = grossValue * servicePercent;
   }
-  else if (orderType === "Home Delivery" || orderType === "Courier") {
-    // 🔥 Delivery ALWAYS from backend eligibility
-   deliveryAmt = Number(window.orderEligibility?.extraCharge || 0);
-  deliveryChargeLabel = window.orderEligibility?.chargeType || "Delivery Charges";
+  else if (orderType === "Home Delivery") {
+
+  // 📦 COURIER MODE → use courier charge ONLY
+  if (window.__DISPATCH_MODE === "COURIER") {
+    deliveryAmt = Number(window.courierCharge || 0);
+    deliveryChargeLabel = "Courier Charges";
+  } 
+  // 🏠 HOME DELIVERY MODE → backend eligibility
+  else {
+    deliveryAmt = Number(window.orderEligibility?.extraCharge || 0);
+    deliveryChargeLabel =
+      window.orderEligibility?.chargeType || "Delivery Charges";
   }
 }
+}
+
+   // 🔴🔴🔴 DEBUG: DELIVERY DECISION (MOST IMPORTANT)
+  console.log("🧾 [DELIVERY DECISION]", {
+    dispatchMode: window.__DISPATCH_MODE,
+    orderType,
+    courierCharge: window.courierCharge,
+    eligibilityExtra: window.orderEligibility?.extraCharge,
+    finalDeliveryAmt: deliveryAmt,
+    label: deliveryChargeLabel
+  });
+  // 🔴🔴🔴 END DEBUG
+  
   /* ======================
      GST RULES
   ====================== */
@@ -13416,7 +13456,17 @@ const billAmount = gstBase + taxTotal;
   billAmount,
   netPayable
   });
-
+// 🔴🔴🔴 DEBUG: FINAL AMOUNT SNAPSHOT
+  console.log("🧾 [INVOICE FINAL SNAPSHOT]", {
+    base,
+    serviceAmt,
+    deliveryAmt,
+    gstBase,
+    taxTotal,
+    netPayable,
+    dispatchMode: window.__DISPATCH_MODE
+  });
+  // 🔴🔴🔴 END DEBUG
   console.log("📦 [INVOICE FINAL WEIGHT CHECK]", {
   totalWeight,
   rounded: Number(totalWeight.toFixed(3)),
@@ -15070,6 +15120,17 @@ async function fetchCourierChargeForCheckout() {
       window.courierCharge = 0;
       return;
     }
+
+   // 🔴🔴🔴 DEBUG: COURIER PRECONDITION SNAPSHOT (DO NOT REMOVE)
+    console.log("🚚 [COURIER CHECK] Preconditions", {
+      dispatchMode: window.__DISPATCH_MODE,
+      selectedPincode: window.selectedPincode,
+      totalWeight: window.totalWeight,
+      totalWeightKg: Number(window.totalWeight) / 1000,
+      orderAmount: window.cartTotalAmount
+    });
+    // 🔴🔴🔴 END DEBUG
+    
 const weightKg = Number(window.totalWeight) / 1000;
     const payload = {
       userPin: window.selectedPincode,
@@ -15091,6 +15152,11 @@ const weightKg = Number(window.totalWeight) / 1000;
 
     const data = await res.json();
 
+  // 🔴🔴🔴 DEBUG: COURIER API RESPONSE
+    console.log("📡 [COURIER API RESPONSE]", data);
+    // 🔴🔴🔴 END DEBUG
+
+    
     if (!data.success) {
       console.error("❌ Courier API error", data.error);
       window.courierCharge = 0;
@@ -15467,6 +15533,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
