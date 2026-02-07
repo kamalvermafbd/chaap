@@ -13414,7 +13414,6 @@ roundedKg: Number((totalWeight / 1000).toFixed(3)),
   
 window.totalWeight = Number(totalWeight.toFixed(3));
 
-// 🔴🔴🔴 AUTO COURIER CALC — AFTER WEIGHT IS READY
 if (
   window.__DISPATCH_MODE === "COURIER" &&
   window.selectedPincode &&
@@ -13424,9 +13423,10 @@ if (
   console.log("🚚 Auto courier trigger after weight ready");
   window.__COURIER_CALC_IN_PROGRESS = true;
 
-//  fetchCourierChargeForCheckout().finally(() => {
-    window.__COURIER_CALC_IN_PROGRESS = false;
-  });
+  // fetchCourierChargeForCheckout();
+
+  window.__COURIER_CALC_IN_PROGRESS = false;
+}
 
 
 
@@ -15636,6 +15636,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
