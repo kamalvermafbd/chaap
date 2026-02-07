@@ -4587,6 +4587,25 @@ function updateCartWeightByMobileAPI() {
 }
 
 
+function handlePincodeUpdated(source) {
+  const pin = document.getElementById("pincode")?.value?.trim();
+  window.selectedPincode = pin;
+
+  console.log("📍 PINCODE UPDATED", {
+    source,
+    pincode: pin,
+    dispatchMode: window.__DISPATCH_MODE
+  });
+
+  // 🚚 Courier selected → fetch courier charge
+  if (window.__DISPATCH_MODE === "COURIER" && pin) {
+    fetchCourierChargeForCheckout().then(() => {
+      console.log("🚚 Courier recalculated after pincode update");
+      window.__CHECKOUT_SNAPSHOT = null;
+      updateCheckoutInvoice();
+    });
+  }
+}
 
     
 window.__COURIER_MODE = false;
@@ -4652,6 +4671,9 @@ window.__COURIER_MODE = true;
     }
     // 🔥 fills name/email/address for guest + login
 toggleAddressForDispatch();
+    // 🔥 ADD THIS
+handlePincodeUpdated("dispatchMode:Courier");
+
 
 // 🔑 Retail master trigger — eligibility via dispatch mode
 if (typeof recheckEligibilityOnDispatchModeChange === "function") {
@@ -15099,6 +15121,18 @@ async function deriveGuestCartBeforeInvoice() {
     console.error("❌ Guest derive error", err);
   }
 }
+  
+function onPincodeChange() {
+  window.selectedPincode = document.getElementById("pincode")?.value.trim();
+
+  if (window.__DISPATCH_MODE === "COURIER") {
+    fetchCourierChargeForCheckout().then(() => {
+      console.log("📍 Courier re-fetched after pincode");
+      window.__CHECKOUT_SNAPSHOT = null;
+      updateCheckoutInvoice();
+    });
+  }
+}
 
 async function fetchCourierChargeForCheckout() {
   try {
@@ -15533,6 +15567,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
