@@ -2644,7 +2644,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbwFQSrsUxTdXpCoOlbB5fucG8nYW0EsCePUSLCPD5jCbM0GxbMDMUctcchZ-OQiX2GcOw/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbzqZ4FSIq1SIjfFDCj233Fo2-H1Aa_jLBi88wbrHiODXdfZm5lowGir3fGUGh15kbwZEw/exec";
 
 // ===============================
 // API HELPER
@@ -13631,6 +13631,14 @@ if (inv.serviceAmt > 0) {
   } else {
     deliveryBox.classList.add("hidden");
   }
+// 🚚 Courier text (derived from backend)
+if (typeof window.courierCharge === "number") {
+  if (window.courierCharge === 0) {
+    showCourierText("🚚 Free Courier");
+  } else {
+    showCourierText(`🚚 Courier Charge: ₹${window.courierCharge}`);
+  }
+}
 
   // ✅ PAYMENT (checkout preview only)
   const payBox = root.querySelector("#invPayment");
@@ -14953,7 +14961,7 @@ function deferCheckoutBackgroundSync() {
         }
 
       }
-
+await fetchCourierChargeForCheckout();   // 🚚 ADD THIS LINE
       // 🧾 Invoice MUST always build
       await updateCheckoutInvoice();
 
@@ -15035,8 +15043,94 @@ async function deriveGuestCartBeforeInvoice() {
   }
 }
 
+async function fetchCourierChargeForCheckout() {
+  try {
+    // 🔒 Preconditions
+    if (!window.selectedPincode) {
+      console.warn("⚠️ Courier skipped: userPin missing");
+      window.courierCharge = 0;
+      return;
+    }
 
-  
+    if (typeof window.totalWeight !== "number") {
+      console.warn("⚠️ Courier skipped: totalWeight missing");
+      window.courierCharge = 0;
+      return;
+    }
+
+    const payload = {
+      userPin: window.selectedPincode,
+      orderAmount: Number(window.cartTotalAmount) || 0,
+      totalWeight: window.totalWeight
+    };
+
+    console.log("🚚 Courier payload", payload);
+
+    const res = await fetch(
+      API_BASE + "?api=calculateCourierCharge",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }
+    );
+
+    const data = await res.json();
+
+    if (!data.success) {
+      console.error("❌ Courier API error", data.error);
+      window.courierCharge = 0;
+      return;
+    }
+
+    // ✅ SINGLE SOURCE OF TRUTH
+    window.courierCharge = Number(data.courierCharge) || 0;
+    window.courierReason = data.reason || "";
+
+    console.log("✅ Courier charge set:", window.courierCharge);
+
+  } catch (err) {
+    console.error("❌ Courier API failed", err);
+    window.courierCharge = 0;
+  }
+}
+
+  function calculateCartTotalWeight(cartItems) {
+  let total = 0;
+
+  cartItems.forEach(item => {
+    const qty = Number(item.qty) || 0;
+    const unitWeight = Number(item.unitWeight) || 0; // KG
+
+    total += qty * unitWeight;
+  });
+
+  // optional: 2 decimal rounding
+  return Math.round(total * 100) / 100;
+}
+async function fetchCourierCharge() {
+  const payload = {
+    userPin: window.selectedPincode,     // checkout se
+    orderAmount: window.cartTotalAmount, // without courier
+    totalWeight: window.totalWeight      // 🔥 YAHI NAYA PART
+  };
+
+  const res = await fetch(API_BASE + "?api=calculateCourierCharge", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await res.json();
+
+  if (!data.success) {
+    alert(data.error);
+    return;
+  }
+
+  window.courierCharge = data.courierCharge || 0;
+}
+
 
 async function validateAppliedCouponForMobile(mobile) {
   console.log("🧪 validateAppliedCouponForMobile HIT", mobile);
@@ -15359,6 +15453,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
