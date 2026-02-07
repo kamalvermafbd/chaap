@@ -4606,18 +4606,34 @@ function handlePincodeUpdated(source) {
   console.log("📍 PINCODE UPDATED", {
     source,
     pincode: pin,
-    dispatchMode: window.__DISPATCH_MODE
+    dispatchMode: window.__DISPATCH_MODE,
+    totalWeight: window.totalWeight
   });
 
-  // 🚚 Courier selected → fetch courier charge
-  if (window.__DISPATCH_MODE === "COURIER" && pin) {
-    fetchCourierChargeForCheckout().then(() => {
-      console.log("🚚 Courier recalculated after pincode update");
-      window.__CHECKOUT_SNAPSHOT = null;
-      updateCheckoutInvoice();
-    });
+  // 🚚 COURIER → only when EVERYTHING is ready
+  if (
+    window.__DISPATCH_MODE === "COURIER" &&
+    pin &&
+    typeof window.totalWeight === "number" &&
+    window.totalWeight > 0 &&
+    window.__COURIER_CALC_IN_PROGRESS !== true
+  ) {
+    console.log("🚚 Courier trigger from pincode update");
+
+    window.__COURIER_CALC_IN_PROGRESS = true;
+
+    fetchCourierChargeForCheckout()
+      .then(() => {
+        console.log("✅ Courier recalculated after pincode update");
+        window.__CHECKOUT_SNAPSHOT = null;
+        updateCheckoutInvoice();
+      })
+      .finally(() => {
+        window.__COURIER_CALC_IN_PROGRESS = false;
+      });
   }
 }
+
 
     
 window.__COURIER_MODE = false;
@@ -13410,7 +13426,7 @@ if (
   console.log("🚚 Auto courier trigger after weight ready");
   window.__COURIER_CALC_IN_PROGRESS = true;
 
-  fetchCourierChargeForCheckout().finally(() => {
+//  fetchCourierChargeForCheckout().finally(() => {
     window.__COURIER_CALC_IN_PROGRESS = false;
   });
 }
@@ -15622,6 +15638,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
