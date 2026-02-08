@@ -13086,27 +13086,26 @@ document.getElementById("invoiceItems").innerHTML =
   const orderType = inv.orderType || "";
   let serviceAmt = 0;
   let deliveryAmt = 0;
+  
+// 🍽️ DINE IN
+if (orderType === "Dine In") {
+  serviceAmt = Number(inv.serviceAmt || 0);
+}
 
-  if (orderType === "Dine In") {
-    serviceAmt = Number(inv.serviceAmt || 0);
-  } else if (orderType === "Home Delivery" || orderType === "Courier") {
-    
+// 🚚 COURIER MODE — SINGLE SOURCE OF TRUTH
+else if (window.__DISPATCH_MODE === "COURIER") {
+  deliveryAmt = Number(inv.deliveryCharge || 0);
+}
 
-deliveryAmt = Number(
-  window.orderEligibility?.extraCharge ??   // 🔥 backend always wins
-  inv.deliveryCharge ??
-  window._checkoutInvoice?.deliveryCharge ??
-  0
-);
+// 🏠 NORMAL HOME DELIVERY
+else if (orderType === "Home Delivery") {
+  deliveryAmt = Number(
+    window.orderEligibility?.extraCharge ??
+    inv.deliveryCharge ??
+    0
+  );
+}
 
-
-const deliveryChargeLabel =
-  inv.deliveryChargeLabel ||
-  window.orderEligibility?.chargeType ||
-  "Delivery Charges";
-
-    
-  }
 
   /* ================= BASE & COUPONS ================= */
   const items = Number(inv.baseTotal || 0);
@@ -15582,6 +15581,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
