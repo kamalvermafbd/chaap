@@ -4939,7 +4939,6 @@ window.orderEligibility = null;
 // 🏬 RETAIL MODE: dispatchMode decides delivery, not orderType
 const industry = window.__INDUSTRY; // already set from Restaurant Info
 const dispatchModeNow = document.getElementById("dispatchMode")?.value;
-
 const isHomeDelivery =
   industry === "retail"
     ? dispatchModeNow === "Home Delivery"
@@ -4955,10 +4954,10 @@ if (
   return false;
 }
 
-    const orderType = document.getElementById("orderType")?.value.trim();
+const orderType = document.getElementById("orderType")?.value.trim();
 const inv = buildCheckoutPreviewInv();
 
-    const amount = Number(inv.baseTotal || 0);
+const amount = Number(inv.baseTotal || 0);
 
 // 🔧 FIX: define element before using
 const orderTypeEl = document.getElementById("orderType");
@@ -4968,8 +4967,6 @@ const orderTypeEl = document.getElementById("orderType");
   showError("⚠️ Please select Order Type");
   return false;
 }
-
-
     //  GUARD 2
     if (amount <= 0) {
       showError("⚠️ Cart is empty");
@@ -5060,8 +5057,6 @@ if (
   showError(res.message || "Delivery not available for this location");
   return false;
 }
-
-
 if (!res || res.allowed !== true) {
   showError(res?.message || "Order is not allowed at this time");
   return false;
@@ -5073,8 +5068,6 @@ if (!res || res.allowed !== true) {
       showError("⚠️ Please select a payment method");
       return false;
     }
-
-  
     // ✅ SUCCESS (NO UI SIDE-EFFECT LOOP)
     showSuccess("✅ Great! Everything is ready — you may place your order now.");
    
@@ -13372,8 +13365,7 @@ if (
 
 
 function buildCheckoutPreviewInv() {
-
-                 // 🔴🔴🔴 DEBUG: ENTRY SNAPSHOT
+// 🔴🔴🔴 DEBUG: ENTRY SNAPSHOT
   console.log("🧾 [INVOICE ENTRY]", {
     dispatchMode: window.__DISPATCH_MODE,
     courierCharge: window.courierCharge,
@@ -13413,22 +13405,6 @@ roundedKg: Number((totalWeight / 1000).toFixed(3)),
   });
   
 window.totalWeight = Number(totalWeight.toFixed(3));
-
-if (
-  window.__DISPATCH_MODE === "COURIER" &&
-  window.selectedPincode &&
-  typeof window.totalWeight === "number" &&
-  window.__COURIER_CALC_IN_PROGRESS !== true
-) {
-  console.log("🚚 Auto courier trigger after weight ready");
-  window.__COURIER_CALC_IN_PROGRESS = true;
-
-  // fetchCourierChargeForCheckout();
-
-  window.__COURIER_CALC_IN_PROGRESS = false;
-}
-
-
 
   const orderType = document.getElementById("orderType")?.value || "";
   const eligibility = window.orderEligibility || {};
@@ -15244,16 +15220,7 @@ const weightKg = Number(window.totalWeight) / 1000;
 
     console.log("🚚 Courier payload", payload);
 
-    const res = await fetch(
-      API_BASE + "?api=calculateCourierCharge",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      }
-    );
-
-    const data = await res.json();
+   const data = await apiPost("calculateCourierCharge", payload);
 
   // 🔴🔴🔴 DEBUG: COURIER API RESPONSE
     console.log("📡 [COURIER API RESPONSE]", data);
@@ -15291,28 +15258,7 @@ const weightKg = Number(window.totalWeight) / 1000;
   // optional: 2 decimal rounding
   return Math.round(total * 100) / 100;
 }
-async function fetchCourierCharge() {
-  const payload = {
-    userPin: window.selectedPincode,     // checkout se
-    orderAmount: window.cartTotalAmount, // without courier
-    totalWeight: window.totalWeight      // 🔥 YAHI NAYA PART
-  };
 
-  const res = await fetch(API_BASE + "?api=calculateCourierCharge", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-
-  const data = await res.json();
-
-  if (!data.success) {
-    alert(data.error);
-    return;
-  }
-
-  window.courierCharge = data.courierCharge || 0;
-}
 
 
 async function validateAppliedCouponForMobile(mobile) {
@@ -15636,6 +15582,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
