@@ -13157,8 +13157,8 @@ else if (orderType === "Home Delivery") {
   const items = Number(inv.baseTotal || 0);
 
   const normalCoupon =
-  selectedCoupon?.type === "normal"
-    ? Number(inv.couponAmount || selectedCoupon.flat || 0)
+  inv.couponType === "normal"
+    ? Number(inv.couponAmount ?? inv.offerDiscount ?? 0)
     : 0;
 
   const signup = Number(inv.signupDiscount || 0);
@@ -13217,7 +13217,8 @@ if (normalCoupon > 0) {
     <div class="flex justify-between text-green-600">
     
      <span>
-  ${selectedCoupon?.type === "normal" ? "Offer Applied" : "Coupon Applied"}
+  ${inv.couponType === "normal" ? "Offer Applied" : "Coupon Applied"}
+
 ${
   finalCouponId
     ? `<span class="text-xs text-gray-500">(${finalCouponId})</span>`
@@ -14402,8 +14403,6 @@ function renderInvoiceFromOrderAPI(inv) {
   // ✅ CLEAR ERROR / LOADING LEFTOVERS
   const itemsBox = document.getElementById("invoiceItems");
   if (itemsBox) itemsBox.innerHTML = "";
-
-
   console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
 
   /* ================= HEADER ================= */
@@ -14524,7 +14523,6 @@ document.getElementById("invoiceItems").innerHTML =
               </div>
             `
         }
-
         <div class="flex justify-between text-sm font-medium mt-0.5">
           <span>Item Total</span>
           <span>${fmt(net)}</span>
@@ -14532,18 +14530,17 @@ document.getElementById("invoiceItems").innerHTML =
       </div>
     `;
   }).join("");
-
-  
 /* ================= BASE & COUPONS ================= */
 // ✅ correct mapping from order sheet
 const items       = Number(inv.itemsSubtotal ?? inv.baseTotal ?? 0);
 const serviceAmt  = Number(inv.serviceCharge ?? inv.serviceCharges ?? 0);
 const deliveryAmt = Number(inv.deliveryCharge || 0);
-
 const signup = Number(inv.signupDiscount || 0);
-
+// ✅ AUTHORITATIVE NORMAL COUPON (checkout / order)
 const normalCoupon =
-  inv.couponType === "normal" ? Number(inv.couponAmount || 0) : 0;
+  inv.couponType === "normal"
+    ? Number(inv.couponAmount ?? inv.offerDiscount ?? 0)
+    : 0;
 
 const reward =
   inv.couponType === "reward" ? Number(inv.rewardDiscount || 0) : 0;
@@ -15646,6 +15643,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
