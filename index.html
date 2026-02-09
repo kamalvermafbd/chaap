@@ -13156,10 +13156,10 @@ else if (orderType === "Home Delivery") {
   /* ================= BASE & COUPONS ================= */
   const items = Number(inv.baseTotal || 0);
 
-  const normalCoupon =
-  inv.couponType === "normal"
-    ? Number(inv.couponAmount ?? inv.offerDiscount ?? 0)
-    : 0;
+ const normalCoupon =
+  window.drawerSpecialCoupon?.type === "normal"
+    ? Number(window.drawerSpecialCoupon.amount || 0)
+    : Number(inv.couponAmount || 0);
 
   const signup = Number(inv.signupDiscount || 0);
   //const reward = Number(inv.rewardDiscount || 0);
@@ -13176,9 +13176,10 @@ const paid =
 
   // Actual selling price
   // Actual selling price (PRE-TAX discounts)
-const grossValue = items - normalCoupon - signup;
-
-  
+const grossValue =
+  normalCoupon > 0
+    ? items - normalCoupon - signup
+    : items - signup;
 
 // 🔥 FINAL GST BASE (signup already adjusted)
 const gstBase = grossValue + serviceAmt + deliveryAmt;
@@ -13217,7 +13218,11 @@ if (normalCoupon > 0) {
     <div class="flex justify-between text-green-600">
     
      <span>
-  ${inv.couponType === "normal" ? "Offer Applied" : "Coupon Applied"}
+  ${window.drawerSpecialCoupon?.type === "normal" ||
+  inv.couponType === "normal"
+  ? "Offer Applied"
+  : "Coupon Applied"}
+
 
 ${
   finalCouponId
@@ -15643,6 +15648,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
