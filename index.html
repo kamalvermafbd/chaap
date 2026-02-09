@@ -13774,7 +13774,7 @@ function showCourierText(text) {
   const inv = buildCheckoutPreviewInv();
 
      // 🔹 2) CHECKOUT-ONLY best offer re-evaluation (CLEAN)
-  const checkoutSubtotal = Number(inv.itemsSubtotal || 0);
+ const checkoutSubtotal = Number(inv.base || 0);
 
   const checkoutBestOffer = evaluateBestOfferForCheckout(checkoutSubtotal);
 
@@ -15649,6 +15649,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
