@@ -13772,15 +13772,16 @@ function showCourierText(text) {
   mountInvoiceIntoCheckout();
    
   const inv = buildCheckoutPreviewInv();
-  renderInvoiceFromAPI(inv);
-  // 2️⃣ Ab FINAL subtotal available hai
-const checkoutSubtotal =
-  Number(window._checkoutInvoice?.itemsSubtotal || 0);
+renderInvoiceFromAPI(inv);
 
-  const checkoutBestOffer =
+// 🔑 FINAL, STOCK-AWARE SUBTOTAL
+const checkoutSubtotal =
+  Number(window._checkoutInvoice?.base || 0);
+
+const checkoutBestOffer =
   evaluateBestOfferForCheckout(checkoutSubtotal);
-   
-  // 3️⃣ APPLY OFFER ON AUTHORITATIVE OBJECT
+
+// APPLY ON AUTHORITATIVE OBJECT
 if (checkoutBestOffer) {
   window._checkoutInvoice.offerDiscount = checkoutBestOffer.value;
   window._checkoutInvoice.couponId = checkoutBestOffer.id;
@@ -13791,8 +13792,9 @@ if (checkoutBestOffer) {
   window._checkoutInvoice.couponText = "";
 }
 
-// 4️⃣ 🔥 FINAL RE-RENDER (once)
+// FINAL RENDER
 renderInvoiceFromAPI(window._checkoutInvoice);
+
 
   console.log("🧪 CHECKOUT PREVIEW (FINAL)", {
     checkoutSubtotal,
@@ -15655,6 +15657,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
