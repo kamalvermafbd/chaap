@@ -10535,6 +10535,45 @@ function refreshCheckoutCart() {
   }
 }
 
+// 🔒 CHECKOUT-ONLY OFFER EVALUATION (ISOLATED)
+function evaluateBestOfferForCheckout(subtotal) {
+  if (!window.liveOffers || !Array.isArray(window.liveOffers)) {
+    return null;
+  }
+
+  let best = null;
+
+  window.liveOffers.forEach(o => {
+    if (!o.active) return;
+
+    const min = Number(o.min || 0);
+    if (subtotal < min) return;
+
+    // percent offer
+    let discountValue = 0;
+    if (o.discount) {
+      discountValue = subtotal * (Number(o.discount) / 100);
+    }
+    // flat offer
+    else if (o.flat) {
+      discountValue = Number(o.flat);
+    }
+
+    if (!best || discountValue > best.value) {
+      best = {
+        id: o.id,
+        text: o.text,
+        min: min,
+        discount: o.discount || 0,
+        value: Number(discountValue.toFixed(2))
+      };
+    }
+  });
+
+  return best;
+}
+
+  
 function updateDrawerTotals() {
   const cartArr = getCart();
   let subtotal = 0;
@@ -13733,8 +13772,27 @@ function showCourierText(text) {
   mountInvoiceIntoCheckout();
    
   const inv = buildCheckoutPreviewInv();
-   // 🔥 YAHIN
-updateDrawerTotals();   // best / manual offer re-evaluate
+
+     // 🔹 2) CHECKOUT-ONLY best offer re-evaluation (CLEAN)
+  const checkoutSubtotal = Number(inv.base || inv.itemsSubtotal || 0);
+
+  const checkoutBestOffer = evaluateBestOfferForCheckout(checkoutSubtotal);
+
+  if (checkoutBestOffer) {
+    inv.offerDiscount = checkoutBestOffer.value;
+    inv.couponId = checkoutBestOffer.id;
+    inv.couponText = checkoutBestOffer.text;
+  } else {
+    inv.offerDiscount = 0;
+    inv.couponId = "";
+    inv.couponText = "";
+  }
+
+  console.log("🧪 CHECKOUT PREVIEW (FINAL)", {
+    checkoutSubtotal,
+    couponId: inv.couponId,
+    offerDiscount: inv.offerDiscount
+  });
 
    console.log("🧪 PREVIEW", buildCheckoutPreviewInv());
    
@@ -15591,6 +15649,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
