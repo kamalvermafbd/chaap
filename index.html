@@ -10722,6 +10722,13 @@ const autoCoupon = {
   text: best.text || best.id
 };
 
+      // 🔍 👇 LOG YAHIN DAALNA HAI
+      console.log("🧪 AUTO COUPON DEBUG", {
+        best_min_raw: best.min,
+        autoCoupon_min: autoCoupon.min,
+        subtotal_used: subtotal,
+        best_id: best.id
+  });
 // 🔑 SINGLE SOURCE OF TRUTH
 selectedCoupon = autoCoupon;
 window._appliedCoupon = autoCoupon;
@@ -15584,6 +15591,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
