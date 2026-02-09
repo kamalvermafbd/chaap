@@ -13773,7 +13773,22 @@ function showCourierText(text) {
    
   const inv = buildCheckoutPreviewInv();
    console.log("🧪 PREVIEW", buildCheckoutPreviewInv());
-   
+   // 🔑 ✅ CHECKOUT-ONLY BEST OFFER RE-EVALUATION
+if (window.couponMode === "bestoffer") {
+  const freshBest = getBestOffer(inv.itemsSubtotal);
+
+  if (freshBest) {
+    inv.offerDiscount = freshBest.value;
+    inv.couponId = freshBest.id;
+    inv.couponText = freshBest.text;
+  } else {
+    inv.offerDiscount = 0;
+    inv.couponId = "";
+    inv.couponText = "";
+  }
+}
+
+console.log("🧪 PREVIEW", inv);
   renderInvoiceFromAPI(inv);
    // 🔥 HIDE cancel / hold items from invoice + show notes
 renderInvoiceNotesFromCart(window.cartSummary?.items || []);
@@ -15628,6 +15643,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
