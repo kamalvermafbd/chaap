@@ -13759,7 +13759,7 @@ function showCourierText(text) {
 
  async function updateCheckoutInvoice() {
 
-    if (window._invoiceUpdating) return;
+  if (window._invoiceUpdating) return;
   window._invoiceUpdating = true;
    
    document.getElementById("checkoutInvoiceOverlay")?.classList.remove("hidden");
@@ -13774,20 +13774,30 @@ function showCourierText(text) {
   const inv = buildCheckoutPreviewInv();
    console.log("🧪 PREVIEW", buildCheckoutPreviewInv());
    // 🔑 ✅ CHECKOUT-ONLY BEST OFFER RE-EVALUATION
+// 🔒 STEP 1: VALIDATE CURRENT COUPON (MIN CHECK)
+if (inv.couponId) {
+  const applied = window.liveOffers?.find(o => o.id === inv.couponId);
+  const min = Number(applied?.min || 0);
+
+  if (inv.itemsSubtotal < min) {
+    // ❌ applied coupon no longer valid
+    inv.couponId = "";
+    inv.couponText = "";
+    inv.offerDiscount = 0;
+  }
+}
+
+// 🔑 STEP 2: APPLY BEST OFFER (IF MODE = bestoffer)
 if (window.couponMode === "bestoffer") {
-  const checkoutSubtotal = inv.itemsSubtotal;
   const freshBest = getBestOffer(inv.itemsSubtotal);
 
   if (freshBest) {
     inv.offerDiscount = freshBest.value;
     inv.couponId = freshBest.id;
     inv.couponText = freshBest.text;
-  } else {
-    inv.offerDiscount = 0;
-    inv.couponId = "";
-    inv.couponText = "";
   }
 }
+
 
 console.log("🧪 PREVIEW", inv);
   renderInvoiceFromAPI(inv);
@@ -15644,6 +15654,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
