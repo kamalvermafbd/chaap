@@ -13022,11 +13022,10 @@ function renderInvoiceFromAPI(inv) {
   console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
 const couponSnapshotId = window._appliedCouponSnapshot?.id || "";
 // 🔒 FINAL COUPON ID (timing-safe)
-const finalCouponId =
-  window._finalCouponId ||
-  inv.couponId ||
-  window._checkoutInvoice?.couponId ||
-  "";
+ const finalCouponId =
+    inv.couponId ||
+    window._finalCouponId ||
+    "";
 
   /* ================= HEADER ================= */
   const orderDt = new Date(inv.orderDate).toLocaleString();
@@ -13803,21 +13802,35 @@ function showCourierText(text) {
 
 
  async function updateCheckoutInvoice() {
-
+  // 🔒 HARD GUARD — NO ASYNC BEFORE THIS
   if (window._invoiceUpdating) return;
   window._invoiceUpdating = true;
-   
-   document.getElementById("checkoutInvoiceOverlay")?.classList.remove("hidden");
 
-     if (window._cartSavePromise) {
+  // 🔥 HARD RESET COUPON STATE (checkout recalculation)
+  window._finalCouponId = null;
+  window._appliedCouponSnapshot = null;
+
+  if (window._checkoutInvoice) {
+    delete window._checkoutInvoice.couponId;
+    delete window._checkoutInvoice.selectedCouponId;
+  }
+
+   document.getElementById("checkoutInvoiceOverlay")
+    ?.classList.remove("hidden");
+
+  if (window._cartSavePromise) {
     await window._cartSavePromise;
   }
-    
+  // 🔒 sync drawer coupon ONLY if user manually selected
+if (window.couponMode !== "bestoffer") {
   syncCouponFromDrawerForCheckout();
+}
+
   mountInvoiceIntoCheckout();
    
-  const inv = buildCheckoutPreviewInv();
-   console.log("🧪 PREVIEW", buildCheckoutPreviewInv());
+ const inv = buildCheckoutPreviewInv();
+console.log("🧪 PREVIEW", inv);
+
    // 🔑 ✅ CHECKOUT-ONLY BEST OFFER RE-EVALUATION
 // 🔒 STEP 1: VALIDATE CURRENT COUPON (MIN CHECK)
 if (inv.couponId) {
@@ -15687,6 +15700,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
