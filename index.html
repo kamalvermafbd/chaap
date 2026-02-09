@@ -13150,17 +13150,10 @@ else if (orderType === "Home Delivery") {
     0
   );
 }
-
-
   /* ================= BASE & COUPONS ================= */
   const items = Number(inv.baseTotal || 0);
 
-const normalCoupon =
-  inv.couponType === "normal"
-    ? Number(inv.couponAmount || 0)
-    : 0;
-
-
+const normalCoupon = Number(inv.couponAmount || 0);
   const signup = Number(inv.signupDiscount || 0);
   //const reward = Number(inv.rewardDiscount || 0);
 
@@ -15705,6 +15698,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
