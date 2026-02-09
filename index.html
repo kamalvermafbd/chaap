@@ -13679,7 +13679,12 @@ gstOnDiscountedAmount: window.gstOnDiscountedAmount,
     signupDiscount: signup,
   couponId: window.drawerSpecialCoupon?.id || "",
 couponAmount: normalCoupon,
+
+// 🔥 🔥 THIS IS THE FIX
+couponType: normalCoupon > 0 ? "normal" : "",
+
 normalCoupon: normalCoupon,
+
 
 
     // ===== PAYMENT =====
@@ -15700,6 +15705,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
