@@ -13156,10 +13156,11 @@ else if (orderType === "Home Delivery") {
   /* ================= BASE & COUPONS ================= */
   const items = Number(inv.baseTotal || 0);
 
- const normalCoupon =
-  window.drawerSpecialCoupon?.type === "normal"
-    ? Number(window.drawerSpecialCoupon.amount || 0)
-    : Number(inv.couponAmount || 0);
+const normalCoupon =
+  inv.couponType === "normal"
+    ? Number(inv.couponAmount || 0)
+    : 0;
+
 
   const signup = Number(inv.signupDiscount || 0);
   //const reward = Number(inv.rewardDiscount || 0);
@@ -13446,7 +13447,6 @@ invoiceItems.forEach(i => {
     totalWeight,
     roundedGrams: Number(totalWeight.toFixed(3)),
 roundedKg: Number((totalWeight / 1000).toFixed(3)),
-
     items: invoiceItems.map(i => ({
       name: i.name,
       qty: i.qty,
@@ -13482,8 +13482,8 @@ console.log("🧾 [INVOICE] Invoice-visible items (after filter):",
 const base = Number(calculatedBase.toFixed(2));
   
 const normalCoupon =
-  selectedCoupon?.type === "normal"
-    ? Number(s.couponAmount || selectedCoupon.flat || 0)
+  window.drawerSpecialCoupon?.type === "normal"
+    ? Number(window.drawerSpecialCoupon.amount || 0)
     : 0;
 
   const signup = Number(s.signupDiscount || 0);
@@ -13633,16 +13633,15 @@ sgstPercent: window.sgstPercent,
 igstPercent: window.igstPercent,
 gstOnDiscountedAmount: window.gstOnDiscountedAmount,
     // ===== COUPONS =====
-   couponAmount: Number(s.couponAmount || 0),
-normalCoupon: Number(s.couponAmount || 0),
+couponAmount: normalCoupon,
+normalCoupon: normalCoupon,
+
     rewardDiscount: reward,
     paidCouponDiscount: paid,
     signupDiscount: signup,
     couponId:
-  window.drawerSpecialCoupon?.id ||
-  selectedCoupon?.id ||
-  alreadyAppliedCouponId ||
-  "",
+  window.drawerSpecialCoupon?.id || "",
+
 
     // ===== PAYMENT =====
     paymentMethod: document.getElementById("paymentMethod")?.value || ""
@@ -15648,6 +15647,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
