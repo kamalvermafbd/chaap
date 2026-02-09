@@ -13775,6 +13775,7 @@ function showCourierText(text) {
    console.log("🧪 PREVIEW", buildCheckoutPreviewInv());
    // 🔑 ✅ CHECKOUT-ONLY BEST OFFER RE-EVALUATION
 if (window.couponMode === "bestoffer") {
+  const checkoutSubtotal = inv.itemsSubtotal;
   const freshBest = getBestOffer(inv.itemsSubtotal);
 
   if (freshBest) {
@@ -15643,6 +15644,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
