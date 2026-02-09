@@ -13480,13 +13480,56 @@ console.log("🧾 [INVOICE] Invoice-visible items (after filter):",
 
 // 🔒 ROUND FINAL BASE (currency-safe)
 const base = Number(calculatedBase.toFixed(2));
-  
-const normalCoupon =
-  window.drawerSpecialCoupon?.type === "normal"
-    ? Number(window.drawerSpecialCoupon.amount || 0)
-    : 0;
 
-  const signup = Number(s.signupDiscount || 0);
+  // 🔁 AUTO COUPON RE-EVALUATION (MOST IMPORTANT FIX)
+let appliedCoupon = null;
+let normalCoupon = 0;
+
+const offers = window.liveOffers || [];
+
+offers.forEach(o => {
+  if (!o.active) return;
+
+  const min = Number(o.min || 0);
+  if (base < min) return;
+
+  let discountValue = 0;
+
+  if (o.discount) {
+    discountValue = base * (Number(o.discount) / 100);
+  } else if (o.flat) {
+    discountValue = Number(o.flat);
+  }
+
+  if (!appliedCoupon || discountValue > appliedCoupon.discountValue) {
+    appliedCoupon = {
+      ...o,
+      discountValue
+    };
+  }
+});
+
+// 🔥 APPLY BEST ELIGIBLE COUPON (OR CLEAR)
+if (appliedCoupon) {
+  normalCoupon = +appliedCoupon.discountValue.toFixed(2);
+
+  window.drawerSpecialCoupon = {
+    id: appliedCoupon.id,
+    type: "normal",
+    amount: normalCoupon,
+    min: appliedCoupon.min
+  };
+} else {
+  window.drawerSpecialCoupon = null;
+}
+
+  console.log("🧪 AUTO COUPON RESULT", {
+  base,
+  applied: window.drawerSpecialCoupon?.id || "NONE",
+  amount: normalCoupon
+});
+
+const signup = Number(s.signupDiscount || 0);
 const reward =
   window.drawerSpecialCoupon?.type === "reward"
     ? window.drawerSpecialCoupon.amount
@@ -13562,8 +13605,6 @@ const billAmount = gstBase + taxTotal;
      NET PAYABLE
   ====================== */
   const netPayable = billAmount - postTaxDiscount;
-
-
   console.log("🧪 PREVIEW DEBUG", {
     orderType,
     grossValue,
@@ -13633,14 +13674,13 @@ sgstPercent: window.sgstPercent,
 igstPercent: window.igstPercent,
 gstOnDiscountedAmount: window.gstOnDiscountedAmount,
     // ===== COUPONS =====
-couponAmount: normalCoupon,
-normalCoupon: normalCoupon,
 
     rewardDiscount: reward,
     paidCouponDiscount: paid,
     signupDiscount: signup,
-    couponId:
-  window.drawerSpecialCoupon?.id || "",
+  couponId: window.drawerSpecialCoupon?.id || "",
+couponAmount: normalCoupon,
+normalCoupon: normalCoupon,
 
 
     // ===== PAYMENT =====
@@ -15647,6 +15687,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
