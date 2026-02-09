@@ -13790,15 +13790,12 @@ if (inv.couponId) {
 // 🔑 STEP 2: APPLY BEST OFFER (IF MODE = bestoffer)
 if (window.couponMode === "bestoffer") {
   const freshBest = getBestOffer(inv.itemsSubtotal);
-
   if (freshBest) {
     inv.offerDiscount = freshBest.value;
     inv.couponId = freshBest.id;
     inv.couponText = freshBest.text;
   }
 }
-
-
 console.log("🧪 PREVIEW", inv);
   renderInvoiceFromAPI(inv);
    // 🔥 HIDE cancel / hold items from invoice + show notes
@@ -13816,9 +13813,7 @@ if (inv.serviceAmt > 0) {
 } else {
   serviceBox.classList.add("hidden");
 }
-
-
-  // Delivery
+// Delivery
   const deliveryBox = root.querySelector("#invDelivery");
   if ((inv.deliveryCharge || inv.extraCharge || 0) > 0) {
 
@@ -13842,14 +13837,9 @@ if (typeof window.courierCharge === "number") {
   } else {
     payBox.classList.remove("hidden");
   }
-
-  injectCheckoutOfferDiscount(inv);
     window._couponApplying = false;
    window._invoiceUpdating = false;
 }
-
-
-
 
   
 function mountInvoiceIntoCheckout() {
@@ -15654,6 +15644,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
