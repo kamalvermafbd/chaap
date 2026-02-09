@@ -13756,63 +13756,73 @@ function showCourierText(text) {
   if (el) el.textContent = text;
 }
 
-async function updateCheckoutInvoice() {
 
-  if (window._invoiceUpdating) return;
+ async function updateCheckoutInvoice() {
+
+    if (window._invoiceUpdating) return;
   window._invoiceUpdating = true;
+   
+   document.getElementById("checkoutInvoiceOverlay")?.classList.remove("hidden");
 
-  document.getElementById("checkoutInvoiceOverlay")
-    ?.classList.remove("hidden");
-
-  if (window._cartSavePromise) {
+     if (window._cartSavePromise) {
     await window._cartSavePromise;
   }
-
+    
   syncCouponFromDrawerForCheckout();
   mountInvoiceIntoCheckout();
-
-  // 1️⃣ Build invoice ONCE
+   
   const inv = buildCheckoutPreviewInv();
+   console.log("🧪 PREVIEW", buildCheckoutPreviewInv());
+   
+  renderInvoiceFromAPI(inv);
+   // 🔥 HIDE cancel / hold items from invoice + show notes
+renderInvoiceNotesFromCart(window.cartSummary?.items || []);
 
-  // 🔒 lock authoritative snapshot
-  window._checkoutInvoice = JSON.parse(JSON.stringify(inv));
+document.getElementById("checkoutInvoiceOverlay")?.classList.add("hidden");
 
-  // 2️⃣ FINAL subtotal (after stock / qty filter)
-  const checkoutSubtotal = Number(
-    window._checkoutInvoice.itemsSubtotal || 0
-  );
+  // 🔒 SINGLE CONTROL POINT
+  const root = document.getElementById("checkoutInvoiceContainer");
 
-  // 3️⃣ Evaluate offer ONLY on this subtotal
-  const best = evaluateBestOfferForCheckout(checkoutSubtotal);
+  // Service
+const serviceBox = root.querySelector("#invService");
+if (inv.serviceAmt > 0) {
+  serviceBox.classList.remove("hidden");
+} else {
+  serviceBox.classList.add("hidden");
+}
 
-  if (best) {
-    window._checkoutInvoice.offerDiscount = best.value;
-    window._checkoutInvoice.couponId = best.id;
-    window._checkoutInvoice.couponText = best.text;
+
+  // Delivery
+  const deliveryBox = root.querySelector("#invDelivery");
+  if ((inv.deliveryCharge || inv.extraCharge || 0) > 0) {
+
+    deliveryBox.classList.remove("hidden");
   } else {
-    window._checkoutInvoice.offerDiscount = 0;
-    window._checkoutInvoice.couponId = "";
-    window._checkoutInvoice.couponText = "";
+    deliveryBox.classList.add("hidden");
+  }
+// 🚚 Courier text (derived from backend)
+if (typeof window.courierCharge === "number") {
+  if (window.courierCharge === 0) {
+    showCourierText("🚚 Free Courier");
+  } else {
+    showCourierText(`🚚 Courier Charge: ₹${window.courierCharge}`);
+  }
+}
+
+  // ✅ PAYMENT (checkout preview only)
+  const payBox = root.querySelector("#invPayment");
+  if (!inv.paymentMethod || inv.paymentMethod.trim() === "") {
+    payBox.classList.add("hidden");
+  } else {
+    payBox.classList.remove("hidden");
   }
 
-  console.log("🧪 FINAL CHECKOUT SNAPSHOT", {
-    subtotal: checkoutSubtotal,
-    coupon: window._checkoutInvoice.couponId,
-    discount: window._checkoutInvoice.offerDiscount
-  });
-
-  // 4️⃣ SINGLE FINAL RENDER
-  renderInvoiceFromAPI(window._checkoutInvoice);
-
-  // Notes (cancel / partial / hold)
-  renderInvoiceNotesFromCart(window.cartSummary?.items || []);
-
-  document.getElementById("checkoutInvoiceOverlay")
-    ?.classList.add("hidden");
-
-  window._couponApplying = false;
-  window._invoiceUpdating = false;
+  injectCheckoutOfferDiscount(inv);
+    window._couponApplying = false;
+   window._invoiceUpdating = false;
 }
+
+
 
 
   
@@ -15618,6 +15628,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
