@@ -13772,21 +13772,27 @@ function showCourierText(text) {
   mountInvoiceIntoCheckout();
    
   const inv = buildCheckoutPreviewInv();
+  renderInvoiceFromAPI(inv);
+  // 2️⃣ Ab FINAL subtotal available hai
+const checkoutSubtotal =
+  Number(window._checkoutInvoice?.itemsSubtotal || 0);
 
-     // 🔹 2) CHECKOUT-ONLY best offer re-evaluation (CLEAN)
- const checkoutSubtotal = Number(inv.base || 0);
+  const checkoutBestOffer =
+  evaluateBestOfferForCheckout(checkoutSubtotal);
+   
+  // 3️⃣ APPLY OFFER ON AUTHORITATIVE OBJECT
+if (checkoutBestOffer) {
+  window._checkoutInvoice.offerDiscount = checkoutBestOffer.value;
+  window._checkoutInvoice.couponId = checkoutBestOffer.id;
+  window._checkoutInvoice.couponText = checkoutBestOffer.text;
+} else {
+  window._checkoutInvoice.offerDiscount = 0;
+  window._checkoutInvoice.couponId = "";
+  window._checkoutInvoice.couponText = "";
+}
 
-  const checkoutBestOffer = evaluateBestOfferForCheckout(checkoutSubtotal);
-
-  if (checkoutBestOffer) {
-    inv.offerDiscount = checkoutBestOffer.value;
-    inv.couponId = checkoutBestOffer.id;
-    inv.couponText = checkoutBestOffer.text;
-  } else {
-    inv.offerDiscount = 0;
-    inv.couponId = "";
-    inv.couponText = "";
-  }
+// 4️⃣ 🔥 FINAL RE-RENDER (once)
+renderInvoiceFromAPI(window._checkoutInvoice);
 
   console.log("🧪 CHECKOUT PREVIEW (FINAL)", {
     checkoutSubtotal,
@@ -13796,7 +13802,7 @@ function showCourierText(text) {
 
    console.log("🧪 PREVIEW", buildCheckoutPreviewInv());
    
-  renderInvoiceFromAPI(inv);
+
    // 🔥 HIDE cancel / hold items from invoice + show notes
 renderInvoiceNotesFromCart(window.cartSummary?.items || []);
 
@@ -15649,6 +15655,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
