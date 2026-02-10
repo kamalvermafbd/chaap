@@ -4655,19 +4655,17 @@ function handlePincodeUpdated(source) {
       });
   }
 }
-
-
     
 window.__COURIER_MODE = false;
 window.__DISPATCH_MODE = null; // "HOME" | "COURIER"
 
 function onDispatchModeChange() {
   // 🔥🔥🔥 RETAIL HARD RESET — allow eligibility + overlay again
-window.__CHECKOUT_SNAPSHOT = null;
-window._checkoutInvoice = null;
+  window.__CHECKOUT_SNAPSHOT = null;
+  window._checkoutInvoice = null;
 
-const overlay = document.getElementById("invoiceProcessingOverlay");
-if (overlay) overlay.classList.add("hidden");
+  const overlay = document.getElementById("invoiceProcessingOverlay");
+  if (overlay) overlay.classList.add("hidden");
 
   const mode = document.getElementById("dispatchMode")?.value;
 
@@ -4676,111 +4674,86 @@ if (overlay) overlay.classList.add("hidden");
   const mapFrame = document.getElementById("mapPreviewFrame");
 
   console.log("🚚 Dispatch mode selected:", mode);
- // 🔄 COMMON: reset location whenever dispatch mode changes
 
   /* ======================================================
    * 🏠 DISPATCH = HOME DELIVERY
-   * 👉 FULL EXISTING FLOW (DATA + GPS)
    * ====================================================== */
-if (mode === "Home Delivery") {
-  window.__COURIER_MODE = false;
-  window.__DISPATCH_MODE = "HOME"; // ✅ NEW
+  if (mode === "Home Delivery") {
+    window.__COURIER_MODE = false;
+    window.__DISPATCH_MODE = "HOME";
 
-  // 🔄 FULL RESET when coming back from Courier
-  window._deliveryLocation = null;
-  window._deliveryLocationReady = false;
-  window._guestLocationPromptShown = false;
+    window._deliveryLocation = null;
+    window._deliveryLocationReady = false;
+    window._guestLocationPromptShown = false;
 
-  const orderType = document.getElementById("orderType");
-  if (orderType) {
-    orderType.value = "Home Delivery";
-  }
-  toggleAddressForDispatch();
-  // 🔒 lock place order until location is set again
-  updatePlaceOrderLockByLocation();
-  console.log("🔄 Switched to Home Delivery — waiting for fresh location");
-  return;
-}
-  /* ======================================================
-   * 📦 DISPATCH = COURIER
-   * 👉 DATA SAME AS HOME DELIVERY
-   * 👉 BUT GPS / MAP / LAT-LNG COMPLETELY DISABLED
-   * ====================================================== */
-if (mode === "Courier") {
-  window.__COURIER_MODE = true;
-  window.__DISPATCH_MODE = "COURIER";
-
-  ensureCartWeightBeforeCourier_then(() => {
-    // 🛑 HARD BLOCK GPS PROMPT
-    window._guestLocationPromptShown = true;
-    window._deliveryLocationReady = true;
-
-    // 🔁 trick: use Home Delivery only for DATA FILL
     const orderType = document.getElementById("orderType");
     if (orderType) orderType.value = "Home Delivery";
 
     toggleAddressForDispatch();
-
-    // ✅ pincode trigger AFTER weight exists
-    setTimeout(() => {
-      handlePincodeUpdated("dispatchMode:autoFill");
-    }, 0);
-
     updatePlaceOrderLockByLocation();
-    canProceedPlaceOrder();
 
-    console.log("🚦 Courier flow continued AFTER weight ensured");
-  });
+    console.log("🔄 Switched to Home Delivery — waiting for fresh location");
+    return;
+  }
 
-  return;
-}
+  /* ======================================================
+   * 📦 DISPATCH = COURIER
+   * ====================================================== */
+  if (mode === "Courier") {
+    window.__COURIER_MODE = true;
+    window.__DISPATCH_MODE = "COURIER";
 
+    ensureCartWeightBeforeCourier_then(() => {
 
-// 🔑 Retail master trigger — eligibility via dispatch mode
-if (typeof recheckEligibilityOnDispatchModeChange === "function") {
-  recheckEligibilityOnDispatchModeChange();
-}
-    // ❌ REMOVE MAP / LOCATION UI
-    if (locRow) locRow.classList.add("hidden");
-    if (mapBox) mapBox.classList.add("hidden");
-    if (mapFrame) mapFrame.src = "";
+      // 🛑 HARD BLOCK GPS / LOCATION (EXISTING LOGIC – MOVED ONLY)
+      window._guestLocationPromptShown = true;
+      window._deliveryLocationReady = true;
+      window._deliveryLocation = null;
+      window._userLat = "";
+      window._userLng = "";
 
-    // ❌ CLEAR ALL GPS STATE (NO SAVE)
-    window._deliveryLocation = null;
-    window._userLat = "";
-    window._userLng = "";
+      if (locRow) locRow.classList.add("hidden");
+      if (mapBox) mapBox.classList.add("hidden");
+      if (mapFrame) mapFrame.src = "";
 
-   // 🔓 allow place order without distance check
-updatePlaceOrderLockByLocation();
+      // 🔁 trick: Home Delivery only for data fill
+      const orderType = document.getElementById("orderType");
+      if (orderType) orderType.value = "Home Delivery";
 
-// 🔑 FINAL ELIGIBILITY CHECK
-canProceedPlaceOrder();
+      toggleAddressForDispatch();
 
-    
-  // ✅✅✅ NEW: UPDATE CART WEIGHT IN BACKEND
-  updateCartWeightByMobileAPI();
-    
-    // 🔒 FINAL OVERRIDE — Courier must NEVER show location/map
-setTimeout(() => {
-  const locRow = document.getElementById("locationStatusRow");
-  const mapBox = document.getElementById("mapPreviewBox");
-  const mapFrame = document.getElementById("mapPreviewFrame");
+      // ✅ pincode trigger AFTER weight exists
+      setTimeout(() => {
+        handlePincodeUpdated("dispatchMode:autoFill");
+      }, 0);
 
-  if (locRow) locRow.classList.add("hidden");
-  if (mapBox) mapBox.classList.add("hidden");
-  if (mapFrame) mapFrame.src = "";
-}, 0);
-    
-console.log("🚦 DISPATCH MODE STATE", {
-  dispatchMode: window.__DISPATCH_MODE,
-  courierMode: window.__COURIER_MODE,
-  orderTypeUI: document.getElementById("orderType")?.value
-});
+      // 🔑 EXISTING FINAL STEPS (UNCHANGED)
+      if (typeof recheckEligibilityOnDispatchModeChange === "function") {
+        recheckEligibilityOnDispatchModeChange();
+      }
+
+      updatePlaceOrderLockByLocation();
+      canProceedPlaceOrder();
+
+      updateCartWeightByMobileAPI();
+
+      // 🔒 FINAL OVERRIDE — Courier must NEVER show location/map
+      setTimeout(() => {
+        if (locRow) locRow.classList.add("hidden");
+        if (mapBox) mapBox.classList.add("hidden");
+        if (mapFrame) mapFrame.src = "";
+      }, 0);
+
+      console.log("🚦 DISPATCH MODE STATE", {
+        dispatchMode: window.__DISPATCH_MODE,
+        courierMode: window.__COURIER_MODE,
+        orderTypeUI: document.getElementById("orderType")?.value
+      });
+    });
 
     return;
   }
 }
-
 
 function toggleMapByOrderType(orderType) {
   const mapBox = document.getElementById("mapPreviewBox");
@@ -15774,6 +15747,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
