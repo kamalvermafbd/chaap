@@ -4613,6 +4613,14 @@ function updateCartWeightByMobileAPI() {
 }
 
 function handlePincodeUpdated(source) {
+  // 🔥 LOGIN SAFE FIX — ensure weight exists
+  if (
+    window.__DISPATCH_MODE === "COURIER" &&
+    (!window.totalWeight || window.totalWeight === 0)
+  ) {
+    console.warn("⚠️ totalWeight missing → building invoice first");
+    buildCheckoutPreviewInv();   // 👈 KEY LINE
+  }
   const pin = document.getElementById("pincode")?.value?.trim();
   window.selectedPincode = pin;
 
@@ -15711,6 +15719,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
