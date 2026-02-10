@@ -7483,8 +7483,7 @@ async function onUserLogin(mobile) {
     discPercent: Number(i.discPercent || 0),
     itemId: i.itemId || "",
     variantId: i.variantId || "",
-    image: i.image || "",
-   weight: Number(i.weight || 0)
+    image: i.image || ""
   }));
 
   // -------------------------------
@@ -13040,7 +13039,31 @@ function revalidateAppliedCouponAgainstCart() {
     hideCouponMotivationHint?.();
   }
 }
-  
+
+  async function ensureCartWeightForCheckout() {
+  if (!isLoggedIn()) return;
+
+  const items = window.cartSummary?.items || [];
+  const hasWeight = items.some(i => Number(i.weight) > 0);
+
+  if (hasWeight) {
+    console.log("⚖️ Weight already present, skipping derive");
+    return;
+  }
+
+  console.log("⚙️ Deriving cart weight from backend");
+
+  const mobile = localStorage.getItem("userMobile");
+  if (!mobile) return;
+
+  await apiPost("updateCartDerivedStateByMobile", { mobile });
+
+  // re-fetch cart so weight comes into cartSummary
+  const res = await apiPost("getCart", { mobile });
+  window.cart = res.cart || [];
+  renderCart(); // this updates window.cartSummary
+}
+
 function renderInvoiceFromAPI(inv) {
   console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
 const couponSnapshotId = window._appliedCouponSnapshot?.id || "";
@@ -13431,7 +13454,7 @@ if (
 }
 
 
-function buildCheckoutPreviewInv() {
+async function buildCheckoutPreviewInv() {
 // 🔴🔴🔴 DEBUG: ENTRY SNAPSHOT
   console.log("🧾 [INVOICE ENTRY]", {
     dispatchMode: window.__DISPATCH_MODE,
@@ -13445,6 +13468,7 @@ console.log("🧾 [INVOICE] Raw cart items (before filter):",
   JSON.parse(JSON.stringify(window.cartSummary?.items || []))
 );
 
+      await ensureCartWeightForCheckout();
   // 🔒 SINGLE SOURCE OF TRUTH (drawer cart snapshot for amounts only)
   const s = window.cartSummary || {};
   const d = window._drawerTotals || {};
@@ -15721,6 +15745,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
