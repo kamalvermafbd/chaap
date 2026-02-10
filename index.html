@@ -4661,7 +4661,7 @@ function handlePincodeUpdated(source) {
 window.__COURIER_MODE = false;
 window.__DISPATCH_MODE = null; // "HOME" | "COURIER"
 
- function onDispatchModeChange() {
+function onDispatchModeChange() {
   // 🔥🔥🔥 RETAIL HARD RESET — allow eligibility + overlay again
 window.__CHECKOUT_SNAPSHOT = null;
 window._checkoutInvoice = null;
@@ -4706,25 +4706,34 @@ if (mode === "Home Delivery") {
    * 👉 DATA SAME AS HOME DELIVERY
    * 👉 BUT GPS / MAP / LAT-LNG COMPLETELY DISABLED
    * ====================================================== */
-  if (mode === "Courier") {
-window.__COURIER_MODE = true;
-  window.__DISPATCH_MODE = "COURIER"; // ✅ NEW
+if (mode === "Courier") {
+  window.__COURIER_MODE = true;
+  window.__DISPATCH_MODE = "COURIER";
 
-    // 🛑 HARD BLOCK GPS PROMPT + AUTO LOCATION SAVE
-    window._guestLocationPromptShown = true; // skip confirm popup
-    window._deliveryLocationReady = true;    // GPS not required
+  ensureCartWeightBeforeCourier_then(() => {
+    // 🛑 HARD BLOCK GPS PROMPT
+    window._guestLocationPromptShown = true;
+    window._deliveryLocationReady = true;
 
     // 🔁 trick: use Home Delivery only for DATA FILL
     const orderType = document.getElementById("orderType");
-    if (orderType) {
-      orderType.value = "Home Delivery";
-    }
-    // 🔥 fills name/email/address for guest + login
-toggleAddressForDispatch();
- 
-  setTimeout(() => {
-    handlePincodeUpdated("dispatchMode:autoFill");
-  }, 0);
+    if (orderType) orderType.value = "Home Delivery";
+
+    toggleAddressForDispatch();
+
+    // ✅ pincode trigger AFTER weight exists
+    setTimeout(() => {
+      handlePincodeUpdated("dispatchMode:autoFill");
+    }, 0);
+
+    updatePlaceOrderLockByLocation();
+    canProceedPlaceOrder();
+
+    console.log("🚦 Courier flow continued AFTER weight ensured");
+  });
+
+  return;
+}
 
 
 // 🔑 Retail master trigger — eligibility via dispatch mode
@@ -13040,28 +13049,48 @@ function revalidateAppliedCouponAgainstCart() {
   }
 }
 
-  async function ensureCartWeightForCheckout() {
-  if (!isLoggedIn()) return;
-
-  const items = window.cartSummary?.items || [];
-  const hasWeight = items.some(i => Number(i.weight) > 0);
-
-  if (hasWeight) {
-    console.log("⚖️ Weight already present, skipping derive");
+function ensureCartWeightBeforeCourier_then(next) {
+  // ❌ guest user → directly continue
+  if (!isLoggedIn()) {
+    next();
     return;
   }
 
-  console.log("⚙️ Deriving cart weight from backend");
+  const items = window.cartSummary?.items || [];
 
-  const mobile = localStorage.getItem("userMobile");
-  if (!mobile) return;
+  // agar weight already hai → continue
+  const hasWeight = items.some(i => Number(i.weight) > 0);
+  if (hasWeight) {
+    next();
+    return;
+  }
 
-  await apiPost("updateCartDerivedStateByMobile", { mobile });
+  console.log("⚖️ Weight missing → updating cart weight (login user)");
 
-  // re-fetch cart so weight comes into cartSummary
-  const res = await apiPost("getCart", { mobile });
-  window.cart = res.cart || [];
-  renderCart(); // this updates window.cartSummary
+  apiPost("updateCartDerivedStateByMobile", {
+    mobile: localStorage.getItem("userMobile")
+  }).then(() => {
+
+    return apiPost("getCart", {
+      mobile: localStorage.getItem("userMobile")
+    });
+
+  }).then(res => {
+
+    if (res?.success) {
+      cart = res.cart;
+      window.cart = res.cart;
+      localStorage.setItem("cart", JSON.stringify(res.cart));
+      renderCart(); // ⭐ updates cartSummary safely
+    }
+
+    // 🟢 NOW SAFE TO CONTINUE
+    next();
+
+  }).catch(err => {
+    console.error("❌ Weight ensure failed", err);
+    next(); // fail-safe
+  });
 }
 
 function renderInvoiceFromAPI(inv) {
@@ -13454,7 +13483,7 @@ if (
 }
 
 
-async function buildCheckoutPreviewInv() {
+function buildCheckoutPreviewInv() {
 // 🔴🔴🔴 DEBUG: ENTRY SNAPSHOT
   console.log("🧾 [INVOICE ENTRY]", {
     dispatchMode: window.__DISPATCH_MODE,
@@ -13468,7 +13497,7 @@ console.log("🧾 [INVOICE] Raw cart items (before filter):",
   JSON.parse(JSON.stringify(window.cartSummary?.items || []))
 );
 
-      await ensureCartWeightForCheckout();
+      
   // 🔒 SINGLE SOURCE OF TRUTH (drawer cart snapshot for amounts only)
   const s = window.cartSummary || {};
   const d = window._drawerTotals || {};
@@ -15745,6 +15774,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
