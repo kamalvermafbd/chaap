@@ -7483,7 +7483,8 @@ async function onUserLogin(mobile) {
     discPercent: Number(i.discPercent || 0),
     itemId: i.itemId || "",
     variantId: i.variantId || "",
-    image: i.image || ""
+    image: i.image || "",
+   weight: Number(i.weight || 0)
   }));
 
   // -------------------------------
@@ -15720,6 +15721,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
