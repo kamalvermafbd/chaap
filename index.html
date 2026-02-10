@@ -3290,7 +3290,8 @@ cart = cart.map(item => {
   item.qty = Number(item.qty || 1);
   item.rate = Number(item.rate || 0);
   item.discPercent = Number(item.discPercent || 0);
-
+// 🔥 ADD THIS LINE
+item.weight = Number(item.weight || 0);
   // 5) TOTAL RECALC
   const discAmt = (item.rate * item.discPercent) / 100;
   item.discAmt = Number(discAmt.toFixed(2));
@@ -15719,6 +15720,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
