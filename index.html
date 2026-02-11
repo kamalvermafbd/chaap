@@ -13909,6 +13909,16 @@ if (window.couponMode !== "bestoffer") {
 }
 
   mountInvoiceIntoCheckout();
+
+    // =====================================================
+    // 🔴 🔴 🔴 NEW: COURIER COST RECOMPUTE (QTY/WEIGHT SAFE)
+    // =====================================================
+    // Qty / closing change → weight change → courier must refresh
+    if (typeof fetchCourierChargeForCheckout === "function") {
+      await fetchCourierChargeForCheckout();
+    }
+    // 🔴 🔴 🔴 END COURIER RECALC
+    // =====================================================
    
  const inv = buildCheckoutPreviewInv();
 console.log("🧪 PREVIEW", inv);
@@ -15782,6 +15792,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
