@@ -5228,52 +5228,53 @@ async function onTestPreplaceClick() {
     if (overlay) overlay.classList.remove("hidden");
 
     // 🔁 STEP 1: trigger existing invoice rebuild pipeline
-    // (this already does stock check, qty adjust, offer/coupon,
-    // courier weight, tax, everything)
+    // (stock check, qty adjust, offers, courier, tax – ALL existing logic)
     await updateCheckoutInvoice();
 
     // 🔒 hide overlay
     if (overlay) overlay.classList.add("hidden");
 
+    // 🔒 FINAL INVOICE = SINGLE SOURCE OF TRUTH
+    const inv = window._checkoutInvoice || {};
+
     // 🔁 STEP 2: collect FINAL invoice snapshot (READ ONLY)
     const snapshot = {
       timestamp: new Date().toISOString(),
 
-      items: (window.cart || []).map(it => ({
+      items: (inv.items || []).map(it => ({
         itemId: it.itemId,
         variantId: it.variantId || "",
         name: it.name,
         qty: it.qty,
         weight: it.weight || 0,
-        price: it.price,
-        total: it.total
+        price: it.rate || it.price || 0,
+        total: it.total || 0
       })),
 
-      subtotal: window._checkoutInvoice?.subTotal ?? null,
+      subtotal: inv.itemsSubtotal ?? null,
 
       coupon: {
-        code: window._finalCouponId || window._appliedCouponSnapshot?.code || null,
-        discount: window._checkoutInvoice?.couponDiscount ?? 0,
-        removed: !window._finalCouponId && !!window._appliedCouponSnapshot
+        code: inv.couponCode || window._finalCouponId || null,
+        discount: inv.couponDiscount || 0
       },
 
       courier: {
         mode: window.__COURIER_MODE ? "Courier" : "Local",
-        eligible: window.orderEligibility || false,
-        charge: window.courierCharge || 0,
-        weight: window.totalCourierWeight || 0
+        eligible: (inv.deliveryCharge || 0) > 0,
+        charge: inv.deliveryCharge || 0,
+        weight: inv.totalWeight || 0
       },
 
       tax: {
-        cgst: window._checkoutInvoice?.cgst ?? 0,
-        sgst: window._checkoutInvoice?.sgst ?? 0,
-        totalTax: window._checkoutInvoice?.totalTax ?? 0
+        cgst: inv.cgst || 0,
+        sgst: inv.sgst || 0,
+        totalTax: inv.taxTotal || 0
       },
 
-      grandTotal: window._checkoutInvoice?.grandTotal ?? null
+      grandTotal: inv.billAmount ?? inv.grandTotal ?? null
     };
 
-    // 🧾 FINAL SNAPSHOT LOG
+    // 🧾 FINAL SNAPSHOT LOG (MATCHES CHECKOUT UI 1:1)
     console.log("🧾 FINAL INVOICE SNAPSHOT (TEST PREPLACE)");
     console.table(snapshot.items);
     console.log(snapshot);
@@ -5285,6 +5286,7 @@ async function onTestPreplaceClick() {
     alert("Test Preplace failed. Check console for details.");
   }
 }
+
     
     
 async function placeOrder() {
@@ -15824,6 +15826,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
