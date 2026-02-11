@@ -5223,21 +5223,34 @@ async function onTestPreplaceClick() {
     console.clear();
     console.log("🧪 TEST PREPLACE START");
 
-    // 🔒 show invoice processing overlay (same UX as real flow)
     const overlay = document.getElementById("invoiceProcessingOverlay");
     if (overlay) overlay.classList.remove("hidden");
 
-    // 🔁 STEP 1: trigger existing invoice rebuild pipeline
-    // (stock check, qty adjust, offers, courier, tax – ALL existing logic)
+    /**
+     * 🔑 KEY IDEA
+     * ----------
+     * Checkout invoice jab open hota hai:
+     * 1) Drawer cart (window.cart) se qty leta hai
+     * 2) Latest stock / closing ke against validate karta hai
+     * 3) Qty reduce / item remove
+     * 4) Weight, coupon, tax, courier sab recompute
+     *
+     * 👉 Test PREPLACE me hum EXACT wahi kar rahe hain
+     */
+
+    // 🧹 STEP 0: ensure invoice is NOT reused
+    // (taaki stale invoice qty use na ho)
+    window._checkoutInvoice = null;
+
+    // 🔁 STEP 1: trigger SAME pipeline as checkout-open
+    // This MUST read from drawer cart, not invoice
     await updateCheckoutInvoice();
 
-    // 🔒 hide overlay
     if (overlay) overlay.classList.add("hidden");
 
     // 🔒 FINAL INVOICE = SINGLE SOURCE OF TRUTH
     const inv = window._checkoutInvoice || {};
 
-    // 🔁 STEP 2: collect FINAL invoice snapshot (READ ONLY)
     const snapshot = {
       timestamp: new Date().toISOString(),
 
@@ -5245,8 +5258,8 @@ async function onTestPreplaceClick() {
         itemId: it.itemId,
         variantId: it.variantId || "",
         name: it.name,
-        qty: it.qty,
-        weight: it.weight || 0,
+        qty: it.qty,                 // ✅ final qty after closing check
+        weight: it.weight || 0,      // ✅ per-unit weight
         price: it.rate || it.price || 0,
         total: it.total || 0
       })),
@@ -5254,12 +5267,11 @@ async function onTestPreplaceClick() {
       subtotal: inv.itemsSubtotal ?? null,
 
       coupon: {
-        code: inv.couponCode || window._finalCouponId || null,
+        code: inv.couponCode || null,
         discount: inv.couponDiscount || 0
       },
 
       courier: {
-        mode: window.__COURIER_MODE ? "Courier" : "Local",
         eligible: (inv.deliveryCharge || 0) > 0,
         charge: inv.deliveryCharge || 0,
         weight: inv.totalWeight || 0
@@ -5271,10 +5283,9 @@ async function onTestPreplaceClick() {
         totalTax: inv.taxTotal || 0
       },
 
-      grandTotal: inv.billAmount ?? inv.grandTotal ?? null
+      grandTotal: inv.billAmount ?? null
     };
 
-    // 🧾 FINAL SNAPSHOT LOG (MATCHES CHECKOUT UI 1:1)
     console.log("🧾 FINAL INVOICE SNAPSHOT (TEST PREPLACE)");
     console.table(snapshot.items);
     console.log(snapshot);
@@ -5287,7 +5298,6 @@ async function onTestPreplaceClick() {
   }
 }
 
-    
     
 async function placeOrder() {
   console.log("🟢 placeOrder() called");
@@ -15826,6 +15836,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
