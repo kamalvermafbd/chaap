@@ -5226,77 +5226,30 @@ async function onTestPreplaceClick() {
     const overlay = document.getElementById("invoiceProcessingOverlay");
     if (overlay) overlay.classList.remove("hidden");
 
-    /**
-     * 🔑 KEY IDEA
-     * ----------
-     * Checkout invoice jab open hota hai:
-     * 1) Drawer cart (window.cart) se qty leta hai
-     * 2) Latest stock / closing ke against validate karta hai
-     * 3) Qty reduce / item remove
-     * 4) Weight, coupon, tax, courier sab recompute
-     *
-     * 👉 Test PREPLACE me hum EXACT wahi kar rahe hain
-     */
+    // 🔥 SAME AS CHECKOUT OPEN
+    // Latest closing stock sync
+    await syncCancelHoldFromScanAPI();
 
-    // 🧹 STEP 0: ensure invoice is NOT reused
-    // (taaki stale invoice qty use na ho)
+    // 🔁 Force fresh invoice rebuild
     window._checkoutInvoice = null;
-
-    // 🔁 STEP 1: trigger SAME pipeline as checkout-open
-    // This MUST read from drawer cart, not invoice
     await updateCheckoutInvoice();
 
     if (overlay) overlay.classList.add("hidden");
 
-    // 🔒 FINAL INVOICE = SINGLE SOURCE OF TRUTH
     const inv = window._checkoutInvoice || {};
 
-    const snapshot = {
-      timestamp: new Date().toISOString(),
-
-      items: (inv.items || []).map(it => ({
-        itemId: it.itemId,
-        variantId: it.variantId || "",
-        name: it.name,
-        qty: it.qty,                 // ✅ final qty after closing check
-        weight: it.weight || 0,      // ✅ per-unit weight
-        price: it.rate || it.price || 0,
-        total: it.total || 0
-      })),
-
-      subtotal: inv.itemsSubtotal ?? null,
-
-      coupon: {
-        code: inv.couponCode || null,
-        discount: inv.couponDiscount || 0
-      },
-
-      courier: {
-        eligible: (inv.deliveryCharge || 0) > 0,
-        charge: inv.deliveryCharge || 0,
-        weight: inv.totalWeight || 0
-      },
-
-      tax: {
-        cgst: inv.cgst || 0,
-        sgst: inv.sgst || 0,
-        totalTax: inv.taxTotal || 0
-      },
-
-      grandTotal: inv.billAmount ?? null
-    };
-
     console.log("🧾 FINAL INVOICE SNAPSHOT (TEST PREPLACE)");
-    console.table(snapshot.items);
-    console.log(snapshot);
+    console.table(inv.items || []);
+    console.log(inv);
 
     console.log("✅ TEST PREPLACE DONE");
 
   } catch (err) {
     console.error("❌ TEST PREPLACE FAILED", err);
-    alert("Test Preplace failed. Check console for details.");
+    alert("Test Preplace failed. Check console.");
   }
 }
+
 
     
 async function placeOrder() {
@@ -15836,6 +15789,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
