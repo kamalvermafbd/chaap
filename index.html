@@ -5223,40 +5223,27 @@ async function onTestPreplaceClick() {
     console.clear();
     console.log("🧪 TEST PREPLACE START");
 
-    const overlay = document.getElementById("invoiceProcessingOverlay");
-    if (overlay) overlay.classList.remove("hidden");
+    // same UX as checkout
+    showInvoiceProcessingOverlay();
 
-    // 🔥 1️⃣ Latest closing sync (updates cartSummary)
-    await syncCancelHoldFromScanAPI();
+    // 🔥 EXACT SAME PIPELINE AS openCheckout
+    // (no manual stock mode, no override)
+    await deferCheckoutBackgroundSync();
 
-    // 🔥 2️⃣ CRITICAL: cartSummary → cart sync
-    if (window.cartSummary?.items) {
-      window.cart = JSON.parse(JSON.stringify(window.cartSummary.items));
-      localStorage.setItem("cart", JSON.stringify(window.cart));
-    }
-
-    // 🔁 3️⃣ Force fresh invoice rebuild
-    window._checkoutInvoice = null;
-    await updateCheckoutInvoice();
-
-    if (overlay) overlay.classList.add("hidden");
-
-    const inv = window._checkoutInvoice || {};
+    hideInvoiceProcessingOverlay();
 
     console.log("🧾 FINAL INVOICE SNAPSHOT (TEST PREPLACE)");
-    console.table(inv.items || []);
-    console.log(inv);
+    console.table(window._checkoutInvoice?.items || []);
+    console.log(window._checkoutInvoice);
 
     console.log("✅ TEST PREPLACE DONE");
 
   } catch (err) {
+    hideInvoiceProcessingOverlay();
     console.error("❌ TEST PREPLACE FAILED", err);
     alert("Test Preplace failed. Check console.");
   }
 }
-
-
-
     
 async function placeOrder() {
   console.log("🟢 placeOrder() called");
@@ -15795,6 +15782,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
