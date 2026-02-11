@@ -5226,11 +5226,16 @@ async function onTestPreplaceClick() {
     const overlay = document.getElementById("invoiceProcessingOverlay");
     if (overlay) overlay.classList.remove("hidden");
 
-    // 🔥 SAME AS CHECKOUT OPEN
-    // Latest closing stock sync
+    // 🔥 1️⃣ Latest closing sync (updates cartSummary)
     await syncCancelHoldFromScanAPI();
 
-    // 🔁 Force fresh invoice rebuild
+    // 🔥 2️⃣ CRITICAL: cartSummary → cart sync
+    if (window.cartSummary?.items) {
+      window.cart = JSON.parse(JSON.stringify(window.cartSummary.items));
+      localStorage.setItem("cart", JSON.stringify(window.cart));
+    }
+
+    // 🔁 3️⃣ Force fresh invoice rebuild
     window._checkoutInvoice = null;
     await updateCheckoutInvoice();
 
@@ -5249,6 +5254,7 @@ async function onTestPreplaceClick() {
     alert("Test Preplace failed. Check console.");
   }
 }
+
 
 
     
@@ -15789,6 +15795,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
