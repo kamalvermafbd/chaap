@@ -13909,19 +13909,21 @@ if (window.couponMode !== "bestoffer") {
 }
 
   mountInvoiceIntoCheckout();
+ let inv = buildCheckoutPreviewInv();
+  console.log("🧪 PREVIEW (AFTER QTY + WEIGHT)", inv);
+     // =====================================================
+  // ✅ STEP 2: COURIER COST RECALC (FINAL WEIGHT SAFE)
+  // =====================================================
+  if (
+    typeof fetchCourierChargeForCheckout === "function" &&
+    window.__DISPATCH_MODE === "COURIER"
+  ) {
+    await fetchCourierChargeForCheckout();
 
-    // =====================================================
-    // 🔴 🔴 🔴 NEW: COURIER COST RECOMPUTE (QTY/WEIGHT SAFE)
-    // =====================================================
-    // Qty / closing change → weight change → courier must refresh
-    if (typeof fetchCourierChargeForCheckout === "function") {
-      await fetchCourierChargeForCheckout();
-    }
-    // 🔴 🔴 🔴 END COURIER RECALC
-    // =====================================================
-   
- const inv = buildCheckoutPreviewInv();
-console.log("🧪 PREVIEW", inv);
+    // 🔁 Courier charge updated → rebuild invoice ONCE more
+    inv = buildCheckoutPreviewInv();
+    console.log("🧪 PREVIEW (AFTER COURIER RECALC)", inv);
+  }
 
    // 🔑 ✅ CHECKOUT-ONLY BEST OFFER RE-EVALUATION
 // 🔒 STEP 1: VALIDATE CURRENT COUPON (MIN CHECK)
@@ -15792,6 +15794,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
