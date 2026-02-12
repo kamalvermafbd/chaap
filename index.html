@@ -2654,7 +2654,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbxbkH2jMZzSXNNpXVkjqraIZkiuQ7MrcD-w2GjQNw1Qge5JJXuE0VKmXIQ8pfO0R-7iSw/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbyOPsd9h4OvGF5fOu2bEobyUpvAzrjLJG4XH8LCdIW8o71b-C2RSGlXqZjuaUbV7PIdgQ/exec";
 
 // ===============================
 // API HELPER
@@ -5614,10 +5614,26 @@ console.log(
     }
   }
 })();
+  console.log(
+  "%c📤 FRONTEND → BACKEND (placeOrder payload)",
+  "color: blue; font-weight: bold;",
+  JSON.parse(JSON.stringify(orderData))
+);
+
+console.log("🚚 DISPATCH MODE:", window.__DISPATCH_MODE);
+console.log("🧾 INVOICE SNAPSHOT:", JSON.parse(JSON.stringify(window._checkoutInvoice)));
+
   
+
   apiPost("placeOrder", orderData)
     .then(async res => {
+      console.log(
+  "%c📥 BACKEND → FRONTEND (placeOrder response)",
+  "color: green; font-weight: bold;",
+  JSON.parse(JSON.stringify(res))
+);
       if (res.success) {
+        
 
         // 🔑 STEP-1: RESET COUPON STATE AFTER SUCCESS
 selectedCoupon = null;
@@ -15928,6 +15944,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
