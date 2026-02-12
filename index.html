@@ -5592,7 +5592,7 @@ console.log(
 );
 
   apiPost("placeOrder", orderData)
-    .then(res => {
+    .then(async res => {
       if (res.success) {
 
         // 🔑 STEP-1: RESET COUPON STATE AFTER SUCCESS
@@ -5612,10 +5612,10 @@ document.getElementById("rewardBox")?.classList.add("hidden");
 document.getElementById("rewardText") && (document.getElementById("rewardText").innerText = "");
 document.getElementById("rewardStatus")?.classList.add("hidden");
 
-           overlay.style.display = "none";
+ overlay.style.display = "none";
 
-        alert(
-          `Order placed successfully!\nYour Order Number: ${res.orderNumber}\n\n${res.message}`
+alert(
+   `Order placed successfully!\nYour Order Number: ${res.orderNumber}\n\n${res.message}`
         );
 
         // ✅ SAME cart reference ko empty karo
@@ -15862,6 +15862,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
