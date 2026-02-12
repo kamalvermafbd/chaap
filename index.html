@@ -13666,13 +13666,18 @@ rawItems.forEach(it => {
   }
 });
 
-// 🔥 TOTAL WEIGHT (for courier eligibility)
+// 🔥 TOTAL WEIGHT — STRICTLY INVOICE ITEMS
 let totalWeight = 0;
-rawItems.forEach(i => {
-  if (i.isCancel !== true && i.isHold !== true) {
-    totalWeight += (Number(i.weight) || 0) * (Number(i.qty) || 0);
-  }
+
+invoiceItems.forEach(i => {
+  totalWeight += (Number(i.weight) || 0) * (Number(i.qty) || 0);
 });
+
+// 🛡️ SAFETY: no invoice items = no weight
+if (!invoiceItems.length) {
+  totalWeight = 0;
+}
+
 
 
 // 🔴🔴🔴 DEBUG: WEIGHT CALCULATION
@@ -15951,6 +15956,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
