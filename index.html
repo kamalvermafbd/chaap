@@ -5254,12 +5254,12 @@ async function onTestPreplaceClick() {
     
 async function placeOrder() {
 
-  console.log("🟢 placeOrder() called");
+console.log("🟢 placeOrder() called");
 console.log("🔒 orderLock before:", window._orderLock);
 
-  console.log("---- DEBUG START ----");
-  console.log("getCart() returns:", getCart());
-  console.log("global cart variable:", cart);
+console.log("---- DEBUG START ----");
+console.log("getCart() returns:", getCart());
+console.log("global cart variable:", cart);
 
 if (window._orderLock) return;
 window._orderLock = true;
@@ -5673,9 +5673,7 @@ if (isLoggedIn()) {
     cartItems: cart
   });
 }
-
-
-        
+    
   //  FIX: signup discount one-time only
   window.signupDiscount = 0;
   localStorage.removeItem("signupDiscount");
@@ -15866,6 +15864,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
