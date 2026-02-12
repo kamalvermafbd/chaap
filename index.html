@@ -5253,6 +5253,7 @@ async function onTestPreplaceClick() {
 }
     
 async function placeOrder() {
+
   console.log("🟢 placeOrder() called");
 console.log("🔒 orderLock before:", window._orderLock);
 
@@ -5262,6 +5263,9 @@ console.log("🔒 orderLock before:", window._orderLock);
 
 if (window._orderLock) return;
 window._orderLock = true;
+
+  // 🔴🔴🔴 [ADD] SNAPSHOT ORIGINAL CART (SINGLE SOURCE OF TRUTH)
+const __ORIGINAL_CART_SNAPSHOT__ = JSON.parse(JSON.stringify(getCart()));
 
 // 🔥 STEP-1: BUTTON IMMEDIATELY DISABLE + TEXT CHANGE
 const placeOrderBtn = document.getElementById("placeOrderBtn");
@@ -5616,11 +5620,49 @@ document.getElementById("rewardStatus")?.classList.add("hidden");
 
         // ✅ SAME cart reference ko empty karo
         // 1️⃣ clear global cart
-cart.length = 0;
+// 🔴🔴🔴 PARTIAL FULFILLMENT CART RECONCILE (CRITICAL PATCH)
 
-// 2️⃣ clear storage (guest + logged in safe)
-localStorage.removeItem("cart");
-localStorage.removeItem("guestCart");
+// original cart before checkout
+// 🔴🔴🔴 ISSUE-3: USE ORIGINAL SNAPSHOT (NOT LIVE CART)
+const originalCart = __ORIGINAL_CART_SNAPSHOT__;
+
+// invoice-final items (what actually got ordered)
+const invoiceItems = window._checkoutInvoice.items || [];
+
+// build new cart with remaining qty
+const remainingCart = [];
+
+originalCart.forEach(cartItem => {
+  const invItem = invoiceItems.find(
+    i =>
+      i.itemId === cartItem.itemId &&
+      (i.variantId || "") === (cartItem.variantId || "")
+  );
+
+  const orderedQty = Number(invItem?.finalQty || invItem?.qty || 0);
+  const originalQty = Number(cartItem.qty || 0);
+
+  const remainingQty = originalQty - orderedQty;
+
+  if (remainingQty > 0) {
+    remainingCart.push({
+      ...cartItem,
+      qty: remainingQty
+    });
+  }
+});
+
+// ✅ APPLY REMAINING CART
+cart.length = 0;
+remainingCart.forEach(i => cart.push(i));
+
+// ✅ SYNC STORAGE
+if (isUserLoggedIn()) {
+  localStorage.setItem("cart", JSON.stringify(cart));
+} else {
+  localStorage.setItem("guestCart", JSON.stringify(cart));
+}
+
   //  FIX: signup discount one-time only
   window.signupDiscount = 0;
   localStorage.removeItem("signupDiscount");
@@ -15811,6 +15853,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
