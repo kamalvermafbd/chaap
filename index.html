@@ -5652,6 +5652,25 @@ originalCart.forEach(cartItem => {
   }
 });
 
+        // 🔁 ADD BACK HOLD ITEMS (NOT CANCEL)
+if (window._holdItemsForCart?.length) {
+  window._holdItemsForCart.forEach(holdItem => {
+    // avoid duplicate if already in remainingCart
+    const exists = remainingCart.find(
+      i =>
+        i.itemId === holdItem.itemId &&
+        (i.variantId || "") === (holdItem.variantId || "")
+    );
+    if (!exists) {
+      remainingCart.push({ ...holdItem });
+    }
+  });
+
+  // 🔒 clear after use
+  window._holdItemsForCart = [];
+}
+
+        
 // ✅ APPLY REMAINING CART
 cart.length = 0;
 remainingCart.forEach(i => cart.push(i));
@@ -13582,6 +13601,24 @@ console.log("🧾 [INVOICE] Raw cart items (before filter):",
 // 🔥 FILTER items for invoice (hide cancel / hold)
 const rawItems = s.items || [];
 const invoiceItems = getInvoiceVisibleItems(rawItems);
+
+  // 🔐 RESET hold items every rebuild (VERY IMPORTANT)
+window._holdItemsForCart = [];
+
+// 👇 scan raw items to capture HOLD (not cancel)
+rawItems.forEach(it => {
+  if (it.isHold === true && it.isCancel !== true) {
+    window._holdItemsForCart.push({
+      itemId: it.itemId,
+      variantId: it.variantId,
+      qty: it.qty,
+      rate: it.rate,
+      name: it.name,
+      unit: it.unit
+    });
+  }
+});
+
 // 🔥 TOTAL WEIGHT (for courier eligibility)
 let totalWeight = 0;
 invoiceItems.forEach(i => {
@@ -15864,6 +15901,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
