@@ -13648,6 +13648,15 @@ console.log("🧾 [INVOICE] Raw cart items (before filter):",
 // 🔥 FILTER items for invoice (hide cancel / hold)
 const rawItems = s.items || [];
 const invoiceItems = getInvoiceVisibleItems(rawItems);
+// 🔴🔴🔴 FIX: FORCE weight from menu for invoice items
+invoiceItems.forEach(it => {
+  const menuItem = (window.menuItems || []).find(m =>
+    String(m.itemId) === String(it.itemId) &&
+    String(m.variantId || "") === String(it.variantId || "")
+  );
+
+  it.weight = Number(menuItem?.cat_weight || 0);
+});
 
   // 🔐 RESET hold items every rebuild (VERY IMPORTANT)
 window._holdItemsForCart = [];
@@ -15962,6 +15971,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
