@@ -13621,9 +13621,12 @@ rawItems.forEach(it => {
 
 // 🔥 TOTAL WEIGHT (for courier eligibility)
 let totalWeight = 0;
-invoiceItems.forEach(i => {
-  totalWeight += (Number(i.weight) || 0) * (Number(i.qty) || 0);
+rawItems.forEach(i => {
+  if (i.isCancel !== true && i.isHold !== true) {
+    totalWeight += (Number(i.weight) || 0) * (Number(i.qty) || 0);
+  }
 });
+
 
 // 🔴🔴🔴 DEBUG: WEIGHT CALCULATION
   console.log("📦 [WEIGHT CALC]", {
@@ -15901,6 +15904,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
