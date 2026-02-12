@@ -13648,15 +13648,19 @@ console.log("🧾 [INVOICE] Raw cart items (before filter):",
 // 🔥 FILTER items for invoice (hide cancel / hold)
 const rawItems = s.items || [];
 const invoiceItems = getInvoiceVisibleItems(rawItems);
-// 🔴🔴🔴 FIX: FORCE weight from menu for invoice items
-invoiceItems.forEach(it => {
-  const menuItem = (window.menuItems || []).find(m =>
-    String(m.itemId) === String(it.itemId) &&
-    String(m.variantId || "") === String(it.variantId || "")
-  );
+// 🔴🔴🔴 FIX: TOTAL WEIGHT MUST COME FROM CART (NOT INVOICE)
+let totalWeight = 0;
 
-  it.weight = Number(menuItem?.cat_weight || 0);
+(rawItems || []).forEach(i => {
+  if (isFlagTrue(i.hold) || isFlagTrue(i.hold1) || isFlagTrue(i.Cancel)) return;
+
+  const qty = Number(i.qty || 0);
+  const wt  = Number(i.weight || 0); // 👈 backend/cart weight
+
+  totalWeight += qty * wt;
 });
+
+window.totalWeight = Number(totalWeight.toFixed(3));
 
   // 🔐 RESET hold items every rebuild (VERY IMPORTANT)
 window._holdItemsForCart = [];
@@ -13674,20 +13678,6 @@ rawItems.forEach(it => {
     });
   }
 });
-
-// 🔥 TOTAL WEIGHT — STRICTLY INVOICE ITEMS
-let totalWeight = 0;
-
-invoiceItems.forEach(i => {
-  totalWeight += (Number(i.weight) || 0) * (Number(i.qty) || 0);
-});
-
-// 🛡️ SAFETY: no invoice items = no weight
-if (!invoiceItems.length) {
-  totalWeight = 0;
-}
-
-
 
 // 🔴🔴🔴 DEBUG: WEIGHT CALCULATION
   console.log("📦 [WEIGHT CALC]", {
@@ -15971,6 +15961,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
