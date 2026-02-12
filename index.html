@@ -15219,6 +15219,8 @@ const closing =
           closing
         });
       }
+// 🔴 FIX: map cat_weight → weight for invoice & courier
+item.weight = Number(item.cat_weight || item.weight || 0);
 
       return item;
     })
@@ -15956,6 +15958,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
