@@ -5280,7 +5280,8 @@ if (!(await canProceedPlaceOrder())) {
   resetPlaceOrderBtn();
   return;
 }
-
+await onTestPreplaceClick();
+  
   const customerName = document.getElementById('customerName').value.trim();
   const email = document.getElementById('email').value.trim();
   const mobile = document.getElementById('mobile').value.trim();
@@ -15801,6 +15802,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
