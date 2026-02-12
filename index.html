@@ -15575,8 +15575,12 @@ async function fetchCourierChargeForCheckout() {
       window.courierCharge = 0;
       return;
     }
-
-   // 🔴🔴🔴 DEBUG: COURIER PRECONDITION SNAPSHOT (DO NOT REMOVE)
+if (Number(window.totalWeight) <= 0) {
+      console.warn("⚠️ Courier skipped: totalWeight = 0 (no invoice items)");
+      window.courierCharge = 0;
+      return;
+    }
+   //  DEBUG: COURIER PRECONDITION SNAPSHOT (DO NOT REMOVE)
     console.log("🚚 [COURIER CHECK] Preconditions", {
       dispatchMode: window.__DISPATCH_MODE,
       selectedPincode: window.selectedPincode,
@@ -15584,7 +15588,7 @@ async function fetchCourierChargeForCheckout() {
       totalWeightKg: Number(window.totalWeight) / 1000,
       orderAmount: window.cartTotalAmount
     });
-    // 🔴🔴🔴 END DEBUG
+    // END DEBUG
     
 const weightKg = Number(window.totalWeight) / 1000;
     const payload = {
@@ -15598,9 +15602,9 @@ const weightKg = Number(window.totalWeight) / 1000;
 
    const data = await apiPost("calculateCourierCharge", payload);
 
-  // 🔴🔴🔴 DEBUG: COURIER API RESPONSE
+  //  DEBUG: COURIER API RESPONSE
     console.log("📡 [COURIER API RESPONSE]", data);
-    // 🔴🔴🔴 END DEBUG
+    //  END DEBUG
 
     
     if (!data.success) {
@@ -15958,6 +15962,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
