@@ -4969,6 +4969,13 @@ if (
 
 const orderType = document.getElementById("orderType")?.value.trim();
 const inv = buildCheckoutPreviewInv();
+const dispatchModeVal = document.getElementById("dispatchMode")?.value?.trim();
+
+// 🔴 RETAIL: Dispatch Mode mandatory
+if (window.__INDUSTRY === "retail" && !dispatchModeVal) {
+  showError("⚠️ Please select Dispatch Mode");
+  return false;
+}
 
 const amount = Number(inv.baseTotal || 0);
 
@@ -15944,6 +15951,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
