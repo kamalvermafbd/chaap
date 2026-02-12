@@ -15402,6 +15402,8 @@ return item;
       item.closing = Number(match.closing);
       item.hold    = match.hold;
       item.Cancel  = match.cancel;
+       // 🔥🔥🔥 THIS IS THE REAL FIX
+  item.weight  = Number(match.weight || 0);
     }
 
     return item;
@@ -15961,6 +15963,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
