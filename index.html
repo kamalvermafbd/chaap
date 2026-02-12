@@ -2654,7 +2654,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbxPffQAtKaeGxn-rJGQOwxcMy5h37smkvJ1FH6rDTqnWkNvM9kKxTrnFdT17HFdotBCKQ/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbzbvBdPTC4X6XWAEHJZGD7tUksa3th7FE8h3182dnY3DGmML7e_cdnrwGUyxSzfUvO2pA/exec";
 
 // ===============================
 // API HELPER
@@ -5233,6 +5233,13 @@ async function onTestPreplaceClick() {
     hideInvoiceProcessingOverlay();
 
     console.log("🧾 FINAL INVOICE SNAPSHOT (TEST PREPLACE)");
+    // 🧪 TEMP TEST — STOCK UPDATE (USING EXISTING apiPost)
+await apiPost("TEST_updateStock", {
+  items: window._checkoutInvoice.items
+});
+
+console.log("🧪 TEST_updateStock API called");
+
     console.table(window._checkoutInvoice?.items || []);
     console.log(window._checkoutInvoice);
 
@@ -15794,6 +15801,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
