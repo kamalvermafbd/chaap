@@ -5546,7 +5546,21 @@ lng: orderType === "Home Delivery"
     invoiceImage: invoiceImageBase64,
  invoiceSnapshot: window._checkoutInvoice
   };
+// 🛡️ GUARD-B: Courier charge column correction
+(function guardCourierCharges() {
+  if (window.__DISPATCH_MODE === "COURIER") {
+    if (
+      Number(orderData.deliveryCharges || 0) > 0 &&
+      Number(orderData.courierCharges || 0) === 0
+    ) {
+      console.warn("🛡️ Guard: deliveryCharges → courierCharges");
+      orderData.courierCharges = Number(orderData.deliveryCharges);
+      orderData.deliveryCharges = 0;
+    }
+  }
+})();
 
+  
 console.log("👤 userType:", userType);
 console.log("🚀 ORDER PAYLOAD TO BACKEND:", JSON.stringify(orderData, null, 2));
 document.querySelectorAll('#checkoutForm input, #checkoutForm select')
@@ -5591,6 +5605,16 @@ console.log(
   window.__FINAL_PLACE_ORDER_PAYLOAD__
 );
 
+// 🛡️ GUARD-A: Dispatch-based OrderType correction
+(function guardOrderType() {
+  if (window.__DISPATCH_MODE === "COURIER") {
+    if (orderData.orderType !== "Courier") {
+      console.warn("🛡️ Guard: OrderType corrected to Courier");
+      orderData.orderType = "Courier";
+    }
+  }
+})();
+  
   apiPost("placeOrder", orderData)
     .then(async res => {
       if (res.success) {
@@ -15904,6 +15928,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
