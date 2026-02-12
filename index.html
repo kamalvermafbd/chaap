@@ -5234,11 +5234,11 @@ async function onTestPreplaceClick() {
 
     console.log("🧾 FINAL INVOICE SNAPSHOT (TEST PREPLACE)");
     // 🧪 TEMP TEST — STOCK UPDATE (USING EXISTING apiPost)
-await apiPost("TEST_updateStock", {
-  items: window._checkoutInvoice.items
-});
+//await apiPost("TEST_updateStock", {
+ // items: window._checkoutInvoice.items
+//});
 
-console.log("🧪 TEST_updateStock API called");
+//console.log("🧪 TEST_updateStock API called");
 
     console.table(window._checkoutInvoice?.items || []);
     console.log(window._checkoutInvoice);
@@ -15801,6 +15801,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
