@@ -5304,7 +5304,7 @@ if (!window._checkoutInvoice || !Array.isArray(window._checkoutInvoice.items)) {
   const city    = document.getElementById("city")?.value.trim() || "";
   const state   = document.getElementById("state")?.value.trim() || "";
 
-const userType = isUserLoggedIn() ? "logged" : "guest";
+const userType = isLoggedIn() ? "logged" : "guest";
 
   // ----------------------------------
 // AUTO CUSTOMER LOOKUP (ONCE)
@@ -5468,7 +5468,7 @@ if (!invoiceNode) {
 }
 
 const canvas = await html2canvas(invoiceNode, {
-  scale: 2,
+  scale: 1,
   backgroundColor: "#ffffff"
 });
 const invoiceImageBase64 = canvas.toDataURL("image/png");
@@ -5569,7 +5569,7 @@ if (orderData.couponDiscount > 0 && !orderData.couponId) {
   return;
 }
 // 🔒 GUEST COUPON FINAL GUARD (CORRECT)
-if (!isUserLoggedIn()) {
+if (!isLoggedIn()) {
 
   // API ne explicitly bola: NOT allowed
   if (window._guestCouponAllowed === false) {
@@ -5657,12 +5657,21 @@ cart.length = 0;
 remainingCart.forEach(i => cart.push(i));
 
 // ✅ SYNC STORAGE
-if (isUserLoggedIn()) {
+if (isLoggedIn()) {
   localStorage.setItem("cart", JSON.stringify(cart));
 } else {
   localStorage.setItem("guestCart", JSON.stringify(cart));
 }
 
+        // 🔴 LOGIN USER: SYNC REMAINING CART TO BACKEND
+if (isLoggedIn()) {
+  await apiPost("saveCart", {
+    mobile,
+    cartItems: cart
+  });
+}
+
+        
   //  FIX: signup discount one-time only
   window.signupDiscount = 0;
   localStorage.removeItem("signupDiscount");
@@ -15853,6 +15862,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
