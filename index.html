@@ -2654,7 +2654,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbx6CrycJ_KQFxTbQj1PMeQnUcEw3EQ6J8FqwkMcFgkKKpyrfyd50nIinSvvCoj90PGmcQ/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbxbkH2jMZzSXNNpXVkjqraIZkiuQ7MrcD-w2GjQNw1Qge5JJXuE0VKmXIQ8pfO0R-7iSw/exec";
 
 // ===============================
 // API HELPER
@@ -5664,12 +5664,16 @@ if (isLoggedIn()) {
 }
 
         // 🔴 LOGIN USER: SYNC REMAINING CART TO BACKEND
+// 🔴🔴🔴 FIX-1: SEND email + sessionId ALSO (CRITICAL)
 if (isLoggedIn()) {
   await apiPost("saveCart", {
     mobile,
+    email, // 🔴 ADD THIS
+    sessionId: window._sessionId || localStorage.getItem("sessionId") || "", // 🔴 ADD THIS
     cartItems: cart
   });
 }
+
 
         
   //  FIX: signup discount one-time only
@@ -15862,6 +15866,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
