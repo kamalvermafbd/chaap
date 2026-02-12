@@ -5281,7 +5281,14 @@ if (!(await canProceedPlaceOrder())) {
   return;
 }
 await onTestPreplaceClick();
-  
+ // 🔴🔴🔴 FINAL INVOICE HARD LOCK (SOURCE OF TRUTH)
+if (!window._checkoutInvoice || !Array.isArray(window._checkoutInvoice.items)) {
+  alert("Invoice finalization failed. Please try again.");
+  resetPlaceOrderBtn();
+  window._orderLock = false;
+  return;
+}
+ 
   const customerName = document.getElementById('customerName').value.trim();
   const email = document.getElementById('email').value.trim();
   const mobile = document.getElementById('mobile').value.trim();
@@ -5490,7 +5497,9 @@ console.log("🧾 COUPON DEBUG (FINAL)", {
     mobile,
     orderType,
     address: finalAddress,
-    cartItems: normalizeCartForOrder(safeCartItems),
+    // 🔴🔴🔴 FORCE FINAL QTY FROM CHECKOUT INVOICE (NOT DRAWER / CART)
+cartItems: normalizeCartForOrder(window._checkoutInvoice.items),
+
     baseTotal: Number(inv.itemsSubtotal || 0),
 signupDiscount: Number(inv.signupDiscount || 0),
 serviceAmt: Number(inv.serviceCharge || 0),
@@ -15802,6 +15811,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
