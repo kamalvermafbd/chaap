@@ -2426,6 +2426,12 @@ document.addEventListener("DOMContentLoaded", function() {
         s.setAttribute("value", "");
     });
 });
+
+    window.showError = window.showError || function (msg) {
+  console.error("❌ UI ERROR:", msg);
+  alert(msg || "Something went wrong. Please try again.");
+};
+
 // ⭐ Restore signup discount on refresh (GLOBAL)
 window.signupDiscount = Number(localStorage.getItem("signupDiscount") || 0);
 
@@ -4929,7 +4935,6 @@ if (!window._deliveryLocationReady) {
   console.warn("⛔ Delivery location not ready");
 }
 
-
   //  DEBUG: which location is actually used
   console.log("📍 DELIVERY LOCATION USED:", window._deliveryLocation);
 
@@ -4971,7 +4976,7 @@ const orderType = document.getElementById("orderType")?.value.trim();
 const inv = buildCheckoutPreviewInv();
 const dispatchModeVal = document.getElementById("dispatchMode")?.value?.trim();
 
-// 🔴 RETAIL: Dispatch Mode mandatory
+//  RETAIL: Dispatch Mode mandatory
 if (window.__INDUSTRY === "retail" && !dispatchModeVal) {
   showError("⚠️ Please select Dispatch Mode");
   return false;
@@ -4999,34 +5004,51 @@ const mobile = document.getElementById("mobile")?.value.trim();
 const userType = isUserLoggedIn() ? "logged" : "guest";
 // 🔥 BUILD FINAL INVOICE FIRST (FINAL QTY / BASE)
 
-    
 showInvoiceProcessingOverlay(); // ⏳ invoice calculation started
 
-const res = await apiPost("checkOrderEligibility", {
-  orderType,
-  orderAmount: amount,
-totalWeight: inv.totalWeight,
-  mobile,
-  userType,
-    // 🔑 VERY IMPORTANT — tells backend this is Courier
-  dispatchMode: document.getElementById("dispatchMode")?.value,
-  
- lat: window.__COURIER_MODE === true
-  ? null
-  : Number(window._deliveryLocation?.lat),
+/* 🔴 SAFE ELIGIBILITY FETCH */
+let res = null;
 
-lng: window.__COURIER_MODE === true
-  ? null
-  : Number(window._deliveryLocation?.lng)
-});
+try {
+  res = await apiPost("checkOrderEligibility", {
+    orderType,
+    orderAmount: amount,
+    totalWeight: inv.totalWeight,
+    mobile,
+    userType,
+    dispatchMode: document.getElementById("dispatchMode")?.value,
 
-    /* 🔴🔴🔴 ADD HERE — COURIER API FETCH (FINAL CHARGE) */
-if (window.__COURIER_MODE === true) {
-  await fetchCourierChargeForCheckout();
+    lat: window.__COURIER_MODE === true
+      ? null
+      : Number(window._deliveryLocation?.lat),
+
+    lng: window.__COURIER_MODE === true
+      ? null
+      : Number(window._deliveryLocation?.lng)
+  });
+
+  /* 🔴 COURIER CHARGE FETCH */
+  if (window.__COURIER_MODE === true) {
+    await fetchCourierChargeForCheckout();
+  }
+
+} catch (err) {
+  console.warn("⚠️ Eligibility API failed (soft handled)", err);
+
+  window.orderEligibility = {
+    allowed: true,
+    extraCharge: 0,
+    chargeType: ""
+  };
+
+  showError("⚠️ Temporary network issue. Charges recalculated safely.");
+
+  // allow flow to continue
+  res = { allowed: true };
 }
-/* 🔴🔴🔴 END ADD */
 
-/* 🔴 FINAL — SINGLE SOURCE OF TRUTH */
+
+/*  FINAL — SINGLE SOURCE OF TRUTH */
 const isCourier = window.__COURIER_MODE === true;
 
 window.orderEligibility = {
@@ -15963,6 +15985,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
