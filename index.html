@@ -13469,17 +13469,12 @@ if (normalCoupon > 0) {
   ? "Offer Applied"
   : "Coupon Applied"}
 
-
 ${
   finalCouponId
     ? `<span class="text-xs text-gray-500">(${finalCouponId})</span>`
     : ""
 }
-
 </span>
-
-
-      
       <span>−${fmt(normalCoupon)}</span>
     </div>
     <div class="flex justify-between font-semibold text-gray-900">
@@ -13504,7 +13499,7 @@ if (deliveryAmt > 0) {
   "Delivery Charges"
 }</span>
 
-      <span>${fmt(deliveryAmt)}</span>
+<span>${fmt(deliveryAmt)}</span>
     </div>`;
 } else deliveryBox.classList.add("hidden");
 
@@ -13536,6 +13531,17 @@ taxBox.innerHTML = `
     <span>Bill Amount</span>
     <span>${fmt(gstBase + taxTotal)}</span>
   </div>`;
+// 🔁 DELIVERY POSITION FIX (TAXABLE / NON-TAXABLE)
+const totalsBox = document.getElementById("invBase").parentElement;
+if (deliveryBox && taxBox) {
+  if (isDeliveryTaxable) {
+    // ✅ Delivery BEFORE tax
+    totalsBox.insertBefore(deliveryBox, taxBox);
+  } else {
+    // ✅ Delivery AFTER tax
+    taxBox.after(deliveryBox);
+  }
+}
 
 // 5️⃣ Signup Discount (after Bill)
 const signupBox = document.getElementById("invSignup");
@@ -13561,7 +13567,6 @@ if (reward > 0) {
      ${couponSnapshotId
   ? `<span class="text-xs text-gray-500">(${couponSnapshotId})</span>`
   : ""}
-
     </span>
     <span>−${fmt(reward)}</span>
   </div>`;
@@ -13584,8 +13589,6 @@ paidBox.innerHTML = `
     <span>−${fmt(paid)}</span>
   </div>`;
 
-
-
 } else paidBox.classList.add("hidden");
 
   document.getElementById("invNet").innerText = fmt(netPayable);
@@ -13607,8 +13610,6 @@ deliveryChargeLabel:
   inv.deliveryChargeLabel ||
   window.orderEligibility?.chargeType ||
   "Delivery Charges",
-
-    
     normalCoupon,
     signupDiscount: signup,
     rewardDiscount: reward,
@@ -16013,117 +16014,3 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
