@@ -2693,12 +2693,18 @@ apiGet("getRestaurantIndustry")
 
       // ✅ ADD THIS — single source of truth for new logic
       window.__INDUSTRY = String(res.industry).toLowerCase();
-
+ // 🔴🔴🔴 ADD THIS (VERY IMPORTANT)
+      window.__DELIVERY_TAXABLE =
+        String(res.delivery_taxable || "").trim();
+         // 🔎 CONFIRMATION LOG
+      console.log("🚚 Delivery Taxable Loaded:", window.__DELIVERY_TAXABLE);
       console.log("Industry loaded:", res.industry);
     } else {
       // ⚠️ fallback
       window.RESTAURANT_INDUSTRY = "Hotel";
       window.__INDUSTRY = "hotel";
+ // 🔴 SAFE DEFAULT
+      window.__DELIVERY_TAXABLE = "No";
 
       console.warn("Industry API failed, defaulting to Hotel");
     }
@@ -2706,7 +2712,8 @@ apiGet("getRestaurantIndustry")
   .catch(err => {
     window.RESTAURANT_INDUSTRY = "Hotel";
     window.__INDUSTRY = "hotel";
-
+  // 🔴 SAFE DEFAULT
+    window.__DELIVERY_TAXABLE = "No";
     console.error("Industry API error:", err);
   });
 
@@ -15985,6 +15992,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
