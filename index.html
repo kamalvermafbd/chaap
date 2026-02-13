@@ -13421,9 +13421,12 @@ const grossValue =
   normalCoupon > 0
     ? items - normalCoupon - signup
     : items - signup;
+const isDeliveryTaxable =
+  String(window.__DELIVERY_TAXABLE || "").toLowerCase() === "yes";
+const gstBase = isDeliveryTaxable
+  ? grossValue + serviceAmt + deliveryAmt
+  : grossValue + serviceAmt;
 
-// 🔥 FINAL GST BASE (signup already adjusted)
-const gstBase = grossValue + serviceAmt + deliveryAmt;
 
   /* ================= GST ================= */
   const cgstRate = Number(inv.cgstPercent || 0);
@@ -13441,7 +13444,9 @@ const billAmount = gstBase + taxTotal;
   const postTaxDiscount = reward + paid;
 
 // ✅ FINAL
-const netPayable = billAmount - postTaxDiscount;
+const netPayable = isDeliveryTaxable
+  ? billAmount - postTaxDiscount
+  : billAmount + deliveryAmt - postTaxDiscount;
 
   /* ================= RENDER TOTALS ================= */
   // 1️⃣ Items
@@ -16008,6 +16013,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
