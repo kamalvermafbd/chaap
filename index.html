@@ -13856,21 +13856,37 @@ const postTaxDiscount =  reward + paid;
   const igstRate = Number(window.igstPercent || 0) / 100;
 
   // GST base = Gross value + Service/Delivery
-  const gstBase = grossValue + serviceAmt + deliveryAmt;
+/* ======================
+   GST BASE (DELIVERY TAXABLE LOGIC)
+====================== */
+const isDeliveryTaxable =
+  String(window.__DELIVERY_TAXABLE || "").toLowerCase() === "yes";
 
-  /* ======================
-     TAX AMOUNTS
-  ====================== */
-  const cgst = gstBase * cgstRate;
-  const sgst = gstBase * sgstRate;
-  const igst = gstBase * igstRate;
-  const taxTotal = cgst + sgst + igst;
+// 👉 GST base depends on restaurant setting
+const gstBase = isDeliveryTaxable
+  ? grossValue + serviceAmt + deliveryAmt   // delivery taxable
+  : grossValue + serviceAmt;                // delivery NOT taxable
+
+/* ======================
+   TAX AMOUNTS
+====================== */
+const cgst = Number((gstBase * cgstRate).toFixed(2));
+const sgst = Number((gstBase * sgstRate).toFixed(2));
+const igst = Number((gstBase * igstRate).toFixed(2));
+
+const taxTotal = cgst + sgst + igst;
+
+// 👉 Bill amount NEVER includes delivery twice
 const billAmount = gstBase + taxTotal;
 
-  /* ======================
-     NET PAYABLE
-  ====================== */
-  const netPayable = billAmount - postTaxDiscount;
+/* ======================
+   NET PAYABLE
+====================== */
+const netPayable = isDeliveryTaxable
+  ? billAmount - postTaxDiscount
+  : billAmount + deliveryAmt - postTaxDiscount;
+
+  
   console.log("🧪 PREVIEW DEBUG", {
     orderType,
     grossValue,
@@ -15992,6 +16008,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
