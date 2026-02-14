@@ -13366,7 +13366,6 @@ document.getElementById("invoiceItems").innerHTML =
               </div>
             `
         }
-
         <div class="flex justify-between text-sm font-medium mt-0.5">
           <span>Item Total</span>
           <span>${fmt(net)}</span>
@@ -13426,8 +13425,6 @@ const isDeliveryTaxable =
 const gstBase = isDeliveryTaxable
   ? grossValue + serviceAmt + deliveryAmt
   : grossValue + serviceAmt;
-
-
   /* ================= GST ================= */
   const cgstRate = Number(inv.cgstPercent || 0);
   const sgstRate = Number(inv.sgstPercent || 0);
@@ -13605,7 +13602,6 @@ deliveryCharge:
   window.orderEligibility?.extraCharge ??
   deliveryAmt ??
   0),
-
 deliveryChargeLabel:
   inv.deliveryChargeLabel ||
   window.orderEligibility?.chargeType ||
@@ -13631,7 +13627,6 @@ selectedCouponType:
   inv.couponType ||
   "",
 
-
     taxableAmount: gstBase,
     cgst, sgst, igst,
     taxTotal,
@@ -13641,7 +13636,6 @@ selectedCouponType:
   inv.couponId ||
   window._appliedCoupon?.id ||
   "",
-
     paymentMethod: inv.paymentMethod || ""
   };
 
@@ -13955,6 +13949,9 @@ const netPayable = isDeliveryTaxable
     taxTotal,
     billAmount,
 netPayable,
+    // 🔴 DELIVERY TAXABLE FLAG (Backend ko batane ke liye)
+deliveryTaxable: isDeliveryTaxable ? "Yes" : "No",
+
     // 🔥 ADD THIS
 totalWeight: Number(totalWeight.toFixed(3)),
 cgstPercent: window.cgstPercent,
@@ -13962,7 +13959,6 @@ sgstPercent: window.sgstPercent,
 igstPercent: window.igstPercent,
 gstOnDiscountedAmount: window.gstOnDiscountedAmount,
     // ===== COUPONS =====
-
     rewardDiscount: reward,
     paidCouponDiscount: paid,
     signupDiscount: signup,
@@ -13971,10 +13967,7 @@ couponAmount: normalCoupon,
 
 // 🔥 🔥 THIS IS THE FIX
 couponType: normalCoupon > 0 ? "normal" : "",
-
 normalCoupon: normalCoupon,
-
-
 
     // ===== PAYMENT =====
     paymentMethod: document.getElementById("paymentMethod")?.value || ""
@@ -16014,3 +16007,4 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
