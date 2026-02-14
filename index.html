@@ -14759,8 +14759,6 @@ function renderInvoiceFromOrderAPI(inv) {
   // ✅ CLEAR ERROR / LOADING LEFTOVERS
   const itemsBox = document.getElementById("invoiceItems");
   if (itemsBox) itemsBox.innerHTML = "";
-
-
   console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
 
   /* ================= HEADER ================= */
@@ -14807,8 +14805,6 @@ if (metaBox) {
     metaBox.innerHTML = "";
   }
 }
-
-  
   const orderTypeBox = document.getElementById("invOrderType");
   if (orderTypeBox && inv.orderType) {
     orderTypeBox.classList.remove("hidden");
@@ -14824,6 +14820,7 @@ if (metaBox) {
       <span class="font-semibold">Name</span>
       <span>: ${inv.customerName || ""}</span>
     </div>`;
+
   document.getElementById("invContact").innerHTML = `
     <div class="grid grid-cols-[140px_auto] gap-1">
       <span class="font-semibold">Mobile / Email</span>
@@ -14882,7 +14879,6 @@ document.getElementById("invoiceItems").innerHTML =
               </div>
             `
         }
-
         <div class="flex justify-between text-sm font-medium mt-0.5">
           <span>Item Total</span>
           <span>${fmt(net)}</span>
@@ -14890,40 +14886,36 @@ document.getElementById("invoiceItems").innerHTML =
       </div>
     `;
   }).join("");
-
-// ================= BASE & COUPONS =================
-
-// 🔥 EXACT VALUES FROM ORDER SHEET
-const items       = Number(inv.baseTotal || 0);
-const serviceAmt  = Number(inv.serviceAmt || 0);
-
-// 🔥 Courier + Delivery both possible
-const deliveryAmt =
-  Number(inv.deliveryCharges || 0) +
-  Number(inv.courierCharges || 0);
-
-// 🔥 Coupon (normal offer)
-const normalCoupon = Number(inv.couponDiscount || 0);
-
-// 🔥 Signup
+/* ================= BASE & COUPONS ================= */
+// ✅ correct mapping from order sheet
+const items       = Number(inv.itemsSubtotal ?? inv.baseTotal ?? 0);
+const serviceAmt  = Number(inv.serviceCharge ?? inv.serviceCharges ?? 0);
+const deliveryAmt = Number(inv.deliveryCharge || 0);
 const signup = Number(inv.signupDiscount || 0);
+// ✅ AUTHORITATIVE NORMAL COUPON (checkout / order)
+const normalCoupon =
+  inv.couponType === "normal"
+    ? Number(inv.couponAmount ?? inv.offerDiscount ?? 0)
+    : 0;
 
-// 🔥 Reward / Paid
-const reward = Number(inv.rewardcoupon || 0);
-const paid   = Number(inv.paidcoupon || 0);
+const reward =
+  inv.couponType === "reward" ? Number(inv.rewardDiscount || 0) : 0;
 
-// ================= TAX (FROM ORDER SHEET) =================
+const paid =
+  Number(inv.paidCouponDiscount || 0);
+// ================= TAX (FROM ORDER SHEET – NO SPLIT) =================
 const cgst = Number(inv.cgstAmt || 0);
 const sgst = Number(inv.sgstAmt || 0);
 const igst = Number(inv.igstAmt || 0);
 
 const taxTotal = cgst + sgst + igst;
 
-// 🔥 DO NOT CALCULATE AGAIN
-const gstBase    = Number(inv.taxableAmount || 0);
-const billAmount = Number(inv.totalAmount || 0);
-const netPayable = Number(inv.netpayable || 0);
 
+// taxable & bill are not stored separately
+const gstBase    = items + serviceAmt + deliveryAmt;
+const billAmount = gstBase + taxTotal;
+
+const netPayable = Number(inv.netPayable || 0);
 
 
   /* ================= RENDER TOTALS ================= */
@@ -14940,11 +14932,15 @@ if (inv.couponType === "normal" && inv.couponAmount > 0) {
   c.classList.remove("hidden");
   c.innerHTML = `
     <div class="flex justify-between text-green-600">
-      <span>Normal Coupon</span>
+      <span>
+        Offer Applied
+        ${inv.couponId ? `<span class="text-xs text-gray-500">(${inv.couponId})</span>` : ""}
+      </span>
       <span>−${fmt(inv.couponAmount)}</span>
     </div>
   `;
-} else {
+}
+ else {
   c.classList.add("hidden");
 }
 
@@ -15044,8 +15040,8 @@ if (paid > 0) {
     cgst, sgst, igst,
     taxTotal,
     netPayable,
-    couponId: inv.couponId || window._appliedCoupon?.id || "",
-
+    couponId: inv.couponId || "",
+  couponType: inv.couponType || "",
     paymentMethod: inv.paymentMethod || ""
   };
 
@@ -15060,7 +15056,7 @@ const uiTpl = document.getElementById("invoiceTemplate");
 if (emailTpl && uiTpl) {
   emailTpl.innerHTML = uiTpl.innerHTML;
 }
-  }
+}
 
 
 
@@ -16012,6 +16008,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
