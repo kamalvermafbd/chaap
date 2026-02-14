@@ -14759,6 +14759,8 @@ function renderInvoiceFromOrderAPI(inv) {
   // ✅ CLEAR ERROR / LOADING LEFTOVERS
   const itemsBox = document.getElementById("invoiceItems");
   if (itemsBox) itemsBox.innerHTML = "";
+
+
   console.log("API INV OBJECT:", JSON.parse(JSON.stringify(inv)));
 
   /* ================= HEADER ================= */
@@ -14805,6 +14807,8 @@ if (metaBox) {
     metaBox.innerHTML = "";
   }
 }
+
+  
   const orderTypeBox = document.getElementById("invOrderType");
   if (orderTypeBox && inv.orderType) {
     orderTypeBox.classList.remove("hidden");
@@ -14814,6 +14818,9 @@ if (metaBox) {
         <span>: ${inv.orderType}</span>
       </div>`;
   }
+
+  
+
   /* ================= CUSTOMER ================= */
   document.getElementById("invCustomer").innerHTML = `
     <div class="grid grid-cols-[140px_auto] gap-1">
@@ -14879,6 +14886,7 @@ document.getElementById("invoiceItems").innerHTML =
               </div>
             `
         }
+
         <div class="flex justify-between text-sm font-medium mt-0.5">
           <span>Item Total</span>
           <span>${fmt(net)}</span>
@@ -14886,23 +14894,28 @@ document.getElementById("invoiceItems").innerHTML =
       </div>
     `;
   }).join("");
+
+  
 /* ================= BASE & COUPONS ================= */
+/* ================= BASE & COUPONS ================= */
+
 // ✅ correct mapping from order sheet
 const items       = Number(inv.itemsSubtotal ?? inv.baseTotal ?? 0);
 const serviceAmt  = Number(inv.serviceCharge ?? inv.serviceCharges ?? 0);
 const deliveryAmt = Number(inv.deliveryCharge || 0);
+
 const signup = Number(inv.signupDiscount || 0);
-// ✅ AUTHORITATIVE NORMAL COUPON (checkout / order)
+
 const normalCoupon =
-  inv.couponType === "normal"
-    ? Number(inv.couponAmount ?? inv.offerDiscount ?? 0)
-    : 0;
+  inv.couponType === "normal" ? Number(inv.couponAmount || 0) : 0;
 
 const reward =
   inv.couponType === "reward" ? Number(inv.rewardDiscount || 0) : 0;
 
 const paid =
   Number(inv.paidCouponDiscount || 0);
+
+
 // ================= TAX (FROM ORDER SHEET – NO SPLIT) =================
 const cgst = Number(inv.cgstAmt || 0);
 const sgst = Number(inv.sgstAmt || 0);
@@ -14932,15 +14945,11 @@ if (inv.couponType === "normal" && inv.couponAmount > 0) {
   c.classList.remove("hidden");
   c.innerHTML = `
     <div class="flex justify-between text-green-600">
-      <span>
-        Offer Applied
-        ${inv.couponId ? `<span class="text-xs text-gray-500">(${inv.couponId})</span>` : ""}
-      </span>
+      <span>Normal Coupon</span>
       <span>−${fmt(inv.couponAmount)}</span>
     </div>
   `;
-}
- else {
+} else {
   c.classList.add("hidden");
 }
 
@@ -15040,8 +15049,8 @@ if (paid > 0) {
     cgst, sgst, igst,
     taxTotal,
     netPayable,
-    couponId: inv.couponId || "",
-  couponType: inv.couponType || "",
+    couponId: inv.couponId || window._appliedCoupon?.id || "",
+
     paymentMethod: inv.paymentMethod || ""
   };
 
@@ -15056,7 +15065,8 @@ const uiTpl = document.getElementById("invoiceTemplate");
 if (emailTpl && uiTpl) {
   emailTpl.innerHTML = uiTpl.innerHTML;
 }
-}
+  }
+
 
 
 function invalidateAppliedCoupon(reason = "") {
@@ -16007,6 +16017,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
