@@ -14924,9 +14924,9 @@ const igst = Number(inv.igstAmt || 0);
 const taxTotal = cgst + sgst + igst;
 
 
-// taxable & bill are not stored separately
-const gstBase    = items + serviceAmt + deliveryAmt;
-const billAmount = gstBase + taxTotal;
+const gstBase    = Number(inv.taxableAmount || 0);
+const billAmount = Number(inv.billAmount || 0);
+
 
 const netPayable = Number(inv.netPayable || 0);
 
@@ -16017,6 +16017,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
