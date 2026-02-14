@@ -14841,17 +14841,21 @@ if (metaBox) {
 document.getElementById("invoiceItems").innerHTML =
   (inv.items || []).map((i, idx) => {
 
-    const qty = Number(i.qty || 0);
-    const rate = Number(i.rate || 0);
-    const discPercent = Number(i.discPercent || 0);
+ const qty  = Number(i.qty || 0);
+const rate = Number(i.rate || 0);
 
-    const gross = qty * rate;
+// 🔥 Sheet authoritative fields
+const discPercent =
+  Number(i.Discount_Percent ?? i.discPercent ?? 0);
 
-    // 🔥 SAME FORMULA AS DRAWER
-    const perUnitDiscount = rate * discPercent / 100;
-    const netRate = rate - perUnitDiscount;
-    const net = netRate * qty;
-    const discAmt = gross - net;
+const discAmt =
+  Number(i.Disc_Amt ?? 0);
+
+const gross = qty * rate;
+
+// 🔥 Use stored Net_Amt (backend verified)
+const net =
+  Number(i.Net_Amt ?? (gross - discAmt));
 
     return `
       <div class="border-b pb-2 mb-2">
@@ -14907,9 +14911,7 @@ const paid =
 const cgst = Number(inv.cgstAmt || 0);
 const sgst = Number(inv.sgstAmt || 0);
 const igst = Number(inv.igstAmt || 0);
-
 const taxTotal = cgst + sgst + igst;
-
 
 // taxable & bill are not stored separately
 const gstBase    = items + serviceAmt + deliveryAmt;
@@ -16008,6 +16010,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
