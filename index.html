@@ -2432,32 +2432,7 @@ document.addEventListener("DOMContentLoaded", function() {
   alert(msg || "Something went wrong. Please try again.");
 };
 
-document.addEventListener("DOMContentLoaded", async function () {
 
-  const shouldOpen = localStorage.getItem("openInvoiceAfterRefresh");
-  const orderNo = localStorage.getItem("lastOrderNo");
-
-  if (shouldOpen === "true" && orderNo) {
-
-    // 🔒 Remove flag so it doesn't reopen again
-    localStorage.removeItem("openInvoiceAfterRefresh");
-localStorage.removeItem("lastOrderNo");
-
-    try {
-      const res = await apiGet("getInvoice", { orderNo });
-
-      if (res?.success && res.invoice) {
-        renderInvoiceFromOrderAPI(res.invoice);
-
-        // agar modal use karte ho
-        document.getElementById("invoiceModal")?.classList.remove("hidden");
-      }
-
-    } catch (err) {
-      console.error("Auto invoice load failed:", err);
-    }
-  }
-});
 
     
 // ⭐ Restore signup discount on refresh (GLOBAL)
@@ -13213,6 +13188,37 @@ if (metaBox) {
   }
 }
 
+  (async function autoOpenInvoiceAfterReload() {
+
+  const shouldOpen = localStorage.getItem("openInvoiceAfterRefresh");
+  const orderNo = localStorage.getItem("lastOrderNo");
+
+  if (shouldOpen === "true" && orderNo) {
+
+    localStorage.removeItem("openInvoiceAfterRefresh");
+    localStorage.removeItem("lastOrderNo");
+
+    try {
+
+      const res = await fetch(
+        API_BASE +
+          "?api=getOrderInvoice&orderId=" +
+          encodeURIComponent(orderNo)
+      );
+
+      const data = await res.json();
+
+      if (data?.success === true) {
+        renderInvoiceFromOrderAPI(data.invoice);
+      }
+
+    } catch (err) {
+      console.error("Auto invoice load failed:", err);
+    }
+  }
+
+})();
+
   function closeInvoiceModal() {
   const modal = document.getElementById("invoiceModal");
   if (modal) modal.classList.add("hidden");
@@ -16076,6 +16082,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
