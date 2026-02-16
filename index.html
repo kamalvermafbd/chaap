@@ -14903,7 +14903,11 @@ const isDeliveryTaxable =
 // ✅ correct mapping from order sheet
 const items       = Number(inv.itemsSubtotal ?? inv.baseTotal ?? 0);
 const serviceAmt  = Number(inv.serviceCharge ?? inv.serviceCharges ?? 0);
-const deliveryAmt = Number(inv.deliveryCharge || 0);
+const deliveryAmt =
+  Number(inv.deliveryCharges || 0) +
+  Number(inv.courierCharges || 0);
+
+  
 const signup = Number(inv.signupDiscount || 0);
 // ✅ AUTHORITATIVE NORMAL COUPON (checkout / order)
 const normalCoupon = Number(inv.couponAmount || 0);
@@ -16018,6 +16022,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
