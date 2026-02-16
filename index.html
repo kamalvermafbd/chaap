@@ -2660,7 +2660,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbxj8QhX1nb5NN7qOlYjp2b0k7_dA793vPo5Dc-3wVQ5mYsN80CYPLf4flPdYH2xBcxzfg/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbwcX8voINbqSXqfzVIx_YN3ROibblFYb8JBS8b6sHfCiKLyVcwh4zQNYR8vnAULTCYm/exec";
 
 // ===============================
 // API HELPER
@@ -14891,6 +14891,13 @@ const net =
       </div>
     `;
   }).join("");
+
+  // 🔥 Order-level delivery taxable snapshot
+const isDeliveryTaxable =
+  String(inv.deliveryTaxable || "")
+    .trim()
+    .toLowerCase() === "yes";
+
 /* ================= BASE & COUPONS ================= */
 // ✅ correct mapping from order sheet
 const items       = Number(inv.itemsSubtotal ?? inv.baseTotal ?? 0);
@@ -14915,7 +14922,10 @@ const igst = Number(inv.igstAmt || 0);
 const taxTotal = cgst + sgst + igst;
 
 // taxable & bill are not stored separately
-const gstBase    = items + serviceAmt + deliveryAmt;
+const gstBase = isDeliveryTaxable
+  ? items + serviceAmt + deliveryAmt
+  : items + serviceAmt;
+
 const billAmount = gstBase + taxTotal;
 
 const netPayable = Number(inv.netPayable || 0);
@@ -16011,6 +16021,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
