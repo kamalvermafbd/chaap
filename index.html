@@ -5691,11 +5691,14 @@ document.getElementById("rewardText") && (document.getElementById("rewardText").
 document.getElementById("rewardStatus")?.classList.add("hidden");
 
  overlay.style.display = "none";
+console.log("BACKEND RESPONSE FULL:", res);
+console.log("ORDER ID FROM BACKEND:", res.orderId);
+console.log("ORDER NUMBER FROM BACKEND:", res.orderNumber);
 
 alert(
    `Order placed successfully!\nYour Order Number: ${res.orderNumber}\n\n${res.message}`
         );
-console.log("ORDER ID FROM BACKEND:", res.orderId);
+
 
 localStorage.setItem("openInvoiceAfterRefresh", "true");
 localStorage.setItem("lastOrderNo", res.orderId);
@@ -16087,6 +16090,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
