@@ -13216,7 +13216,15 @@ if (metaBox) {
       console.log("AUTO OPEN API RESPONSE:", data);
 
       if (data?.success === true) {
+
         renderInvoiceFromOrderAPI(data.invoice);
+
+        // 🔥 SHOW MODAL
+        const modal = document.getElementById("invoiceModal");
+        if (modal) {
+          modal.classList.remove("hidden");
+          modal.style.display = "flex";
+        }
       }
 
     } catch (err) {
@@ -13225,6 +13233,7 @@ if (metaBox) {
   }
 
 })();
+
 
 
   function closeInvoiceModal() {
@@ -16090,6 +16099,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
