@@ -14840,6 +14840,7 @@ if (metaBox) {
 /* ================= ITEMS ================= */
 document.getElementById("invoiceItems").innerHTML =
   (inv.items || []).map((i, idx) => {
+console.log("ITEM OBJECT:", i);
 
  const qty  = Number(i.qty || 0);
 const rate = Number(i.rate || 0);
@@ -16010,6 +16011,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
