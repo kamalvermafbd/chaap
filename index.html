@@ -14922,7 +14922,11 @@ const cgst = Number(inv.cgstAmt || 0);
 const sgst = Number(inv.sgstAmt || 0);
 const igst = Number(inv.igstAmt || 0);
 const taxTotal = cgst + sgst + igst;
-const gstBase = Number(inv.taxableAmount || 0);
+const gstBase = isDeliveryTaxable
+  ? Number(inv.taxableAmount || 0)
+  : Number(inv.taxableAmount || 0); 
+// (Sheet se hi aa raha hai, so correct already)
+
 const billAmount = gstBase + taxTotal;
 
 const netPayable = Number(inv.netPayable || 0);
@@ -14964,12 +14968,20 @@ const serviceBox  = document.getElementById("invService");
 
 if (deliveryAmt > 0) {
   deliveryBox.classList.remove("hidden");
-  deliveryBox.innerHTML = `
-    <div class="flex justify-between">
-      <span>${inv.deliveryChargeLabel || "Delivery Charges"}</span>
-      <span>${fmt(deliveryAmt)}</span>
-    </div>`;
-} else deliveryBox.classList.add("hidden");
+
+  // 🔥 If delivery taxable → show before taxable
+  if (isDeliveryTaxable) {
+    deliveryBox.innerHTML = `
+      <div class="flex justify-between">
+        <span>${inv.deliveryChargeLabel || "Delivery Charges"}</span>
+        <span>${fmt(deliveryAmt)}</span>
+      </div>`;
+  } else {
+    // 🔥 If NOT taxable → show later (after Bill Amount)
+    deliveryBox.innerHTML = ""; 
+  }
+}
+ else deliveryBox.classList.add("hidden");
 
 if (serviceAmt > 0) {
   serviceBox.classList.remove("hidden");
@@ -14999,7 +15011,19 @@ taxBox.innerHTML = `
     <span>Bill Amount</span>
     <span>${fmt(billAmount)}</span>
   </div>
+  
+  ${
+    !isDeliveryTaxable && deliveryAmt > 0
+      ? `
+      <div class="flex justify-between">
+        <span>${inv.deliveryChargeLabel || "Delivery Charges"}</span>
+        <span>${fmt(deliveryAmt)}</span>
+      </div>
+      `
+      : ""
+  }
 `;
+
 
 // 5️⃣ Signup Discount (after Bill)
 const signupBox = document.getElementById("invSignup");
@@ -16022,6 +16046,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
