@@ -13188,11 +13188,12 @@ if (metaBox) {
     }
   }
 }
-
-  (async function autoOpenInvoiceAfterReload() {
+(async function autoOpenInvoiceAfterReload() {
 
   const shouldOpen = localStorage.getItem("openInvoiceAfterRefresh");
   const orderNo = localStorage.getItem("lastOrderNo");
+
+  console.log("AUTO OPEN CHECK:", shouldOpen, orderNo);
 
   if (shouldOpen === "true" && orderNo) {
 
@@ -13203,11 +13204,13 @@ if (metaBox) {
 
       const res = await fetch(
         API_BASE +
-          "?api=getOrderInvoice&orderId=" +
-          encodeURIComponent(orderNo)
+        "?api=getOrderInvoice&orderId=" +
+        encodeURIComponent(orderNo)
       );
 
       const data = await res.json();
+
+      console.log("AUTO OPEN API RESPONSE:", data);
 
       if (data?.success === true) {
         renderInvoiceFromOrderAPI(data.invoice);
@@ -13219,6 +13222,7 @@ if (metaBox) {
   }
 
 })();
+
 
   function closeInvoiceModal() {
   const modal = document.getElementById("invoiceModal");
@@ -16083,6 +16087,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
