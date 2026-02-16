@@ -14755,6 +14755,7 @@ function buildRewardBannerHTML(data) {
 }
 
 function renderInvoiceFromOrderAPI(inv) {
+console.log("DELIVERY TAXABLE FROM API:", inv.deliveryTaxable);
 
   // ✅ CLEAR ERROR / LOADING LEFTOVERS
   const itemsBox = document.getElementById("invoiceItems");
@@ -16021,6 +16022,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
