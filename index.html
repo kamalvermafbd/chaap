@@ -2441,6 +2441,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // 🔒 Remove flag so it doesn't reopen again
     localStorage.removeItem("openInvoiceAfterRefresh");
+localStorage.removeItem("lastOrderNo");
 
     try {
       const res = await apiGet("getInvoice", { orderNo });
@@ -16075,6 +16076,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
