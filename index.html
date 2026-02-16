@@ -2432,6 +2432,33 @@ document.addEventListener("DOMContentLoaded", function() {
   alert(msg || "Something went wrong. Please try again.");
 };
 
+document.addEventListener("DOMContentLoaded", async function () {
+
+  const shouldOpen = localStorage.getItem("openInvoiceAfterRefresh");
+  const orderNo = localStorage.getItem("lastOrderNo");
+
+  if (shouldOpen === "true" && orderNo) {
+
+    // 🔒 Remove flag so it doesn't reopen again
+    localStorage.removeItem("openInvoiceAfterRefresh");
+
+    try {
+      const res = await apiGet("getInvoice", { orderNo });
+
+      if (res?.success && res.invoice) {
+        renderInvoiceFromAPI(res.invoice);
+
+        // agar modal use karte ho
+        document.getElementById("invoiceModal")?.classList.remove("hidden");
+      }
+
+    } catch (err) {
+      console.error("Auto invoice load failed:", err);
+    }
+  }
+});
+
+    
 // ⭐ Restore signup discount on refresh (GLOBAL)
 window.signupDiscount = Number(localStorage.getItem("signupDiscount") || 0);
 
@@ -5694,6 +5721,8 @@ alert(
    `Order placed successfully!\nYour Order Number: ${res.orderNumber}\n\n${res.message}`
         );
 
+localStorage.setItem("openInvoiceAfterRefresh", "true");
+localStorage.setItem("lastOrderNo", res.orderNumber);
         // ✅ SAME cart reference ko empty karo
         // 1️⃣ clear global cart
 // 🔴🔴🔴 PARTIAL FULFILLMENT CART RECONCILE (CRITICAL PATCH)
@@ -16046,6 +16075,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
