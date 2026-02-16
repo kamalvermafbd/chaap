@@ -2447,7 +2447,7 @@ localStorage.removeItem("lastOrderNo");
       const res = await apiGet("getInvoice", { orderNo });
 
       if (res?.success && res.invoice) {
-        renderInvoiceFromAPI(res.invoice);
+        renderInvoiceFromOrderAPI(res.invoice);
 
         // agar modal use karte ho
         document.getElementById("invoiceModal")?.classList.remove("hidden");
@@ -16076,6 +16076,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
