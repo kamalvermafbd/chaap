@@ -2660,7 +2660,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbx4DW39oczZuoL9Ths9oJI9CWXNUquqE9RUzSoJ8GOsWYQq-9pcGeDVaWoaUyEQevrkCA/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbyQ6sEIOBoS2QfD0fAcnkOtXNWOZIZaPb51abgmUXajiH0snMMBqRLdMLdtcVT82T5SeA/exec";
 
 // ===============================
 // API HELPER
@@ -14906,10 +14906,7 @@ const serviceAmt  = Number(inv.serviceCharge ?? inv.serviceCharges ?? 0);
 const deliveryAmt = Number(inv.deliveryCharge || 0);
 const signup = Number(inv.signupDiscount || 0);
 // ✅ AUTHORITATIVE NORMAL COUPON (checkout / order)
-const normalCoupon =
-  inv.couponType === "normal"
-    ? Number(inv.couponAmount ?? inv.offerDiscount ?? 0)
-    : 0;
+const normalCoupon = Number(inv.couponAmount || 0);
 
 const reward =
   inv.couponType === "reward" ? Number(inv.rewardDiscount || 0) : 0;
@@ -14921,12 +14918,7 @@ const cgst = Number(inv.cgstAmt || 0);
 const sgst = Number(inv.sgstAmt || 0);
 const igst = Number(inv.igstAmt || 0);
 const taxTotal = cgst + sgst + igst;
-
-// taxable & bill are not stored separately
-const gstBase = isDeliveryTaxable
-  ? items + serviceAmt + deliveryAmt
-  : items + serviceAmt;
-
+const gstBase = Number(inv.taxableAmount || 0);
 const billAmount = gstBase + taxTotal;
 
 const netPayable = Number(inv.netPayable || 0);
@@ -14942,21 +14934,25 @@ document.getElementById("invBase").innerHTML = `
 
 // 2️⃣ Normal Coupon + Gross
 const c = document.getElementById("invCoupon");
-if (inv.couponType === "normal" && inv.couponAmount > 0) {
+
+if (normalCoupon > 0) {
+  const grossValue = items - normalCoupon;
+
   c.classList.remove("hidden");
   c.innerHTML = `
     <div class="flex justify-between text-green-600">
-      <span>
-        Offer Applied
-        ${inv.couponId ? `<span class="text-xs text-gray-500">(${inv.couponId})</span>` : ""}
-      </span>
-      <span>−${fmt(inv.couponAmount)}</span>
+      <span>Offer Applied (${inv.couponId || ""})</span>
+      <span>−${fmt(normalCoupon)}</span>
+    </div>
+    <div class="flex justify-between font-semibold">
+      <span>Gross Value</span>
+      <span>${fmt(grossValue)}</span>
     </div>
   `;
-}
- else {
+} else {
   c.classList.add("hidden");
 }
+
 
 // 3️⃣ Service / Delivery
 const deliveryBox = document.getElementById("invDelivery");
@@ -16022,6 +16018,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
