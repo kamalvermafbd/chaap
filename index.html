@@ -15276,6 +15276,12 @@ const uiTpl = document.getElementById("invoiceTemplate");
 if (emailTpl && uiTpl) {
   emailTpl.innerHTML = uiTpl.innerHTML;
 }
+  // ✅ AUTO OPEN INVOICE MODAL
+const modal = document.getElementById("invoiceModal");
+if (modal) {
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+}
 }
 
 
@@ -16228,6 +16234,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
