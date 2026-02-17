@@ -1243,6 +1243,14 @@ body::before {
   z-index: 100000 !important;
 }
 
+ @media (max-width: 768px) {
+
+  #recentCloseBtn {
+    display: block !important;
+  }
+
+}
+   
   </style>
 </head>
 <body>
@@ -1837,6 +1845,7 @@ body::before {
      style="
        width:380px;
        position:sticky;
+       position:relative;
        top:20px;
        max-height:90vh;
        overflow-y:auto;
@@ -1844,8 +1853,8 @@ body::before {
        border-radius:16px;
        box-shadow:0 10px 30px rgba(0,0,0,0.1);
        padding:16px;
-    position:relative;
      ">
+
 <button onclick="toggleRecentOrders()"
           style="
             position:absolute;
@@ -16342,6 +16351,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
