@@ -5468,29 +5468,26 @@ async function loadInvoiceFromOrderId(orderId) {
 
     
 function renderOrderCards(orders) {
-
   const container = document.getElementById("orderCardsContainer");
   if (!container) return;
-
   container.innerHTML = "";
-
   orders.forEach(o => {
-
     const card = document.createElement("div");
     card.style.padding = "12px";
     card.style.marginBottom = "10px";
     card.style.borderRadius = "10px";
     card.style.background = "#f8f8f8";
     card.style.cursor = "pointer";
-
-    const orderDate = new Date(o.orderDate);
-const formattedDate = orderDate.toLocaleString("en-GB", {
-  day: "2-digit",
-  month: "short",
-  hour: "2-digit",
-  minute: "2-digit"
-});
-
+const orderDate = o.timestamp ? new Date(o.timestamp) : null;
+const formattedDate =
+  orderDate && !isNaN(orderDate.getTime())
+    ? orderDate.toLocaleString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit"
+      })
+    : "";
 card.innerHTML = `
   <div style="
       font-weight:600;
@@ -5502,8 +5499,6 @@ card.innerHTML = `
     ${o.orderNumber} • ${formattedDate} • ${fmt(o.netPayable)} • ${o.orderType}
   </div>
 `;
-
-
     card.onclick = function () {
        window._invoiceFromRecent = true; 
 
@@ -5517,9 +5512,7 @@ card.innerHTML = `
       
       loadInvoiceFromOrderId(o.orderId);
     };
-
     container.appendChild(card);
-
   });
 
 }
@@ -16408,6 +16401,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
