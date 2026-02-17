@@ -5492,6 +5492,16 @@ function renderOrderCards(orders) {
 
     card.onclick = function () {
        window._invoiceFromRecent = true; 
+
+      
+  // 🔥 Immediately close Recent Orders drawer
+  const panel = document.getElementById("orderSidePanel");
+  const backdrop = document.getElementById("recentBackdrop");
+
+  if (panel) panel.classList.remove("active");
+  if (backdrop) backdrop.style.display = "none";
+  document.body.style.overflow = "";
+      
       loadInvoiceFromOrderId(o.orderId);
     };
 
@@ -16385,6 +16395,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
