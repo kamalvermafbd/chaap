@@ -1684,9 +1684,10 @@ body::before {
 <!-- MAIN CONTENT AREA -->
 <div id="mainContent" 
      style="margin-left:0px; padding:20px; transition:0.2s ease;">
-
+<div id="layoutWrapper" style="display:flex; gap:20px; align-items:flex-start; width:100%;">
     <!--  MENU WRAPPER (default visible) -->
-    <div id="menuWrapper">
+    <div id="menuWrapper" style="flex:1;">
+
 
         <!-- FILTER AREA -->
         <div id="filterWrapper" style="text-align:center; margin-bottom:15px;">
@@ -1777,7 +1778,30 @@ body::before {
   </div>
         </div>
     </div>
+  <div id="orderSidePanel"
+     style="
+       width:380px;
+       display:none;
+       position:sticky;
+       top:20px;
+       max-height:90vh;
+       overflow-y:auto;
+       background:#ffffff;
+       border-radius:16px;
+       box-shadow:0 10px 30px rgba(0,0,0,0.1);
+       padding:16px;
+     ">
+
+  <h3 style="font-size:18px; font-weight:600; margin-bottom:12px;">
+    Recent Orders
+  </h3>
+
+  <div id="orderCardsContainer"></div>
+
 </div>
+</div>
+
+
   
   <div id="pageWrapper" style="display:none; padding:10px;">
 
@@ -2350,7 +2374,7 @@ body::before {
   `
 };
 
-    function isUserLoggedIn() {
+function isUserLoggedIn() {
   return !!localStorage.getItem("userMobile");
 }
 
@@ -2433,6 +2457,34 @@ document.addEventListener("DOMContentLoaded", function() {
 };
 
 
+document.addEventListener("DOMContentLoaded", async function () {
+
+  const mobile = getActiveOrdersMobile();
+  if (!mobile) return;
+
+  console.log("🔍 Checking recent orders for:", mobile);
+
+  try {
+    const res = await fetch(
+      API_BASE +
+      "?api=getRecentOrdersByMobile&mobile=" +
+      encodeURIComponent(mobile)
+    );
+
+    const data = await res.json();
+
+    console.log("📦 Recent Orders API:", data);
+
+    if (data?.success && Array.isArray(data.orders) && data.orders.length > 0) {
+      document.getElementById("orderSidePanel").style.display = "block";
+      renderOrderCards(data.orders);
+    }
+
+  } catch (err) {
+    console.error("Recent orders load failed:", err);
+  }
+
+});
 
     
 // ⭐ Restore signup discount on refresh (GLOBAL)
@@ -2442,6 +2494,14 @@ window.signupDiscount = Number(localStorage.getItem("signupDiscount") || 0);
 window.CURRENCY = window.CURRENCY || "₹";
 window.__COURIER_CALC_IN_PROGRESS = false;
 
+function getActiveOrdersMobile() {
+
+  if (isUserLoggedIn()) {
+    return localStorage.getItem("userMobile") || null;
+  }
+
+  return localStorage.getItem("recentOrdersMobile") || null;
+}
 
 function fmt(amount, digits = 2) {
   if (amount === null || amount === undefined) amount = 0;
@@ -5661,8 +5721,6 @@ console.log(
 console.log("🚚 DISPATCH MODE:", window.__DISPATCH_MODE);
 console.log("🧾 INVOICE SNAPSHOT:", JSON.parse(JSON.stringify(window._checkoutInvoice)));
 
-  
-
   apiPost("placeOrder", orderData)
     .then(async res => {
       console.log(
@@ -5671,7 +5729,6 @@ console.log("🧾 INVOICE SNAPSHOT:", JSON.parse(JSON.stringify(window._checkout
   JSON.parse(JSON.stringify(res))
 );
       if (res.success) {
-        
 
         // 🔑 STEP-1: RESET COUPON STATE AFTER SUCCESS
 selectedCoupon = null;
@@ -5702,6 +5759,16 @@ alert(
 
 localStorage.setItem("openInvoiceAfterRefresh", "true");
 localStorage.setItem("lastOrderNo", res.orderId);
+// ✅ STORE MOBILE FOR RECENT ORDERS (GUEST CASE)
+if (!isUserLoggedIn()) {
+  localStorage.setItem("recentOrdersMobile", mobile);
+}
+        
+// ✅ SHOW SIDE PANEL
+const sidePanel = document.getElementById("orderSidePanel");
+if (sidePanel) {
+  sidePanel.style.display = "block";
+}
 
         // ✅ SAME cart reference ko empty karo
         // 1️⃣ clear global cart
@@ -16099,6 +16166,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
