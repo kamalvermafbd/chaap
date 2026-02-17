@@ -5471,11 +5471,18 @@ function renderOrderCards(orders) {
   });
 
 }
-
+    
 function toggleRecentOrders() {
   const panel = document.getElementById("orderSidePanel");
   panel.classList.toggle("active");
+
+  if (panel.classList.contains("active")) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "";
+  }
 }
+
 
     
 async function placeOrder() {
@@ -16311,6 +16318,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
