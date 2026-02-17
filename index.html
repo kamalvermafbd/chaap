@@ -5483,17 +5483,30 @@ function renderOrderCards(orders) {
     card.style.background = "#f8f8f8";
     card.style.cursor = "pointer";
 
-    card.innerHTML = `
-      <div style="font-weight:600;">${o.orderNumber}</div>
-      <div style="font-size:13px;color:#666;">
-        ${fmt(o.netPayable)} • ${o.orderType}
-      </div>
-    `;
+    const orderDate = new Date(o.orderDate);
+const formattedDate = orderDate.toLocaleString("en-GB", {
+  day: "2-digit",
+  month: "short",
+  hour: "2-digit",
+  minute: "2-digit"
+});
+
+card.innerHTML = `
+  <div style="
+      font-weight:600;
+      font-size:14px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    ">
+    ${o.orderNumber} • ${formattedDate} • ${fmt(o.netPayable)} • ${o.orderType}
+  </div>
+`;
+
 
     card.onclick = function () {
        window._invoiceFromRecent = true; 
 
-      
   // 🔥 Immediately close Recent Orders drawer
   const panel = document.getElementById("orderSidePanel");
   const backdrop = document.getElementById("recentBackdrop");
@@ -16395,6 +16408,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
