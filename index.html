@@ -5501,14 +5501,19 @@ function renderOrderCards(orders) {
     
 function toggleRecentOrders() {
   const panel = document.getElementById("orderSidePanel");
+  const backdrop = document.getElementById("recentBackdrop");
+
   panel.classList.toggle("active");
 
   if (panel.classList.contains("active")) {
+    backdrop.style.display = "block";
     document.body.style.overflow = "hidden";
   } else {
+    backdrop.style.display = "none";
     document.body.style.overflow = "";
   }
 }
+
 
 
     
@@ -15042,9 +15047,12 @@ function buildRewardBannerHTML(data) {
 function renderInvoiceFromOrderAPI(inv) {
 
    // 🔥 MOBILE FIX — Close Recent Orders drawer first
-  const recentPanel = document.getElementById("orderSidePanel");
-  if (recentPanel) recentPanel.classList.remove("active");
-  document.body.style.overflow = "";
+ const recentPanel = document.getElementById("orderSidePanel");
+const recentBackdrop = document.getElementById("recentBackdrop");
+
+if (recentPanel) recentPanel.classList.remove("active");
+if (recentBackdrop) recentBackdrop.style.display = "none";
+document.body.style.overflow = "";
 
   console.log("DELIVERY TAXABLE FROM API:", inv.deliveryTaxable);
 
@@ -16348,9 +16356,21 @@ window._guestCouponAllowed = (result && result.used === false);
   </div>
 </div>
   
-  
+  <div id="recentBackdrop"
+     onclick="toggleRecentOrders()"
+     style="
+       position:fixed;
+       inset:0;
+       background:rgba(0,0,0,0.35);
+       backdrop-filter:blur(2px);
+       display:none;
+       z-index:99998;
+     ">
+</div>
+
 </body>
 </html>
+
 
 
 
