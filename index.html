@@ -5355,6 +5355,10 @@ async function loadInvoiceFromOrderId(orderId) {
 
   console.log("🧾 Loading invoice for:", orderId);
 
+  // 🔥 SHOW OVERLAY
+  const overlay = document.getElementById("invoiceOverlay");
+  if (overlay) overlay.classList.remove("hidden");
+
   try {
 
     const res = await fetch(
@@ -5375,9 +5379,13 @@ async function loadInvoiceFromOrderId(orderId) {
 
   } catch (err) {
     console.error("Invoice load failed:", err);
-  }
+  } finally {
 
+    // 🔥 HIDE OVERLAY (ALWAYS)
+    if (overlay) overlay.classList.add("hidden");
+  }
 }
+
 
     
 function renderOrderCards(orders) {
@@ -16144,6 +16152,15 @@ window._guestCouponAllowed = (result && result.used === false);
     </div>
   </div>
 </div>
+  <div id="invoiceOverlay"
+     class="hidden fixed inset-0 bg-black bg-opacity-40 
+            flex items-center justify-center z-[10000]">
+
+  <div class="bg-white px-6 py-3 rounded-lg font-semibold shadow">
+    Loading invoice...
+  </div>
+</div>
+
 <div
   id="invoiceModal"
   class="fixed inset-0 bg-black bg-opacity-50 hidden z-[9999] flex items-center justify-center">
@@ -16237,46 +16254,5 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
