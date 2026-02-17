@@ -7104,7 +7104,8 @@ function showPage(pageId) {
     "profilePage",
     "ordersPage",
     "offersPage",
-    "myCouponsPage"
+    "myCouponsPage",
+    "orderSidePanel" 
   ];
 
   idsToHide.forEach(id => {
@@ -7116,6 +7117,11 @@ function showPage(pageId) {
   if (pageId === "menuPage") {
     const menu = document.getElementById("menuWrapper");
     if (menu) menu.style.display = "block";
+
+    // 🔥 Show Recent Orders only on menu page
+  const panel = document.getElementById("orderSidePanel");
+  if (panel) panel.style.display = "block";
+    
   } else {
     const wrapper = document.getElementById("pageWrapper");
     const page = document.getElementById(pageId);
@@ -16401,6 +16407,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
