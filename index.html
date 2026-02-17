@@ -5350,7 +5350,39 @@ async function onTestPreplaceClick() {
     alert("Test Preplace failed. Check console.");
   }
 }
-    
+  function renderOrderCards(orders) {
+
+  const container = document.getElementById("orderCardsContainer");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  orders.forEach(o => {
+
+    const card = document.createElement("div");
+    card.style.padding = "12px";
+    card.style.marginBottom = "10px";
+    card.style.borderRadius = "10px";
+    card.style.background = "#f8f8f8";
+    card.style.cursor = "pointer";
+
+    card.innerHTML = `
+      <div style="font-weight:600;">${o.orderNumber}</div>
+      <div style="font-size:13px;color:#666;">
+        ${fmt(o.netPayable)} • ${o.orderType}
+      </div>
+    `;
+
+    card.onclick = function () {
+      loadInvoiceFromOrderId(o.orderId);
+    };
+
+    container.appendChild(card);
+
+  });
+
+}
+  
 async function placeOrder() {
 
 console.log("🟢 placeOrder() called");
@@ -16166,6 +16198,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
