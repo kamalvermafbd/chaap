@@ -15013,7 +15013,13 @@ function buildRewardBannerHTML(data) {
 }
 
 function renderInvoiceFromOrderAPI(inv) {
-console.log("DELIVERY TAXABLE FROM API:", inv.deliveryTaxable);
+
+   // 🔥 MOBILE FIX — Close Recent Orders drawer first
+  const recentPanel = document.getElementById("orderSidePanel");
+  if (recentPanel) recentPanel.classList.remove("active");
+  document.body.style.overflow = "";
+
+  console.log("DELIVERY TAXABLE FROM API:", inv.deliveryTaxable);
 
   // ✅ CLEAR ERROR / LOADING LEFTOVERS
   const itemsBox = document.getElementById("invoiceItems");
@@ -16318,6 +16324,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
