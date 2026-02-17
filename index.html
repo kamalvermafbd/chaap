@@ -1844,8 +1844,23 @@ body::before {
        border-radius:16px;
        box-shadow:0 10px 30px rgba(0,0,0,0.1);
        padding:16px;
+    position:relative;
      ">
-
+<button onclick="toggleRecentOrders()"
+          style="
+            position:absolute;
+            right:14px;
+            top:14px;
+            font-size:22px;
+            background:none;
+            border:none;
+            cursor:pointer;
+            display:none;
+          "
+          id="recentCloseBtn">
+    ✕
+  </button>
+    
   <h3 style="font-size:18px; font-weight:600; margin-bottom:12px;">
     Recent Orders
   </h3>
@@ -16236,7 +16251,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 <div
   id="invoiceModal"
-  class="fixed inset-0 bg-black bg-opacity-50 hidden z-[9999] flex items-center justify-center">
+  class="fixed inset-0 bg-black bg-opacity-50 hidden z-[100000] flex items-center justify-center">
   <div class="bg-white w-[95%] max-w-xl rounded-xl p-4 text-sm relative">
 <div id="invoiceTemplate">
 
@@ -16327,6 +16342,7 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
 
