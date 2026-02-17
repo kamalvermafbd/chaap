@@ -1204,6 +1204,41 @@ body::before {
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
+    @media (max-width: 768px) {
+
+  /* layout vertical */
+  #layoutWrapper {
+    flex-direction: column;
+  }
+
+  /* drawer mode */
+  #orderSidePanel {
+    position: fixed !important;
+    top: 0;
+    right: -100%;
+    height: 100vh;
+    width: 88%;
+    max-width: 380px;
+    background: #ffffff;
+    box-shadow: -6px 0 18px rgba(0,0,0,0.18);
+    border-top-left-radius: 18px;
+    border-bottom-left-radius: 18px;
+    z-index: 99999;
+    overflow-y: auto;
+    transition: right 0.3s ease;
+  }
+
+  #orderSidePanel.active {
+    right: 0;
+  }
+}
+
+    @media (min-width: 769px) {
+  #recentOrdersBtn {
+    display: none;
+  }
+}
+
 
   </style>
 </head>
@@ -1488,6 +1523,23 @@ body::before {
   onmouseout="this.style.background='#FFEDD5'"
 >
   View Cart (<span id="cartCount">0</span>)
+</button>
+
+    <button
+  onclick="toggleRecentOrders()"
+  id="recentOrdersBtn"
+  style="
+    background:#FFEDD5;
+    color:#EA580C;
+    padding:8px 16px;
+    border:none;
+    border-radius:9999px;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
+  "
+>
+  Recent Orders
 </button>
 
 
@@ -1781,7 +1833,6 @@ body::before {
   <div id="orderSidePanel"
      style="
        width:380px;
-       display:none;
        position:sticky;
        top:20px;
        max-height:90vh;
@@ -5420,7 +5471,13 @@ function renderOrderCards(orders) {
   });
 
 }
-  
+
+function toggleRecentOrders() {
+  const panel = document.getElementById("orderSidePanel");
+  panel.classList.toggle("active");
+}
+
+    
 async function placeOrder() {
 
 console.log("🟢 placeOrder() called");
@@ -16254,5 +16311,6 @@ window._guestCouponAllowed = (result && result.used === false);
   
 </body>
 </html>
+
 
 
