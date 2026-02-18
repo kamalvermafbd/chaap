@@ -2937,7 +2937,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // MENU LOAD
 // ===============================
  // 🔴 MEMORY CACHE CHECK (ADD THIS ABOVE apiGet)
-
+document.addEventListener("DOMContentLoaded", function () {
 if (window._menuMemoryCache) {
   renderMenu(window._menuMemoryCache);
   return;
@@ -2971,7 +2971,7 @@ apiGet("getMenu")
   .finally(() => {
     console.timeEnd("menuLoadTotal");
   });
-
+}
 // ===============================
 // CAT ALLOCATION LOAD
 // ===============================
@@ -16498,6 +16498,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
