@@ -5479,26 +5479,32 @@ async function loadInvoiceFromOrderId(orderId) {
 
     
 function renderOrderCards(orders) {
+
+  console.log("renderOrderCards called with:", orders);
+
   const container = document.getElementById("orderCardsContainer");
-  const emptyMsg = document.getElementById("noRecentOrdersMessage");
   if (!container) return;
 
-  // 🔥 REMOVE ONLY CARDS, NOT EMPTY MESSAGE
+  const emptyMsg = document.getElementById("noRecentOrdersMessage");
+
+  // 🔥 REMOVE ONLY ORDER CARDS
   Array.from(container.children).forEach(child => {
     if (child.id !== "noRecentOrdersMessage") {
       child.remove();
     }
   });
 
-  // ✅ SHOW EMPTY STATE
-  if (!orders || orders.length === 0) {
+  // ✅ EMPTY STATE
+  if (!Array.isArray(orders) || orders.length === 0) {
+    console.log("Orders empty — showing message");
     if (emptyMsg) emptyMsg.style.display = "block";
     return;
   }
 
-  // 🔒 Hide empty message when orders exist
+  // 🔒 Hide empty message
   if (emptyMsg) emptyMsg.style.display = "none";
 
+  // 🔽 Render Cards
   orders.forEach(o => {
     const card = document.createElement("div");
     card.style.padding = "12px";
@@ -5546,7 +5552,6 @@ function renderOrderCards(orders) {
     container.appendChild(card);
   });
 }
-
 
 function toggleRecentOrders() {
   const panel = document.getElementById("orderSidePanel");
@@ -16450,6 +16455,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
