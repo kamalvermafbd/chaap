@@ -13556,6 +13556,16 @@ function closeInvoiceModal() {
 
   // 🔥 Force repaint (desktop fade fix)
   document.body.offsetHeight;
+  // 🔥 Desktop blur safety patch (DO NOT REMOVE OLD CODE)
+if (window.innerWidth > 768) {
+  const backdrop = document.getElementById("recentBackdrop");
+  if (backdrop) {
+    backdrop.style.display = "none";
+    backdrop.style.backdropFilter = "none";
+    backdrop.style.webkitBackdropFilter = "none";
+  }
+}
+
 }
 
 
@@ -16454,6 +16464,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
