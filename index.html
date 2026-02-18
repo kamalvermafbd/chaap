@@ -15435,9 +15435,14 @@ if (signup > 0) {
 const rewardBox = document.getElementById("invReward");
 if (reward > 0) {
   rewardBox.classList.remove("hidden");
+
+   const rewardLabel = inv.couponId
+    ? `Reward Coupon (${inv.couponId})`
+    : "Reward Coupon";
+  
   rewardBox.innerHTML = `
     <div class="flex justify-between text-green-600">
-      <span>Reward Coupon</span>
+      <span>${rewardLabel}</span>
       <span>−${fmt(reward)}</span>
     </div>`;
 } else rewardBox.classList.add("hidden");
@@ -16465,6 +16470,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
