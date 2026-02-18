@@ -2564,10 +2564,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     console.log("📦 Recent Orders API:", data);
 
-    if (data?.success && Array.isArray(data.orders) && data.orders.length > 0) {
-      document.getElementById("orderSidePanel").style.display = "block";
-      renderOrderCards(data.orders);
-    }
+ if (data?.success && Array.isArray(data.orders)) {
+  document.getElementById("orderSidePanel").style.display = "block";
+  renderOrderCards(data.orders);
+}
+
 
   } catch (err) {
     console.error("Recent orders load failed:", err);
@@ -16455,6 +16456,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
