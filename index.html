@@ -1874,7 +1874,18 @@ body::before {
     Recent Orders
   </h3>
 
-  <div id="orderCardsContainer"></div>
+  <div id="orderCardsContainer">
+  <div id="noRecentOrdersMessage" style="display:none; text-align:center; padding:30px 10px;">
+    <div style="font-size:32px; margin-bottom:10px;">📦</div>
+    <div style="font-weight:600; font-size:15px; color:#444;">
+      You haven't placed any orders yet.
+    </div>
+    <div style="font-size:13px; color:#777; margin-top:6px;">
+      Start exploring our menu and order your favorites!
+    </div>
+  </div>
+</div>
+
 
 </div>
 </div>
@@ -5470,7 +5481,30 @@ async function loadInvoiceFromOrderId(orderId) {
 function renderOrderCards(orders) {
   const container = document.getElementById("orderCardsContainer");
   if (!container) return;
+
   container.innerHTML = "";
+
+  // ✅ EMPTY STATE
+  if (!orders || orders.length === 0) {
+    container.innerHTML = `
+      <div style="
+          text-align:center;
+          padding:30px 10px;
+          color:#555;
+        ">
+        <div style="font-size:32px; margin-bottom:10px;">📦</div>
+        <div style="font-weight:600; font-size:14px;">
+          You haven't placed any orders yet.
+        </div>
+        <div style="font-size:13px; color:#777; margin-top:6px;">
+          Start exploring our menu and order your favorites!
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  // 🔽 EXISTING LOGIC (UNCHANGED)
   orders.forEach(o => {
     const card = document.createElement("div");
     card.style.padding = "12px";
@@ -5478,45 +5512,47 @@ function renderOrderCards(orders) {
     card.style.borderRadius = "10px";
     card.style.background = "#f8f8f8";
     card.style.cursor = "pointer";
-const orderDate = o.timestamp ? new Date(o.timestamp) : null;
-const formattedDate =
-  orderDate && !isNaN(orderDate.getTime())
-    ? orderDate.toLocaleString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit"
-      })
-    : "";
-card.innerHTML = `
-  <div style="
-      font-weight:600;
-      font-size:14px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    ">
-    ${o.orderNumber} • ${formattedDate} • ${fmt(o.netPayable)} • ${o.orderType}
-  </div>
-`;
+
+    const orderDate = o.timestamp ? new Date(o.timestamp) : null;
+    const formattedDate =
+      orderDate && !isNaN(orderDate.getTime())
+        ? orderDate.toLocaleString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit"
+          })
+        : "";
+
+    card.innerHTML = `
+      <div style="
+          font-weight:600;
+          font-size:14px;
+          white-space:nowrap;
+          overflow:hidden;
+          text-overflow:ellipsis;
+        ">
+        ${o.orderNumber} • ${formattedDate} • ${fmt(o.netPayable)} • ${o.orderType}
+      </div>
+    `;
+
     card.onclick = function () {
-       window._invoiceFromRecent = true; 
+      window._invoiceFromRecent = true;
 
-  // 🔥 Immediately close Recent Orders drawer
-  const panel = document.getElementById("orderSidePanel");
-  const backdrop = document.getElementById("recentBackdrop");
+      const panel = document.getElementById("orderSidePanel");
+      const backdrop = document.getElementById("recentBackdrop");
 
-  if (panel) panel.classList.remove("active");
-  if (backdrop) backdrop.style.display = "none";
-  document.body.style.overflow = "";
-      
+      if (panel) panel.classList.remove("active");
+      if (backdrop) backdrop.style.display = "none";
+      document.body.style.overflow = "";
+
       loadInvoiceFromOrderId(o.orderId);
     };
+
     container.appendChild(card);
   });
-
 }
-    
+ 
 function toggleRecentOrders() {
   const panel = document.getElementById("orderSidePanel");
   const backdrop = document.getElementById("recentBackdrop");
@@ -16419,6 +16455,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
