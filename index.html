@@ -2936,15 +2936,20 @@ document.addEventListener("DOMContentLoaded", () => {
 // ===============================
 // MENU LOAD
 // ===============================
+    console.time("menuLoadTotal");
 apiGet("getMenu")
   .then(res => {
+    console.time("menuMapping");
     res.menu = (res.menu || []).map(row => ({
       ...row,
       image: row["Image Url"] || row.image || row.Image || row.img || ""
     }));
-
+console.timeEnd("menuMapping");
     window.menuItems = res.menu;
+    console.time("renderMenu");
     renderMenu(res.menu);
+    console.timeEnd("renderMenu");
+    console.timeEnd("menuLoadTotal");
   })
   .catch(err => console.error("Menu load error:", err));
 
@@ -16470,6 +16475,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
