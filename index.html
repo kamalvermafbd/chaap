@@ -2936,7 +2936,14 @@ document.addEventListener("DOMContentLoaded", () => {
 // ===============================
 // MENU LOAD
 // ===============================
-   console.time("menuLoadTotal");
+ // 🔴 MEMORY CACHE CHECK (ADD THIS ABOVE apiGet)
+
+if (window._menuMemoryCache) {
+  renderMenu(window._menuMemoryCache);
+  return;
+}
+
+    console.time("menuLoadTotal");
 
 apiGet("getMenu")
   .then(res => {
@@ -2951,7 +2958,8 @@ apiGet("getMenu")
     console.timeEnd("menuMapping");
 
     window.menuItems = menu;
-
+  // 🔴 STORE IN MEMORY CACHE
+    window._menuMemoryCache = menu;
     console.time("renderMenu");
     renderMenu(menu);
     console.timeEnd("renderMenu");
@@ -6090,6 +6098,10 @@ window._drawerTotals = null;
 renderCart();
 try { refreshCouponMotivationHint(); } catch(e){}
         closeCheckout();
+
+        // 🔴 RESET MENU MEMORY CACHE (VERY IMPORTANT)
+window._menuMemoryCache = null;
+        
         renderMenu(window.menuItems || []);
 
       setTimeout(async () => {
@@ -16486,6 +16498,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
