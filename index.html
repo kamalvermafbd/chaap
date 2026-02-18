@@ -5482,29 +5482,28 @@ function renderOrderCards(orders) {
   const container = document.getElementById("orderCardsContainer");
   if (!container) return;
 
+  // 🔥 Clear ONLY cards, not empty message permanently
   container.innerHTML = "";
 
-  // ✅ EMPTY STATE
+  // ✅ EMPTY STATE FIX
   if (!orders || orders.length === 0) {
-    container.innerHTML = `
-      <div style="
-          text-align:center;
-          padding:30px 10px;
-          color:#555;
-        ">
-        <div style="font-size:32px; margin-bottom:10px;">📦</div>
-        <div style="font-weight:600; font-size:14px;">
-          You haven't placed any orders yet.
-        </div>
-        <div style="font-size:13px; color:#777; margin-top:6px;">
-          Start exploring our menu and order your favorites!
-        </div>
+    const emptyDiv = document.createElement("div");
+    emptyDiv.style.textAlign = "center";
+    emptyDiv.style.padding = "30px 10px";
+    emptyDiv.innerHTML = `
+      <div style="font-size:32px; margin-bottom:10px;">📦</div>
+      <div style="font-weight:600; font-size:15px; color:#444;">
+        You haven't placed any orders yet.
+      </div>
+      <div style="font-size:13px; color:#777; margin-top:6px;">
+        Start exploring our menu and order your favorites!
       </div>
     `;
+    container.appendChild(emptyDiv);
     return;
   }
 
-  // 🔽 EXISTING LOGIC (UNCHANGED)
+  // 🔽 EXISTING CARD RENDERING
   orders.forEach(o => {
     const card = document.createElement("div");
     card.style.padding = "12px";
@@ -5552,7 +5551,7 @@ function renderOrderCards(orders) {
     container.appendChild(card);
   });
 }
- 
+
 function toggleRecentOrders() {
   const panel = document.getElementById("orderSidePanel");
   const backdrop = document.getElementById("recentBackdrop");
@@ -16455,6 +16454,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
