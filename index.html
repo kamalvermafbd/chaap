@@ -15306,10 +15306,11 @@ const signup = Number(inv.signupDiscount || 0);
 const normalCoupon = Number(inv.couponAmount || 0);
 
 const reward =
-  inv.couponType === "reward" ? Number(inv.rewardDiscount || 0) : 0;
+  Number(inv.rewardcoupon ?? inv.rewardDiscount ?? 0);
 
 const paid =
-  Number(inv.paidCouponDiscount || 0);
+  Number(inv.paidcoupon ?? inv.paidCouponDiscount ?? 0);
+
 // ================= TAX (FROM ORDER SHEET – NO SPLIT) =================
 const cgst = Number(inv.cgstAmt || 0);
 const sgst = Number(inv.sgstAmt || 0);
@@ -16464,6 +16465,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
