@@ -5480,30 +5480,25 @@ async function loadInvoiceFromOrderId(orderId) {
     
 function renderOrderCards(orders) {
   const container = document.getElementById("orderCardsContainer");
+  const emptyMsg = document.getElementById("noRecentOrdersMessage");
   if (!container) return;
 
-  // 🔥 Clear ONLY cards, not empty message permanently
-  container.innerHTML = "";
+  // 🔥 REMOVE ONLY CARDS, NOT EMPTY MESSAGE
+  Array.from(container.children).forEach(child => {
+    if (child.id !== "noRecentOrdersMessage") {
+      child.remove();
+    }
+  });
 
-  // ✅ EMPTY STATE FIX
+  // ✅ SHOW EMPTY STATE
   if (!orders || orders.length === 0) {
-    const emptyDiv = document.createElement("div");
-    emptyDiv.style.textAlign = "center";
-    emptyDiv.style.padding = "30px 10px";
-    emptyDiv.innerHTML = `
-      <div style="font-size:32px; margin-bottom:10px;">📦</div>
-      <div style="font-weight:600; font-size:15px; color:#444;">
-        You haven't placed any orders yet.
-      </div>
-      <div style="font-size:13px; color:#777; margin-top:6px;">
-        Start exploring our menu and order your favorites!
-      </div>
-    `;
-    container.appendChild(emptyDiv);
+    if (emptyMsg) emptyMsg.style.display = "block";
     return;
   }
 
-  // 🔽 EXISTING CARD RENDERING
+  // 🔒 Hide empty message when orders exist
+  if (emptyMsg) emptyMsg.style.display = "none";
+
   orders.forEach(o => {
     const card = document.createElement("div");
     card.style.padding = "12px";
@@ -5551,6 +5546,7 @@ function renderOrderCards(orders) {
     container.appendChild(card);
   });
 }
+
 
 function toggleRecentOrders() {
   const panel = document.getElementById("orderSidePanel");
@@ -16454,6 +16450,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
