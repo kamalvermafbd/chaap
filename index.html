@@ -2467,9 +2467,9 @@ function isUserLoggedIn() {
   return !!localStorage.getItem("userMobile");
 }
 
-    document.addEventListener("DOMContentLoaded", () => {
-  fetchRestaurantInfo();
-});
+//    document.addEventListener("DOMContentLoaded", () => {
+ // fetchRestaurantInfo();
+//});
 
 document.querySelectorAll(".payment-btn").forEach(btn => {
   btn.addEventListener("click", () => {
@@ -2540,18 +2540,43 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-    window.showError = window.showError || function (msg) {
+window.showError = window.showError || function (msg) {
   console.error("❌ UI ERROR:", msg);
   alert(msg || "Something went wrong. Please try again.");
 };
 
+document.addEventListener("DOMContentLoaded", async () => {
 
-document.addEventListener("DOMContentLoaded", async function () {
+  console.time("menuLoadTotal");
+
+  await fetchMenuFromBackend();   // 🔥 ONLY blocking API
+
+  console.timeEnd("menuLoadTotal");
+
+  startBackgroundAPIs();
+
+});
+
+function startBackgroundAPIs() {
+
+  // Restaurant Info (background)
+  setTimeout(() => {
+    fetchRestaurantInfo?.();
+  }, 400);
+
+  // Recent Orders (only if logged in)
+  if (isLoggedIn()) {
+    setTimeout(() => {
+      loadRecentOrdersInBackground();
+    }, 800);
+  }
+
+}
+
+    async function loadRecentOrdersInBackground() {
 
   const mobile = getActiveOrdersMobile();
   if (!mobile) return;
-
-  console.log("🔍 Checking recent orders for:", mobile);
 
   try {
     const res = await fetch(
@@ -2562,27 +2587,14 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const data = await res.json();
 
-    console.log("📦 Recent Orders API:", data);
-
- if (data?.success && Array.isArray(data.orders)) {
-
-  const panel = document.getElementById("orderSidePanel");
-
-  // 🔹 Mobile me drawer open kare
-  if (window.innerWidth <= 768 && panel) {
-    panel.classList.add("active");
-  }
-
-  renderOrderCards(data.orders);
-}
-
-
+    if (data?.success && Array.isArray(data.orders)) {
+      renderOrderCards(data.orders);
+    }
 
   } catch (err) {
     console.error("Recent orders load failed:", err);
   }
-
-});
+}
 
     window._invoiceFromRecent = false;
 
@@ -16498,6 +16510,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
