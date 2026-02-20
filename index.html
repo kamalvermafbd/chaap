@@ -5833,11 +5833,11 @@ if (!invoiceNode) {
   return;
 }
 
-const canvas = await html2canvas(invoiceNode, {
-  scale: 1,
-  backgroundColor: "#ffffff"
-});
-const invoiceImageBase64 = canvas.toDataURL("image/png");
+//const canvas = await html2canvas(invoiceNode, {
+  //scale: 1,
+  //backgroundColor: "#ffffff"
+//});
+//const invoiceImageBase64 = canvas.toDataURL("image/png");
 const inv = window._checkoutInvoice;
 
 // clear error if valid
@@ -5908,7 +5908,7 @@ lng: orderType === "Home Delivery"
   deliveryCharges: Number(inv.deliveryCharge || 0),
   courierCharges: Number(inv.courierCharge || 0),
   extraChargeReason: String(inv.chargeType || ""),
-    invoiceImage: invoiceImageBase64,
+  invoiceImage: "",   // 
  invoiceSnapshot: window._checkoutInvoice
   };
 // 🛡️ GUARD-B: Courier charge column correction
@@ -6019,7 +6019,7 @@ console.log("BACKEND RESPONSE FULL:", res);
 console.log("ORDER ID FROM BACKEND:", res.orderId);
 console.log("ORDER NUMBER FROM BACKEND:", res.orderNumber);
 
-alert(
+showToast(
    `Order placed successfully!\nYour Order Number: ${res.orderNumber}\n\n${res.message}`
         );
 
@@ -16522,6 +16522,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
