@@ -2467,6 +2467,9 @@ function isUserLoggedIn() {
   return !!localStorage.getItem("userMobile");
 }
 
+function isLoggedIn() {
+  return isUserLoggedIn();
+}
 //    document.addEventListener("DOMContentLoaded", () => {
  // fetchRestaurantInfo();
 //});
@@ -16510,6 +16513,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
