@@ -6876,19 +6876,18 @@ function unlockSignupForm() {
 }
 
 function sendEmailOTP() {
-  const email = document.getElementById("suEmail").value.trim();
+  const email  = document.getElementById("suEmail").value.trim();
+  const mobile = document.getElementById("suMobile").value.trim();
 
-  if (!email) {
-    alert("Please enter email first.");
+  if (!email || !mobile) {
+    alert("Please enter email and mobile.");
     return;
   }
 
-  // ?? lock UI while sending OTP
   lockSignupForm();
   updateSignupOverlayMessage("Sending OTP...");
 
-  // ? GAS ? Netlify API call conversion
-  apiGet("sendSignupEmailOTP", { email })
+  apiGet("sendSignupEmailOTP", { email, mobile })
     .then(res => {
       unlockSignupForm();
 
@@ -16552,6 +16551,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
