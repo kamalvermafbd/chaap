@@ -2548,18 +2548,45 @@ window.showError = window.showError || function (msg) {
   alert(msg || "Something went wrong. Please try again.");
 };
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", function () {
+
+  // 🔴 MEMORY CACHE CHECK
+  if (window._menuMemoryCache) {
+    renderMenu(window._menuMemoryCache);
+    startBackgroundAPIs();   // 👈 background start
+    return;
+  }
 
   console.time("menuLoadTotal");
 
-  await fetchMenuFromBackend();   // 🔥 ONLY blocking API
+  apiGet("getMenu")
+    .then(res => {
 
-  console.timeEnd("menuLoadTotal");
+      console.time("menuMapping");
 
-  startBackgroundAPIs();
+      const menu = (res.menu || []).map(row => ({
+        ...row,
+        image: row["Image Url"] || row.image || row.Image || row.img || ""
+      }));
+
+      console.timeEnd("menuMapping");
+
+      window.menuItems = menu;
+      window._menuMemoryCache = menu;
+
+      console.time("renderMenu");
+      renderMenu(menu);
+      console.timeEnd("renderMenu");
+    })
+    .catch(err => {
+      console.error("Menu load error:", err);
+    })
+    .finally(() => {
+      console.timeEnd("menuLoadTotal");
+      startBackgroundAPIs();   // 👈 background APIs yaha se start
+    });
 
 });
-
 function startBackgroundAPIs() {
 
   // Restaurant Info (background)
@@ -16513,6 +16540,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
