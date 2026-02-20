@@ -2547,20 +2547,32 @@ window.showError = window.showError || function (msg) {
   console.error("❌ UI ERROR:", msg);
   alert(msg || "Something went wrong. Please try again.");
 };
-
+    
 document.addEventListener("DOMContentLoaded", function () {
+
+  console.log("🚀 DOMContentLoaded triggered");
 
   // 🔴 MEMORY CACHE CHECK
   if (window._menuMemoryCache) {
+    console.log("⚡ Using MEMORY CACHE for menu");
+    console.log("📦 Cached Items:", window._menuMemoryCache.length);
+
+    console.time("renderMenu (cache)");
     renderMenu(window._menuMemoryCache);
-    startBackgroundAPIs();   // 👈 background start
+    console.timeEnd("renderMenu (cache)");
+
+    startBackgroundAPIs();
     return;
   }
+
+  console.log("🌐 No cache found → Fetching menu from API");
 
   console.time("menuLoadTotal");
 
   apiGet("getMenu")
     .then(res => {
+
+      console.log("📡 API Response Received:", res);
 
       console.time("menuMapping");
 
@@ -2571,19 +2583,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
       console.timeEnd("menuMapping");
 
+      console.log("📦 Total Menu Items:", menu.length);
+      console.log("🧾 Sample Item:", menu[0]);
+
       window.menuItems = menu;
       window._menuMemoryCache = menu;
 
       console.time("renderMenu");
       renderMenu(menu);
       console.timeEnd("renderMenu");
+
+      console.log("✅ Menu Render Completed");
     })
     .catch(err => {
-      console.error("Menu load error:", err);
+      console.error("❌ Menu load error:", err);
     })
     .finally(() => {
       console.timeEnd("menuLoadTotal");
-      startBackgroundAPIs();   // 👈 background APIs yaha se start
+      console.log("🎯 menuLoadTotal finished");
+      
+      console.log("🔄 Starting Background APIs...");
+      startBackgroundAPIs();
     });
 
 });
@@ -2975,45 +2995,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// ===============================
-// MENU LOAD
-// ===============================
- // 🔴 MEMORY CACHE CHECK (ADD THIS ABOVE apiGet)
-document.addEventListener("DOMContentLoaded", function () {
-if (window._menuMemoryCache) {
-  renderMenu(window._menuMemoryCache);
-  return;
-}
 
-    console.time("menuLoadTotal");
-
-apiGet("getMenu")
-  .then(res => {
-
-    console.time("menuMapping");
-
-    const menu = (res.menu || []).map(row => ({
-      ...row,
-      image: row["Image Url"] || row.image || row.Image || row.img || ""
-    }));
-
-    console.timeEnd("menuMapping");
-
-    window.menuItems = menu;
-  // 🔴 STORE IN MEMORY CACHE
-    window._menuMemoryCache = menu;
-    console.time("renderMenu");
-    renderMenu(menu);
-    console.timeEnd("renderMenu");
-
-  })
-  .catch(err => {
-    console.error("Menu load error:", err);
-  })
-  .finally(() => {
-    console.timeEnd("menuLoadTotal");
-  });
-});
 // ===============================
 // CAT ALLOCATION LOAD
 // ===============================
@@ -16540,6 +16522,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
