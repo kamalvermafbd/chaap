@@ -235,7 +235,7 @@ button:active::after {
   font-weight: 600;
 }
 body {
-  background: #e9ddd5;
+  background: linear-gradient(135deg, #fff9f2, #ffe6d5);
   background-attachment: fixed;
 }
     
@@ -1484,23 +1484,19 @@ body::before {
   Install App
 </button>
 <div style="
+  width:100%;
   max-width:1200px;
   margin:40px auto;
-  background:#f5ece6;
-  border-radius:28px;
-  padding:20px;
-  box-shadow:0 30px 60px rgba(0,0,0,0.08);
+  padding:0 20px;
 ">
 <header
   style="
     position: relative;
-    padding: 30px 20px 60px;
-  padding-bottom: 80px;
-    min-height: 380px;
+    padding: 60px 20px 140px;
     background: linear-gradient(135deg,#ff7a18 0%, #ff6f00 60%, #ff5400 100%);
     color: white;
-  border-radius:24px;
-overflow:hidden;
+    border-radius:24px;
+    overflow:hidden;
   "
 >
 
@@ -1516,7 +1512,8 @@ overflow:hidden;
 <!-- 🔥 HERO CENTER CONTENT -->
 <div style="
   text-align:center;
-  margin-top:40px;
+  max-width:700px;
+  margin:0 auto;
 ">
 
   <h1 style="
@@ -1553,16 +1550,15 @@ overflow:hidden;
   
   <!-- RIGHT SIDE ACTIONS -->
   <div
-    class="header-actions"
-    style="
-      margin-left: auto;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      align-items: center;
-    "
-  >
+  style="
+    position:absolute;
+    top:25px;
+    right:25px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  "
+>
 
     <!-- VIEW CART -->
    <button
@@ -16611,6 +16607,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
