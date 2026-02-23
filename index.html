@@ -1621,7 +1621,46 @@ body::before {
 
   </div>
 </header>
+<!-- 🔥 COMPACT HOME INTRO -->
+<div id="homeIntro"
+     class="mx-4 mt-4 mb-3 rounded-2xl shadow-md
+            bg-gradient-to-r from-orange-500 to-orange-600
+            text-white p-6">
 
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+    <div>
+      <h1 class="text-2xl md:text-3xl font-bold tracking-tight">
+        Chaap Express
+      </h1>
+
+      <p class="mt-2 text-sm md:text-base text-orange-100">
+        Premium Chaap & Tandoor Specials • 100% Veg • Delivered Fast
+      </p>
+
+      <div class="flex gap-2 mt-3 flex-wrap">
+        <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-medium">
+          🔥 Best Seller
+        </span>
+        <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-medium">
+          🥬 Pure Veg
+        </span>
+        <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-medium">
+          ⚡ Fast Delivery
+        </span>
+      </div>
+    </div>
+
+    <div>
+      <button onclick="document.getElementById('menuSearch').scrollIntoView({behavior:'smooth'})"
+              class="bg-white text-orange-600 px-6 py-2 rounded-full
+                     font-semibold shadow hover:bg-orange-50 transition">
+        Order Now
+      </button>
+    </div>
+
+  </div>
+</div>
 <!-- PROMOTION BANNER (ONLY DYNAMIC – NO STATIC SLIDE) -->
 <div id="promoBanner"
   class="mx-4 mt-4 mb-5
@@ -16551,6 +16590,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
