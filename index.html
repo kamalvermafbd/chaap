@@ -1250,7 +1250,88 @@ body::before {
   }
 
 }
-   
+
+/* ===== PREMIUM HERO PROMO BANNER ===== */
+
+#promoBanner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 50px !important;
+  border-radius: 30px !important;
+  background: linear-gradient(135deg,#ffffff 0%,#fff7f2 100%) !important;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.15) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Soft wave glow background */
+#promoBanner::before {
+  content: "";
+  position: absolute;
+  bottom: -40px;
+  left: -10%;
+  width: 120%;
+  height: 200px;
+  background:
+    radial-gradient(circle at 25% 50%, rgba(255,140,60,0.25), transparent 60%),
+    radial-gradient(circle at 75% 50%, rgba(255,100,0,0.25), transparent 60%);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+/* Keep slides above wave */
+#promoSlides {
+  position: relative;
+  z-index: 2;
+}
+
+/* Make slide layout perfect */
+#promoSlides > div {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 50px !important;
+}
+
+/* Left text block */
+#promoSlides .offer-left,
+#promoSlides .slide-left {
+  flex: 1;
+}
+
+/* Right image block */
+#promoSlides .offer-img,
+#promoSlides .slide-img {
+  flex: 1;
+  text-align: right;
+}
+
+/* Food image perfect display */
+#promoSlides img {
+  max-height: 260px !important;
+  width: auto !important;
+  object-fit: contain !important;
+  border-radius: 20px !important;
+}
+
+/* Improve title */
+#promoSlides h3 {
+  font-size: 30px !important;
+  font-weight: 800 !important;
+  margin-bottom: 10px !important;
+}
+
+/* Improve button look */
+#promoSlides button {
+  background: linear-gradient(135deg,#ff7a18,#ff6f00) !important;
+  color: white !important;
+  padding: 14px 30px !important;
+  border-radius: 999px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 12px 25px rgba(255,111,0,0.35) !important;
+}
+
+    
   </style>
 </head>
 <body>
@@ -1492,7 +1573,7 @@ body::before {
 <header
   style="
     position: relative;
-    padding: 60px 20px 140px;
+    padding: 70px 20px 200px;
     background: linear-gradient(135deg,#ff7a18 0%, #ff6f00 60%, #ff5400 100%);
     color: white;
     border-radius:24px;
@@ -16607,6 +16688,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
