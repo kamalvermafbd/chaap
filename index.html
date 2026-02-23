@@ -1487,11 +1487,10 @@ body::before {
 <header
   style="
     position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    padding: 10px 14px;
-    gap: 8px;
+    padding: 30px 20px 60px;
+    min-height: 340px;
+    background: linear-gradient(135deg,#ff7a18,#ff6f00);
+    color: white;
   "
 >
 
@@ -1503,7 +1502,45 @@ body::before {
   >
     Logged in: <span id="loggedEmail"></span>
   </div>
+  
+<!-- 🔥 HERO CENTER CONTENT -->
+<div style="
+  text-align:center;
+  margin-top:40px;
+">
 
+  <h1 style="
+      font-size:36px;
+      font-weight:700;
+      margin-bottom:10px;
+  ">
+    Chaap Express
+  </h1>
+
+  <p style="
+      font-size:16px;
+      opacity:0.9;
+      margin-bottom:25px;
+  ">
+    Premium Chaap & Tandoor Specials • 100% Veg • Delivered Fast
+  </p>
+
+  <button onclick="document.getElementById('menuSearch').scrollIntoView({behavior:'smooth'})"
+          style="
+            background:white;
+            color:#ff6f00;
+            padding:10px 26px;
+            border:none;
+            border-radius:999px;
+            font-weight:600;
+            cursor:pointer;
+            box-shadow:0 6px 14px rgba(0,0,0,0.15);
+          ">
+    Order Now
+  </button>
+
+</div>
+  
   <!-- RIGHT SIDE ACTIONS -->
   <div
     class="header-actions"
@@ -1620,6 +1657,37 @@ body::before {
 
 
   </div>
+  <!-- 🔥 HERO PROMO INSET CARD -->
+<div style="margin-top:40px; display:flex; justify-content:center;">
+  <div id="promoBanner"
+  class="mx-4 mt-4 mb-5
+         py-2
+         min-h-[220px]
+         rounded-3xl
+         relative
+         shadow-xl
+         border border-white/10
+         bg-[#fff7f2]
+         overflow-hidden
+         hidden">
+
+  <!-- CLOSE BUTTON -->
+  <button onclick="closePromoBanner()"
+          class="absolute top-2 right-3 z-10 text-gray-500 text-xl font-bold">
+    ×
+  </button>
+
+  <!-- SLIDER TRACK -->
+  <div id="promoSlides"
+       class="flex transition-transform duration-700 ease-in-out">
+  </div>
+
+  <!-- DOTS -->
+  <div id="promoDots"
+       class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+  </div>
+
+</div>
 </header>
 <!-- 🔥 COMPACT HOME INTRO -->
 <div id="homeIntro"
@@ -1662,35 +1730,7 @@ body::before {
   </div>
 </div>
 <!-- PROMOTION BANNER (ONLY DYNAMIC – NO STATIC SLIDE) -->
-<div id="promoBanner"
-  class="mx-4 mt-4 mb-5
-         py-2
-         min-h-[220px]
-         rounded-3xl
-         relative
-         shadow-xl
-         border border-white/10
-         bg-[#fff7f2]
-         overflow-hidden
-         hidden">
 
-  <!-- CLOSE BUTTON -->
-  <button onclick="closePromoBanner()"
-          class="absolute top-2 right-3 z-10 text-gray-500 text-xl font-bold">
-    ×
-  </button>
-
-  <!-- SLIDER TRACK -->
-  <div id="promoSlides"
-       class="flex transition-transform duration-700 ease-in-out">
-  </div>
-
-  <!-- DOTS -->
-  <div id="promoDots"
-       class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
-  </div>
-
-</div>
 
 <!-- LOGIN USER OFFER BANNER -->
 <div
@@ -16590,6 +16630,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
