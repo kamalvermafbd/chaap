@@ -1253,14 +1253,13 @@ body::before {
 /* ===== CLEAN PREMIUM BANNER (SAFE) ===== */
 
 #promoBanner {
+  width: 100%;
   max-width: 1100px;
   margin: 0 auto;
-  padding: 30px 40px !important;
-  border-radius: 28px !important;
-  background: linear-gradient(135deg,#ffffff 0%,#fdf4ee 100%) !important;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.15) !important;
-  position: relative;
-  overflow: hidden;
+  padding: 24px 28px !important;
+  box-sizing: border-box;
+  position: relative;     /* 👈 ADD THIS */
+  overflow: hidden;       /* 👈 ADD THIS */
 }
 
 /* Soft wave glow */
@@ -1317,6 +1316,31 @@ body::before {
   }
 
 }    
+
+    @media (max-width: 768px) {
+
+  #promoBanner {
+    padding: 16px !important;
+    border-radius: 20px !important;
+  }
+
+  #promoSlides {
+    width: 100%;
+  }
+
+  #promoSlides > div {
+    min-width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  #promoSlides img {
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    object-fit: contain !important;
+  }
+
+}
   </style>
 </head>
 <body>
@@ -16673,6 +16697,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
