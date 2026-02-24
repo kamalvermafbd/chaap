@@ -1352,6 +1352,12 @@ body::before {
   margin: 20px 0 10px 0;
   display: inline-block;
 }
+
+    .category-title {
+  background: #e8f5e9;   /* Patti ka color yaha change karo */
+  color: #1b5e20;        /* Text color */
+  border-radius: 8px;
+}
   </style>
 </head>
 <body>
@@ -3279,9 +3285,7 @@ let renderIndex = 0;
     heading.innerHTML = "Chef Special";
     heading.style.margin = "10px 0 5px";
     heading.style.padding = "10px";
-    heading.style.background = "#ff6347";
-    heading.style.color = "white";
-    heading.style.borderRadius = "6px";
+   heading.classList.add("category-title");
     heading.style.gridColumn = "1 / -1";
     menuDiv.appendChild(heading);
 
@@ -3313,9 +3317,7 @@ renderIndex++;
       heading.innerHTML = cat;
       heading.style.margin = "10px 0 5px";
       heading.style.padding = "10px";
-      heading.style.background = "#ff6347";
-      heading.style.color = "white";
-      heading.style.borderRadius = "6px";
+      heading.classList.add("category-title");
       heading.style.gridColumn = "1 / -1";
       menuDiv.appendChild(heading);
 
@@ -16708,6 +16710,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
