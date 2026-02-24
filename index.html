@@ -1302,7 +1302,21 @@ body::before {
   box-shadow: 0 10px 20px rgba(255,111,0,0.35) !important;
 }
 
-    
+/* ===== MOBILE HERO BUTTON FIX ===== */
+@media (max-width: 768px) {
+
+  .hero-buttons {
+    position: static !important;
+    margin-top: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  header {
+    padding-top: 120px !important;
+  }
+
+}    
   </style>
 </head>
 <body>
@@ -1604,12 +1618,12 @@ body::before {
   <div
   style="
     position:absolute;
-    top:25px;
-    right:25px;
+    top:20px;
+    right:20px;
     display:flex;
-    gap:10px;
-    flex-wrap:wrap;
+    gap:8px;
   "
+  class="hero-buttons"
 >
 
     <!-- VIEW CART -->
@@ -16659,6 +16673,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
