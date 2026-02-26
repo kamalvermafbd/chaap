@@ -1819,7 +1819,7 @@ body::before {
  <!-- SLIDER / CONTENT -->
 <div
   id="loginOfferSlider"
-  class="relative z-10 flex transition-transform duration-700 ease-in-out min-h-[360px] md:min-h-[380px]"
+  class="relative z-10 flex transition-transform duration-700 ease-in-out h-[420px] md:h-[450px]"
   style="
     width:100%;
     max-width:1500px;
@@ -15226,13 +15226,12 @@ async function showLoginUserOfferBanner() {
   // 🔹 clear slider
   slider.innerHTML = eligible.map(o => `
     <div class="
-      relative
-      min-w-full
-      h-[240px]
-      sm:h-[280px]
+  relative
+  min-w-full
+  h-full
       rounded-2xl
       overflow-hidden
-      px-8 pt-8 pb-6
+      px-8 pt-8 pb-16
       flex
       flex-col
       justify-between
@@ -15332,11 +15331,10 @@ function buildRewardBannerHTML(data) {
   <div class="
     relative
     min-w-full
-    h-[240px]
-    sm:h-[280px]
+  h-full
     rounded-2xl
     overflow-hidden
-    px-8 pt-8 pb-6
+    px-8 pt-8 pb-16
     flex
     flex-col
     justify-between
@@ -16717,6 +16715,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
