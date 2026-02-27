@@ -15225,7 +15225,7 @@ async function showLoginUserOfferBanner() {
   });
 
   // 🔹 clear slider
-  slider.innerHTML = eligible.map(o => `
+ slider.innerHTML = eligible.map((o, index) => `
     <div class="
   relative
   min-w-full
@@ -15238,10 +15238,10 @@ async function showLoginUserOfferBanner() {
       justify-between
       shadow-lg
       bg-gradient-to-br
-      ${o.flat > 0 ? 'from-orange-500 to-orange-600'
-                  : o.discount >= 20 ? 'from-green-500 to-green-600'
-                  : 'from-indigo-500 to-indigo-600'}
-      text-white
+${index % 3 === 0 ? 'from-[#fff3e6] to-[#ffe2cc]'
+ : index % 3 === 1 ? 'from-[#2a0a4a] to-[#4c1d95]'
+ : 'from-[#b91c1c] to-[#ef4444]'}
+${index % 3 === 0 ? 'text-[#7c2d12]' : 'text-white'}
     ">
       <div class="relative z-10">
         <div class="text-3xl font-extrabold">${o.text}</div>
@@ -16716,6 +16716,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
