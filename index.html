@@ -1358,7 +1358,15 @@ body::before {
     padding-bottom: 80px;   /* wave ke liye space */
   }
 }
+@keyframes offerPulse {
+  0%   { opacity: 1; transform: scale(1); }
+  50%  { opacity: 0.85; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
 
+.offer-blink {
+  animation: offerPulse 1.8s ease-in-out infinite;
+}
   </style>
 </head>
 <body>
@@ -15257,13 +15265,14 @@ ${index % 3 === 0 ? 'text-[#7c2d12]' : 'text-white'}
 
     <!-- Main Text -->
     <div class="relative px-8 py-3
-                text-4xl md:text-5xl
+                text-5xl md:text-6xl
                 font-extrabold italic
+                offer-blink
                 bg-gradient-to-r from-yellow-300 via-orange-400 to-red-500
                 bg-clip-text text-transparent
                 drop-shadow-[4px_4px_0px_rgba(0,0,0,0.45)]
                 tracking-wide">
-      Grab the offer
+      Grab the offer!!
     </div>
 
   </div>
@@ -16739,6 +16748,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
