@@ -15246,6 +15246,17 @@ ${index % 3 === 0 ? 'text-[#7c2d12]' : 'text-white'}
       <div class="relative z-10">
         <div class="text-3xl font-extrabold">${o.text}</div>
         <div class="text-lg opacity-90 mt-2">Min order ${fmt(o.min)}</div>
+
+        <div class="relative mt-6">
+  <div class="text-3xl font-extrabold italic
+              bg-gradient-to-r from-yellow-300 via-orange-400 to-red-500
+              bg-clip-text text-transparent
+              drop-shadow-[2px_2px_0px_rgba(0,0,0,0.35)]
+              tracking-wide">
+    Grab the offer
+  </div>
+</div>
+
       </div>
 
      <button
@@ -16716,6 +16727,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
