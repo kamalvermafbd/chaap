@@ -4,6 +4,8 @@ const URLS_TO_CACHE = [
   "/",
   "/index.html",
    "/privacy.html",
+   "/refund.html",
+   "/terms.html",
   "/manifest.json",
   "/offline.html",
   "/icons/icon-192.png",
@@ -76,6 +78,7 @@ self.addEventListener("fetch", event => {
     })
   );
 });
+
 
 
 
