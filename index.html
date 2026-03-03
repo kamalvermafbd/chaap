@@ -13922,13 +13922,7 @@ document.documentElement.style.overflow = "";
   document.body.offsetHeight;
 
   // 🔥 Desktop blur safety patch
-  if (window.innerWidth > 768) {
-    if (backdrop) {
-      backdrop.style.display = "none";
-      backdrop.style.backdropFilter = "none";
-      backdrop.style.webkitBackdropFilter = "none";
-    }
-  }
+ 
 }
 
 
@@ -16855,6 +16849,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
