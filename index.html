@@ -13911,8 +13911,8 @@ function closeInvoiceModal() {
     if (backdrop) backdrop.style.display = "none";
     if (panel) panel.classList.remove("active");
 
-    document.body.style.overflow = "auto";
-    document.documentElement.style.overflow = "auto";
+    document.body.style.overflow = "";
+document.documentElement.style.overflow = "";
   }
 
   // 🔥 Reset flag AFTER logic
@@ -16855,6 +16855,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
