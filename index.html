@@ -13887,7 +13887,6 @@ if (metaBox) {
 
 })();
 
-
 function closeInvoiceModal() {
 
   const modal = document.getElementById("invoiceModal");
@@ -13910,7 +13909,7 @@ function closeInvoiceModal() {
     if (backdrop) backdrop.style.display = "none";
     if (panel) panel.classList.remove("active");
 
-    document.body.style.overflow = "";
+    document.body.style.overflow = "auto";
   }
 
   window._invoiceFromRecent = false;
@@ -16853,6 +16852,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
