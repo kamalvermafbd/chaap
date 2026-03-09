@@ -16741,13 +16741,14 @@ window._guestCouponAllowed = (result && result.used === false);
 <div
   id="invoiceModal"
   class="fixed inset-0 bg-black bg-opacity-50 hidden z-[100000] flex items-center justify-center">
-  <div class="bg-white w-[95%] max-w-xl rounded-xl p-4 text-sm relative">
+  <div class="bg-white w-[95%] max-w-xl rounded-xl p-4 text-sm relative
+            max-h-[90vh] overflow-y-auto">
 <div id="invoiceTemplate">
 
     <!-- CLOSE -->
     <button
       onclick="closeInvoiceModal()"
-      class="absolute top-2 right-3 text-gray-400 text-xl">
+      class="sticky top-0 float-right text-gray-400 text-xl bg-white">
       ✕
     </button>
 
@@ -16842,6 +16843,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
