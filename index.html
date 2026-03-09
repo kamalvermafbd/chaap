@@ -1365,7 +1365,16 @@ body::before {
 .offer-blink {
   animation: offerPulse 1.8s ease-in-out infinite;
 }
-
+#invoiceModal .modal-content {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+    .modal-header {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+}
     
   </style>
 </head>
@@ -16828,6 +16837,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
