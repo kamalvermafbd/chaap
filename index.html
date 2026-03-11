@@ -5519,7 +5519,7 @@ showInvoiceProcessingOverlay(); // ⏳ invoice calculation started
 
 /* 🔴 SAFE ELIGIBILITY FETCH */
 let res = null;
-
+console.log("📮 PIN SENT:", document.getElementById("pincode")?.value);
 try {
   res = await apiPost("checkOrderEligibility", {
     orderType,
@@ -16844,6 +16844,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
