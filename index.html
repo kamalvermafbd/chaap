@@ -5522,13 +5522,26 @@ let res = null;
 console.log("📮 PIN SENT:", document.getElementById("pincode")?.value);
 
   // 🔐 Safe pincode fetch (DOM + deliveryLocation fallback)
+// 🔐 Get pincode safely
 const userPin =
-  document.getElementById("pincode")?.value?.trim() ||
   window._deliveryLocation?.pincode ||
+  document.getElementById("pincode")?.value?.trim() ||
   "";
 
-// Debug
+// 🔒 If still not available → skip eligibility check
+if (!userPin) {
+  console.warn("⏳ Waiting for pincode before eligibility check");
+
+  if (placeBtn) {
+    placeBtn.disabled = true;
+    placeBtn.classList.add("disabled-btn");
+  }
+
+  return false;
+}
+
 console.log("📮 PIN USED:", userPin);
+    
     
 try {
   res = await apiPost("checkOrderEligibility", {
@@ -16853,6 +16866,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
