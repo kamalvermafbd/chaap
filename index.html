@@ -5528,8 +5528,12 @@ try {
     mobile,
     userType,
     dispatchMode: document.getElementById("dispatchMode")?.value,
-userPin: document.getElementById("pincode")?.value?.trim(),
+const userPin = document.getElementById("pincode")?.value?.trim();
 
+if (!userPin) {
+  showError("📍 Please wait, pincode is still loading...");
+  return false;
+}
     lat: window.__COURIER_MODE === true
       ? null
       : Number(window._deliveryLocation?.lat),
@@ -16844,6 +16848,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
