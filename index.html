@@ -5521,12 +5521,15 @@ showInvoiceProcessingOverlay(); // ⏳ invoice calculation started
 let res = null;
 console.log("📮 PIN SENT:", document.getElementById("pincode")?.value);
 
-    const userPin = document.getElementById("pincode")?.value?.trim();
+  // 🔐 Safe pincode fetch (DOM + deliveryLocation fallback)
+const userPin =
+  document.getElementById("pincode")?.value?.trim() ||
+  window._deliveryLocation?.pincode ||
+  "";
 
-if (!userPin) {
-  showError("📍 Please wait, pincode is still loading...");
-  return false;
-}
+// Debug
+console.log("📮 PIN USED:", userPin);
+    
 try {
   res = await apiPost("checkOrderEligibility", {
     orderType,
@@ -16850,6 +16853,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
