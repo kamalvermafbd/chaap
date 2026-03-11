@@ -3945,9 +3945,16 @@ cartItemsContainer.appendChild(card);
   });
 
   // ===== FINAL TOTAL SET =====
-  let baseTotal = parseFloat(grandTotal.toFixed(2));
-  document.getElementById("cartTotal").innerText = fmt(baseTotal);
+  // ===== FINAL TOTAL SET =====
+let baseTotal = parseFloat(grandTotal.toFixed(2));
+document.getElementById("cartTotal").innerText = fmt(baseTotal);
 
+// ⭐ SAVE cart total for courier API
+window.cartTotalAmount = baseTotal;
+
+// 🧪 DEBUG LOG
+const debugDate = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+console.log("🧪 CART TOTAL DEBUG | Date:", debugDate, "| CartTotal:", window.cartTotalAmount);
 
   // TAX BLOCK unchanged
   // ===== TAX CALCULATION (FINAL & SAFE) =====
@@ -16866,6 +16873,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
