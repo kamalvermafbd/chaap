@@ -6222,6 +6222,7 @@ if (!inv) {
 
 // 🔒 cart & totals checkout invoice se aayenge
 const safeCartItems = inv.items.map(i => ({ ...i }));
+  const normalizedCart = normalizeCartForOrder(window._checkoutInvoice.items);
 const drawer = window._drawerTotals || {};
 const couponDiscFinal =
   Number(drawer.offerDiscount || 0) +
@@ -6235,13 +6236,15 @@ console.log("🧾 COUPON DEBUG (FINAL)", {
   totalCouponDiscount: couponDiscFinal
 });
   const orderData = {
+    requestId: "REQ-" + Date.now() + "-" + Math.floor(Math.random()*1000),
     customerName,
     email,
     mobile,
     orderType,
     address: finalAddress,
     // 🔴🔴🔴 FORCE FINAL QTY FROM CHECKOUT INVOICE (NOT DRAWER / CART)
-cartItems: normalizeCartForOrder(window._checkoutInvoice.items),
+cartItems: normalizedCart,
+  total_weight: normalizedCart[0]?.weight || 0,   
 baseTotal: Number(inv.itemsSubtotal || 0),
 signupDiscount: Number(inv.signupDiscount || 0),
 serviceAmt: Number(inv.serviceCharge || 0),
@@ -6360,7 +6363,7 @@ console.log(
 
 console.log("🚚 DISPATCH MODE:", window.__DISPATCH_MODE);
 console.log("🧾 INVOICE SNAPSHOT:", JSON.parse(JSON.stringify(window._checkoutInvoice)));
-
+console.log("⚖️ TOTAL WEIGHT SENT:", orderData.total_weight);
   apiPost("placeOrder", orderData)
     .then(async res => {
       console.log(
@@ -16892,6 +16895,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
