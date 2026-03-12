@@ -14397,6 +14397,7 @@ deliveryChargeLabel:
   inv.deliveryChargeLabel ||
   window.orderEligibility?.chargeType ||
   "Delivery Charges",
+     courierPrice: Number(inv.courierPrice || 0),   // ⭐ ADD THIS
     normalCoupon,
     signupDiscount: signup,
     rewardDiscount: reward,
@@ -16908,6 +16909,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
