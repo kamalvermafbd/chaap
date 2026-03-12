@@ -14467,7 +14467,10 @@ console.log("🧾 [INVOICE] Raw cart items (before filter):",
   const d = window._drawerTotals || {};
 // 🔥 FILTER items for invoice (hide cancel / hold)
 const rawItems = s.items || [];
-const invoiceItems = getInvoiceVisibleItems(rawItems);
+const invoiceItems = getInvoiceVisibleItems(rawItems).map(i => ({
+  ...i,
+  weight: Number(i.weight || 0)
+}));
 // 🔴🔴🔴 FIX: TOTAL WEIGHT MUST COME FROM CART (NOT INVOICE)
 let totalWeight = 0;
 
@@ -14742,7 +14745,7 @@ const netPayable = isDeliveryTaxable
 netPayable,
     // 🔴 DELIVERY TAXABLE FLAG (Backend ko batane ke liye)
 deliveryTaxable: isDeliveryTaxable ? "Yes" : "No",
-
+courierPrice: Number(window.courierPrice || 0), 
     // 🔥 ADD THIS
 totalWeight: Number(totalWeight.toFixed(3)),
 cgstPercent: window.cgstPercent,
@@ -16904,6 +16907,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
