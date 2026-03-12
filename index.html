@@ -16517,7 +16517,7 @@ const weightKg = Number(window.totalWeight) / 1000;
    const data = await apiPost("calculateCourierCharge", payload);
 
   //  DEBUG: COURIER API RESPONSE
-    console.log("📡 [COURIER API RESPONSE]", data);
+    console.log("📡 FULL COURIER RESPONSE:", JSON.stringify(data, null, 2));
     //  END DEBUG
 
     
@@ -16899,6 +16899,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
