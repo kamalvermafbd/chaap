@@ -5342,7 +5342,8 @@ function normalizeCartForOrder(cart) {
       discAmt: discAmt,
       netAmt: netAmt,
       total: netAmt,          // ⭐ IMPORTANT
-      image: item.image || ""
+      image: item.image || "",
+     weight: Number(item.weight ?? item.Weight ?? 0) // ⚖️ SAFE VERSION
     };
   });
 }
@@ -16873,6 +16874,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
