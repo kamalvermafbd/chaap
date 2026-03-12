@@ -14908,10 +14908,11 @@ function showCourierText(text) {
 if (window.couponMode !== "bestoffer") {
   syncCouponFromDrawerForCheckout();
 }
+mountInvoiceIntoCheckout();
+// ⭐ THEN build invoice
+let inv = buildCheckoutPreviewInv();
 
-  mountInvoiceIntoCheckout();
- let inv = buildCheckoutPreviewInv();
-  console.log("🧪 PREVIEW (AFTER QTY + WEIGHT)", inv);
+console.log("🧪 PREVIEW (AFTER QTY + WEIGHT)", inv);
      // =====================================================
   // ✅ STEP 2: COURIER COST RECALC (FINAL WEIGHT SAFE)
   // =====================================================
@@ -16913,6 +16914,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
