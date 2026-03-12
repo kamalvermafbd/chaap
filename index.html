@@ -5672,7 +5672,12 @@ if (!res || res.allowed !== true) {
     }
     // ✅ SUCCESS (NO UI SIDE-EFFECT LOOP)
     showSuccess("✅ Great! Everything is ready — you may place your order now.");
-   
+   console.log("🚚 COURIER DEBUG BEFORE PLACE ORDER", {
+  courierCharge: window.courierCharge,
+  courierPrice: window.courierPrice,
+  totalWeight: window.totalWeight,
+  orderAmount: window.cartTotalAmount
+});
 // 🔓 ENABLE Place Order after success
 if (placeBtn) {
   placeBtn.disabled = false;
@@ -16899,6 +16904,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
