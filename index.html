@@ -6284,6 +6284,8 @@ lng: orderType === "Home Delivery"
   deliveryCharges: Number(inv.deliveryCharge || 0),
   courierCharges: Number(inv.courierCharge || 0),
   extraChargeReason: String(inv.chargeType || ""),
+    courierPrice: Number(inv.courierPrice || 0),
+    
   invoiceImage: "",   // 
  invoiceSnapshot: window._checkoutInvoice
   };
@@ -16527,10 +16529,12 @@ const weightKg = Number(window.totalWeight) / 1000;
 
     // ✅ SINGLE SOURCE OF TRUTH
     window.courierCharge = Number(data.courierCharge) || 0;
+    window.courierPrice = Number(data.courierPrice) || 0;
     window.courierReason = data.reason || "";
-
-    console.log("✅ Courier charge set:", window.courierCharge);
-
+ // 🔥 DEBUG LOGS (IMPORTANT)
+    console.log("✅ Courier charge received:", window.courierCharge);
+    console.log("💰 Courier price per KG received:", window.courierPrice);
+    console.log("📌 Courier reason:", window.courierReason);
   } catch (err) {
     console.error("❌ Courier API failed", err);
     window.courierCharge = 0;
@@ -16895,6 +16899,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
