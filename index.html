@@ -14916,15 +14916,19 @@ if (window.couponMode !== "bestoffer") {
   // ✅ STEP 2: COURIER COST RECALC (FINAL WEIGHT SAFE)
   // =====================================================
   if (
-    typeof fetchCourierChargeForCheckout === "function" &&
-    window.__DISPATCH_MODE === "COURIER"
-  ) {
-    await fetchCourierChargeForCheckout();
+  typeof fetchCourierChargeForCheckout === "function" &&
+  window.__DISPATCH_MODE === "COURIER"
+) {
+  await fetchCourierChargeForCheckout();
 
-    // 🔁 Courier charge updated → rebuild invoice ONCE more
-    inv = buildCheckoutPreviewInv();
-    console.log("🧪 PREVIEW (AFTER COURIER RECALC)", inv);
-  }
+  // 🔁 Courier charge updated → rebuild invoice ONCE more
+  inv = buildCheckoutPreviewInv();
+
+  // ⭐ FIX
+  inv.courierPrice = Number(window.courierPrice ?? 0);
+
+  console.log("🧪 PREVIEW (AFTER COURIER RECALC)", inv);
+}
 
    // 🔑 ✅ CHECKOUT-ONLY BEST OFFER RE-EVALUATION
 // 🔒 STEP 1: VALIDATE CURRENT COUPON (MIN CHECK)
@@ -16909,6 +16913,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
