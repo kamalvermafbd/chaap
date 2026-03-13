@@ -14355,7 +14355,7 @@ taxBox.innerHTML = `
 // 🔁 DELIVERY POSITION FIX (TAXABLE / NON-TAXABLE)
 const totalsBox = document.getElementById("invBase").parentElement;
 if (deliveryBox && taxBox) {
-   deliveryBox.remove();
+  
   if (isDeliveryTaxable) {
     // ✅ Delivery BEFORE tax
     totalsBox.insertBefore(deliveryBox, taxBox);
@@ -16965,6 +16965,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
