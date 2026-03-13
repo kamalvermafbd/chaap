@@ -14808,8 +14808,9 @@ gstOnDiscountedAmount: window.gstOnDiscountedAmount,
 couponAmount: normalCoupon,
 
 // 🔥 🔥 THIS IS THE FIX
-couponType: window.drawerSpecialCoupon?.type || "",
+couponType: normalCoupon > 0 ? "normal" : "",
 normalCoupon: normalCoupon,
+
 
     // ===== PAYMENT =====
     paymentMethod: document.getElementById("paymentMethod")?.value || ""
@@ -16965,6 +16966,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
