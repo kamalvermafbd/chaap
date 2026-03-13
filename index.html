@@ -14232,11 +14232,7 @@ const normalCoupon = Number(inv.couponAmount || 0);
   const signup = Number(inv.signupDiscount || 0);
   //const reward = Number(inv.rewardDiscount || 0);
 
-  const reward =
-  window.drawerSpecialCoupon?.type === "reward"
-    ? window.drawerSpecialCoupon.amount
-    : Number(inv.rewardDiscount || 0);
-
+  const reward = Number(inv.rewardDiscount || 0);
   // 🔴 FIX: drawer always wins
 const paid =
   Number(inv.paidCouponDiscount || 0) ||
@@ -16969,6 +16965,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
