@@ -1620,7 +1620,7 @@ body::before {
   padding:0 20px;
 ">
 <header
- onclick="autoCollapseDrawerOnMenuInteraction()"
+ 
   style="
     position: relative;
     padding: 70px 20px 120px;
@@ -9648,7 +9648,24 @@ document.addEventListener("keydown", function(e) {
     closeCartDrawer();
   }
 });
+  
+// ⭐ ADD THIS BLOCK HERE
+document.addEventListener("click", function(e){
 
+  // cart drawer par click ignore
+  if (e.target.closest("#cartDrawer")) return;
+
+  // cart handle arrow ignore
+  if (e.target.closest("#cartHandle")) return;
+
+  // view cart button ignore
+  if (e.target.closest("#cartCount")) return;
+
+  collapseDrawerCart();
+
+});
+  
+  
 function addFromMenu(itemId, idx) {
 //autoCollapseDrawerOnMenuInteraction();
   itemId = String(itemId);
@@ -16933,6 +16950,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
