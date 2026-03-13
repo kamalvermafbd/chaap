@@ -9446,11 +9446,11 @@ async function openCartDrawer() {
 
   resetAppliedCoupon();   // ⭐ yaha call karo
   document.getElementById("availableCouponsList").innerHTML = "";  // ⭐ ADD THIS LINE
-
+ showCouponHintPlaceholder(); // 👈 STEP-1 placeholder
  window._offersReady = false;
 const rewardPromise = fetchRewardMotivationForCart();
  closeCheckout();
-  showCouponHintPlaceholder(); // 👈 STEP-1 placeholder
+ 
   //  OPEN DRAWER INSTANTLY (NO DELAY)
   document.getElementById("cartBackdrop").classList.add("active");
   document.getElementById("cartDrawer").classList.add("active");
@@ -16922,6 +16922,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
