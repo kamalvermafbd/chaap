@@ -15000,6 +15000,7 @@ if (window.couponMode === "bestoffer") {
 
 console.log("🧪 PREVIEW", inv);
   renderInvoiceFromAPI(inv);
+   injectCheckoutOfferDiscount(inv);
    // 🔥 HIDE cancel / hold items from invoice + show notes
 renderInvoiceNotesFromCart(window.cartSummary?.items || []);
 
@@ -16951,6 +16952,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
