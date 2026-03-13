@@ -1693,6 +1693,7 @@ body::before {
 
     <!-- VIEW CART -->
    <button
+     id="viewCartBtn"
   onclick="onViewCartClick()"
   style="
     background:#FFEDD5;
@@ -9659,7 +9660,7 @@ document.addEventListener("click", function(e){
   if (e.target.closest("#cartHandle")) return;
 
   // view cart button ignore
-  if (e.target.closest("#cartCount")) return;
+  if (e.target.closest("#viewCartBtn")) return;
 
   collapseDrawerCart();
 
@@ -16950,6 +16951,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
