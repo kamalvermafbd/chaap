@@ -9443,6 +9443,8 @@ function decideCartMotivation() {
 
   
 async function openCartDrawer() {
+
+  resetAppliedCoupon();   // ⭐ yaha call karo
  window._offersReady = false;
 const rewardPromise = fetchRewardMotivationForCart();
  closeCheckout();
@@ -9476,19 +9478,7 @@ fetchOffersFromBackend().then(() => {
   // ----------------------------------------
   // ⭐ FIXED RESTORE: coupon should restore ONLY if valid
   // ----------------------------------------
-  if (alreadyAppliedCouponId && (!selectedCoupon || selectedCoupon.id !== alreadyAppliedCouponId)) {
 
-    const offers = window.liveOffers || [];
-    const found = offers.find(x => x.id === alreadyAppliedCouponId);
-
-    if (found) {
-      selectedCoupon = found;
-    } else {
-      // coupon expired or removed → reset
-      alreadyAppliedCouponId = "";
-      selectedCoupon = null;
-    }
-  }
   // ----------------------------------------
 // ⭐ G4: REVALIDATE COUPON on drawer open
 // ----------------------------------------
@@ -12397,6 +12387,22 @@ function markAppliedCouponUI() {
   }
 }
 
+  function resetAppliedCoupon() {
+
+  selectedCoupon = null;
+  alreadyAppliedCouponId = "";
+
+  window._appliedCouponType = null;
+  window._appliedCouponSnapshot = null;
+  window.drawerSpecialCoupon = null;
+
+  window._couponLocked = false;
+
+  console.log("🧹 Coupon reset");
+
+}
+  
+  
 function applyRewardCoupon(couponCode, amount, couponType) {
   if (!couponCode) return;
 
@@ -16914,6 +16920,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
