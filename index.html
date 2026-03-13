@@ -14609,12 +14609,14 @@ offers.forEach(o => {
   }
 });
 
-// 🔥 APPLY BEST ELIGIBLE COUPON (OR CLEAR)
-// ⭐ PRESERVE MANUAL COUPON (reward / prepaid)
+
+// 🔥 APPLY BEST ELIGIBLE COUPON
 if (window.drawerSpecialCoupon?.type === "reward" ||
     window.drawerSpecialCoupon?.type === "paid") {
 
   normalCoupon = 0;
+
+  // 🚫 DO NOT modify drawerSpecialCoupon here
 
 } else if (appliedCoupon) {
 
@@ -16967,6 +16969,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
