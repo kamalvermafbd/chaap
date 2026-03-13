@@ -14926,7 +14926,10 @@ function showCourierText(text) {
   if (window._invoiceUpdating) return;
   window._invoiceUpdating = true;
 
-  // 🔥 HARD RESET COUPON STATE (checkout recalculation)
+  
+ // 🔒 DO NOT reset if drawer coupon exists
+if (!window.drawerSpecialCoupon) {
+
   window._finalCouponId = null;
   window._appliedCouponSnapshot = null;
 
@@ -14935,6 +14938,7 @@ function showCourierText(text) {
     delete window._checkoutInvoice.selectedCouponId;
   }
 
+}
    document.getElementById("checkoutInvoiceOverlay")
     ?.classList.remove("hidden");
 
@@ -16952,6 +16956,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
