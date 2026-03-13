@@ -9444,13 +9444,15 @@ function decideCartMotivation() {
   
 async function openCartDrawer() {
 window._couponHintLocked = false;
-  resetAppliedCoupon();   // ⭐ yaha call karo
-  document.getElementById("availableCouponsList").innerHTML = "";  // ⭐ ADD THIS LINE
-  // ⭐ show hint immediately
-const hint = document.getElementById("couponHintBox");
-if (hint) hint.style.display = "block";
+
+resetAppliedCoupon();
+
+const list = document.getElementById("availableCouponsList");
+if (list) list.innerHTML = "";
+
+// ⭐ single clean hint start
+showCouponHintPlaceholder();
   
- showCouponHintPlaceholder(); // 👈 STEP-1 placeholder
  window._offersReady = false;
 const rewardPromise = fetchRewardMotivationForCart();
  closeCheckout();
@@ -16930,6 +16932,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
