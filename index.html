@@ -9443,7 +9443,7 @@ function decideCartMotivation() {
 
   
 async function openCartDrawer() {
-
+window._couponHintLocked = false;
   resetAppliedCoupon();   // ⭐ yaha call karo
   document.getElementById("availableCouponsList").innerHTML = "";  // ⭐ ADD THIS LINE
   // ⭐ show hint immediately
@@ -10231,14 +10231,18 @@ function toggleClaimRewardOnCart(cartList) {
 
   
 }
-
+  
 function showCouponHintPlaceholder() {
+
+  if (window._couponHintLocked) return;   // ⭐ already running
+
   const hintBox = document.getElementById("couponHintBox");
   if (!hintBox) return;
 
   hintBox.innerText = "Checking best offers for you…";
   hintBox.style.display = "block";
-   window._couponHintLocked = true;
+
+  window._couponHintLocked = true;
 }
 
 window._couponHintTimer = null;
@@ -16926,6 +16930,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
