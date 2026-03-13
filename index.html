@@ -14609,7 +14609,14 @@ offers.forEach(o => {
 });
 
 // 🔥 APPLY BEST ELIGIBLE COUPON (OR CLEAR)
-if (appliedCoupon) {
+// ⭐ PRESERVE MANUAL COUPON (reward / prepaid)
+if (window.drawerSpecialCoupon?.type === "reward" ||
+    window.drawerSpecialCoupon?.type === "paid") {
+
+  normalCoupon = 0;
+
+} else if (appliedCoupon) {
+
   normalCoupon = +appliedCoupon.discountValue.toFixed(2);
 
   window.drawerSpecialCoupon = {
@@ -14618,8 +14625,11 @@ if (appliedCoupon) {
     amount: normalCoupon,
     min: appliedCoupon.min
   };
+
 } else {
+
   window.drawerSpecialCoupon = null;
+
 }
 
   console.log("🧪 AUTO COUPON RESULT", {
@@ -14799,7 +14809,7 @@ gstOnDiscountedAmount: window.gstOnDiscountedAmount,
 couponAmount: normalCoupon,
 
 // 🔥 🔥 THIS IS THE FIX
-couponType: normalCoupon > 0 ? "normal" : "",
+couponType: window.drawerSpecialCoupon?.type || "",
 normalCoupon: normalCoupon,
 
     // ===== PAYMENT =====
@@ -16956,6 +16966,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
