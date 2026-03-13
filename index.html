@@ -9445,6 +9445,8 @@ function decideCartMotivation() {
 async function openCartDrawer() {
 
   resetAppliedCoupon();   // ⭐ yaha call karo
+  document.getElementById("availableCouponsList").innerHTML = "";  // ⭐ ADD THIS LINE
+
  window._offersReady = false;
 const rewardPromise = fetchRewardMotivationForCart();
  closeCheckout();
@@ -16920,6 +16922,7 @@ window._guestCouponAllowed = (result && result.used === false);
 
 </body>
 </html>
+
 
 
 
