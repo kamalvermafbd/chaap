@@ -3218,7 +3218,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbx0OZMuX7Xz8FMo5Awt0BNIP0X0VlkoTWpmQE7pVm3JFfKYuR7yhR73nTrO_MAJinid6A/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbwyl-MYyLV0p3RnfOyznaBkEvKJPd1x07nUAqwo7Z4wfhxa2qKmFKCqU4R5wzbmqh7a/exec";
 
 // ===============================
 // API HELPER
@@ -16721,10 +16721,10 @@ window._guestCouponAllowed = (result && result.used === false);
     console.error("❌ Coupon validation failed", err);
   }
 }
-
+  
 async function showWalletBalance(){
 
-const mobile = localStorage.getItem("mobile");
+const mobile = localStorage.getItem("userMobile");
 
 if(!mobile){
 alert("Login required");
@@ -16732,7 +16732,7 @@ return;
 }
 
 const res = await fetch(
-API_URL + "?api=getWalletBalance&mobile=" + mobile
+API_BASE + "?api=getWalletBalance&mobile=" + mobile
 );
 
 const data = await res.json();
@@ -16745,7 +16745,7 @@ const banner = document.getElementById("walletBalanceBanner");
 
 banner.innerHTML =
 "💰 Wallet Balance : " +
-currency + " " + data.balance.toFixed(2);
+currency + " " + Number(data.balance).toFixed(2);
 
 banner.style.display = "block";
 
@@ -17033,93 +17033,5 @@ banner.style.display = "block";
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
