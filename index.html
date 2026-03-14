@@ -9610,6 +9610,7 @@ console.log("================================");
 window._drawerCollapsed = false;
   
 function collapseDrawerCart() {
+  if (!isDrawerOpen()) return;
   const drawer = document.getElementById("cartDrawer");
   if (!drawer) return;
 
