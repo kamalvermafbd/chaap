@@ -16750,6 +16750,13 @@ alert("Login required");
 return;
 }
 
+
+const banner = document.getElementById("walletBalanceBanner");
+
+// ⭐ ADD THESE 2 LINES HERE
+banner.innerHTML = "💳 Wallet is loading...";
+banner.style.display = "block";
+  
 const res = await fetch(
 API_BASE + "?api=getWalletBalance&mobile=" + mobile
 );
@@ -16760,8 +16767,7 @@ if(data.success){
 
 const currency = window.CURRENCY || "₹";
 
-const banner = document.getElementById("walletBalanceBanner");
-
+  
 banner.innerHTML =
 "💰 Wallet Balance : " +
 currency + " " + Number(data.balance).toFixed(2);
