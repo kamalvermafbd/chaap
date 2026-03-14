@@ -6986,7 +6986,7 @@ function filterMenu() {
 
 
 <script>
-
+let cartWasOpened = false;
 //open login
 function openLogin() {
   const modal = document.getElementById("loginModal");
@@ -9494,7 +9494,7 @@ function decideCartMotivation() {
   
 async function openCartDrawer() {
 window._couponHintLocked = false;
-
+cartWasOpened = true;
 resetAppliedCoupon();
 
 const list = document.getElementById("availableCouponsList");
@@ -9579,6 +9579,10 @@ function closeCartDrawer() {
   const backdrop = document.getElementById("cartBackdrop");
   const drawer   = document.getElementById("cartDrawer");
 
+// ⭐ check if drawer was open
+  const wasOpen = drawer && drawer.classList.contains("active");
+
+  
   if (drawer) {
     drawer.classList.remove("active");
   }
@@ -9588,6 +9592,9 @@ function closeCartDrawer() {
   }
 
   document.body.style.overflow = "auto";
+ if (cartWasOpened) {
+    document.getElementById("cartHandle").style.display = "flex";
+  }
 
   console.log("===== CART MOTIVATION DEBUG =====");
 console.log("_appliedCouponType:", window._appliedCouponType);
