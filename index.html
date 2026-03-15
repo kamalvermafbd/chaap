@@ -14433,7 +14433,7 @@ const billAmount = gstBase + taxTotal;
 
   const postTaxDiscount = reward + paid;
 // ⭐ WALLET CALCULATION
-const walletUsed = Math.min(walletBalance || 0, billAmount);
+const walletUsed = Math.min(walletBalance || 0, billAmount + deliveryAmt);
 
 const netPayable = isDeliveryTaxable
   ? billAmount - postTaxDiscount - walletUsed
@@ -14922,7 +14922,7 @@ const taxTotal = cgst + sgst + igst;
 const billAmount = gstBase + taxTotal;
   
 // ⭐ WALLET APPLY (CHECKOUT STAGE)
-let walletUsedFinal = Math.min(walletBalance || 0, billAmount);
+let walletUsedFinal = Math.min(walletBalance || 0, billAmount+deliveryAmt);
 
 // expose globally for payload + invoice
 window.walletUsed = walletUsedFinal;
