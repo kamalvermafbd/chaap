@@ -9381,7 +9381,13 @@ if (!window._offersReady) {
   alert("⏳ Applying best offers… please wait a moment.");
   return;
 }
+if(!window._discountEngineReady){
 
+alert("Please wait, loading best offers...");
+
+return;
+
+}
   if (window._cartUpdating) {
     alert("Cart is still updating. Please wait…");
     return;
