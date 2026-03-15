@@ -16839,14 +16839,18 @@ currency + " " + walletBalance.toFixed(2);
 banner.style.display = "block";
 }
 }
+  
+let useWallet = false;
 
 function toggleWalletUse(){
-const checkbox = document.getElementById("useWalletCheckbox");
-useWallet = checkbox.checked;
-// cart totals refresh
-renderCart();
-}
 
+const cb = document.getElementById("useWalletCheckbox");
+
+useWallet = cb.checked;
+
+updateDrawerTotals();
+
+}
 
   
 </script>
