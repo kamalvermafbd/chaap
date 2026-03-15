@@ -9592,12 +9592,7 @@ function closeCartDrawer() {
   }
 
   document.body.style.overflow = "auto";
- if (cartWasOpened) {
-    document.getElementById("cartHandle").style.display = "flex";
-  }
-if (cartWasOpened && showArrow) {
-    document.getElementById("cartHandle").style.display = "flex";
-  }
+
   document.getElementById("cartHandle").style.display = "none";
   console.log("===== CART MOTIVATION DEBUG =====");
 console.log("_appliedCouponType:", window._appliedCouponType);
