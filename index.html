@@ -13954,7 +13954,7 @@ document.getElementById("invoiceCloseBtn").style.display = "block";
   if (!modal) return;
 
   modal.classList.remove("hidden");
-
+modal.classList.add("flex");
   // ✅ CLEAR OLD ERROR (VERY IMPORTANT)
   const errBox = document.getElementById("invoiceError");
   if (errBox) {
