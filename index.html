@@ -16902,16 +16902,11 @@ showCouponError("Please wait, best offers and coupons are still loading.");
 cb.checked = false;
 
 return;
-
-}
-
-
-  
+} 
 useWallet = cb.checked;
-
 updateDrawerTotals();
-
 }
+
 function checkDiscountEngineReady(){
 
 if(window._offersReady && window._couponsReady){
@@ -16922,10 +16917,27 @@ console.log("✅ Discount engine ready");
 
 updateDrawerTotals();
 
-}
+// ⭐ wallet info message
+const walletBox = document.getElementById("walletApplyBox");
+
+if(walletBalance > 0 && walletBox){
+
+const box = document.getElementById("couponMessage");
+
+if(box){
+
+box.style.display = "block";
+box.style.background = "#e8f7ec";
+box.style.color = "#1a7f37";
+box.style.border = "1px solid #b7ebc6";
+
+box.innerText =
+`💳 You can use your wallet balance of ${fmt(walletBalance)} for this order.`;
 
 }
-  
+}
+}
+}
 </script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
