@@ -11899,15 +11899,15 @@ if (payable < 0) payable = 0;
 payable = Number(payable.toFixed(2));
 // ⭐ WALLET APPLY (before tax calculation)
   walletUsed = 0;
+// 🛑 GUARD → wallet tabhi apply hoga jab discount engine ready ho
+if(!window._discountEngineReady){
+useWallet = false;
+}
 if(useWallet && walletBalance > 0){
-
 walletUsed = Math.min(walletBalance, payable);
-
 payable = payable - walletUsed;
-
 if (payable < 0) payable = 0;
 payable = Number(payable.toFixed(2));
-
 }
 // =====================================================
 // ⭐⭐ 3) WALLET (after tax) discounts
@@ -16895,6 +16895,18 @@ function toggleWalletUse(){
 
 const cb = document.getElementById("useWalletCheckbox");
 
+if(!window._discountEngineReady){
+
+console.log("⏳ Wallet blocked → discount engine not ready");
+
+cb.checked = false;
+
+return;
+
+}
+
+
+  
 useWallet = cb.checked;
 
 updateDrawerTotals();
