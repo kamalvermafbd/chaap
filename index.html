@@ -1440,7 +1440,7 @@ flex-wrap:wrap;
 
   <div id="cartBackdrop" onclick="closeCartDrawer()"></div> 
 <div id="cartDrawer"> 
-   <button onclick="closeCartDrawer()" 
+   <button onclick="event.stopPropagation();closeCartDrawer()" 
     class="absolute right-3 top-3 text-gray-500 hover:text-gray-800 text-2xl font-bold">
     &times;
   </button>
@@ -9598,6 +9598,7 @@ function closeCartDrawer() {
 if (cartWasOpened && showArrow) {
     document.getElementById("cartHandle").style.display = "flex";
   }
+  document.getElementById("cartHandle").style.display = "none";
   console.log("===== CART MOTIVATION DEBUG =====");
 console.log("_appliedCouponType:", window._appliedCouponType);
 console.log("_rewardMotivation:", window._rewardMotivation);
