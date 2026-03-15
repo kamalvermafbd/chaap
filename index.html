@@ -9569,7 +9569,7 @@ const rewardPromise = fetchRewardMotivationForCart();
   Promise.all([offersPromise, rewardPromise]).then(() => {
 
   window._offersReady = true;
-
+checkDiscountEngineReady();
   console.log("✅ Offers + Rewards loaded → checkout allowed");
 
   updateDrawerTotals();
@@ -11095,6 +11095,9 @@ async function fetchAndRenderUserCouponsForCart() {
         if (loading) loading.classList.add("hidden");
         if (empty) empty.classList.remove("hidden");
       });
+      window._couponsReady = true;
+
+checkDiscountEngineReady();
       return;
     }
 
@@ -11113,6 +11116,9 @@ async function fetchAndRenderUserCouponsForCart() {
         if (loading) loading.classList.add("hidden");
         if (empty) empty.classList.remove("hidden");
       });
+      window._couponsReady = true;
+
+checkDiscountEngineReady();
       return;
     }
 
@@ -11130,6 +11136,9 @@ async function fetchAndRenderUserCouponsForCart() {
       } else {
         if (empty) empty.classList.add("hidden");
       }
+      window._couponsReady = true;
+
+checkDiscountEngineReady();
     });
 
   } catch (err) {
@@ -11141,6 +11150,9 @@ async function fetchAndRenderUserCouponsForCart() {
       if (loading) loading.classList.add("hidden");
       if (empty) empty.classList.remove("hidden");
     });
+    window._couponsReady = true;
+
+checkDiscountEngineReady();
   }
 }
 
@@ -16882,7 +16894,19 @@ useWallet = cb.checked;
 updateDrawerTotals();
 
 }
+function checkDiscountEngineReady(){
 
+if(window._offersReady && window._couponsReady){
+
+window._discountEngineReady = true;
+
+console.log("✅ Discount engine ready");
+
+updateDrawerTotals();
+
+}
+
+}
   
 </script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
