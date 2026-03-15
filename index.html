@@ -5851,7 +5851,7 @@ function buildOrderPayloadForDebug() {
     baseTotal: Number(inv?.itemsSubtotal || 0),
     couponDiscount: couponDiscFinal,
     signupDiscount: Number(inv?.signupDiscount || 0),
-
+walletUsed: Number(window.walletUsed || 0),
     payableAfterDiscount:
       Number(inv?.taxableAmount || 0) -
       couponDiscFinal -
@@ -11848,7 +11848,18 @@ if (window._checkoutInvoice) {
 let payable = subtotal - offerDiscount;   // GST base
 if (payable < 0) payable = 0;
 payable = Number(payable.toFixed(2));
+// ⭐ WALLET APPLY (before tax calculation)
+  walletUsed = 0;
+if(useWallet && walletBalance > 0){
 
+walletUsed = Math.min(walletBalance, payable);
+
+payable = payable - walletUsed;
+
+if (payable < 0) payable = 0;
+payable = Number(payable.toFixed(2));
+
+}
 // =====================================================
 // ⭐⭐ 3) WALLET (after tax) discounts
 // =====================================================
@@ -11909,7 +11920,12 @@ ${offerDiscount > 0
        <span>- ${fmt(offerDiscount)}</span>
      </div>`
   : ``}
-
+${walletUsed > 0 
+  ? `<div class="flex justify-between text-blue-600">
+       <span>Wallet Used:</span>
+       <span>- ${fmt(walletUsed)}</span>
+     </div>`
+  : ``}
 
     ${signupDiscount > 0 
       ? `<div class="flex justify-between text-green-600">
@@ -11931,7 +11947,7 @@ ${paidDiscount > 0
      </div>`
   : ``}
 
-    ${(offerDiscount > 0 || signupDiscount > 0 || rewardDiscount > 0) ? `
+   ${(offerDiscount > 0 || walletUsed > 0 || signupDiscount > 0 || rewardDiscount > 0) ? `
   <div class="border-t my-2"></div>
 
   <div class="flex justify-between items-center font-semibold text-base sm:text-lg text-gray-900 whitespace-nowrap">
@@ -11939,6 +11955,7 @@ ${paidDiscount > 0
     <span>${fmt(
   subtotal
   - offerDiscount
+      - walletUsed
   - signupDiscount
   - rewardDiscount
   - paidDiscount     // 🔴 RED FIX: include prepaid
@@ -11971,7 +11988,8 @@ window._drawerTotals = {
   igstAmt: igstAmt,
   grandTotal: netPayable              // 🔥 FIX
 };
-
+// ⭐ ADD THIS
+window.walletUsed = walletUsed;
   if (
     window._autoCouponJustChanged &&
     document.getElementById("offerList")?.style.display !== "none"
