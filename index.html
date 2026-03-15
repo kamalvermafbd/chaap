@@ -9675,6 +9675,14 @@ function toggleCartDrawer() {
   updateCartBadge();    
 });
 
+  const drawer = document.getElementById("cartDrawer");
+
+if (drawer) {
+  drawer.addEventListener("click", function(e){
+    e.stopPropagation();
+  });
+}
+  
 // ===== SWIPE TO CLOSE Drawer (Zomato style) =====
 let touchStartX = 0;
 
