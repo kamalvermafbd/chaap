@@ -1501,7 +1501,27 @@ flex-wrap:wrap;
   </button>
 </div>
 
+<!-- 💳 WALLET APPLY BOX -->
+<div id="walletApplyBox"
+     class="hidden mt-2 p-3 rounded-lg border border-blue-300 bg-blue-50 flex justify-between items-center">
 
+  <div>
+    <div class="font-semibold text-blue-800">
+      💳 Use Wallet Balance
+    </div>
+
+    <div id="walletBalanceText"
+         class="text-sm text-blue-700">
+      ₹0 available
+    </div>
+  </div>
+
+  <input type="checkbox"
+         id="useWalletCheckbox"
+         onchange="toggleWalletUse()"
+         class="w-5 h-5 cursor-pointer">
+
+</div>
 
   <div id="offerList"
     onclick="event.stopPropagation()"
@@ -6989,6 +7009,10 @@ function filterMenu() {
 
 <script>
 let cartWasOpened = false;
+let walletBalance = 0;
+let walletUsed = 0;
+let useWallet = false;
+  
 //open login
 function openLogin() {
   const modal = document.getElementById("loginModal");
@@ -16756,8 +16780,7 @@ window._guestCouponAllowed = (result && result.used === false);
     console.error("❌ Coupon validation failed", err);
   }
 }
-  
-async function showWalletBalance(){
+  async function showWalletBalance(){
 
 const mobile = localStorage.getItem("userMobile");
 
@@ -16766,10 +16789,8 @@ alert("Login required");
 return;
 }
 
-
 const banner = document.getElementById("walletBalanceBanner");
 
-// ⭐ ADD THESE 2 LINES HERE
 banner.innerHTML = "💳 Wallet is loading...";
 banner.style.display = "block";
   
@@ -16781,12 +16802,21 @@ const data = await res.json();
 
 if(data.success){
 
+walletBalance = Number(data.balance) || 0;
+
+const walletBox = document.getElementById("walletApplyBox");
+const walletText = document.getElementById("walletBalanceText");
+
+if(walletBalance > 0 && walletBox && walletText){
+  walletBox.classList.remove("hidden");
+  walletText.innerText = "₹ " + walletBalance.toFixed(2) + " available";
+}
+
 const currency = window.CURRENCY || "₹";
 
-  
 banner.innerHTML =
 "💰 Wallet Balance : " +
-currency + " " + Number(data.balance).toFixed(2);
+currency + " " + walletBalance.toFixed(2);
 
 banner.style.display = "block";
 
