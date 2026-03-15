@@ -5834,12 +5834,28 @@ async function recheckEligibilityOnDispatchModeChange() {
 
     
 function buildOrderPayloadForDebug() {
+    console.log("🚀 buildOrderPayloadForDebug() CALLED");
   const inv = window._checkoutInvoice;
   const drawer = window._drawerTotals || {};
-
+console.log("📦 Drawer Totals Snapshot", drawer);
+  console.log("🧾 Checkout Invoice Snapshot", inv);
   const couponDiscFinal =
     Number(drawer.offerDiscount || 0) +
     Number(drawer.rewardDiscount || 0);
+  console.log("🎟 Coupon Discount Breakdown", {
+    offerDiscount: drawer.offerDiscount,
+    rewardDiscount: drawer.rewardDiscount,
+    totalCouponDiscount: couponDiscFinal
+  });
+
+  console.log("💰 Wallet Debug", {
+    walletUsed: window.walletUsed,
+    walletUsedFinal: Number(window.walletUsed || 0)
+  });
+
+  console.log("🎁 Signup Discount Debug", {
+    signupDiscount: Number(inv?.signupDiscount || 0)
+  });
 
   const payload = {
     orderType: document.getElementById("orderType")?.value,
@@ -5877,7 +5893,13 @@ walletUsed: Number(window.walletUsed || 0),
         : ""
   };
 
-  console.log("🧪 ORDER DEBUG PAYLOAD", payload);
+  console.log("🧪 FINAL ORDER DEBUG PAYLOAD", payload);
+
+  console.log("✅ Checkout discounts ready for invoice", {
+    couponDiscount: payload.couponDiscount,
+    signupDiscount: payload.signupDiscount,
+    walletUsed: payload.walletUsed
+  });
   return payload;
 }
 
