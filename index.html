@@ -16898,7 +16898,7 @@ const cb = document.getElementById("useWalletCheckbox");
 if(!window._discountEngineReady){
 
 console.log("⏳ Wallet blocked → discount engine not ready");
-
+showCouponError("Please wait, best offers and coupons are still loading.");
 cb.checked = false;
 
 return;
