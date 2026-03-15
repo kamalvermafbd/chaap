@@ -9595,7 +9595,9 @@ function closeCartDrawer() {
  if (cartWasOpened) {
     document.getElementById("cartHandle").style.display = "flex";
   }
-
+if (cartWasOpened && showArrow) {
+    document.getElementById("cartHandle").style.display = "flex";
+  }
   console.log("===== CART MOTIVATION DEBUG =====");
 console.log("_appliedCouponType:", window._appliedCouponType);
 console.log("_rewardMotivation:", window._rewardMotivation);
