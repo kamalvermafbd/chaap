@@ -5752,8 +5752,21 @@ if (!res || res.allowed !== true) {
   courierCharge: window.courierCharge,
   courierPrice: window.courierPrice,
   totalWeight: window.totalWeight,
-  orderAmount: window.cartTotalAmount
+  orderAmount: window.cartTotalAmount,
 });
+
+    console.log("💳 WALLET DEBUG BEFORE PLACE ORDER", {
+  walletBalance: window.walletBalance,
+  walletUsed: window.walletUsed,
+  billAmount:
+    (window._checkoutInvoice?.taxableAmount || 0) +
+    (window._checkoutInvoice?.cgst || 0) +
+    (window._checkoutInvoice?.sgst || 0) +
+    (window._checkoutInvoice?.igst || 0),
+  deliveryCharge: window._checkoutInvoice?.deliveryCharge,
+  netPayable: window._checkoutInvoice?.netPayable
+});
+    
 // 🔓 ENABLE Place Order after success
 if (placeBtn) {
   placeBtn.disabled = false;
@@ -6361,7 +6374,7 @@ billAmount: Number(inv.taxableAmount + inv.cgst + inv.sgst + inv.igst),
 rewardcoupon: Number(inv.rewardDiscount || 0),
 paidcoupon: Number(inv.paidCouponDiscount || 0),
 netpayable: Number(inv.netPayable || 0),
-
+walletUsed: Number(window.walletUsed || 0),
 couponId:
   inv.couponId ||
   selectedCoupon?.id ||
@@ -6405,6 +6418,14 @@ lng: orderType === "Home Delivery"
     }
   }
 })();
+console.log("💰 FINAL AMOUNT CHECK BEFORE API", {
+  baseTotal: orderData.baseTotal,
+  billAmount: orderData.billAmount,
+  deliveryCharges: orderData.deliveryCharges,
+  courierCharges: orderData.courierCharges,
+  walletUsed: orderData.walletUsed,
+  netpayable: orderData.netpayable
+});
 
   
 console.log("👤 userType:", userType);
