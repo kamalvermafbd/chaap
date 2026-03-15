@@ -14425,11 +14425,20 @@ const gstBase = isDeliveryTaxable
 const billAmount = gstBase + taxTotal;
 
   const postTaxDiscount = reward + paid;
-
+// ⭐ WALLET CALCULATION
+const walletUsed = Math.min(walletBalance || 0, billAmount);
 // ✅ FINAL
 const netPayable = isDeliveryTaxable
-  ? billAmount - postTaxDiscount
-  : billAmount + deliveryAmt - postTaxDiscount;
+  ? billAmount - postTaxDiscount - walletUsed
+  : billAmount + deliveryAmt - postTaxDiscount - walletUsed;
+  window.walletUsed = walletUsed;
+console.log("💳 WALLET CHECK", {
+  walletBalance,
+  billAmount,
+  walletUsed,
+  postTaxDiscount,
+  netPayable
+});
 
   /* ================= RENDER TOTALS ================= */
   // 1️⃣ Items
@@ -14883,7 +14892,13 @@ const taxTotal = cgst + sgst + igst;
 
 // 👉 Bill amount NEVER includes delivery twice
 const billAmount = gstBase + taxTotal;
+  
+// ⭐ WALLET APPLY (CHECKOUT STAGE)
+let walletUsedFinal = Math.min(walletBalance || 0, billAmount);
 
+// expose globally for payload + invoice
+window.walletUsed = walletUsedFinal;
+  
 /* ======================
    NET PAYABLE
 ====================== */
@@ -16114,6 +16129,20 @@ if (paid > 0) {
     </div>`;
 } else paidBox.classList.add("hidden");
 
+// ⭐ WALLET USED
+const walletBox = document.getElementById("invWallet");
+
+if (window.walletUsed > 0) {
+  walletBox.classList.remove("hidden");
+  walletBox.innerHTML = `
+    <div class="flex justify-between text-blue-600">
+      <span>Wallet Used</span>
+      <span>−${fmt(window.walletUsed)}</span>
+    </div>`;
+} else {
+  walletBox.classList.add("hidden");
+}
+  
   document.getElementById("invNet").innerText = fmt(netPayable);
   document.getElementById("invPayment").innerText =
     `Payment: ${inv.paymentMethod || ""}`;
@@ -17178,6 +17207,9 @@ box.innerText =
   <div id="invSignup" class="text-green-600 hidden"></div>
     <div id="invReward" class="text-green-600 hidden"></div>
 <div id="invPaid" class="text-green-600 hidden"></div>
+    
+<!-- ⭐ ADD WALLET HERE -->
+<div id="invWallet" class="text-blue-600 hidden"></div>
 </div>
 
 
