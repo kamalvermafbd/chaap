@@ -9553,6 +9553,7 @@ showCouponHintPlaceholder();
   
  window._offersReady = false;
 const rewardPromise = fetchRewardMotivationForCart();
+  const offersPromise = fetchOffersFromBackend();
  closeCheckout();
  
   //  OPEN DRAWER INSTANTLY (NO DELAY)
@@ -9562,9 +9563,17 @@ const rewardPromise = fetchRewardMotivationForCart();
 
   // Fetch offers in background (NO await)
 
-fetchOffersFromBackend().then(() => {
+//fetchOffersFromBackend().then(() => {
+ // window._offersReady = true;
+  //updateDrawerTotals();
+  Promise.all([offersPromise, rewardPromise]).then(() => {
+
   window._offersReady = true;
+
+  console.log("✅ Offers + Rewards loaded → checkout allowed");
+
   updateDrawerTotals();
+
 });
 
 
