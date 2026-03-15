@@ -5351,6 +5351,13 @@ function onDispatchModeChange() {
         courierMode: window.__COURIER_MODE,
         orderTypeUI: document.getElementById("orderType")?.value
       });
+// ⭐ REBUILD CHECKOUT INVOICE (wallet reapply + courier charge reflect)
+setTimeout(() => {
+  if (typeof updateCheckoutInvoice === "function") {
+    updateCheckoutInvoice();
+  }
+}, 50);
+
     });
 
     return;
@@ -14427,11 +14434,13 @@ const billAmount = gstBase + taxTotal;
   const postTaxDiscount = reward + paid;
 // ⭐ WALLET CALCULATION
 const walletUsed = Math.min(walletBalance || 0, billAmount);
-// ✅ FINAL
+
 const netPayable = isDeliveryTaxable
   ? billAmount - postTaxDiscount - walletUsed
   : billAmount + deliveryAmt - postTaxDiscount - walletUsed;
-  window.walletUsed = walletUsed;
+
+window.walletUsed = walletUsed;
+  
 console.log("💳 WALLET CHECK", {
   walletBalance,
   billAmount,
@@ -14583,6 +14592,25 @@ paidBox.innerHTML = `
   </div>`;
 
 } else paidBox.classList.add("hidden");
+
+  // 8️⃣ Wallet Used
+const walletBox = document.getElementById("invWallet");
+
+if (walletBox && window.walletUsed > 0) {
+
+  walletBox.classList.remove("hidden");
+
+  walletBox.innerHTML = `
+    <div class="flex justify-between text-blue-600">
+      <span>Wallet Used</span>
+      <span>−${fmt(window.walletUsed)}</span>
+    </div>`;
+
+} else if (walletBox) {
+
+  walletBox.classList.add("hidden");
+
+}
 
   document.getElementById("invNet").innerText = fmt(netPayable);
   document.getElementById("invPayment").innerText =
@@ -14903,8 +14931,8 @@ window.walletUsed = walletUsedFinal;
    NET PAYABLE
 ====================== */
 const netPayable = isDeliveryTaxable
-  ? billAmount - postTaxDiscount
-  : billAmount + deliveryAmt - postTaxDiscount;
+  ? billAmount - postTaxDiscount - walletUsedFinal
+  : billAmount + deliveryAmt - postTaxDiscount - walletUsedFinal;
 
   
   console.log("🧪 PREVIEW DEBUG", {
@@ -17209,7 +17237,7 @@ box.innerText =
 <div id="invPaid" class="text-green-600 hidden"></div>
     
 <!-- ⭐ ADD WALLET HERE -->
-<div id="invWallet" class="text-blue-600 hidden"></div>
+<div id="invWallet" class="hidden"></div>
 </div>
 
 
