@@ -12156,6 +12156,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 function onViewCartClick() {
+  const cart = getCart();
+
+if (!cart || cart.length === 0) {
+  showError("Your cart is empty. Please add items first.");
+  return;
+}
   showCouponHintPlaceholder(); 
   
   const drawer = document.getElementById("cartDrawer");
