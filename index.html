@@ -17045,13 +17045,30 @@ box.style.background = "#e8f7ec";
 box.style.color = "#1a7f37";
 box.style.border = "1px solid #b7ebc6";
 
+const cartTotal = getCartTotal ? getCartTotal() : 0;
+const walletUsed = Math.min(walletBalance, cartTotal);
+const remaining = Math.max(0, cartTotal - walletUsed);
+
+const walletCheckbox = document.getElementById("useWallet");
+
+if(walletUsed > 0 && walletCheckbox && walletCheckbox.checked){
+
+box.innerText =
+`💳 Wallet ${fmt(walletUsed)} applied successfully. Remaining payable ${fmt(remaining)}.`;
+
+}else{
+
 box.innerText =
 `💳 You can use your wallet balance of ${fmt(walletBalance)} for this order.`;
+
+}
 
 }
 }
 }
 }
+
+  
 </script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
