@@ -8404,7 +8404,8 @@ async function saveCartToBackend(cartData = null) {
       discPercent: Number(item.discPercent || 0),
       itemId: item.itemId || "",
       variantId: item.variantId || "",
-      image: item.image || ""
+      image: item.image || "",
+   weight: Number(item.weight || 0)   // ⭐ ADD THIS
     }));
 
     try {
