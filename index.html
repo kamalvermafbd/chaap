@@ -3675,7 +3675,7 @@ if (!isLoggedIn()) {
     const menuItemFull = (window.menuItems || []).find(
   m => m.itemId == itemId
 );
-
+const weight = Number(menuItemFull?.weight || 0);   // ⭐ ADD THIS
     const qty = 1;
 
     const total = rate * qty;
@@ -3692,7 +3692,8 @@ if (!isLoggedIn()) {
       itemId,
       variantId,
       discPercent: Number(discPercent),
-       image: menuItemFull?.image || ""
+       image: menuItemFull?.image || "",
+    weight
     };
 
     if (discPercent > 0) {
@@ -8529,7 +8530,8 @@ async function onUserLogin(mobile) {
     discPercent: Number(i.discPercent || 0),
     itemId: i.itemId || "",
     variantId: i.variantId || "",
-    image: i.image || ""
+    image: i.image || "",
+    weight: Number(i.weight || 0)   // ⭐ ADD THIS
   }));
 
   // -------------------------------
@@ -8545,7 +8547,8 @@ async function onUserLogin(mobile) {
     discPercent: Number(i.discPercent || 0),
     itemId: i.itemId || "",
     variantId: i.variantId || "",
-    image: i.image || ""
+    image: i.image || "",
+  weight: Number(i.weight || 0)   // ⭐ ADD THIS
   }));
 
   // -------------------------------
@@ -8557,6 +8560,7 @@ async function onUserLogin(mobile) {
   // 3D) Final Normalize
   // -------------------------------
   const finalMerged = merged.map(item => {
+     item.weight = Number(item.weight || 0); 
     item.qty = Number(item.qty || 1);
     item.rate = Number(item.rate || 0);
     item.discPercent = Number(item.discPercent || 0);
