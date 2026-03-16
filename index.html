@@ -17047,7 +17047,8 @@ box.style.color = "#1a7f37";
 box.style.border = "1px solid #b7ebc6";
 
 const cartTotal = parseFloat(
-  document.getElementById("drawerTotalAmount")?.innerText || 0
+  (document.getElementById("drawerTotalAmount")?.innerText || "0")
+    .replace(/[^\d.]/g, "")
 );
 console.log("🧪 CartTotal:", cartTotal);   // ⭐ LOG-2
   
