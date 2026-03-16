@@ -10219,6 +10219,12 @@ function removeAllOldMultiEvents() {
 }
 function buildCartObject(itemId, variantId, meta = {}) {
 
+console.log("BUILD CART OBJECT CALLED");
+console.log("ITEM ID:", itemId);
+console.log("VARIANT ID:", variantId);
+console.log("META RECEIVED:", meta);
+
+  
   itemId = String(itemId || "");
   variantId = String(variantId || "");
 
@@ -10226,7 +10232,10 @@ function buildCartObject(itemId, variantId, meta = {}) {
   const menuItem = window.menuItems?.find(m =>
     String(m.itemId) === itemId
   );
+console.log("MENU ITEM FOUND:", menuItem);
+console.log("MENU WEIGHT:", menuItem?.weight);
 
+  
   let variant = null;
   if (menuItem?.variants && variantId) {
     variant = menuItem.variants.find(v =>
@@ -10249,11 +10258,13 @@ function buildCartObject(itemId, variantId, meta = {}) {
     discPercent: discount,
     qty: 1,
     image: menuItem?.image || "",
-
+ weight: Number(menuItem?.weight || 0),   // ⭐ ADD THIS
     // UI helpers — optional
     rate: price,
     total: price,
   };
+
+  
 }
 
 function finalizeCartUpdate(cartArr) {
