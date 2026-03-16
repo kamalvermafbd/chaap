@@ -6374,7 +6374,7 @@ billAmount: Number(inv.taxableAmount + inv.cgst + inv.sgst + inv.igst),
 rewardcoupon: Number(inv.rewardDiscount || 0),
 paidcoupon: Number(inv.paidCouponDiscount || 0),
 netpayable: Number(inv.netPayable || 0),
-walletUsed: Number(window.walletUsed || 0),
+walletUsed: Math.abs(Number(window.walletUsed || 0)),
 couponId:
   inv.couponId ||
   selectedCoupon?.id ||
