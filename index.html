@@ -5515,7 +5515,9 @@ function hideInvoiceProcessingOverlay() {
 
     
 async function canProceedPlaceOrder() {
-// ===============================
+
+  updateCartWeightByMobileAPI();
+    // ===============================
 // 🔒 PROCESSING STATE (default)
 // ===============================
   // 🔒 Always sync Courier mode from UI (single source of truth)
