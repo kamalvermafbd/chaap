@@ -10270,7 +10270,10 @@ function finalizeCartUpdate(cartArr) {
  async function updateCart(itemId, variantId = "", action, meta = {}) {
 
   console.log("🟡 updateCart drawer");
-
+console.log("ITEM:", itemId);
+console.log("VARIANT:", variantId);
+console.log("ACTION:", action);
+console.log("META:", meta);
   // 🔒 START LOCK
   window._cartUpdating = true;
   syncCheckoutButton();
@@ -10289,7 +10292,15 @@ function finalizeCartUpdate(cartArr) {
 
   if (action === "add") {
     if (existing) existing.qty++;
-    else cartArr.push(buildCartObject(itemId, variantId, meta));
+    else {
+
+  const obj = buildCartObject(itemId, variantId, meta);
+
+  console.log("🧪 BUILD CART OBJECT:", obj);
+  console.log("🧪 WEIGHT IN OBJECT:", obj?.weight);
+
+  cartArr.push(obj);
+}
     cartChanged = true;
   }
 
@@ -10308,6 +10319,7 @@ function finalizeCartUpdate(cartArr) {
   if (!cartChanged) return unlockDrawer();
 
   // 🔥 save + UI refresh is one transaction
+   console.log("🧪 FINAL CART BEFORE SAVE:", cartArr);
   setCart(cartArr);
 
   try {
