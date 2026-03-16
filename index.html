@@ -17008,7 +17008,8 @@ banner.style.display = "block";
 function toggleWalletUse(){
 
 const cb = document.getElementById("useWalletCheckbox");
-
+console.log("Wallet checkbox state:", cb.checked);   // ⭐ add
+  
 if(!window._discountEngineReady){
 
 console.log("⏳ Wallet blocked → discount engine not ready");
@@ -17019,11 +17020,11 @@ return;
 } 
 useWallet = cb.checked;
 updateDrawerTotals();
-  checkDiscountEngineReady();
+checkDiscountEngineReady();
 }
 
 function checkDiscountEngineReady(){
-
+console.log("🔍 checkDiscountEngineReady() called");
 if(window._offersReady && window._couponsReady){
 
 window._discountEngineReady = true;
@@ -17049,11 +17050,13 @@ box.style.border = "1px solid #b7ebc6";
 const cartTotal = parseFloat(
   document.getElementById("drawerTotalAmount")?.innerText || 0
 );
+console.log("🧪 CartTotal:", cartTotal);   // ⭐ LOG-2
+  
 const walletUsed = Math.min(walletBalance, cartTotal);
 const remaining = Math.max(0, cartTotal - walletUsed);
-
+console.log("💳 walletBalance:", walletBalance, "walletUsed:", walletUsed, "remaining:", remaining);   // ⭐ LOG-3
 const walletCheckbox = document.getElementById("useWalletCheckbox");
-
+console.log("☑ walletCheckbox.checked:", walletCheckbox?.checked);   // ⭐ LOG-4
 if(walletUsed > 0 && walletCheckbox && walletCheckbox.checked){
 
 box.innerText =
