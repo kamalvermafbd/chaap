@@ -17049,7 +17049,7 @@ const cartTotal = window.cartTotal || 0;
 const walletUsed = Math.min(walletBalance, cartTotal);
 const remaining = Math.max(0, cartTotal - walletUsed);
 
-const walletCheckbox = document.getElementById("useWallet");
+const walletCheckbox = document.getElementById("useWalletCheckbox");
 
 if(walletUsed > 0 && walletCheckbox && walletCheckbox.checked){
 
