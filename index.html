@@ -10258,7 +10258,7 @@ console.log("MENU WEIGHT:", menuItem?.weight);
     discPercent: discount,
     qty: 1,
     image: menuItem?.image || "",
- weight: Number(menuItem?.weight || 0),   // ⭐ ADD THIS
+ weight: Number(variant?.weight || menuItem?.weight || 0)
     // UI helpers — optional
     rate: price,
     total: price,
