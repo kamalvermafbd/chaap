@@ -3251,7 +3251,7 @@ function populateCategoryDropdown(items) {
 
     let menuItems = [];
  
-const API_BASE = "https://script.google.com/macros/s/AKfycbwGgeLauDSRvhrLobe2wXy2ygd3uCU_slHT_22h5HXq_mqPRaV_hxcIXVuhSA_WToEi/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbyGKZT8kwjOpzW2z-jXYS8JmeUJqYybTWDUaqh9YVz3dCTa8zGuPDoWxqykLEyCZ16J/exec";
 
 // ===============================
 // API HELPER
@@ -3675,7 +3675,11 @@ if (!isLoggedIn()) {
     const menuItemFull = (window.menuItems || []).find(
   m => m.itemId == itemId
 );
+
+    console.log("MENU ITEM FOUND:", menuItemFull);
 const weight = Number(menuItemFull?.weight || 0);   // ⭐ ADD THIS
+console.log("WEIGHT FROM MENU:", weight);
+    
     const qty = 1;
 
     const total = rate * qty;
@@ -3693,7 +3697,7 @@ const weight = Number(menuItemFull?.weight || 0);   // ⭐ ADD THIS
       variantId,
       discPercent: Number(discPercent),
        image: menuItemFull?.image || "",
-    weight
+   weight: Number(menuItemFull?.weight || 0)
     };
 
     if (discPercent > 0) {
@@ -8504,6 +8508,7 @@ function mergeCarts(localCart, backendCart) {
   map.forEach(item => finalCart.push(item));
   return finalCart;
 }
+  
 async function onUserLogin(mobile) {
 
   // ALWAYS load email first (IMPORTANT)
@@ -8521,7 +8526,7 @@ async function onUserLogin(mobile) {
   // -------------------------------
   const backendRes = await apiPost("getCart", { mobile });
   const backendCartRaw = backendRes.cart || [];
-
+console.log("BACKEND CART RAW:", backendCartRaw);
   const backendCart = backendCartRaw.map(i => ({
     name: i.name || "",
     unit: i.unit || "",
@@ -8533,7 +8538,7 @@ async function onUserLogin(mobile) {
     image: i.image || "",
     weight: Number(i.weight || 0)   // ⭐ ADD THIS
   }));
-
+console.log("BACKEND CART NORMALIZED:", backendCart);
   // -------------------------------
   // 2) Read local guest cart
   // -------------------------------
@@ -8550,12 +8555,12 @@ async function onUserLogin(mobile) {
     image: i.image || "",
   weight: Number(i.weight || 0)   // ⭐ ADD THIS
   }));
-
+console.log("GUEST CART NORMALIZED:", guestCart);
   // -------------------------------
   // 3A) Merge guest + backend (ONLY ONCE)
   // -------------------------------
   let merged = mergeCarts(guestCart, backendCart);
-
+console.log("MERGED CART RESULT:", merged);
   // -------------------------------
   // 3D) Final Normalize
   // -------------------------------
@@ -8585,6 +8590,7 @@ async function onUserLogin(mobile) {
   window.cart = finalMerged;
 
   localStorage.setItem("userEmail", email);
+  console.log("MERGED CART RESULT:", merged);
   await saveCartToBackend(finalMerged);
 
   // Clear guest cart
