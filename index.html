@@ -17045,7 +17045,7 @@ box.style.background = "#e8f7ec";
 box.style.color = "#1a7f37";
 box.style.border = "1px solid #b7ebc6";
 
-const cartTotal = getCartTotal ? getCartTotal() : 0;
+const cartTotal = window.cartTotal || 0;
 const walletUsed = Math.min(walletBalance, cartTotal);
 const remaining = Math.max(0, cartTotal - walletUsed);
 
