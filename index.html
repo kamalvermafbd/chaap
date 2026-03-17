@@ -12002,17 +12002,7 @@ let payable = subtotal - offerDiscount;   // GST base
 if (payable < 0) payable = 0;
 payable = Number(payable.toFixed(2));
 // ⭐ WALLET APPLY (before tax calculation)
-  walletUsed = 0;
-// 🛑 GUARD → wallet tabhi apply hoga jab discount engine ready ho
-if(!window._discountEngineReady){
-useWallet = false;
-}
-if(useWallet && walletBalance > 0){
-walletUsed = Math.min(walletBalance, payable);
-payable = payable - walletUsed;
-if (payable < 0) payable = 0;
-payable = Number(payable.toFixed(2));
-}
+
 // =====================================================
 // ⭐⭐ 3) WALLET (after tax) discounts
 // =====================================================
@@ -12028,6 +12018,20 @@ try {
 // 🔴 RED FIX: include PAID coupon
 const afterTaxWallet = signupDiscount + rewardDiscount + paidDiscount;
 
+walletUsed = 0;
+// 🛑 GUARD → wallet tabhi apply hoga jab discount engine ready ho
+if(!window._discountEngineReady){
+useWallet = false;
+}
+if(useWallet && walletBalance > 0){
+  
+walletUsed = Math.min(walletBalance, Math.max(0, payable));
+  
+  payable = payable - walletUsed;
+if (payable < 0) payable = 0;
+payable = Number(payable.toFixed(2));
+}
+  
   // =====================================================
   // ========== 4) TAX + SERVICE CHARGE ==================
   // =====================================================
@@ -12045,7 +12049,8 @@ const afterTaxWallet = signupDiscount + rewardDiscount + paidDiscount;
   let igstAmt = taxable * ((t.igstPercent || 0) / 100);
 
   let grandTotal = taxable + cgstAmt + sgstAmt + igstAmt;
-let netPayable = grandTotal - afterTaxWallet;
+let netPayable = grandTotal - afterTaxWallet - walletUsed;
+  
 if (netPayable < 0) netPayable = 0;
 netPayable = Number(netPayable.toFixed(2));
 
