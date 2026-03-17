@@ -6146,6 +6146,32 @@ if (!(await canProceedPlaceOrder())) {
   resetPlaceOrderBtn();
   return;
 }
+
+
+// 🔒 FINAL WALLET BALANCE RECHECK (MULTI TAB SAFETY)
+const previousBalance = walletBalance;
+
+await showWalletBalance(); // fetch latest wallet balance
+
+console.log("💳 Wallet recheck before order", {
+  previousBalance,
+  latestBalance: walletBalance,
+  walletUsed: window.walletUsed
+});
+
+if (Number(window.walletUsed || 0) > Number(walletBalance || 0)) {
+
+  alert("⚠️ Wallet balance changed. Please refresh cart.");
+
+  useWallet = false;
+  updateDrawerTotals();
+
+  resetPlaceOrderBtn();
+  window._orderLock = false;
+
+  return;
+} 
+  
 await onTestPreplaceClick();
  // 🔴🔴🔴 FINAL INVOICE HARD LOCK (SOURCE OF TRUTH)
 if (!window._checkoutInvoice || !Array.isArray(window._checkoutInvoice.items)) {
