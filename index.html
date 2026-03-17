@@ -14541,12 +14541,20 @@ const gstBase = isDeliveryTaxable
 const billAmount = gstBase + taxTotal;
 
   const postTaxDiscount = reward + paid;
-// ⭐ WALLET CALCULATION
-const walletUsed = Math.min(walletBalance || 0, billAmount + deliveryAmt);
 
-const netPayable = isDeliveryTaxable
-  ? billAmount - postTaxDiscount - walletUsed
-  : billAmount + deliveryAmt - postTaxDiscount - walletUsed;
+// ⭐ WALLET CAP after coupon/discount
+const walletCap = isDeliveryTaxable
+  ? billAmount - postTaxDiscount
+  : billAmount + deliveryAmt - postTaxDiscount;
+
+const walletUsed = Math.min(walletBalance || 0, Math.max(0, walletCap));
+
+const netPayable = Math.max(
+  0,
+  isDeliveryTaxable
+    ? billAmount - postTaxDiscount - walletUsed
+    : billAmount + deliveryAmt - postTaxDiscount - walletUsed
+);
 
 window.walletUsed = walletUsed;
   
