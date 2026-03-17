@@ -12020,14 +12020,21 @@ const afterTaxWallet = signupDiscount + rewardDiscount + paidDiscount;
 
 walletUsed = 0;
 // 🛑 GUARD → wallet tabhi apply hoga jab discount engine ready ho
+
+// ⭐ remaining amount after reward / prepaid
+let payableBeforeWallet = payable - rewardDiscount - paidDiscount;
+
+if (payableBeforeWallet < 0) payableBeforeWallet = 0;
+  
 if(!window._discountEngineReady){
 useWallet = false;
 }
 if(useWallet && walletBalance > 0){
+
+walletUsed = Math.min(walletBalance, payableBeforeWallet);
+
+payableBeforeWallet = payableBeforeWallet - walletUsed;
   
-walletUsed = Math.min(walletBalance, Math.max(0, payable));
-  
-  payable = payable - walletUsed;
 if (payable < 0) payable = 0;
 payable = Number(payable.toFixed(2));
 }
