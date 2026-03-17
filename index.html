@@ -15039,8 +15039,14 @@ if (!isDeliveryTaxable) {
 
 if (payableBeforeWallet < 0) payableBeforeWallet = 0;
 
-// ⭐ wallet should apply AFTER reward/prepaid
-let walletUsedFinal = Math.min(walletBalance || 0, payableBeforeWallet);
+
+// ⭐ wallet cap = billAmount - reward - paid
+let walletCap = billAmount - reward - paid;
+
+if (walletCap < 0) walletCap = 0;
+
+// apply wallet only upto remaining amount
+let walletUsedFinal = Math.min(walletBalance || 0, walletCap);
   
 // expose globally for payload + invoice
 window.walletUsed = walletUsedFinal;
@@ -15048,9 +15054,12 @@ window.walletUsed = walletUsedFinal;
 /* ======================
    NET PAYABLE
 ====================== */
-const netPayable = isDeliveryTaxable
-  ? billAmount - postTaxDiscount - walletUsedFinal
-  : billAmount + deliveryAmt - postTaxDiscount - walletUsedFinal;
+const netPayable = Math.max(
+  0,
+  isDeliveryTaxable
+    ? billAmount - postTaxDiscount - walletUsedFinal
+    : billAmount + deliveryAmt - postTaxDiscount - walletUsedFinal
+);
 
   
   console.log("🧪 PREVIEW DEBUG", {
