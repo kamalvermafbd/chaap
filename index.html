@@ -15030,9 +15030,18 @@ const taxTotal = cgst + sgst + igst;
 // 👉 Bill amount NEVER includes delivery twice
 const billAmount = gstBase + taxTotal;
   
-// ⭐ WALLET APPLY (CHECKOUT STAGE)
-let walletUsedFinal = Math.min(walletBalance || 0, billAmount+deliveryAmt);
+// ⭐ remaining amount after reward / prepaid
+let payableBeforeWallet = billAmount - postTaxDiscount;
 
+if (!isDeliveryTaxable) {
+  payableBeforeWallet = payableBeforeWallet + deliveryAmt;
+}
+
+if (payableBeforeWallet < 0) payableBeforeWallet = 0;
+
+// ⭐ wallet should apply AFTER reward/prepaid
+let walletUsedFinal = Math.min(walletBalance || 0, payableBeforeWallet);
+  
 // expose globally for payload + invoice
 window.walletUsed = walletUsedFinal;
   
