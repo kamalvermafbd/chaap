@@ -15041,8 +15041,10 @@ if (payableBeforeWallet < 0) payableBeforeWallet = 0;
 
 
 // ⭐ wallet cap = billAmount - reward - paid
-let walletCap = billAmount - reward - paid;
-
+let walletCap = isDeliveryTaxable
+  ? billAmount - postTaxDiscount
+  : billAmount + deliveryAmt - postTaxDiscount;
+  
 if (walletCap < 0) walletCap = 0;
 
 // apply wallet only upto remaining amount
