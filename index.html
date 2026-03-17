@@ -6158,19 +6158,33 @@ console.log("💳 Wallet recheck before order", {
   latestBalance: walletBalance,
   walletUsed: window.walletUsed
 });
-
 if (Number(window.walletUsed || 0) > Number(walletBalance || 0)) {
 
-  alert("⚠️ Wallet balance changed. Please refresh cart.");
+  alert("⚠️ Wallet balance changed. Cart totals will refresh.");
 
+  // disable wallet usage
   useWallet = false;
+
+  // refresh totals
   updateDrawerTotals();
 
+  // refresh checkout invoice also
+  try {
+    await updateCheckoutInvoice();
+  } catch(e) {
+    console.warn("Invoice refresh skipped", e);
+  }
+
+  // hide overlay if visible
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) overlay.style.display = "none";
+
+  // reset button + unlock
   resetPlaceOrderBtn();
   window._orderLock = false;
 
   return;
-} 
+}
   
 await onTestPreplaceClick();
  // 🔴🔴🔴 FINAL INVOICE HARD LOCK (SOURCE OF TRUTH)
