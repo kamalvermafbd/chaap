@@ -17046,8 +17046,6 @@ box.style.background = "#e8f7ec";
 box.style.color = "#1a7f37";
 box.style.border = "1px solid #b7ebc6";
 
-const cartTotal = window.cartTotal || 0;
-
   const cartText = document.getElementById("drawerTotalAmount")?.innerText || "0";
 const cartTotal = parseFloat(cartText.replace("Rs.", "").replace("₹", "").trim()) || 0;
 console.log("🧪 CartTotal:", cartTotal);   // ⭐ LOG-2
