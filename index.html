@@ -17137,7 +17137,12 @@ const cartTotal = parseFloat(cartText.replace("Rs.", "").replace("₹", "").trim
 console.log("🧪 CartTotal:", cartTotal);   // ⭐ LOG-2
 
 // ⭐ remaining amount after discounts (reward/coupon already applied)
-let payableBeforeWallet = cartTotal;
+ let payableBeforeWallet =
+    cartTotal
+    - (window._drawerTotals?.offerDiscount || 0)
+    - (window._drawerTotals?.rewardDiscount || 0)
+    - (window._drawerTotals?.paidCouponDiscount || 0);
+  console.log("Final:", payableBeforeWallet);
 
 // ensure negative na ho
 payableBeforeWallet = Math.max(0, payableBeforeWallet);
