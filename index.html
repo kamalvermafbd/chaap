@@ -8233,10 +8233,18 @@ item.itemId = String(
   if (item.cat2 === "Single") {
 
     // FINAL PRICE CALCULATION (MENU SHEET)
-    const mrp  = Number(item.price);               // From menu sheet
-    const disc = Number(item.discPercent || 0);
-    const finalPrice = parseFloat((mrp - (mrp * disc / 100)).toFixed(2));
+//    const mrp  = Number(item.price);               // From menu sheet
+//    const disc = Number(item.discPercent || 0);
+    //const finalPrice = parseFloat((mrp - (mrp * disc / 100)).toFixed(2));
 
+
+const mrp  = Number(item.price); // 🔒 cart
+const menuPrice = Number(item.displayPrice || item.price); // ✅ menu
+
+const disc = Number(item.discPercent || 0);
+const finalPrice = parseFloat((menuPrice - (menuPrice * disc / 100)).toFixed(2));
+    
+  
     priceSection = `
       <div class="variant-box">
         <div class="variant-row">
@@ -8260,7 +8268,7 @@ item.itemId = String(
               <span class="mrp" 
                     style="text-decoration:line-through;color:#777;
                            margin-left:6px;font-size:13px;">
-                 ${fmt(mrp)}
+                 ${fmt(menuPrice)}
               </span>
             ` : ""}
           </div>
@@ -8296,10 +8304,17 @@ item.itemId = String(
 
     item.variants.forEach(v => {
       // FINAL PRICE CALCULATION (CAT_ALLOCATION SHEET)
-      const mrp  = Number(v.price);                  // From cat_allocation sheet
-      const disc = Number(v.discPercent || 0);
-      const finalPrice = parseFloat((mrp - (mrp * disc / 100)).toFixed(2));
+  //    const mrp  = Number(v.price);                  // From cat_allocation sheet
+//      const disc = Number(v.discPercent || 0);
+      //const finalPrice = parseFloat((mrp - (mrp * disc / 100)).toFixed(2));
 
+const mrp  = Number(v.price); // 🔒 cart
+const menuPrice = Number(v.displayPrice || v.price); // ✅ menu
+
+const disc = Number(v.discPercent || 0);
+const finalPrice = parseFloat((menuPrice - (menuPrice * disc / 100)).toFixed(2));
+
+  
       const boxId    = `box-${item.itemId}_${v.variantId}-${idx}`;
       const qtyTextId = `qtyText-${item.itemId}_${v.variantId}-${idx}`;
 
@@ -8335,7 +8350,7 @@ item.itemId = String(
             ${disc > 0 ? `
               <span style="text-decoration:line-through;
                            color:#777;margin-left:6px;font-size:13px;">
-                ${fmt(mrp)}
+              ${fmt(menuPrice)}
               </span>
             ` : ""}
           </div>
