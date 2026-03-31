@@ -2918,6 +2918,7 @@ window.showError = window.showError || function (msg) {
 document.addEventListener("DOMContentLoaded", function () {
 
   console.log("🚀 DOMContentLoaded triggered");
+  initTableFromQR();
 
   // 🔴 MEMORY CACHE CHECK
   if (window._menuMemoryCache) {
@@ -3047,7 +3048,17 @@ window.drawerSpecialCoupon = {
   amount: 0
 };
 
+function initTableFromQR(){
+  const tableNo = new URLSearchParams(window.location.search).get("table");
 
+  if(!tableNo) return "";
+
+  localStorage.setItem("activeTableNo", tableNo);
+
+  console.log("✅ Table detected from QR:", tableNo);
+
+  return tableNo;
+}
     
 function fmtNoSymbol(amount, digits = 2) {
   const n = Number(amount) || 0;
